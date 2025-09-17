@@ -1,6 +1,7 @@
 import 'package:client/models/document_status_summary.dart';
 import 'package:flutter/material.dart';
 import '../../models/document.dart';
+import '../../screens/documents/documents_screen.dart';
 
 class DocumentStatusCard extends StatelessWidget {
   final DocumentStatusSummary? documentStatusSummary;

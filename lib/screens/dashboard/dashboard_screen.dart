@@ -16,6 +16,14 @@ import '../../widgets/dashboard/case_summary_card.dart';
 import '../../widgets/dashboard/document_status_card.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
 import '../../widgets/dashboard/upcoming_deadlines_card.dart';
+import '../messages/send_message_screen.dart';
+import '../documents/upload_document_screen.dart';
+import '../appointments/book_appointment_screen.dart';
+import '../cases/cases_list_screen.dart';
+import '../documents/documents_screen.dart';
+import '../appointments/appointments_screen.dart';
+import '../tasks/tasks_screen.dart';
+import '../billing/billing_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -192,9 +200,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       _buildWelcomeSection(),
                       const SizedBox(height: 24),
                       QuickActionsCard(
-                        onUploadDocument: () {},
-                        onBookAppointment: () {},
-                        onSendMessage: () {},
+                        onUploadDocument: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const UploadDocumentScreen(),
+                            ),
+                          );
+                        },
+                        onBookAppointment: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const BookAppointmentScreen(),
+                            ),
+                          );
+                        },
+                        onSendMessage: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const SendMessageScreen(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 24),
                       CaseSummaryCard(caseSummary: _caseSummary, cases: _cases),

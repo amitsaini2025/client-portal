@@ -3,6 +3,7 @@ import 'package:client/screens/cases/cases_list_screen.dart';
 import 'package:client/screens/dashboard/recent_case/recent_case_screen.dart';
 import 'package:client/screens/documents/documents_screen.dart';
 import 'package:client/screens/profile/profile_screen.dart';
+import 'package:client/screens/tasks/tasks_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -188,6 +189,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/profile': (context) => const ProfileScreen(),
             '/recent-cases': (context) => const CasesListScreen(),
             '/documents': (context) => const DocumentsScreen(),
+            '/tasks': (context) => const TasksScreen(),
           },
         );
       },

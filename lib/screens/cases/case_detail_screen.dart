@@ -424,7 +424,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
                 color: Colors.white,
               ),
             ),
-            title: Text(document.title ?? 'Untitled'),
+            title: Text(document.name ?? 'Untitled'),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -521,7 +521,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
       if (doc.uploadedAt != null) {
         events.add(
           TimelineEvent(
-            title: 'Document Uploaded: ${doc.title}',
+            title: 'Document Uploaded: ${doc.name}',
             description: 'Document was uploaded and is ${doc.status}',
             date: doc.uploadedAt!,
             type: TimelineEventType.document,

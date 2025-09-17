@@ -60,7 +60,7 @@ class UpcomingDeadlinesCard extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: Navigate to full deadlines view
+                  Navigator.pushNamed(context, '/tasks');
                 },
                 child: const Text('View All'),
               ),
