@@ -55,17 +55,17 @@ class DocumentCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          document.title ?? 'Untitled Document',
+                          document.name ?? 'Untitled Document',
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.w600),
                         ),
 
                         const SizedBox(height: 4),
 
-                        if (document.description != null &&
-                            document.description!.isNotEmpty)
+                        if (document.fileName != null &&
+                            document.fileName!.isNotEmpty)
                           Text(
-                            document.description!,
+                            document.fileName!,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: Colors.grey.shade600),
                             maxLines: 2,
@@ -186,7 +186,7 @@ class DocumentCard extends StatelessWidget {
               ),
 
               // Additional metadata
-              if (document.fileType != null || document.filePath != null)
+              if (document.fileType != null || document.fileUrl != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 12),
                   child: Row(
@@ -206,10 +206,10 @@ class DocumentCard extends StatelessWidget {
                       ],
 
                       if (document.fileType != null &&
-                          document.filePath != null)
+                          document.fileUrl != null)
                         const SizedBox(width: 16),
 
-                      if (document.filePath != null) ...[
+                      if (document.fileUrl != null) ...[
                         Icon(
                           Icons.folder,
                           size: 16,
@@ -218,7 +218,7 @@ class DocumentCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            document.filePath!,
+                            document.fileUrl!,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: Colors.grey.shade500),
                             maxLines: 1,

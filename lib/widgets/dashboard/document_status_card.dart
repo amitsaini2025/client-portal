@@ -1,10 +1,12 @@
+import 'package:client/models/document_status_summary.dart';
 import 'package:flutter/material.dart';
 import '../../models/document.dart';
 
 class DocumentStatusCard extends StatelessWidget {
+  final DocumentStatusSummary? documentStatusSummary;
   final List<Document> documents;
 
-  const DocumentStatusCard({super.key, required this.documents});
+  const DocumentStatusCard({super.key, required this.documentStatusSummary, required this.documents});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class DocumentStatusCard extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: Navigate to documents list
+                  Navigator.pushNamed(context, '/documents');
                 },
                 child: const Text('View All'),
               ),
@@ -51,7 +53,7 @@ class DocumentStatusCard extends StatelessWidget {
                   context: context,
                   icon: Icons.check_circle,
                   label: 'Approved',
-                  value: approvedDocs.toString(),
+                  value: documentStatusSummary!.approved.toString(),
                   color: Colors.green,
                 ),
               ),
@@ -61,7 +63,7 @@ class DocumentStatusCard extends StatelessWidget {
                   context: context,
                   icon: Icons.pending,
                   label: 'Pending',
-                  value: pendingDocs.toString(),
+                  value: documentStatusSummary!.pending.toString(),
                   color: Colors.orange,
                 ),
               ),
@@ -71,7 +73,7 @@ class DocumentStatusCard extends StatelessWidget {
                   context: context,
                   icon: Icons.error,
                   label: 'Rejected',
-                  value: rejectedDocs.toString(),
+                  value: documentStatusSummary!.rejected.toString(),
                   color: Colors.red,
                 ),
               ),
@@ -227,7 +229,7 @@ class DocumentStatusCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  document.title ?? 'Untitled Document',
+                  document.name ?? 'Untitled Document',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),

@@ -56,11 +56,14 @@ class AuthService {
 
       if (response['success'] == true) {
         final token = response['data']['token'];
-        final clientData = response['data']['client'];
+        final refreshToken = response['data']['refresh_token'];
+        final clientData = response['data']['user'];
 
         // Store token securely
         await _secureStorage.write(key: _tokenKey, value: token);
         _currentToken = token;
+
+        await _secureStorage.write(key: _refreshTokenKey, value: token);
 
         // Store user data
         if (clientData != null) {
@@ -253,9 +256,10 @@ class AuthService {
       final response = await ApiService.forgotPassword(email);
 
       if (response['success'] == true) {
+        final message = response['message'];
         return {
           'success': true,
-          'message': 'Password reset link sent to your email',
+          'message': message,
         };
       } else {
         return {
@@ -270,7 +274,8 @@ class AuthService {
 
   /// Reset password
   static Future<Map<String, dynamic>> resetPassword({
-    required String token,
+    required String email,
+    required String code,
     required String password,
     required String confirmPassword,
   }) async {
@@ -280,7 +285,8 @@ class AuthService {
       }
 
       final response = await ApiService.resetPassword(
-        token: token,
+        email: email,
+        code : code,
         password: password,
         passwordConfirmation: confirmPassword,
       );

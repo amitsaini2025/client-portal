@@ -1,20 +1,23 @@
 class ApiConfig {
   // Base API configuration
-  static const String baseUrl = 'https://your-crm-domain.com/api';
+  static const String baseUrl = 'https://migrationmanager.bansalcrm.com/api';
   static const String clientPortalEndpoint = '/client-portal';
 
   // Authentication endpoints
-  static const String loginEndpoint = '/auth/login';
+  static const String loginEndpoint = '/login';
   static const String registerEndpoint = '/auth/register';
-  static const String logoutEndpoint = '/auth/logout';
-  static const String forgotPasswordEndpoint = '/auth/forgot-password';
-  static const String resetPasswordEndpoint = '/auth/reset-password';
+  static const String logoutEndpoint = '/logout';
+  static const String forgotPasswordEndpoint = '/forgot-password';
+  static const String resetPasswordEndpoint = '/reset-password';
   static const String refreshTokenEndpoint = '/auth/refresh';
 
+  // Dashboard
+  static const String dashboardEndpoint = '/dashboard';
+
   // Client portal specific endpoints
-  static const String clientProfileEndpoint = '/client-portal/profile';
-  static const String clientCasesEndpoint = '/client-portal/cases';
-  static const String clientDocumentsEndpoint = '/client-portal/documents';
+  static const String clientProfileEndpoint = '/profile';
+  static const String clientCasesEndpoint = '/recent-cases';
+  static const String clientDocumentsEndpoint = '/documents';
   static const String clientAppointmentsEndpoint =
       '/client-portal/appointments';
   static const String clientMessagesEndpoint = '/client-portal/messages';

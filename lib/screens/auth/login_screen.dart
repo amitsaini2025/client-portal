@@ -202,7 +202,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Navigate to dashboard after successful test login
       Future.delayed(const Duration(seconds: 1), () {
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        //Navigator.pushReplacementNamed(context, '/dashboard');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/dashboard',
+              (Route<dynamic> route) => false,
+        );
       });
     } catch (e) {
       setState(() {
@@ -515,7 +520,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 20),
 
                         // Register Link
-                        Row(
+                        /*Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
@@ -529,7 +534,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: const Text('Sign Up'),
                             ),
                           ],
-                        ),
+                        ),*/
                       ],
                     ),
                   ),

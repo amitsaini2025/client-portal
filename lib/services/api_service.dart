@@ -164,7 +164,7 @@ class ApiService {
       // Continue with local logout even if API call fails
       print('Logout API call failed: $e');
     } finally {
-      clearAuthToken();
+      clearAuth();
     }
     
     return {'success': true, 'message': 'Logged out successfully'};
@@ -180,7 +180,8 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> resetPassword({
-    required String token,
+    required String email,
+    required String code,
     required String password,
     required String passwordConfirmation,
   }) async {
@@ -188,7 +189,8 @@ class ApiService {
       ApiConfig.resetPasswordEndpoint,
       _buildHeaders(requiresAuth: false),
       {
-        'token': token,
+        'email': email,
+        'code': code,
         'password': password,
         'password_confirmation': passwordConfirmation,
       },
@@ -236,18 +238,51 @@ class ApiService {
     );
   }
 
-  static Future<Map<String, dynamic>> getClientCases() async {
+  static Future<Map<String, dynamic>> getDashboard() async {
     return await _makeRequest(
-      ApiConfig.clientCasesEndpoint,
+      ApiConfig.dashboardEndpoint,
       _buildHeaders(),
       null,
       'GET',
     );
   }
 
-  static Future<Map<String, dynamic>> getClientDocuments() async {
+
+  /*static Future<Map<String, dynamic>> getClientCases() async {
     return await _makeRequest(
-      ApiConfig.clientDocumentsEndpoint,
+      ApiConfig.clientCasesEndpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }*/
+
+  static Future<Map<String, dynamic>> getClientCases({
+    int page = 1,
+    int perPage = 10,
+    String search = '',
+    String status = '',
+  }) async {
+    final endpoint =
+        "${ApiConfig.clientCasesEndpoint}?page=$page&per_page=$perPage&search=$search&status=$status";
+
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+  static Future<Map<String, dynamic>> getClientDocuments({
+    int page = 1,
+    int perPage = 10,
+    String search = '',
+    String status = '',
+    String docType = ''
+  }) async {
+    return await _makeRequest(
+      "${ApiConfig.clientDocumentsEndpoint}??page=$page&per_page=$perPage&search=$search&status=$status&doc_type=$docType",
       _buildHeaders(),
       null,
       'GET',

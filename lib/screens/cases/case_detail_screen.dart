@@ -70,7 +70,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
     // Mock case data
     _case = Case(
       id: widget.caseId,
-      name: 'Student Visa Application',
+      title: 'Student Visa Application',
       status: 'in_progress',
       caseType: 'Student Visa',
       priority: 'high',
@@ -85,7 +85,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
     _documents = [
       Document(
         id: 1,
-        title: 'Passport Copy',
+        name: 'Passport Copy',
         status: 'approved',
         uploadedAt: DateTime.now().subtract(const Duration(days: 5)),
         createdAt: DateTime.now().subtract(const Duration(days: 5)),
@@ -93,7 +93,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
       ),
       Document(
         id: 2,
-        title: 'Academic Transcripts',
+        name: 'Academic Transcripts',
         status: 'pending_review',
         uploadedAt: DateTime.now().subtract(const Duration(days: 2)),
         createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -208,7 +208,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _case!.name,
+                  _case!.title,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),

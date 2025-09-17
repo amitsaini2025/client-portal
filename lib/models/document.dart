@@ -1,3 +1,4 @@
+/*
 class Document {
   final int id;
   final String? title;
@@ -267,4 +268,68 @@ class Document {
 
   @override
   int get hashCode => id.hashCode;
+}
+*/
+
+
+
+class Document {
+  final int id;
+  final String? name;
+  final String? fileName;
+  final String? fileType;
+  final String? docType;
+  final String? status;
+  final String? originalStatus;
+  final int? fileSize;
+  final DateTime? uploadedAt;
+  final DateTime? updatedAt;
+  final double? uploadedDaysAgo;
+  final String? lastUpdated;
+  final String? fileUrl;
+  final String? fileKey;
+
+  Document({
+    required this.id,
+    this.name,
+    this.fileName,
+    this.fileType,
+    this.docType,
+    this.status,
+    this.originalStatus,
+    this.fileSize,
+    this.uploadedAt,
+    this.updatedAt,
+    this.uploadedDaysAgo,
+    this.lastUpdated,
+    this.fileUrl,
+    this.fileKey,
+  });
+
+  factory Document.fromJson(Map<String, dynamic> json) {
+    return Document(
+      id: json['id'],
+      name: json['name'],
+      fileName: json['file_name'],
+      fileType: json['file_type'],
+      docType: json['doc_type'],
+      status: json['status'],
+      originalStatus: json['original_status'],
+      fileSize: json['file_size'] != null
+          ? int.tryParse(json['file_size'].toString())
+          : null,
+      uploadedAt: json['uploaded_at'] != null
+          ? DateTime.tryParse(json['uploaded_at'])
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.tryParse(json['updated_at'])
+          : null,
+      uploadedDaysAgo: json['uploaded_days_ago'] != null
+          ? double.tryParse(json['uploaded_days_ago'].toString())
+          : null,
+      lastUpdated: json['last_updated'],
+      fileUrl: json['file_url'],
+      fileKey: json['file_key'],
+    );
+  }
 }

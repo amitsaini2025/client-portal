@@ -1,6 +1,6 @@
 class Case {
   final int id;
-  final String name;
+  final String title;
   final String status;
   final int? packageId;
   final int? userId;
@@ -20,7 +20,7 @@ class Case {
 
   Case({
     required this.id,
-    required this.name,
+    required this.title,
     required this.status,
     this.packageId,
     this.userId,
@@ -41,7 +41,7 @@ class Case {
   factory Case.fromJson(Map<String, dynamic> json) {
     return Case(
       id: json['id'] ?? 0,
-      name: json['name'] ?? '',
+      title: json['title'] ?? '',
       status: json['status'] ?? '',
       packageId: json['package_id'],
       userId: json['user_id'],
@@ -67,7 +67,7 @@ class Case {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
+      'name': title,
       'status': status,
       'package_id': packageId,
       'user_id': userId,
@@ -106,7 +106,7 @@ class Case {
   }) {
     return Case(
       id: id ?? this.id,
-      name: name ?? this.name,
+      title: name ?? this.title,
       status: status ?? this.status,
       packageId: packageId ?? this.packageId,
       userId: userId ?? this.userId,
@@ -184,7 +184,7 @@ class Case {
 
   @override
   String toString() {
-    return 'Case(id: $id, name: $name, status: $status, caseNumber: $caseNumber)';
+    return 'Case(id: $id, name: $title, status: $status, caseNumber: $caseNumber)';
   }
 
   @override
@@ -196,3 +196,39 @@ class Case {
   @override
   int get hashCode => id.hashCode;
 }
+
+/*class Case {
+  final int id;
+  final String title;
+  final String caseNumber;
+  final String status;
+  final String updatedAt;
+
+  Case({
+    required this.id,
+    required this.title,
+    required this.caseNumber,
+    required this.status,
+    required this.updatedAt,
+  });
+
+  factory Case.fromJson(Map<String, dynamic> json) {
+    return Case(
+      id: json['id'] ?? 0,
+      title: json['title'] ?? '',
+      caseNumber: json['case_number'] ?? '',
+      status: json['status'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'case_number': caseNumber,
+      'status': status,
+      'updated_at': updatedAt,
+    };
+  }
+}*/

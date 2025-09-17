@@ -1,15 +1,21 @@
+import 'package:client/models/case_summary.dart';
+import 'package:client/models/dashboard_summary.dart';
+import 'package:client/models/document_status_summary.dart';
+import 'package:client/models/upcoming_deadline_summary.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
 import '../../models/case.dart';
+import '../../models/deadline.dart'; // <- new Deadline model
 import '../../models/document.dart';
-import '../../models/appointment.dart';
+import '../../models/recent_activity.dart';
 import '../../models/task.dart';
-import '../../widgets/common/loading_widget.dart';
+import '../../services/api_service.dart';
 import '../../widgets/common/error_widget.dart';
+import '../../widgets/common/loading_widget.dart';
 import '../../widgets/dashboard/case_summary_card.dart';
 import '../../widgets/dashboard/document_status_card.dart';
-import '../../widgets/dashboard/upcoming_deadlines_card.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
+import '../../widgets/dashboard/upcoming_deadlines_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -22,11 +28,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
-  // Mock data for demonstration - replace with actual API calls
+  DashboardSummary? _dashboardSummary;
+  CaseSummary? _caseSummary;
   List<Case> _cases = [];
+  DocumentStatusSummary? _documentStatusSummary;
   List<Document> _documents = [];
-  List<Appointment> _appointments = [];
+  UpcomingDeadlineSummary? _upcomingDeadlineSummary;
+  List<Deadline> _deadlines = [];
   List<Task> _tasks = [];
+  List<RecentActivity> _recentActivity = [];
 
   @override
   void initState() {
@@ -41,120 +51,106 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
 
     try {
-      // TODO: Replace with actual API calls
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      final result = await ApiService.getDashboard();
 
-      // Load mock data
-      _loadMockData();
+      if (result['success'] == true) {
+        final data = result['data'];
 
-      setState(() {
-        _isLoading = false;
-      });
+        CaseSummary? caseSummary;
+        if (data['case_summary'] != null) {
+          caseSummary = CaseSummary.fromJson(data['case_summary']);
+        }
+
+        DashboardSummary dashboardSummary = DashboardSummary.fromJson(data);
+
+        // Parse Cases
+        List<Case> cases = [];
+        if (data['recent_cases'] != null && data['recent_cases'] is List) {
+          cases =
+              (data['recent_cases'] as List)
+                  .map((e) => Case.fromJson(Map<String, dynamic>.from(e)))
+                  .toList();
+        }
+
+        // Parse Documents
+        List<Document> documents = [];
+        if (data['document_status']?['recent_documents'] != null &&
+            data['document_status']['recent_documents'] is List) {
+          documents =
+              (data['document_status']['recent_documents'] as List)
+                  .map((e) => Document.fromJson(Map<String, dynamic>.from(e)))
+                  .toList();
+        }
+
+        DocumentStatusSummary? documentStatusSummary;
+        if (data['document_status']?['summary'] != null) {
+          documentStatusSummary = DocumentStatusSummary.fromJson(
+            data['document_status']?['summary'],
+          );
+        }
+
+        UpcomingDeadlineSummary? upcomingDeadlineSummary;
+        if (data['upcoming_deadlines']?['summary'] != null) {
+          upcomingDeadlineSummary = UpcomingDeadlineSummary.fromJson(
+            data['upcoming_deadlines']?['summary'],
+          );
+        }
+        // Parse Deadlines (formerly Appointments)
+        List<Deadline> deadlines = [];
+        if (data['upcoming_deadlines']?['due_this_week_list'] != null &&
+            data['upcoming_deadlines']['due_this_week_list'] is List) {
+          deadlines =
+              (data['upcoming_deadlines']['due_this_week_list'] as List)
+                  .map((e) => Deadline.fromJson(Map<String, dynamic>.from(e)))
+                  .toList();
+        }
+
+        // Parse Tasks
+        List<Task> tasks = [];
+        if (data['tasks'] != null && data['tasks'] is List) {
+          tasks =
+              (data['tasks'] as List)
+                  .map((e) => Task.fromJson(Map<String, dynamic>.from(e)))
+                  .toList();
+        }
+
+        // Parse Recent Activity
+        List<RecentActivity> recentActivity = [];
+        if (data['recent_activity'] != null &&
+            data['recent_activity'] is List) {
+          recentActivity =
+              (data['recent_activity'] as List)
+                  .map(
+                    (e) =>
+                        RecentActivity.fromJson(Map<String, dynamic>.from(e)),
+                  )
+                  .toList();
+        }
+
+        setState(() {
+          _dashboardSummary = dashboardSummary;
+          _caseSummary = caseSummary;
+          _cases = cases;
+          _documentStatusSummary = documentStatusSummary;
+          _documents = documents;
+          _upcomingDeadlineSummary = upcomingDeadlineSummary;
+          _deadlines = deadlines;
+          _tasks = tasks;
+          _recentActivity = recentActivity;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = result['message'] ?? 'Failed to load dashboard';
+        });
+      }
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Failed to load dashboard data: ${e.toString()}';
+        _errorMessage = 'Error: ${e.toString()}';
       });
     }
-  }
-
-  void _loadMockData() {
-    // Mock cases
-    _cases = [
-      Case(
-        id: 1,
-        name: 'Immigration Visa Application',
-        status: 'in_progress',
-        createdAt: DateTime.now().subtract(const Duration(days: 30)),
-        updatedAt: DateTime.now().subtract(const Duration(hours: 2)),
-      ),
-      Case(
-        id: 2,
-        name: 'Work Permit Renewal',
-        status: 'pending_documents',
-        createdAt: DateTime.now().subtract(const Duration(days: 15)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      Case(
-        id: 3,
-        name: 'Citizenship Application',
-        status: 'completed',
-        createdAt: DateTime.now().subtract(const Duration(days: 90)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-    ];
-
-    // Mock documents
-    _documents = [
-      Document(
-        id: 1,
-        title: 'Passport Copy',
-        status: 'approved',
-        uploadedAt: DateTime.now().subtract(const Duration(days: 5)),
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-      Document(
-        id: 2,
-        title: 'Birth Certificate',
-        status: 'pending_review',
-        uploadedAt: DateTime.now().subtract(const Duration(days: 2)),
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-      Document(
-        id: 3,
-        title: 'Employment Letter',
-        status: 'rejected',
-        uploadedAt: DateTime.now().subtract(const Duration(days: 1)),
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-    ];
-
-    // Mock appointments
-    _appointments = [
-      Appointment(
-        id: 1,
-        title: 'Visa Interview',
-        date: DateTime.now().add(const Duration(days: 3)),
-        time: '10:00 AM',
-        status: 'confirmed',
-        createdAt: DateTime.now().subtract(const Duration(days: 7)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      Appointment(
-        id: 2,
-        title: 'Document Review',
-        date: DateTime.now().add(const Duration(days: 7)),
-        time: '2:00 PM',
-        status: 'pending',
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-    ];
-
-    // Mock tasks
-    _tasks = [
-      Task(
-        id: 1,
-        title: 'Submit additional documents',
-        dueDate: DateTime.now().add(const Duration(days: 5)),
-        priority: 'high',
-        status: 'pending',
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      Task(
-        id: 2,
-        title: 'Schedule medical examination',
-        dueDate: DateTime.now().add(const Duration(days: 10)),
-        priority: 'medium',
-        status: 'in_progress',
-        createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        updatedAt: DateTime.now().subtract(const Duration(hours: 12)),
-      ),
-    ];
   }
 
   @override
@@ -168,14 +164,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              // TODO: Navigate to notifications
-            },
+            onPressed: () {},
           ),
           IconButton(
             icon: const Icon(Icons.person_outline),
             onPressed: () {
-              // TODO: Navigate to profile
+              Navigator.pushNamed(context, '/profile');
             },
           ),
         ],
@@ -195,40 +189,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Welcome Section
                       _buildWelcomeSection(),
                       const SizedBox(height: 24),
-
-                      // Quick Actions
                       QuickActionsCard(
-                        onUploadDocument: () {
-                          // TODO: Navigate to document upload
-                        },
-                        onBookAppointment: () {
-                          // TODO: Navigate to appointment booking
-                        },
-                        onSendMessage: () {
-                          // TODO: Navigate to messaging
-                        },
+                        onUploadDocument: () {},
+                        onBookAppointment: () {},
+                        onSendMessage: () {},
                       ),
                       const SizedBox(height: 24),
-
-                      // Case Summary
-                      CaseSummaryCard(cases: _cases),
+                      CaseSummaryCard(caseSummary: _caseSummary, cases: _cases),
                       const SizedBox(height: 24),
-
-                      // Document Status
-                      DocumentStatusCard(documents: _documents),
+                      DocumentStatusCard(
+                        documentStatusSummary: _documentStatusSummary,
+                        documents: _documents,
+                      ),
                       const SizedBox(height: 24),
-
-                      // Upcoming Deadlines
                       UpcomingDeadlinesCard(
+                        upcomingDeadlineSummary: _upcomingDeadlineSummary,
                         tasks: _tasks,
-                        appointments: _appointments,
+                        deadlines: _deadlines,
                       ),
                       const SizedBox(height: 24),
-
-                      // Recent Activity
                       _buildRecentActivitySection(),
                     ],
                   ),
@@ -246,7 +227,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           end: Alignment.bottomRight,
           colors: [
             Theme.of(context).primaryColor,
-            Theme.of(context).primaryColor.withValues(alpha: 0.8),
+            Theme.of(context).primaryColor.withOpacity(0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
@@ -260,7 +241,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: const Icon(Icons.person, color: Colors.white, size: 30),
@@ -282,7 +263,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Text(
                       'Here\'s what\'s happening with your cases',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.white.withOpacity(0.9),
                       ),
                     ),
                   ],
@@ -296,23 +277,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _buildStatItem(
                 icon: Icons.folder_open,
                 label: 'Active Cases',
-                value:
-                    _cases
-                        .where((c) => c.status != 'completed')
-                        .length
-                        .toString(),
+                value: _dashboardSummary!.activeCases.toString(),
               ),
               const SizedBox(width: 24),
               _buildStatItem(
                 icon: Icons.description,
                 label: 'Documents',
-                value: _documents.length.toString(),
+                value: _dashboardSummary!.totalDocuments.toString(),
               ),
               const SizedBox(width: 24),
               _buildStatItem(
                 icon: Icons.schedule,
-                label: 'Appointments',
-                value: _appointments.length.toString(),
+                label: 'Deadlines',
+                value: _dashboardSummary!.totalAppointments.toString(),
               ),
             ],
           ),
@@ -330,7 +307,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.2),
+          color: Colors.white.withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -347,7 +324,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white.withValues(alpha: 0.9),
+                color: Colors.white.withOpacity(0.9),
               ),
               textAlign: TextAlign.center,
             ),
@@ -377,36 +354,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
-              TextButton(
-                onPressed: () {
-                  // TODO: Navigate to full activity log
-                },
-                child: const Text('View All'),
-              ),
+              TextButton(onPressed: () {}, child: const Text('View All')),
             ],
           ),
           const SizedBox(height: 16),
-          _buildActivityItem(
-            icon: Icons.upload_file,
-            title: 'Document uploaded',
-            subtitle: 'Passport copy uploaded for Case #123',
-            time: '2 hours ago',
-            color: Colors.blue,
-          ),
-          _buildActivityItem(
-            icon: Icons.schedule,
-            title: 'Appointment scheduled',
-            subtitle: 'Visa interview scheduled for Dec 15',
-            time: '1 day ago',
-            color: Colors.green,
-          ),
-          _buildActivityItem(
-            icon: Icons.message,
-            title: 'Message received',
-            subtitle: 'New message from your case manager',
-            time: '2 days ago',
-            color: Colors.orange,
-          ),
+          ..._recentActivity.map((activity) {
+            return _buildActivityItem(
+              icon: Icons.task,
+              title: activity.title,
+              subtitle: activity.description,
+              time: activity.timeAgo,
+              color: Colors.blue,
+            );
+          }).toList(),
         ],
       ),
     );
@@ -427,7 +387,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -448,7 +408,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(
                       context,
-                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                    ).textTheme.bodyMedium?.color?.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -459,7 +419,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(
                 context,
-              ).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+              ).textTheme.bodyMedium?.color?.withOpacity(0.5),
             ),
           ),
         ],

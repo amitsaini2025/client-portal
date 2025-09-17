@@ -38,6 +38,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (result['success'] == true) {
         setState(() {
           _successMessage = result['message'];
+          Future.delayed(const Duration(seconds: 1), () {
+            //Navigator.pushReplacementNamed(context, '/set-password');
+            Navigator.pushReplacementNamed(
+              context,
+              '/reset-password',
+              arguments: _emailController.text.trim(),
+            );
+          });
         });
       } else {
         setState(() {
@@ -103,7 +111,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Enter your email address and we\'ll send you a link to reset your password.',
+                        'Enter your email address and we\'ll send you a code.',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                         ),
@@ -169,7 +177,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 ),
                               )
                             : const Text(
-                                'Send Reset Link',
+                                'Send Code',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

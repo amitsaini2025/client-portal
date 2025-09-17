@@ -1,16 +1,21 @@
+import 'package:client/models/case_summary.dart';
 import 'package:flutter/material.dart';
 import '../../models/case.dart';
 
 class CaseSummaryCard extends StatelessWidget {
+  final CaseSummary? caseSummary;
   final List<Case> cases;
 
-  const CaseSummaryCard({super.key, required this.cases});
+  const CaseSummaryCard({super.key, required this.caseSummary,required this.cases});
 
   @override
   Widget build(BuildContext context) {
-    final activeCases = cases.where((c) => c.status != 'completed').length;
+    /*final activeCases = cases.where((c) => c.status != 'completed').length;
     final completedCases = cases.where((c) => c.status == 'completed').length;
-    final totalCases = cases.length;
+    final totalCases = cases.length;*/
+    final activeCases = caseSummary?.activeCases;
+    final completedCases = caseSummary?.completedCases;
+    final totalCases = caseSummary?.totalCases;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -33,7 +38,7 @@ class CaseSummaryCard extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: Navigate to cases list
+                  Navigator.pushNamed(context, '/recent-cases');
                 },
                 child: const Text('View All'),
               ),
@@ -196,7 +201,7 @@ class CaseSummaryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  caseItem.name,
+                  caseItem.title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -205,7 +210,7 @@ class CaseSummaryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Case #${caseItem.id}',
+                  caseItem.caseNumber.toString(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(
                       context,
