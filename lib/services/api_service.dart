@@ -248,6 +248,15 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> getMatters() async {
+    return await _makeRequest(
+      ApiConfig.mattersEndpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
 
   /*static Future<Map<String, dynamic>> getClientCases() async {
     return await _makeRequest(

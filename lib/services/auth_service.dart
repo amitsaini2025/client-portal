@@ -1,9 +1,11 @@
 import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/client.dart';
+
 import '../models/admin.dart';
+import '../models/client.dart';
 import 'api_service.dart';
 
 class AuthService {
@@ -15,33 +17,85 @@ class AuthService {
   static const String _userDataKey = 'user_data';
   static const String _biometricEnabledKey = 'biometric_enabled';
   static const String _rememberMeKey = 'remember_me';
+  static const String _selectedMatterKey = 'selected_matter_id';
 
   // Current user data
   static Client? _currentClient;
   static Admin? _currentAdmin;
   static String? _currentToken;
+  static int? _selectedMatterId;
 
   // Getters
   static Client? get currentClient => _currentClient;
+
   static Admin? get currentAdmin => _currentAdmin;
+
   static String? get currentToken => _currentToken;
+
+  static int? get selectedMatterId => _selectedMatterId;
+
   static bool get isAuthenticated => _currentToken != null;
 
-  /// Initialize authentication service
+  static bool get isMatterSelected => _selectedMatterId != null;
+
+  /// Initialize authentication service and load matter
   static Future<void> initialize() async {
     try {
-      // Check if user is already logged in
+      // Load token
       final token = await _secureStorage.read(key: _tokenKey);
       if (token != null) {
         _currentToken = token;
         await _loadUserData();
-        
-        // Update API service with the token
         ApiService.setAuthToken(token);
       }
+
+      // Load selected matter
+      final storedMatterId = await _secureStorage.read(key: _selectedMatterKey);
+      if (storedMatterId != null) {
+        _selectedMatterId = int.tryParse(storedMatterId);
+      }
     } catch (e) {
-      print('Error initializing auth service: $e');
+      print('Error initializing AuthService: $e');
     }
+  }
+
+  /// Select a matter
+  static Future<void> selectMatter(int matterId) async {
+    _selectedMatterId = matterId;
+    try {
+      await _secureStorage.write(
+        key: _selectedMatterKey,
+        value: matterId.toString(),
+      );
+    } catch (e) {
+      print('Error saving selected matter: $e');
+    }
+  }
+
+  /// Clear selected matter
+  static Future<void> clearSelectedMatter() async {
+    _selectedMatterId = null;
+    try {
+      await _secureStorage.delete(key: _selectedMatterKey);
+    } catch (e) {
+      print('Error clearing selected matter: $e');
+    }
+  }
+
+  /// Check if matter is selected
+  static Future<bool> checkMatterSelected() async {
+    if (_selectedMatterId != null) return true;
+
+    try {
+      final storedId = await _secureStorage.read(key: _selectedMatterKey);
+      if (storedId != null) {
+        _selectedMatterId = int.tryParse(storedId);
+        return true;
+      }
+    } catch (e) {
+      print('Error checking matter selection: $e');
+    }
+    return false;
   }
 
   /// Login with email/phone and password
@@ -62,7 +116,6 @@ class AuthService {
         // Store token securely
         await _secureStorage.write(key: _tokenKey, value: token);
         _currentToken = token;
-
         await _secureStorage.write(key: _refreshTokenKey, value: token);
 
         // Store user data
@@ -144,34 +197,56 @@ class AuthService {
   /// Logout user
   static Future<void> logout() async {
     try {
-      // Call logout API if token exists
+      // Call API logout if token exists
       if (_currentToken != null) {
         try {
           await ApiService.logout();
         } catch (e) {
-          // Continue with local logout even if API call fails
           print('Logout API call failed: $e');
         }
       }
 
-      // Clear local data
+      // Clear local storage
       await _secureStorage.delete(key: _tokenKey);
       await _secureStorage.delete(key: _refreshTokenKey);
       await _secureStorage.delete(key: _userDataKey);
+      await _secureStorage.delete(key: _selectedMatterKey);
 
       // Clear memory
       _currentToken = null;
       _currentClient = null;
       _currentAdmin = null;
+      _selectedMatterId = null;
 
-      // Clear API service token
       ApiService.clearAuthToken();
 
-      // Clear SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
     } catch (e) {
       print('Error during logout: $e');
+    }
+  }
+
+  /// Save user data to secure storage
+  static Future<void> _saveUserData() async {
+    if (_currentClient != null) {
+      await _secureStorage.write(
+        key: _userDataKey,
+        value: json.encode(_currentClient!.toJson()),
+      );
+    }
+  }
+
+  /// Load user data from secure storage
+  static Future<void> _loadUserData() async {
+    try {
+      final userData = await _secureStorage.read(key: _userDataKey);
+      if (userData != null) {
+        final data = json.decode(userData);
+        _currentClient = Client.fromJson(data);
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
     }
   }
 
@@ -257,10 +332,7 @@ class AuthService {
 
       if (response['success'] == true) {
         final message = response['message'];
-        return {
-          'success': true,
-          'message': message,
-        };
+        return {'success': true, 'message': message};
       } else {
         return {
           'success': false,
@@ -286,7 +358,7 @@ class AuthService {
 
       final response = await ApiService.resetPassword(
         email: email,
-        code : code,
+        code: code,
         password: password,
         passwordConfirmation: confirmPassword,
       );
@@ -316,7 +388,7 @@ class AuthService {
         final newToken = response['data']['token'];
         await _secureStorage.write(key: _tokenKey, value: newToken);
         _currentToken = newToken;
-        
+
         // Update API service with new token
         ApiService.setAuthToken(newToken);
         return true;
@@ -348,17 +420,17 @@ class AuthService {
   }
 
   /// Save user data to secure storage
-  static Future<void> _saveUserData() async {
+  /*static Future<void> _saveUserData() async {
     if (_currentClient != null) {
       await _secureStorage.write(
         key: _userDataKey,
         value: json.encode(_currentClient!.toJson()),
       );
     }
-  }
+  }*/
 
   /// Load user data from secure storage
-  static Future<void> _loadUserData() async {
+  /*static Future<void> _loadUserData() async {
     try {
       final userData = await _secureStorage.read(key: _userDataKey);
       if (userData != null) {
@@ -368,14 +440,14 @@ class AuthService {
     } catch (e) {
       print('Error loading user data: $e');
     }
-  }
+  }*/
 
   /// Clear all stored data
   static Future<void> clearAllData() async {
     await _secureStorage.deleteAll();
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    
+
     // Clear API service token
     ApiService.clearAuthToken();
   }

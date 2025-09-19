@@ -2,6 +2,7 @@ import 'package:client/screens/auth/reset_password_screen.dart';
 import 'package:client/screens/cases/cases_list_screen.dart';
 import 'package:client/screens/dashboard/recent_case/recent_case_screen.dart';
 import 'package:client/screens/documents/documents_screen.dart';
+import 'package:client/screens/matters/matters_screen.dart';
 import 'package:client/screens/profile/profile_screen.dart';
 import 'package:client/screens/tasks/tasks_screen.dart';
 import 'package:flutter/material.dart';
@@ -185,6 +186,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/register': (context) => const RegisterScreen(),
             '/forgot-password': (context) => const ForgotPasswordScreen(),
             '/reset-password': (context) => const ResetPasswordScreen(),
+            '/matters': (context) => const MattersScreen(),
             '/dashboard': (context) => const DashboardScreen(),
             '/profile': (context) => const ProfileScreen(),
             '/recent-cases': (context) => const CasesListScreen(),
@@ -213,7 +215,11 @@ class AuthWrapper extends StatelessWidget {
         }
 
         if (snapshot.data == true) {
-          return const DashboardScreen();
+          if (AuthService.isMatterSelected) {
+            return const DashboardScreen();
+          } else {
+            return const MattersScreen();
+          }
         } else {
           return const LoginScreen();
         }

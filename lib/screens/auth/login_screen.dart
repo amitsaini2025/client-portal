@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Navigate to dashboard after successful login
         Future.delayed(const Duration(seconds: 1), () {
-          Navigator.pushReplacementNamed(context, '/dashboard');
+          Navigator.pushReplacementNamed(context, '/matters');
         });
       } else {
         setState(() {

@@ -11,6 +11,9 @@ class ApiConfig {
   static const String resetPasswordEndpoint = '/reset-password';
   static const String refreshTokenEndpoint = '/auth/refresh';
 
+  // Matters
+  static const String mattersEndpoint = '/matters';
+
   // Dashboard
   static const String dashboardEndpoint = '/dashboard';
 
