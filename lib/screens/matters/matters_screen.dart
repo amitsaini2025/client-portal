@@ -109,15 +109,6 @@ class _MattersScreenState extends State<MattersScreen> {
                         horizontal: 20,
                         vertical: 12,
                       ),
-                      leading: CircleAvatar(
-                        backgroundColor:
-                        isSelected ? Colors.blueAccent : Colors.grey.shade300,
-                        foregroundColor: isSelected ? Colors.white : Colors.black,
-                        child: Text(
-                          matterId.toString(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
                       title: Text(
                         matter['matter_name'],
                         style: TextStyle(
