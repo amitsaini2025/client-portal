@@ -239,14 +239,25 @@ class ApiService {
     );
   }
 
-  static Future<Map<String, dynamic>> getDashboard() async {
+  /*static Future<Map<String, dynamic>> getDashboard() async {
     return await _makeRequest(
       ApiConfig.dashboardEndpoint,
       _buildHeaders(),
       null,
       'GET',
     );
+  }*/
+
+  static Future<Map<String, dynamic>> getDashboard({required String selMatterId}) async {
+    final url = '${ApiConfig.dashboardEndpoint}?sel_matter_id=$selMatterId';
+    return await _makeRequest(
+      url,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
   }
+
 
   static Future<Map<String, dynamic>> getMatters() async {
     return await _makeRequest(

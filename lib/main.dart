@@ -187,7 +187,11 @@ class MyAppWithTheme extends StatelessWidget {
             '/forgot-password': (context) => const ForgotPasswordScreen(),
             '/reset-password': (context) => const ResetPasswordScreen(),
             '/matters': (context) => const MattersScreen(),
-            '/dashboard': (context) => const DashboardScreen(),
+            '/dashboard': (context) {
+              final matterId =
+              ModalRoute.of(context)!.settings.arguments as String;
+              return DashboardScreen(matterId: matterId);
+            },
             '/profile': (context) => const ProfileScreen(),
             '/recent-cases': (context) => const CasesListScreen(),
             '/documents': (context) => const DocumentsScreen(),
@@ -216,7 +220,7 @@ class AuthWrapper extends StatelessWidget {
 
         if (snapshot.data == true) {
           if (AuthService.isMatterSelected) {
-            return const DashboardScreen();
+            return DashboardScreen(matterId: AuthService.selectedMatterId!.toString());
           } else {
             return const MattersScreen();
           }

@@ -5,7 +5,7 @@ import 'package:client/models/upcoming_deadline_summary.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/case.dart';
-import '../../models/deadline.dart'; // <- new Deadline model
+import '../../models/deadline.dart';
 import '../../models/document.dart';
 import '../../models/recent_activity.dart';
 import '../../models/task.dart';
@@ -26,7 +26,9 @@ import '../tasks/tasks_screen.dart';
 import '../billing/billing_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final String matterId;
+
+  const DashboardScreen({super.key, required this.matterId});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -59,7 +61,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
 
     try {
-      final result = await ApiService.getDashboard();
+      final result = await ApiService.getDashboard(selMatterId: widget.matterId);
 
       if (result['success'] == true) {
         final data = result['data'];
@@ -69,70 +71,68 @@ class _DashboardScreenState extends State<DashboardScreen> {
           caseSummary = CaseSummary.fromJson(data['case_summary']);
         }
 
-        DashboardSummary dashboardSummary = DashboardSummary.fromJson(data);
+        DashboardSummary dashboardSummary = DashboardSummary(
+          activeCases: data['active_cases'] ?? 0,
+          totalDocuments: data['total_documents'] ?? 0,
+          totalAppointments: data['total_appointments'] ?? 0,
+        );
 
         // Parse Cases
         List<Case> cases = [];
         if (data['recent_cases'] != null && data['recent_cases'] is List) {
-          cases =
-              (data['recent_cases'] as List)
-                  .map((e) => Case.fromJson(Map<String, dynamic>.from(e)))
-                  .toList();
+          cases = (data['recent_cases'] as List)
+              .map((e) => Case.fromJson(Map<String, dynamic>.from(e)))
+              .toList();
         }
 
         // Parse Documents
         List<Document> documents = [];
         if (data['document_status']?['recent_documents'] != null &&
             data['document_status']['recent_documents'] is List) {
-          documents =
-              (data['document_status']['recent_documents'] as List)
-                  .map((e) => Document.fromJson(Map<String, dynamic>.from(e)))
-                  .toList();
+          documents = (data['document_status']['recent_documents'] as List)
+              .map((e) => Document.fromJson(Map<String, dynamic>.from(e)))
+              .toList();
         }
 
         DocumentStatusSummary? documentStatusSummary;
         if (data['document_status']?['summary'] != null) {
           documentStatusSummary = DocumentStatusSummary.fromJson(
-            data['document_status']?['summary'],
+            data['document_status']['summary'],
           );
         }
 
         UpcomingDeadlineSummary? upcomingDeadlineSummary;
         if (data['upcoming_deadlines']?['summary'] != null) {
-          upcomingDeadlineSummary = UpcomingDeadlineSummary.fromJson(
-            data['upcoming_deadlines']?['summary'],
+          upcomingDeadlineSummary = UpcomingDeadlineSummary(
+            dueThisWeekCount: data['upcoming_deadlines']['summary']['due_this_week_count'] ?? 0,
+            appointmentsCount: data['upcoming_deadlines']['summary']['appointments_count'] ?? 0,
+            overdueCount: data['upcoming_deadlines']['summary']['overdue_count'] ?? 0,
           );
         }
-        // Parse Deadlines (formerly Appointments)
+
+        // Parse Deadlines
         List<Deadline> deadlines = [];
         if (data['upcoming_deadlines']?['due_this_week_list'] != null &&
             data['upcoming_deadlines']['due_this_week_list'] is List) {
-          deadlines =
-              (data['upcoming_deadlines']['due_this_week_list'] as List)
-                  .map((e) => Deadline.fromJson(Map<String, dynamic>.from(e)))
-                  .toList();
+          deadlines = (data['upcoming_deadlines']['due_this_week_list'] as List)
+              .map((e) => Deadline.fromJson(Map<String, dynamic>.from(e)))
+              .toList();
         }
 
-        // Parse Tasks
+        // Parse Tasks (still empty in API response)
         List<Task> tasks = [];
         if (data['tasks'] != null && data['tasks'] is List) {
-          tasks =
-              (data['tasks'] as List)
-                  .map((e) => Task.fromJson(Map<String, dynamic>.from(e)))
-                  .toList();
+          tasks = (data['tasks'] as List)
+              .map((e) => Task.fromJson(Map<String, dynamic>.from(e)))
+              .toList();
         }
 
         // Parse Recent Activity
         List<RecentActivity> recentActivity = [];
-        if (data['recent_activity'] != null &&
-            data['recent_activity'] is List) {
-          recentActivity =
-              (data['recent_activity'] as List)
-                  .map(
-                    (e) =>
-                        RecentActivity.fromJson(Map<String, dynamic>.from(e)),
-                  )
-                  .toList();
+        if (data['recent_activity'] != null && data['recent_activity'] is List) {
+          recentActivity = (data['recent_activity'] as List)
+              .map((e) => RecentActivity.fromJson(Map<String, dynamic>.from(e)))
+              .toList();
         }
 
         setState(() {
@@ -182,69 +182,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body:
-          _isLoading
-              ? const LoadingWidget(message: 'Loading dashboard...')
-              : _errorMessage != null
-              ? CustomErrorWidget(
-                message: _errorMessage!,
-                onRetry: _loadDashboardData,
-              )
-              : RefreshIndicator(
-                onRefresh: _loadDashboardData,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildWelcomeSection(),
-                      const SizedBox(height: 24),
-                      QuickActionsCard(
-                        onUploadDocument: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const UploadDocumentScreen(),
-                            ),
-                          );
-                        },
-                        onBookAppointment: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const BookAppointmentScreen(),
-                            ),
-                          );
-                        },
-                        onSendMessage: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const SendMessageScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      CaseSummaryCard(caseSummary: _caseSummary, cases: _cases),
-                      const SizedBox(height: 24),
-                      DocumentStatusCard(
-                        documentStatusSummary: _documentStatusSummary,
-                        documents: _documents,
-                      ),
-                      const SizedBox(height: 24),
-                      UpcomingDeadlinesCard(
-                        upcomingDeadlineSummary: _upcomingDeadlineSummary,
-                        tasks: _tasks,
-                        deadlines: _deadlines,
-                      ),
-                      const SizedBox(height: 24),
-                      _buildRecentActivitySection(),
-                    ],
-                  ),
-                ),
+      body: _isLoading
+          ? const LoadingWidget(message: 'Loading dashboard...')
+          : _errorMessage != null
+          ? CustomErrorWidget(
+        message: _errorMessage!,
+        onRetry: _loadDashboardData,
+      )
+          : RefreshIndicator(
+        onRefresh: _loadDashboardData,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildWelcomeSection(),
+              const SizedBox(height: 24),
+              QuickActionsCard(
+                onUploadDocument: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const UploadDocumentScreen(),
+                    ),
+                  );
+                },
+                onBookAppointment: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const BookAppointmentScreen(),
+                    ),
+                  );
+                },
+                onSendMessage: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const SendMessageScreen(),
+                    ),
+                  );
+                },
               ),
+              const SizedBox(height: 24),
+              CaseSummaryCard(caseSummary: _caseSummary, cases: _cases),
+              const SizedBox(height: 24),
+              DocumentStatusCard(
+                documentStatusSummary: _documentStatusSummary,
+                documents: _documents,
+              ),
+              const SizedBox(height: 24),
+              UpcomingDeadlinesCard(
+                upcomingDeadlineSummary: _upcomingDeadlineSummary,
+                tasks: _tasks,
+                deadlines: _deadlines,
+              ),
+              const SizedBox(height: 24),
+              _buildRecentActivitySection(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildWelcomeSection() {
+    if (_dashboardSummary == null) return const SizedBox.shrink();
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -432,9 +433,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(
                   subtitle,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -443,9 +446,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Text(
             time,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.color?.withOpacity(0.5),
+              color: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.color
+                  ?.withOpacity(0.5),
             ),
           ),
         ],

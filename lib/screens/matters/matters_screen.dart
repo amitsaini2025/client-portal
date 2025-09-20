@@ -31,7 +31,12 @@ class _MattersScreenState extends State<MattersScreen> {
     }
 
     // Navigate to dashboard
-    Navigator.pushReplacementNamed(context, '/dashboard');
+    Navigator.pushReplacementNamed(
+      context,
+      '/dashboard',
+      arguments: AuthService.selectedMatterId.toString(),
+    );
+
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
