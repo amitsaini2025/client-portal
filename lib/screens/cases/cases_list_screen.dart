@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../models/case.dart';
+import '../../models/new/case.dart';
 import '../../services/api_service.dart';
 
 class CasesListScreen extends StatefulWidget {
@@ -324,7 +324,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          caseItem.description ?? 'No description available',
+                          caseItem.stageName ?? 'No description available',
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             color: const Color(0xFF5E8B7E),
@@ -358,25 +358,6 @@ class _CasesListScreenState extends State<CasesListScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _getPriorityColor(caseItem.priority ?? 'low')
-                              .withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          (caseItem.priority ?? 'low').toUpperCase(),
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w600,
-                            color: _getPriorityColor(caseItem.priority ?? 'low'),
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ],
@@ -400,7 +381,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                         ),
                       ),
                       Text(
-                        '${_calculateProgress(caseItem)}%',
+                        caseItem.progressDisplay!,
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -411,7 +392,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                   ),
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
-                    value: _calculateProgress(caseItem) / 100,
+                    value: (caseItem.progressPercentage ?? 0) / 100,
                     backgroundColor: const Color(0xFFE3E8EF),
                     valueColor: const AlwaysStoppedAnimation<Color>(
                       Color(0xFF5E8B7E),
@@ -423,28 +404,23 @@ class _CasesListScreenState extends State<CasesListScreen> {
               const SizedBox(height: 16),
 
               // Details row
-              Row(
+              ListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _buildDetailItem(
-                    Icons.person,
-                    'Agent: ${caseItem.agentId ?? 'Unassigned'}',
-                    const Color(0xFF5E8B7E),
-                  ),
-                  const SizedBox(width: 24),
-                  _buildDetailItem(
-                    Icons.category,
-                    caseItem.caseType ?? 'Unknown',
-                    const Color(0xFF30475E),
-                  ),
-                  const SizedBox(width: 24),
-                  if (caseItem.estimatedCompletion != null)
-                    _buildDetailItem(
-                      Icons.schedule,
-                      'Due: ${_formatDate(caseItem.estimatedCompletion!)}',
-                      const Color(0xFFF39C12),
-                    ),
+                  ...caseItem.agentsMap.entries.map((entry) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _buildDetailItem(
+                        Icons.person,
+                        '${entry.key}: ${entry.value.name}',
+                        const Color(0xFF5E8B7E),
+                      ),
+                    );
+                  }),
                 ],
               ),
+
 
               const SizedBox(height: 16),
 

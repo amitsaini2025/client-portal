@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../models/case_item.dart';
+import '../../../models/recent_case.dart';
 import '../../../services/api_service.dart';
 
 class RecentCasesScreen extends StatefulWidget {
@@ -11,7 +10,7 @@ class RecentCasesScreen extends StatefulWidget {
 }
 
 class _RecentCasesScreenState extends State<RecentCasesScreen> {
-  List<CaseItem> _cases = [];
+  List<RecentCase> _cases = [];
   int _currentPage = 1;
   bool _isLoading = false;
   bool _hasNextPage = true;
@@ -43,11 +42,11 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
 
       if (response['success'] == true) {
         final List<dynamic> list = response['data']['cases'];
-        final newCases = list.map((e) => CaseItem.fromJson(e)).toList();
+        final newCases = list.map((e) => RecentCase.fromJson(e)).toList();
 
         final pagination = response['data']['pagination'];
         setState(() {
-          _cases.addAll(newCases.cast<CaseItem>());
+          _cases.addAll(newCases);
           _hasNextPage = pagination['has_next_page'] ?? false;
           _currentPage++;
         });
@@ -59,7 +58,7 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
     setState(() => _isLoading = false);
   }
 
-  Widget _buildCaseCard(CaseItem caseItem) {
+  Widget _buildCaseCard(RecentCase caseItem) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 2,
@@ -79,15 +78,17 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(caseItem.caseNumber),
+            if (caseItem.caseNumber != null)
+              Text("Case #: ${caseItem.caseNumber}"),
             Text("Status: ${caseItem.status}"),
-            Text("Stage: ${caseItem.stageName}"),
-            Text("Updated: ${caseItem.lastUpdated}"),
+            if (caseItem.stageName != null)
+              Text("Stage: ${caseItem.stageName}"),
+            if (caseItem.lastUpdated != null)
+              Text("Updated: ${caseItem.lastUpdated}"),
           ],
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () {
-          // TODO: navigate to details
         },
       ),
     );
@@ -100,33 +101,32 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
         title: const Text("Recent Cases"),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
-      body:
-          _cases.isEmpty && _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : RefreshIndicator(
-                onRefresh: () async {
-                  setState(() {
-                    _cases.clear();
-                    _currentPage = 1;
-                    _hasNextPage = true;
-                  });
-                  await _fetchCases();
-                },
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: _cases.length + (_isLoading ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index < _cases.length) {
-                      return _buildCaseCard(_cases[index]);
-                    } else {
-                      return const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(child: CircularProgressIndicator()),
-                      );
-                    }
-                  },
-                ),
-              ),
+      body: _cases.isEmpty && _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            _cases.clear();
+            _currentPage = 1;
+            _hasNextPage = true;
+          });
+          await _fetchCases();
+        },
+        child: ListView.builder(
+          controller: _scrollController,
+          itemCount: _cases.length + (_isLoading ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index < _cases.length) {
+              return _buildCaseCard(_cases[index]);
+            } else {
+              return const Padding(
+                padding: EdgeInsets.all(16),
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+          },
+        ),
+      ),
     );
   }
 }

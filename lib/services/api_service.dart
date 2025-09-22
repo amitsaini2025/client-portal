@@ -278,7 +278,7 @@ class ApiService {
     );
   }*/
 
-  static Future<Map<String, dynamic>> getClientCases({
+  /*static Future<Map<String, dynamic>> getClientCases({
     int page = 1,
     int perPage = 10,
     String search = '',
@@ -287,6 +287,24 @@ class ApiService {
     final endpoint =
         "${ApiConfig.clientCasesEndpoint}?page=$page&per_page=$perPage&search=$search&status=$status";
 
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }*/
+
+  static Future<Map<String, dynamic>> getClientCases({
+    int page = 1,
+    int perPage = 10,
+    String search = '',
+    String status = '',
+    String priority = '',
+    String selMatterId = '1135',
+  }) async {
+    final endpoint =
+        "${ApiConfig.clientCasesEndpoint}?page=$page&per_page=$perPage&search=$search&status=$status&priority=$priority&sel_matter_id=$selMatterId";
     return await _makeRequest(
       endpoint,
       _buildHeaders(),
