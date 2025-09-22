@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import '../../models/document.dart';
+import 'package:flutter/material.dart';
+
 import '../../models/case.dart';
+import '../../models/new/document.dart';
 import '../../services/api_service.dart';
-import '../../widgets/common/loading_widget.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/common/error_widget.dart';
+import '../../widgets/common/loading_widget.dart';
 import '../../widgets/documents/document_card.dart';
 import '../../widgets/documents/upload_progress.dart';
 
@@ -20,6 +22,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   String? _errorMessage;
   List<Document> _documents = [];
   List<Case> _cases = [];
+  Summary? _summary;
+  Pagination? _pagination;
 
   // Upload state
   bool _isUploading = false;
@@ -40,16 +44,17 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     });
 
     try {
-      final response = await ApiService.getClientDocuments(page: page);
+      final response = await ApiService.getClientDocuments(
+        page: page,
+        selMatterID: AuthService.selectedMatterId!.toString(),
+      );
 
       if (response['success'] == true) {
-        final data = response['data'];
-        final docs = (data['documents'] as List)
-            .map((json) => Document.fromJson(json))
-            .toList();
-
+        final docsResponse = DocumentsResponse.fromJson(response);
         setState(() {
-          _documents = docs;
+          _documents = docsResponse.data.documents;
+          _summary = docsResponse.data.summary;
+          _pagination = docsResponse.data.pagination;
           _isLoading = false;
         });
       } else {
@@ -72,9 +77,8 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
       if (response['success'] == true) {
         final data = response['data'];
-        final cases = (data['cases'] as List)
-            .map((json) => Case.fromJson(json))
-            .toList();
+        final cases =
+            (data['cases'] as List).map((json) => Case.fromJson(json)).toList();
 
         setState(() {
           _cases = cases;
@@ -120,123 +124,140 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     String priority = 'medium';
 
     return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Upload Document'),
-        content: StatefulBuilder(
-          builder: (context, setState) => SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // File info
-                ListTile(
-                  leading: Icon(
-                    _getFileIcon(file.extension),
-                    color: Colors.blue,
-                  ),
-                  title: Text(file.name),
-                  subtitle: Text(
-                    '${(file.size / 1024 / 1024).toStringAsFixed(2)} MB',
-                  ),
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                title: const Text('Upload Document'),
+                content: StatefulBuilder(
+                  builder:
+                      (context, setState) => SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // File info
+                            ListTile(
+                              leading: Icon(
+                                _getFileIcon(file.extension),
+                                color: Colors.blue,
+                              ),
+                              title: Text(file.name),
+                              subtitle: Text(
+                                '${(file.size / 1024 / 1024).toStringAsFixed(2)} MB',
+                              ),
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            // Title field
+                            TextField(
+                              decoration: const InputDecoration(
+                                labelText: 'Document Title',
+                                border: OutlineInputBorder(),
+                              ),
+                              onChanged: (value) => title = value,
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            // Description field
+                            TextField(
+                              decoration: const InputDecoration(
+                                labelText: 'Description',
+                                border: OutlineInputBorder(),
+                              ),
+                              maxLines: 3,
+                              onChanged: (value) => description = value,
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            // Case selection
+                            if (_cases.isNotEmpty) ...[
+                              DropdownButtonFormField<int>(
+                                decoration: const InputDecoration(
+                                  labelText: 'Related Case (Optional)',
+                                  border: OutlineInputBorder(),
+                                ),
+                                value: selectedCaseId,
+                                items:
+                                    _cases
+                                        .map(
+                                          (caseItem) => DropdownMenuItem(
+                                            value: caseItem.id,
+                                            child: Text(caseItem.title),
+                                          ),
+                                        )
+                                        .toList(),
+                                onChanged: (value) => selectedCaseId = value,
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+
+                            // Priority selection
+                            DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                labelText: 'Priority',
+                                border: OutlineInputBorder(),
+                              ),
+                              value: priority,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'low',
+                                  child: Text('Low'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'medium',
+                                  child: Text('Medium'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'high',
+                                  child: Text('High'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'critical',
+                                  child: Text('Critical'),
+                                ),
+                              ],
+                              onChanged: (value) => priority = value!,
+                            ),
+                          ],
+                        ),
+                      ),
                 ),
-
-                const SizedBox(height: 12),
-
-                // Title field
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'Document Title',
-                    border: OutlineInputBorder(),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Cancel'),
                   ),
-                  onChanged: (value) => title = value,
-                ),
-
-                const SizedBox(height: 12),
-
-                // Description field
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    border: OutlineInputBorder(),
+                  ElevatedButton(
+                    onPressed:
+                        title.trim().isEmpty
+                            ? null
+                            : () async {
+                              Navigator.of(context).pop(true);
+                              await _performUpload(
+                                file,
+                                title,
+                                description,
+                                selectedCaseId,
+                                priority,
+                              );
+                            },
+                    child: const Text('Upload'),
                   ),
-                  maxLines: 3,
-                  onChanged: (value) => description = value,
-                ),
-
-                const SizedBox(height: 12),
-
-                // Case selection
-                if (_cases.isNotEmpty) ...[
-                  DropdownButtonFormField<int>(
-                    decoration: const InputDecoration(
-                      labelText: 'Related Case (Optional)',
-                      border: OutlineInputBorder(),
-                    ),
-                    value: selectedCaseId,
-                    items: _cases
-                        .map((caseItem) => DropdownMenuItem(
-                      value: caseItem.id,
-                      child: Text(caseItem.title),
-                    ))
-                        .toList(),
-                    onChanged: (value) => selectedCaseId = value,
-                  ),
-                  const SizedBox(height: 12),
                 ],
-
-                // Priority selection
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'Priority',
-                    border: OutlineInputBorder(),
-                  ),
-                  value: priority,
-                  items: const [
-                    DropdownMenuItem(value: 'low', child: Text('Low')),
-                    DropdownMenuItem(value: 'medium', child: Text('Medium')),
-                    DropdownMenuItem(value: 'high', child: Text('High')),
-                    DropdownMenuItem(
-                        value: 'critical', child: Text('Critical')),
-                  ],
-                  onChanged: (value) => priority = value!,
-                ),
-              ],
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: title.trim().isEmpty
-                ? null
-                : () async {
-              Navigator.of(context).pop(true);
-              await _performUpload(
-                file,
-                title,
-                description,
-                selectedCaseId,
-                priority,
-              );
-            },
-            child: const Text('Upload'),
-          ),
-        ],
-      ),
-    ) ??
+              ),
+        ) ??
         false;
   }
 
   Future<void> _performUpload(
-      PlatformFile file,
-      String title,
-      String description,
-      int? caseId,
-      String priority,
-      ) async {
+    PlatformFile file,
+    String title,
+    String description,
+    int? caseId,
+    String priority,
+  ) async {
     setState(() {
       _isUploading = true;
       _uploadProgress = 0.0;
@@ -278,21 +299,22 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   Future<void> _deleteDocument(Document document) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Document'),
-        content: Text('Delete "${document.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Delete Document'),
+            content: Text('Delete "${document.name}"?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('Delete'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -379,22 +401,23 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               status: _uploadStatus ?? '',
             ),
           Expanded(
-            child: _documents.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _documents.length,
-              itemBuilder: (context, index) {
-                final doc = _documents[index];
-                return DocumentCard(
-                  document: doc,
-                  onTap: () {
-                    // TODO: Navigate to details
-                  },
-                  onDelete: () => _deleteDocument(doc),
-                );
-              },
-            ),
+            child:
+                _documents.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _documents.length,
+                      itemBuilder: (context, index) {
+                        final doc = _documents[index];
+                        return DocumentCard(
+                          document: doc,
+                          onTap: () {
+                            // TODO: Navigate to details
+                          },
+                          onDelete: () => _deleteDocument(doc),
+                        );
+                      },
+                    ),
           ),
         ],
       ),
@@ -414,18 +437,16 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           const SizedBox(height: 16),
           Text(
             'No documents yet',
-            style: Theme.of(context)
-                .textTheme
-                .headlineSmall
-                ?.copyWith(color: Colors.grey.shade600),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(color: Colors.grey.shade600),
           ),
           const SizedBox(height: 8),
           Text(
             'Upload your first document to get started',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: Colors.grey.shade500),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade500),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),

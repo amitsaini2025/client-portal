@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/new/case.dart';
 import '../../services/api_service.dart';
+import '../../services/auth_service.dart';
 
 class CasesListScreen extends StatefulWidget {
   const CasesListScreen({super.key});
@@ -49,6 +50,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
       final result = await ApiService.getClientCases(
         page: page,
         perPage: perPage,
+        selMatterId: AuthService.selectedMatterId!.toString()
       );
 
       if (result['success'] == true) {

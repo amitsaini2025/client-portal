@@ -301,7 +301,7 @@ class ApiService {
     String search = '',
     String status = '',
     String priority = '',
-    String selMatterId = '1135',
+    String selMatterId = '',
   }) async {
     final endpoint =
         "${ApiConfig.clientCasesEndpoint}?page=$page&per_page=$perPage&search=$search&status=$status&priority=$priority&sel_matter_id=$selMatterId";
@@ -318,15 +318,17 @@ class ApiService {
     int perPage = 10,
     String search = '',
     String status = '',
-    String docType = ''
+    String docType = '',
+    String selMatterID = '',
   }) async {
     return await _makeRequest(
-      "${ApiConfig.clientDocumentsEndpoint}??page=$page&per_page=$perPage&search=$search&status=$status&doc_type=$docType",
+      "${ApiConfig.clientDocumentsEndpoint}?page=$page&per_page=$perPage&search=$search&status=$status&doc_type=$docType&sel_matter_id=$selMatterID",
       _buildHeaders(),
       null,
       'GET',
     );
   }
+
 
   static Future<Map<String, dynamic>> uploadDocument(
     String filePath,

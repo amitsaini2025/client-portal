@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../models/document.dart';
+
+import '../../models/new/document.dart' show Document;
 
 class DocumentCard extends StatelessWidget {
   final Document document;
@@ -111,7 +112,7 @@ class DocumentCard extends StatelessWidget {
                               document.uploadedAt != null
                                   ? DateFormat(
                                     'MMM dd, yyyy',
-                                  ).format(document.uploadedAt!)
+                                  ).format(DateTime.parse(document.uploadedAt))
                                   : 'Unknown date',
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(color: Colors.grey.shade500),
@@ -205,8 +206,7 @@ class DocumentCard extends StatelessWidget {
                         ),
                       ],
 
-                      if (document.fileType != null &&
-                          document.fileUrl != null)
+                      if (document.fileType != null && document.fileUrl != null)
                         const SizedBox(width: 16),
 
                       if (document.fileUrl != null) ...[
