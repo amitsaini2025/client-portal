@@ -24,7 +24,7 @@ class ApiConfig {
   static const String clientAppointmentsEndpoint =
       '/client-portal/appointments';
   static const String clientMessagesEndpoint = '/client-portal/messages';
-  static const String clientTasksEndpoint = '/client-portal/tasks';
+  static const String clientTasksEndpoint = '/upcoming-deadlines';
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

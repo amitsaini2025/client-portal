@@ -440,9 +440,27 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>> getClientTasks() async {
+  /*static Future<Map<String, dynamic>> getClientTasks() async {
     return await _makeRequest(
       ApiConfig.clientTasksEndpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }*/
+
+  static Future<Map<String, dynamic>> getClientTasks({
+    int page = 1,
+    int perPage = 10,
+    String search = "",
+    String status = "all",
+    String priority = "all",
+  }) async {
+    final query =
+        "?page=$page&per_page=$perPage&search=$search&status=$status&priority=$priority";
+
+    return await _makeRequest(
+      "${ApiConfig.clientTasksEndpoint}$query",
       _buildHeaders(),
       null,
       'GET',
