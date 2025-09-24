@@ -467,6 +467,21 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> getRecentActivities({
+    int page = 1,
+    int perPage = 10,
+    String search = "",
+  }) async {
+    final query = "?page=$page&per_page=$perPage&search=$search&type=";
+
+    return await _makeRequest(
+      "${ApiConfig.recentActivityEndpoint}$query",
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> data) async {
     return await _makeRequest(endpoint, _buildHeaders(), data, 'POST');

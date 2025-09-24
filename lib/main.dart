@@ -4,6 +4,7 @@ import 'package:client/screens/dashboard/recent_case/recent_case_screen.dart';
 import 'package:client/screens/documents/documents_screen.dart';
 import 'package:client/screens/matters/matters_screen.dart';
 import 'package:client/screens/profile/profile_screen.dart';
+import 'package:client/screens/recent_activity/recent_activity.dart';
 import 'package:client/screens/tasks/tasks_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -196,6 +197,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/recent-cases': (context) => const CasesListScreen(),
             '/documents': (context) => const DocumentsScreen(),
             '/tasks': (context) => const TasksScreen(),
+            '/recent-activity': (context) => const RecentActivityScreen(),
           },
         );
       },

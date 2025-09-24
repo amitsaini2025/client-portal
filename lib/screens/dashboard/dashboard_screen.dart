@@ -381,7 +381,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
-              TextButton(onPressed: () {}, child: const Text('View All')),
+              TextButton(onPressed: () {
+                Navigator.pushNamed(context, '/recent-activity');
+              }, child: const Text('View All')),
             ],
           ),
           const SizedBox(height: 16),
