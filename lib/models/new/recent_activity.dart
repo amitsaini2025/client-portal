@@ -33,7 +33,7 @@ class Activity {
   String createdAt;
   String updatedAt;
   String timeAgo;
-  String taskGroup;
+  String? taskGroup;
 
   Activity({
     required this.id,
@@ -43,19 +43,19 @@ class Activity {
     required this.createdAt,
     required this.updatedAt,
     required this.timeAgo,
-    required this.taskGroup,
+    this.taskGroup,
   });
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
       id: json['id'],
-      type: json['type'],
-      title: json['title'],
-      description: json['description'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-      timeAgo: json['time_ago'],
-      taskGroup: json['task_group'],
+      type: json['type'] ?? "",
+      title: json['title'] ?? "",
+      description: json['description'] ?? "",
+      createdAt: json['created_at'] ?? "",
+      updatedAt: json['updated_at'] ?? "",
+      timeAgo: json['time_ago'] ?? "",
+      taskGroup: json['task_group'], // can be null
     );
   }
 }

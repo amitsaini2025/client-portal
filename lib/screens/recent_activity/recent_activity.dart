@@ -101,9 +101,11 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
           children: [
             Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
             const SizedBox(height: 16),
-            Text(_errorMessage!,
-                style: Theme.of(context).textTheme.bodyLarge,
-                textAlign: TextAlign.center),
+            Text(
+              _errorMessage!,
+              style: Theme.of(context).textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 16),
             ElevatedButton(onPressed: _loadActivities, child: const Text('Retry')),
           ],
@@ -120,7 +122,10 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
             const SizedBox(height: 16),
             Text(
               'No activities found',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(color: Colors.grey[600]),
             ),
           ],
         ),
@@ -152,17 +157,19 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(activity.description),
+            Text(activity.description.isNotEmpty ? activity.description : "No description"),
             const SizedBox(height: 4),
             Text(
-              'Group: ${activity.taskGroup}',
+              'Group: ${activity.taskGroup ?? "N/A"}',
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
-            Text('Created: ${activity.createdAt} • ${activity.timeAgo}',
-                style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            Text(
+              'Created: ${activity.createdAt} • ${activity.timeAgo}',
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
           ],
         ),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () {
           _showActivityDetails(activity);
         },
@@ -184,7 +191,8 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: ListView(
                 controller: scrollController,
@@ -200,11 +208,16 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Text(activity.title,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w600)),
+                  Text(
+                    activity.title,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
                   const SizedBox(height: 12),
-                  _buildDetailRow('Description', activity.description),
+                  _buildDetailRow('Description',
+                      activity.description.isNotEmpty ? activity.description : "No description"),
                   _buildDetailRow('Task Group', activity.taskGroup),
                   _buildDetailRow('Created At', activity.createdAt),
                   _buildDetailRow('Updated At', activity.updatedAt),
@@ -218,13 +231,13 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(String label, String? value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
           Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value)),
+          Expanded(child: Text(value ?? "N/A")),
         ],
       ),
     );
