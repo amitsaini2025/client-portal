@@ -1,6 +1,7 @@
 import 'package:client/screens/auth/reset_password_screen.dart';
 import 'package:client/screens/cases/cases_list_screen.dart';
 import 'package:client/screens/dashboard/recent_case/recent_case_screen.dart';
+import 'package:client/screens/document_management/document_management.dart';
 import 'package:client/screens/documents/documents_screen.dart';
 import 'package:client/screens/matters/matters_screen.dart';
 import 'package:client/screens/profile/profile_screen.dart';
@@ -198,6 +199,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/documents': (context) => const DocumentsScreen(),
             '/tasks': (context) => const TasksScreen(),
             '/recent-activity': (context) => const RecentActivityScreen(),
+            '/document-management': (context) => const DocumentManagementScreen(),
           },
         );
       },

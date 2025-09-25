@@ -1,0 +1,220 @@
+import 'package:flutter/material.dart';
+import '../../models/new/document_category.dart';
+import '../../services/api_service.dart';
+
+class DocumentManagementScreen extends StatefulWidget {
+  const DocumentManagementScreen({super.key});
+
+  @override
+  State<DocumentManagementScreen> createState() => _DocumentManagementScreenState();
+}
+
+class _DocumentManagementScreenState extends State<DocumentManagementScreen>
+    with TickerProviderStateMixin {
+  late TabController _mainTabController;
+
+  List<DocumentCategory> _categories = [];
+  List<DocumentChecklist> _documents = [];
+
+  bool _isLoading = false;
+  String? _errorMessage;
+  int? _selectedCategoryId;
+
+  @override
+  void initState() {
+    super.initState();
+    _mainTabController = TabController(length: 2, vsync: this);
+    _loadCategories("personal");
+  }
+
+  Future<void> _loadCategories(String type) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final response = await ApiService.getDocumentCategories(type: type);
+      final cats = (response['data']['categories'] as List)
+          .map((json) => DocumentCategory.fromJson(json))
+          .toList();
+
+      setState(() {
+        _categories = cats;
+        if (_categories.isNotEmpty) {
+          _selectedCategoryId = _categories.first.id;
+        }
+      });
+
+      await _loadChecklist(type);
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = "Failed to load categories: $e";
+      });
+    }
+  }
+
+  Future<void> _loadChecklist(String type) async {
+    if (_selectedCategoryId == null) {
+      setState(() {
+        _documents = [];
+        _isLoading = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final response = await ApiService.getDocumentChecklist(type: type);
+      final docs = (response as List)
+          .map((json) => DocumentChecklist.fromJson(json))
+          .toList();
+
+      setState(() {
+        _documents = docs;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = "Failed to load checklist: $e";
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentType = _mainTabController.index == 0 ? "personal" : "visa";
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Documents"),
+        bottom: TabBar(
+          controller: _mainTabController,
+          onTap: (index) {
+            final type = index == 0 ? "personal" : "visa";
+            _loadCategories(type);
+          },
+          tabs: const [
+            Tab(text: "Personal Documents"),
+            Tab(text: "Visa Documents"),
+          ],
+        ),
+      ),
+      body: Column(
+        children: [
+          if (_categories.isNotEmpty)
+            SizedBox(
+              height: 50,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _categories.length,
+                itemBuilder: (context, index) {
+                  final cat = _categories[index];
+                  final selected = cat.id == _selectedCategoryId;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedCategoryId = cat.id;
+                      });
+                      _loadChecklist(currentType);
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: selected ? Theme.of(context).primaryColor : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Text(
+                          cat.title,
+                          style: TextStyle(
+                            color: selected ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          Expanded(child: _buildBody(currentType)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody(String type) {
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_errorMessage != null) return _buildError(type);
+    if (_documents.isEmpty) return _buildEmpty();
+
+    return RefreshIndicator(
+      onRefresh: () async => _loadChecklist(type),
+      child: ListView.builder(
+        itemCount: _documents.length,
+        itemBuilder: (context, index) {
+          final doc = _documents[index];
+          return Card(
+            margin: const EdgeInsets.all(8),
+            child: ListTile(
+              title: Text(doc.name),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Type: ${doc.docTypeName}"),
+                  Text("Created: ${doc.createdAt}"),
+                  Text("Updated: ${doc.updatedAt}"),
+                ],
+              ),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  // TODO: Upload / View
+                },
+                child: const Text("Action"),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildError(String type) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(_errorMessage!),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => _loadCategories(type),
+            child: const Text("Retry"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmpty() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.folder_open, size: 64, color: Colors.grey),
+          SizedBox(height: 16),
+          Text("No documents found"),
+        ],
+      ),
+    );
+  }
+}

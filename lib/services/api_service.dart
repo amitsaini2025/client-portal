@@ -482,6 +482,29 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> getDocumentCategories({
+    String type = "personal", // personal or visa
+  }) async {
+    return await _makeRequest(
+      "${ApiConfig.documentsEndpoint}/$type/categories",
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+  static Future<List<dynamic>> getDocumentChecklist({String type = "personal"}) async {
+    final response = await _makeRequest(
+      "${ApiConfig.documentsEndpoint}/$type/checklist",
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+
+    return response['data']['checklist'] ?? [];
+  }
+
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> data) async {
     return await _makeRequest(endpoint, _buildHeaders(), data, 'POST');
