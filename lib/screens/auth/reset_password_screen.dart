@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:client/services/api_service.dart';
+import '../../config/theme_config.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -65,7 +66,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: ThemeConfig.navyBlue,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -75,14 +76,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo & Title
                   Column(
                     children: [
                       Container(
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
+                          color: ThemeConfig.goldenYellow,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Icon(Icons.lock_outline,
@@ -94,17 +94,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         style: Theme.of(context)
                             .textTheme
                             .headlineMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                            ?.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         "Create a new password for your account",
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.color
-                              ?.withAlpha(180),
+                          color: Colors.white.withOpacity(0.7),
                         ),
                       ),
                     ],
@@ -128,10 +124,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            hintStyle: const TextStyle(color: Colors.grey),
                             filled: true,
-                            fillColor: Theme.of(context).cardColor,
+                            fillColor: Colors.white,
                             counterText: "", // hides counter
                           ),
+                          style: const TextStyle(color: Colors.black),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "Enter your code";
@@ -155,12 +153,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           decoration: InputDecoration(
                             labelText: "Password",
                             prefixIcon: const Icon(Icons.lock),
+                            hintStyle: const TextStyle(color: Colors.grey),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             filled: true,
-                            fillColor: Theme.of(context).cardColor,
+                            fillColor: Colors.white,
                           ),
+                          style: const TextStyle(color: Colors.black),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "Enter your password";
@@ -180,12 +180,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           decoration: InputDecoration(
                             labelText: "Confirm Password",
                             prefixIcon: const Icon(Icons.lock_outline),
+                            hintStyle: const TextStyle(color: Colors.grey),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             filled: true,
-                            fillColor: Theme.of(context).cardColor,
+                            fillColor: Colors.white,
                           ),
+                          style: const TextStyle(color: Colors.black),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "Confirm your password";
@@ -204,7 +206,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           onPressed: _isLoading ? null : _setPassword,
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 56),
-                            backgroundColor: Theme.of(context).primaryColor,
+                            backgroundColor: ThemeConfig.goldenYellow,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(

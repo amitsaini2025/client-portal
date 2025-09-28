@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:client/config/theme_config.dart';
 import '../../models/new/recent_activity.dart';
 import '../../services/api_service.dart';
 
@@ -52,9 +53,12 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeConfig.navyBlue, // ✅ Background applied
       appBar: AppBar(
-        title: const Text('Recent Activities'),
-        backgroundColor: Colors.transparent,
+        title: const Text("Recent Activities"),
+        centerTitle: true,
+        backgroundColor: ThemeConfig.goldenYellow, // ✅ Themed AppBar
+        foregroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
@@ -74,14 +78,25 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
                 });
                 _loadActivities();
               },
+              style: const TextStyle(color: Colors.white), // ✅ White text
               decoration: InputDecoration(
-                hintText: 'Search activities...',
-                prefixIcon: const Icon(Icons.search),
+                hintText: "Search activities...",
+                hintStyle: TextStyle(color: Colors.white70),
+                prefixIcon: const Icon(Icons.search, color: Colors.white),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: ThemeConfig.goldenYellow),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: ThemeConfig.goldenYellow),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: ThemeConfig.goldenYellow, width: 2),
                 ),
                 filled: true,
-                fillColor: Theme.of(context).cardColor,
+                fillColor: ThemeConfig.navyBlue.withOpacity(0.5),
               ),
             ),
           ),
@@ -92,22 +107,29 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
   }
 
   Widget _buildActivityList() {
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Colors.white));
 
     if (_errorMessage != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
+            Icon(Icons.error_outline, size: 64, color: ThemeConfig.goldenYellow),
             const SizedBox(height: 16),
             Text(
               _errorMessage!,
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: const TextStyle(color: Colors.white),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: _loadActivities, child: const Text('Retry')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThemeConfig.goldenYellow,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: _loadActivities,
+              child: const Text("Retry"),
+            ),
           ],
         ),
       );
@@ -118,14 +140,11 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.list_alt, size: 64, color: Colors.grey[400]),
+            Icon(Icons.list_alt, size: 64, color: Colors.white70),
             const SizedBox(height: 16),
             Text(
-              'No activities found',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: Colors.grey[600]),
+              "No activities found",
+              style: const TextStyle(color: Colors.white70),
             ),
           ],
         ),
@@ -134,6 +153,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
 
     return RefreshIndicator(
       onRefresh: _loadActivities,
+      color: ThemeConfig.goldenYellow,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: _activities.length,
@@ -147,32 +167,37 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
 
   Widget _buildActivityCard(Activity activity) {
     return Card(
+      color: ThemeConfig.navyBlue.withOpacity(0.6), // ✅ Dark card
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
+      ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
-        leading: Icon(Icons.task, color: Theme.of(context).primaryColor),
-        title: Text(activity.title),
+        leading: Icon(Icons.task, color: ThemeConfig.goldenYellow),
+        title: Text(activity.title, style: const TextStyle(color: Colors.white)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(activity.description.isNotEmpty ? activity.description : "No description"),
+            Text(
+              activity.description.isNotEmpty ? activity.description : "No description",
+              style: const TextStyle(color: Colors.white70),
+            ),
             const SizedBox(height: 4),
             Text(
-              'Group: ${activity.taskGroup ?? "N/A"}',
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              "Group: ${activity.taskGroup ?? "N/A"}",
+              style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
             ),
             Text(
-              'Created: ${activity.createdAt} • ${activity.timeAgo}',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              "Created: ${activity.createdAt} • ${activity.timeAgo}",
+              style: const TextStyle(fontSize: 12, color: Colors.white70),
             ),
           ],
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: () {
-          _showActivityDetails(activity);
-        },
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white70),
+        onTap: () => _showActivityDetails(activity),
       ),
     );
   }
@@ -181,6 +206,10 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: ThemeConfig.navyBlue, // ✅ Themed bottom sheet
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
         return DraggableScrollableSheet(
           initialChildSize: 0.5,
@@ -189,11 +218,6 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
           builder: (context, scrollController) {
             return Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(20)),
-              ),
               child: ListView(
                 controller: scrollController,
                 children: [
@@ -202,7 +226,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: ThemeConfig.goldenYellow,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -210,18 +234,18 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
                   const SizedBox(height: 16),
                   Text(
                     activity.title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 12),
-                  _buildDetailRow('Description',
-                      activity.description.isNotEmpty ? activity.description : "No description"),
-                  _buildDetailRow('Task Group', activity.taskGroup),
-                  _buildDetailRow('Created At', activity.createdAt),
-                  _buildDetailRow('Updated At', activity.updatedAt),
-                  _buildDetailRow('Time Ago', activity.timeAgo),
+                  _buildDetailRow("Description", activity.description.isNotEmpty ? activity.description : "No description"),
+                  _buildDetailRow("Task Group", activity.taskGroup),
+                  _buildDetailRow("Created At", activity.createdAt),
+                  _buildDetailRow("Updated At", activity.updatedAt),
+                  _buildDetailRow("Time Ago", activity.timeAgo),
                 ],
               ),
             );
@@ -236,8 +260,13 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value ?? "N/A")),
+          Text(
+            "$label: ",
+            style: TextStyle(fontWeight: FontWeight.bold, color: ThemeConfig.goldenYellow),
+          ),
+          Expanded(
+            child: Text(value ?? "N/A", style: const TextStyle(color: Colors.white)),
+          ),
         ],
       ),
     );

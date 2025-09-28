@@ -1,14 +1,14 @@
-import 'package:client/models/case_summary.dart';
-import 'package:client/models/dashboard_summary.dart';
-import 'package:client/models/document_status_summary.dart';
-import 'package:client/models/upcoming_deadline_summary.dart';
+import 'package:client/config/theme_config.dart';
 import 'package:flutter/material.dart';
-
 import '../../models/case.dart';
+import '../../models/case_summary.dart';
+import '../../models/dashboard_summary.dart';
 import '../../models/deadline.dart';
 import '../../models/document.dart';
+import '../../models/document_status_summary.dart';
 import '../../models/recent_activity.dart';
 import '../../models/task.dart';
+import '../../models/upcoming_deadline_summary.dart';
 import '../../services/api_service.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
@@ -16,14 +16,14 @@ import '../../widgets/dashboard/case_summary_card.dart';
 import '../../widgets/dashboard/document_status_card.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
 import '../../widgets/dashboard/upcoming_deadlines_card.dart';
-import '../messages/send_message_screen.dart';
-import '../documents/upload_document_screen.dart';
+import '../appointments/appointments_screen.dart';
 import '../appointments/book_appointment_screen.dart';
+import '../billing/billing_screen.dart';
 import '../cases/cases_list_screen.dart';
 import '../documents/documents_screen.dart';
-import '../appointments/appointments_screen.dart';
+import '../documents/upload_document_screen.dart';
+import '../messages/send_message_screen.dart';
 import '../tasks/tasks_screen.dart';
-import '../billing/billing_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String matterId;
@@ -77,7 +77,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           totalAppointments: data['total_appointments'] ?? 0,
         );
 
-        // Parse Cases
         List<Case> cases = [];
         if (data['recent_cases'] != null && data['recent_cases'] is List) {
           cases = (data['recent_cases'] as List)
@@ -85,7 +84,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               .toList();
         }
 
-        // Parse Documents
         List<Document> documents = [];
         if (data['document_status']?['recent_documents'] != null &&
             data['document_status']['recent_documents'] is List) {
@@ -104,13 +102,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         UpcomingDeadlineSummary? upcomingDeadlineSummary;
         if (data['upcoming_deadlines']?['summary'] != null) {
           upcomingDeadlineSummary = UpcomingDeadlineSummary(
-            dueThisWeekCount: data['upcoming_deadlines']['summary']['due_this_week_count'] ?? 0,
-            appointmentsCount: data['upcoming_deadlines']['summary']['appointments_count'] ?? 0,
-            overdueCount: data['upcoming_deadlines']['summary']['overdue_count'] ?? 0,
+            dueThisWeekCount: data['upcoming_deadlines']['summary']
+            ['due_this_week_count'] ??
+                0,
+            appointmentsCount: data['upcoming_deadlines']['summary']
+            ['appointments_count'] ??
+                0,
+            overdueCount:
+            data['upcoming_deadlines']['summary']['overdue_count'] ?? 0,
           );
         }
 
-        // Parse Deadlines
         List<Deadline> deadlines = [];
         if (data['upcoming_deadlines']?['due_this_week_list'] != null &&
             data['upcoming_deadlines']['due_this_week_list'] is List) {
@@ -119,7 +121,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               .toList();
         }
 
-        // Parse Tasks (still empty in API response)
         List<Task> tasks = [];
         if (data['tasks'] != null && data['tasks'] is List) {
           tasks = (data['tasks'] as List)
@@ -127,7 +128,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               .toList();
         }
 
-        // Parse Recent Activity
         List<RecentActivity> recentActivity = [];
         if (data['recent_activity'] != null && data['recent_activity'] is List) {
           recentActivity = (data['recent_activity'] as List)
@@ -163,11 +163,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
         title: const Text('Dashboard'),
-        backgroundColor: Colors.transparent,
+        backgroundColor: ThemeConfig.goldenYellow,
+        foregroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
@@ -202,27 +204,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onUploadDocument: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const UploadDocumentScreen(),
+                      builder: (context) =>
+                      const UploadDocumentScreen(),
                     ),
                   );
                 },
                 onBookAppointment: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const BookAppointmentScreen(),
+                      builder: (context) =>
+                      const BookAppointmentScreen(),
                     ),
                   );
                 },
                 onSendMessage: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const SendMessageScreen(),
+                      builder: (context) =>
+                      const SendMessageScreen(),
                     ),
                   );
                 },
               ),
               const SizedBox(height: 24),
-              CaseSummaryCard(caseSummary: _caseSummary, cases: _cases),
+              CaseSummaryCard(
+                  caseSummary: _caseSummary, cases: _cases),
               const SizedBox(height: 24),
               DocumentStatusCard(
                 documentStatusSummary: _documentStatusSummary,
@@ -362,12 +368,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildRecentActivitySection() {
+    const cardBackground = Color(0xFF2A1F70); // lighter navy
+    const goldenYellow = Color(0xFFF9B000);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: cardBackground,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor),
+        border: Border.all(color: goldenYellow.withOpacity(0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -377,14 +386,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               Text(
                 'Recent Activity',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
-              TextButton(onPressed: () {
-                Navigator.pushNamed(context, '/recent-activity');
-                //Navigator.pushNamed(context, '/document-management');
-              }, child: const Text('View All')),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/recent-activity');
+                },
+                child: const Text(
+                  'View All',
+                  style: TextStyle(color: goldenYellow),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -394,7 +409,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               title: activity.title,
               subtitle: activity.description,
               time: activity.timeAgo,
-              color: Colors.blue,
+              color: goldenYellow,
             );
           }).toList(),
         ],
@@ -431,16 +446,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
                 Text(
                   subtitle,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.color
-                        ?.withOpacity(0.7),
+                    color: Colors.white70,
                   ),
                 ),
               ],
@@ -449,11 +461,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Text(
             time,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.color
-                  ?.withOpacity(0.5),
+              color: Colors.white54,
             ),
           ),
         ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../models/new/task.dart';
 import '../../services/api_service.dart';
+import '../../config/theme_config.dart';
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
@@ -109,7 +109,7 @@ class _TasksScreenState extends State<TasksScreen> {
   Color _getStatusColor(String status) {
     switch (status) {
       case 'pending':
-        return Colors.orange;
+        return ThemeConfig.goldenYellow;
       case 'in_progress':
         return Colors.blue;
       case 'completed':
@@ -159,10 +159,11 @@ class _TasksScreenState extends State<TasksScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
         title: const Text('Tasks'),
-        backgroundColor: Colors.transparent,
+        backgroundColor: ThemeConfig.goldenYellow,
+        foregroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
@@ -194,13 +195,14 @@ class _TasksScreenState extends State<TasksScreen> {
             },
             decoration: InputDecoration(
               hintText: 'Search tasks...',
-              prefixIcon: const Icon(Icons.search),
+              prefixIcon: const Icon(Icons.search, color: Colors.white70),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               filled: true,
-              fillColor: Theme.of(context).cardColor,
+              fillColor: Colors.grey[800],
             ),
+            style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 12),
           SingleChildScrollView(
@@ -237,9 +239,34 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 
+  Widget _buildFilterChip(String label, String value, String type) {
+    final isSelected =
+    type == 'status' ? _statusFilter == value : _priorityFilter == value;
+
+    return FilterChip(
+      label: Text(label, style: const TextStyle(color: Colors.white)),
+      selected: isSelected,
+      onSelected: (selected) {
+        setState(() {
+          if (type == 'status') {
+            _statusFilter = value;
+          } else {
+            _priorityFilter = value;
+          }
+        });
+        _loadTasks();
+      },
+      selectedColor: ThemeConfig.goldenYellow.withOpacity(0.2),
+      checkmarkColor: ThemeConfig.goldenYellow,
+      backgroundColor: Colors.grey[700],
+    );
+  }
+
   Widget _buildTaskList() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(color: ThemeConfig.goldenYellow),
+      );
     }
 
     if (_errorMessage != null) {
@@ -250,10 +277,17 @@ class _TasksScreenState extends State<TasksScreen> {
             Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
             const SizedBox(height: 16),
             Text(_errorMessage!,
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: const TextStyle(color: Colors.white),
                 textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: _loadTasks, child: const Text('Retry')),
+            ElevatedButton(
+              onPressed: _loadTasks,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThemeConfig.goldenYellow,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Retry'),
+            ),
           ],
         ),
       );
@@ -272,10 +306,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   _priorityFilter != 'all'
                   ? 'No tasks match your search'
                   : 'No tasks found',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: Colors.grey[600]),
+              style: const TextStyle(color: Colors.white70),
             ),
           ],
         ),
@@ -283,6 +314,7 @@ class _TasksScreenState extends State<TasksScreen> {
     }
 
     return RefreshIndicator(
+      color: ThemeConfig.goldenYellow,
       onRefresh: _loadTasks,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -295,41 +327,14 @@ class _TasksScreenState extends State<TasksScreen> {
     );
   }
 
-  Widget _buildFilterChip(String label, String value, String type) {
-    final isSelected =
-    type == 'status' ? _statusFilter == value : _priorityFilter == value;
-
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (selected) {
-        setState(() {
-          if (type == 'status') {
-            _statusFilter = value;
-          } else {
-            _priorityFilter = value;
-          }
-        });
-        _loadTasks();
-      },
-      selectedColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
-      checkmarkColor: Theme.of(context).primaryColor,
-    );
-  }
-
   Widget _buildTaskCard(Task task) {
-
-
     return Card(
+      color: Colors.grey[800],
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () {
-          _showTaskDetails(task);
-        },
+        onTap: () => _showTaskDetails(task),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -341,20 +346,18 @@ class _TasksScreenState extends State<TasksScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                      color: ThemeConfig.goldenYellow.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
-                      Icons.task,
-                      color: Theme.of(context).primaryColor,
-                      size: 24,
-                    ),
+                    child: Icon(Icons.task,
+                        color: ThemeConfig.goldenYellow, size: 24),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       task.title ?? 'Untitled Task',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      style: TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.w600,
                         decoration: task.status == 'completed'
                             ? TextDecoration.lineThrough
@@ -362,157 +365,18 @@ class _TasksScreenState extends State<TasksScreen> {
                       ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      // Priority Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: _getPriorityColor(task.priority ?? 'unknown')
-                              .withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: _getPriorityColor(task.priority ?? 'unknown')
-                                .withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              _getPriorityIcon(task.priority ?? 'unknown'),
-                              size: 12,
-                              color: _getPriorityColor(task.priority ?? 'unknown'),
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              _getPriorityText(task.priority ?? 'unknown'),
-                              style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: _getPriorityColor(
-                                    task.priority ?? 'unknown'),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Status Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: _getStatusColor(task.status ?? 'unknown')
-                              .withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: _getStatusColor(task.status ?? 'unknown')
-                                .withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              _getStatusIcon(task.status ?? 'unknown'),
-                              size: 14,
-                              color: _getStatusColor(task.status ?? 'unknown'),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _getStatusText(task.status ?? 'unknown'),
-                              style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: _getStatusColor(
-                                    task.status ?? 'unknown'),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(
-                    Icons.schedule,
-                    size: 16,
-                    color: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.color
-                        ?.withValues(alpha: 0.6),
-                  ),
+                  Icon(Icons.schedule,
+                      size: 16, color: Colors.white70),
                   const SizedBox(width: 4),
-                  Text(
-                    task.dueDate,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.color
-                          ?.withValues(alpha: 0.6),
-                    ),
-                  ),
+                  Text(task.dueDate,
+                      style: const TextStyle(color: Colors.white70)),
                 ],
               ),
-              const SizedBox(height: 8),
-              if (task.isOverdue)
-                Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.warning, size: 14, color: Colors.red[700]),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Overdue',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.red[700],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              else if (task.isOverdue)
-                Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                        color: Colors.orange.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.schedule, size: 14, color: Colors.orange[700]),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Due Soon',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.orange[700],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
             ],
           ),
         ),
@@ -524,6 +388,7 @@ class _TasksScreenState extends State<TasksScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: ThemeConfig.navyBlue,
       builder: (BuildContext context) {
         return DraggableScrollableSheet(
           initialChildSize: 0.6,
@@ -532,13 +397,11 @@ class _TasksScreenState extends State<TasksScreen> {
           builder: (context, scrollController) {
             return Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              decoration: const BoxDecoration(
+                  borderRadius:
+                  BorderRadius.vertical(top: Radius.circular(20))),
+              child: ListView(
+                controller: scrollController,
                 children: [
                   Center(
                     child: Container(
@@ -553,66 +416,19 @@ class _TasksScreenState extends State<TasksScreen> {
                   const SizedBox(height: 20),
                   Text(
                     task.title ?? 'Untitled Task',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    style: const TextStyle(
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
-                      decoration: task.status == 'completed'
-                          ? TextDecoration.lineThrough
-                          : null,
+                      fontSize: 20,
                     ),
                   ),
                   const SizedBox(height: 16),
                   _buildDetailRow(
-                      Icons.schedule,
-                      'Due Date',
-                      task.dueDate),
+                      Icons.schedule, 'Due Date', task.dueDate),
                   _buildDetailRow(Icons.priority_high, 'Priority',
                       _getPriorityText(task.priority ?? 'unknown')),
                   _buildDetailRow(Icons.info, 'Status',
                       _getStatusText(task.status ?? 'unknown')),
-                  _buildDetailRow(Icons.schedule, 'Created',
-                      task.createdAt),
-                  const SizedBox(height: 24),
-                  if (task.status != 'completed')
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'Mark as complete functionality not implemented yet')),
-                          );
-                        },
-                        icon: const Icon(Icons.check),
-                        label: const Text('Mark as Complete'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                    ),
-                  if (task.status == 'pending')
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'Start task functionality not implemented yet')),
-                          );
-                        },
-                        icon: const Icon(Icons.play_arrow),
-                        label: const Text('Start Task'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Theme.of(context).primaryColor,
-                          side:
-                          BorderSide(color: Theme.of(context).primaryColor),
-                        ),
-                      ),
-                    ),
                 ],
               ),
             );
@@ -627,19 +443,17 @@ class _TasksScreenState extends State<TasksScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Theme.of(context).primaryColor),
+          Icon(icon, size: 20, color: ThemeConfig.goldenYellow),
           const SizedBox(width: 12),
           Text(
             '$label: ',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w600),
           ),
           Expanded(
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyMedium,
-              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ],

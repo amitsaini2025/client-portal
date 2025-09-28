@@ -1,7 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-
-import '../../models/case.dart';
+import '../../config/theme_config.dart';
 import '../../models/new/document.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
@@ -21,11 +20,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   List<Document> _documents = [];
-  List<Case> _cases = [];
   Summary? _summary;
   Pagination? _pagination;
 
-  // Upload state
   bool _isUploading = false;
   double _uploadProgress = 0.0;
   String? _uploadStatus;
@@ -34,7 +31,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   void initState() {
     super.initState();
     _loadDocuments();
-    _loadCases();
   }
 
   Future<void> _loadDocuments({int page = 1}) async {
@@ -46,7 +42,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     try {
       final response = await ApiService.getClientDocuments(
         page: page,
-        selMatterID: AuthService.selectedMatterId!.toString(),
+        selMatterID: AuthService.selectedMatterId?.toString() ?? '',
       );
 
       if (response['success'] == true) {
@@ -60,7 +56,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = "Failed to load documents";
+          _errorMessage = 'Failed to load documents';
         });
       }
     } catch (e) {
@@ -68,24 +64,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         _isLoading = false;
         _errorMessage = 'Failed to load documents: ${e.toString()}';
       });
-    }
-  }
-
-  Future<void> _loadCases() async {
-    try {
-      final response = await ApiService.getClientCases();
-
-      if (response['success'] == true) {
-        final data = response['data'];
-        final cases =
-            (data['cases'] as List).map((json) => Case.fromJson(json)).toList();
-
-        setState(() {
-          _cases = cases;
-        });
-      }
-    } catch (e) {
-      debugPrint('Failed to load cases: $e');
     }
   }
 
@@ -100,12 +78,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       if (result != null && result.files.isNotEmpty) {
         final file = result.files.first;
 
-        // Show upload dialog
         final uploaded = await _showUploadDialog(file);
 
-        if (uploaded) {
-          await _loadDocuments();
-        }
+        if (uploaded) await _loadDocuments();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -120,144 +95,83 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   Future<bool> _showUploadDialog(PlatformFile file) async {
     String title = '';
     String description = '';
-    int? selectedCaseId;
     String priority = 'medium';
 
     return await showDialog<bool>(
-          context: context,
-          builder:
-              (context) => AlertDialog(
-                title: const Text('Upload Document'),
-                content: StatefulBuilder(
-                  builder:
-                      (context, setState) => SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // File info
-                            ListTile(
-                              leading: Icon(
-                                _getFileIcon(file.extension),
-                                color: Colors.blue,
-                              ),
-                              title: Text(file.name),
-                              subtitle: Text(
-                                '${(file.size / 1024 / 1024).toStringAsFixed(2)} MB',
-                              ),
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            // Title field
-                            TextField(
-                              decoration: const InputDecoration(
-                                labelText: 'Document Title',
-                                border: OutlineInputBorder(),
-                              ),
-                              onChanged: (value) => title = value,
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            // Description field
-                            TextField(
-                              decoration: const InputDecoration(
-                                labelText: 'Description',
-                                border: OutlineInputBorder(),
-                              ),
-                              maxLines: 3,
-                              onChanged: (value) => description = value,
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            // Case selection
-                            if (_cases.isNotEmpty) ...[
-                              DropdownButtonFormField<int>(
-                                decoration: const InputDecoration(
-                                  labelText: 'Related Case (Optional)',
-                                  border: OutlineInputBorder(),
-                                ),
-                                value: selectedCaseId,
-                                items:
-                                    _cases
-                                        .map(
-                                          (caseItem) => DropdownMenuItem(
-                                            value: caseItem.id,
-                                            child: Text(caseItem.title),
-                                          ),
-                                        )
-                                        .toList(),
-                                onChanged: (value) => selectedCaseId = value,
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-
-                            // Priority selection
-                            DropdownButtonFormField<String>(
-                              decoration: const InputDecoration(
-                                labelText: 'Priority',
-                                border: OutlineInputBorder(),
-                              ),
-                              value: priority,
-                              items: const [
-                                DropdownMenuItem(
-                                  value: 'low',
-                                  child: Text('Low'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'medium',
-                                  child: Text('Medium'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'high',
-                                  child: Text('High'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'critical',
-                                  child: Text('Critical'),
-                                ),
-                              ],
-                              onChanged: (value) => priority = value!,
-                            ),
-                          ],
-                        ),
-                      ),
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Upload Document'),
+        content: StatefulBuilder(
+          builder: (context, setState) => SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Icon(
+                    _getFileIcon(file.extension),
+                    color: Colors.blue,
+                  ),
+                  title: Text(file.name),
+                  subtitle: Text('${(file.size / 1024 / 1024).toStringAsFixed(2)} MB'),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text('Cancel'),
+                const SizedBox(height: 12),
+                TextField(
+                  decoration: const InputDecoration(
+                    labelText: 'Document Title',
+                    border: OutlineInputBorder(),
                   ),
-                  ElevatedButton(
-                    onPressed:
-                        title.trim().isEmpty
-                            ? null
-                            : () async {
-                              Navigator.of(context).pop(true);
-                              await _performUpload(
-                                file,
-                                title,
-                                description,
-                                selectedCaseId,
-                                priority,
-                              );
-                            },
-                    child: const Text('Upload'),
+                  onChanged: (value) => title = value,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(),
                   ),
-                ],
-              ),
-        ) ??
+                  maxLines: 3,
+                  onChanged: (value) => description = value,
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    labelText: 'Priority',
+                    border: OutlineInputBorder(),
+                  ),
+                  value: priority,
+                  items: const [
+                    DropdownMenuItem(value: 'low', child: Text('Low')),
+                    DropdownMenuItem(value: 'medium', child: Text('Medium')),
+                    DropdownMenuItem(value: 'high', child: Text('High')),
+                    DropdownMenuItem(value: 'critical', child: Text('Critical')),
+                  ],
+                  onChanged: (value) => priority = value!,
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: title.trim().isEmpty
+                ? null
+                : () async {
+              Navigator.of(context).pop(true);
+              await _performUpload(file, title, description, priority);
+            },
+            child: const Text('Upload'),
+          ),
+        ],
+      ),
+    ) ??
         false;
   }
 
   Future<void> _performUpload(
-    PlatformFile file,
-    String title,
-    String description,
-    int? caseId,
-    String priority,
-  ) async {
+      PlatformFile file, String title, String description, String priority) async {
     setState(() {
       _isUploading = true;
       _uploadProgress = 0.0;
@@ -265,7 +179,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     });
 
     try {
-      // TODO: Replace with actual API upload
       await Future.delayed(const Duration(seconds: 2));
 
       setState(() {
@@ -299,27 +212,25 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   Future<void> _deleteDocument(Document document) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Delete Document'),
-            content: Text('Delete "${document.name}"?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: const Text('Delete'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Document'),
+        content: Text('Delete "${document.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
     );
 
     if (confirmed == true) {
       try {
-        // TODO: Replace with API call
         await Future.delayed(const Duration(milliseconds: 500));
         setState(() {
           _documents.removeWhere((d) => d.id == document.id);
@@ -360,13 +271,16 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(body: LoadingWidget());
-    }
+    if (_isLoading) return const Scaffold(body: LoadingWidget());
 
     if (_errorMessage != null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Documents')),
+        backgroundColor: ThemeConfig.navyBlue,
+        appBar: AppBar(
+          title: const Text('Documents'),
+          backgroundColor: ThemeConfig.goldenYellow,
+          foregroundColor: Colors.white,
+        ),
         body: CustomErrorWidget(
           message: _errorMessage!,
           onRetry: _loadDocuments,
@@ -375,21 +289,14 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     }
 
     return Scaffold(
+      backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
         title: const Text('Documents'),
+        backgroundColor: ThemeConfig.goldenYellow,
+        foregroundColor: Colors.white,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // TODO: Add search
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              // TODO: Add filter
-            },
-          ),
+          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.filter_list), onPressed: () {}),
         ],
       ),
       body: Column(
@@ -401,27 +308,26 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               status: _uploadStatus ?? '',
             ),
           Expanded(
-            child:
-                _documents.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _documents.length,
-                      itemBuilder: (context, index) {
-                        final doc = _documents[index];
-                        return DocumentCard(
-                          document: doc,
-                          onTap: () {
-                            // TODO: Navigate to details
-                          },
-                          onDelete: () => _deleteDocument(doc),
-                        );
-                      },
-                    ),
+            child: _documents.isEmpty
+                ? _buildEmptyState()
+                : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _documents.length,
+              itemBuilder: (context, index) {
+                final doc = _documents[index];
+                return DocumentCard(
+                  document: doc,
+                  onTap: () {},
+                  onDelete: () => _deleteDocument(doc),
+                );
+              },
+            ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: ThemeConfig.goldenYellow,
+        foregroundColor: Colors.white,
         onPressed: _isUploading ? null : _uploadDocument,
         child: const Icon(Icons.add),
       ),
@@ -433,20 +339,16 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.folder_open, size: 64, color: Colors.grey.shade400),
+          Icon(Icons.folder_open, size: 64, color: Colors.white70),
           const SizedBox(height: 16),
           Text(
             'No documents yet',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(color: Colors.grey.shade600),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
           ),
           const SizedBox(height: 8),
           Text(
             'Upload your first document to get started',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade500),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
@@ -454,6 +356,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             onPressed: _uploadDocument,
             icon: const Icon(Icons.upload),
             label: const Text('Upload Document'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ThemeConfig.goldenYellow,
+              foregroundColor: Colors.white,
+            ),
           ),
         ],
       ),

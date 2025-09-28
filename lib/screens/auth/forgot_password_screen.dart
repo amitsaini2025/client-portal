@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/common/error_widget.dart';
+import '../../config/theme_config.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -12,7 +13,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  
+
   bool _isLoading = false;
   String? _errorMessage;
   String? _successMessage;
@@ -39,7 +40,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         setState(() {
           _successMessage = result['message'];
           Future.delayed(const Duration(seconds: 1), () {
-            //Navigator.pushReplacementNamed(context, '/set-password');
             Navigator.pushReplacementNamed(
               context,
               '/reset-password',
@@ -66,7 +66,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
         title: const Text('Forgot Password'),
         backgroundColor: Colors.transparent,
@@ -93,7 +93,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
+                          color: ThemeConfig.goldenYellow,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Icon(
@@ -107,21 +107,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         'Forgot Password?',
                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Enter your email address and we\'ll send you a code.',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                          color: Colors.white.withOpacity(0.7),
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 48),
-                  
+
                   // Form
                   Form(
                     key: _formKey,
@@ -135,13 +136,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           decoration: InputDecoration(
                             labelText: 'Email Address',
                             hintText: 'Enter your email address',
+                            hintStyle: const TextStyle(color: Colors.grey),
                             prefixIcon: const Icon(Icons.email_outlined),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             filled: true,
-                            fillColor: Theme.of(context).cardColor,
+                            fillColor: Colors.white,
                           ),
+                          style: const TextStyle(color: Colors.black),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Please enter your email address';
@@ -152,14 +155,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             return null;
                           },
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Submit Button
                         ElevatedButton(
                           onPressed: _isLoading ? null : _resetPassword,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
+                            backgroundColor: ThemeConfig.goldenYellow,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
@@ -168,58 +171,54 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             elevation: 0,
                           ),
                           child: _isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              )
-                            : const Text(
-                                'Send Code',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                              ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                              : const Text(
+                            'Send Code',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        
+
                         // Back to Login
                         TextButton(
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: const Text('Back to Login'),
+                          child: const Text('Back to Login', style: TextStyle(color: Colors.white)),
                         ),
                       ],
                     ),
                   ),
-                  
+
                   // Error/Success Messages
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 20),
                     CustomErrorWidget(message: _errorMessage!),
                   ],
-                  
+
                   if (_successMessage != null) ...[
                     const SizedBox(height: 20),
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.green.withValues(alpha: 0.1),
+                        color: Colors.green.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                        border: Border.all(color: Colors.green.withOpacity(0.3)),
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.check_circle,
-                            color: Colors.green,
-                            size: 20,
-                          ),
+                          const Icon(Icons.check_circle, color: Colors.green, size: 20),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(

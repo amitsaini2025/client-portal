@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/common/error_widget.dart';
+import '../../config/theme_config.dart'; // Make sure this import is present
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -20,15 +21,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _cityController = TextEditingController();
   final _addressController = TextEditingController();
-  
+
   DateTime? _selectedDob;
   DateTime? _selectedWeddingAnniversary;
-  
+
   bool _isLoading = false;
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _acceptTerms = false;
-  
+
   String? _errorMessage;
   String? _successMessage;
 
@@ -47,17 +48,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _selectDate(BuildContext context, bool isDob) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: isDob 
-        ? DateTime.now().subtract(const Duration(days: 6570)) // 18 years ago
-        : DateTime.now(),
-      firstDate: isDob 
-        ? DateTime.now().subtract(const Duration(days: 36500)) // 100 years ago
-        : DateTime.now().subtract(const Duration(days: 36500)),
-      lastDate: isDob 
-        ? DateTime.now().subtract(const Duration(days: 6570)) // 18 years ago
-        : DateTime.now(),
+      initialDate: isDob
+          ? DateTime.now().subtract(const Duration(days: 6570)) // 18 years ago
+          : DateTime.now(),
+      firstDate: isDob
+          ? DateTime.now().subtract(const Duration(days: 36500)) // 100 years ago
+          : DateTime.now().subtract(const Duration(days: 36500)),
+      lastDate: isDob
+          ? DateTime.now().subtract(const Duration(days: 6570)) // 18 years ago
+          : DateTime.now(),
     );
-    
+
     if (picked != null) {
       setState(() {
         if (isDob) {
@@ -101,8 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         setState(() {
           _successMessage = result['message'];
         });
-        
-        // Navigate to login after successful registration
+
         Future.delayed(const Duration(seconds: 2), () {
           Navigator.pushReplacementNamed(context, '/login');
         });
@@ -125,7 +125,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
         title: const Text('Create Account'),
         backgroundColor: Colors.transparent,
@@ -150,7 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
+                        color: ThemeConfig.goldenYellow,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Icon(
@@ -164,42 +164,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       'Join Our Client Portal',
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Create your account to get started',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                        color: Colors.white.withOpacity(0.7),
                       ),
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Personal Information
                 Text(
                   'Personal Information',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Name Field
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
                     labelText: 'Full Name *',
                     hintText: 'Enter your full name',
-                    prefixIcon: const Icon(Icons.person_outlined),
+                    prefixIcon: const Icon(Icons.person_outlined, color: Colors.white),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Theme.of(context).cardColor,
+                    fillColor: ThemeConfig.navyBlue,
                   ),
+                  style: const TextStyle(color: Colors.white),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter your full name';
@@ -210,9 +213,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Email Field
                 TextFormField(
                   controller: _emailController,
@@ -220,13 +223,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Email Address *',
                     hintText: 'Enter your email address',
-                    prefixIcon: const Icon(Icons.email_outlined),
+                    prefixIcon: const Icon(Icons.email_outlined, color: Colors.white),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Theme.of(context).cardColor,
+                    fillColor: ThemeConfig.navyBlue,
                   ),
+                  style: const TextStyle(color: Colors.white),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter your email address';
@@ -237,9 +241,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Phone Field
                 TextFormField(
                   controller: _phoneController,
@@ -247,13 +251,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Phone Number *',
                     hintText: 'Enter your phone number',
-                    prefixIcon: const Icon(Icons.phone_outlined),
+                    prefixIcon: const Icon(Icons.phone_outlined, color: Colors.white),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Theme.of(context).cardColor,
+                    fillColor: ThemeConfig.navyBlue,
                   ),
+                  style: const TextStyle(color: Colors.white),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter your phone number';
@@ -264,26 +269,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // City Field
                 TextFormField(
                   controller: _cityController,
                   decoration: InputDecoration(
                     labelText: 'City',
                     hintText: 'Enter your city (optional)',
-                    prefixIcon: const Icon(Icons.location_city_outlined),
+                    prefixIcon: const Icon(Icons.location_city_outlined, color: Colors.white),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Theme.of(context).cardColor,
+                    fillColor: ThemeConfig.navyBlue,
                   ),
+                  style: const TextStyle(color: Colors.white),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Address Field
                 TextFormField(
                   controller: _addressController,
@@ -291,33 +297,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Address',
                     hintText: 'Enter your address (optional)',
-                    prefixIcon: const Icon(Icons.home_outlined),
+                    prefixIcon: const Icon(Icons.home_outlined, color: Colors.white),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Theme.of(context).cardColor,
+                    fillColor: ThemeConfig.navyBlue,
                   ),
+                  style: const TextStyle(color: Colors.white),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Date of Birth
                 InkWell(
                   onTap: () => _selectDate(context, true),
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).dividerColor),
+                      border: Border.all(color: Colors.white.withOpacity(0.3)),
                       borderRadius: BorderRadius.circular(12),
-                      color: Theme.of(context).cardColor,
+                      color: ThemeConfig.navyBlue,
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.calendar_today_outlined,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        Icon(Icons.calendar_today_outlined, color: ThemeConfig.goldenYellow),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -325,9 +329,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ? 'Date of Birth: ${DateFormat('MMM dd, yyyy').format(_selectedDob!)}'
                                 : 'Date of Birth (optional)',
                             style: TextStyle(
-                              color: _selectedDob != null
-                                  ? Theme.of(context).textTheme.bodyMedium?.color
-                                  : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+                              color: Colors.white.withOpacity(_selectedDob != null ? 1 : 0.5),
                             ),
                           ),
                         ),
@@ -335,25 +337,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Wedding Anniversary
                 InkWell(
                   onTap: () => _selectDate(context, false),
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).dividerColor),
+                      border: Border.all(color: Colors.white.withOpacity(0.3)),
                       borderRadius: BorderRadius.circular(12),
-                      color: Theme.of(context).cardColor,
+                      color: ThemeConfig.navyBlue,
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.favorite_outlined,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        Icon(Icons.favorite_outlined, color: ThemeConfig.goldenYellow),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -361,9 +360,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ? 'Wedding Anniversary: ${DateFormat('MMM dd, yyyy').format(_selectedWeddingAnniversary!)}'
                                 : 'Wedding Anniversary (optional)',
                             style: TextStyle(
-                              color: _selectedWeddingAnniversary != null
-                                  ? Theme.of(context).textTheme.bodyMedium?.color
-                                  : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+                              color: Colors.white.withOpacity(_selectedWeddingAnniversary != null ? 1 : 0.5),
                             ),
                           ),
                         ),
@@ -371,18 +368,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Security Information
                 Text(
                   'Security Information',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Password Field
                 TextFormField(
                   controller: _passwordController,
@@ -390,41 +388,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Password *',
                     hintText: 'Create a strong password',
-                    prefixIcon: const Icon(Icons.lock_outlined),
+                    prefixIcon: const Icon(Icons.lock_outlined, color: Colors.white),
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible 
-                          ? Icons.visibility_off 
-                          : Icons.visibility,
-                      ),
+                      icon: Icon(_isPasswordVisible ? Icons.visibility_off : Icons.visibility, color: Colors.white),
                       onPressed: () {
                         setState(() {
                           _isPasswordVisible = !_isPasswordVisible;
                         });
                       },
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     filled: true,
-                    fillColor: Theme.of(context).cardColor,
+                    fillColor: ThemeConfig.navyBlue,
                   ),
+                  style: const TextStyle(color: Colors.white),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a password';
-                    }
-                    if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
-                    }
+                    if (value == null || value.isEmpty) return 'Please enter a password';
+                    if (value.length < 8) return 'Password must be at least 8 characters';
                     if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
                       return 'Password must contain uppercase, lowercase, and number';
                     }
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Confirm Password Field
                 TextFormField(
                   controller: _confirmPasswordController,
@@ -432,38 +421,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Confirm Password *',
                     hintText: 'Confirm your password',
-                    prefixIcon: const Icon(Icons.lock_outlined),
+                    prefixIcon: const Icon(Icons.lock_outlined, color: Colors.white),
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        _isConfirmPasswordVisible 
-                          ? Icons.visibility_off 
-                          : Icons.visibility,
-                      ),
+                      icon: Icon(_isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility, color: Colors.white),
                       onPressed: () {
                         setState(() {
                           _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
                         });
                       },
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     filled: true,
-                    fillColor: Theme.of(context).cardColor,
+                    fillColor: ThemeConfig.navyBlue,
                   ),
+                  style: const TextStyle(color: Colors.white),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'Passwords do not match';
-                    }
+                    if (value == null || value.isEmpty) return 'Please confirm your password';
+                    if (value != _passwordController.text) return 'Passwords do not match';
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Terms and Conditions
                 Row(
                   children: [
@@ -474,17 +454,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           _acceptTerms = value ?? false;
                         });
                       },
+                      checkColor: ThemeConfig.navyBlue,
+                      activeColor: ThemeConfig.goldenYellow,
                     ),
                     Expanded(
                       child: RichText(
                         text: TextSpan(
                           text: 'I agree to the ',
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          style: const TextStyle(color: Colors.white),
                           children: [
                             TextSpan(
                               text: 'Terms of Service',
                               style: TextStyle(
-                                color: Theme.of(context).primaryColor,
+                                color: ThemeConfig.goldenYellow,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -492,7 +474,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             TextSpan(
                               text: 'Privacy Policy',
                               style: TextStyle(
-                                color: Theme.of(context).primaryColor,
+                                color: ThemeConfig.goldenYellow,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -502,80 +484,71 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Register Button
                 ElevatedButton(
                   onPressed: _isLoading ? null : _register,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
+                    backgroundColor: ThemeConfig.goldenYellow,
+                    foregroundColor: ThemeConfig.navyBlue,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
                   ),
                   child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Text(
-                        'Create Account',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                      : const Text(
+                    'Create Account',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Login Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Already have an account? ',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    const Text('Already have an account? ', style: TextStyle(color: Colors.white)),
                     TextButton(
                       onPressed: () {
                         Navigator.pushReplacementNamed(context, '/login');
                       },
-                      child: const Text('Sign In'),
+                      child: Text('Sign In', style: TextStyle(color: ThemeConfig.goldenYellow)),
                     ),
                   ],
                 ),
-                
+
                 // Error/Success Messages
                 if (_errorMessage != null) ...[
                   const SizedBox(height: 20),
                   CustomErrorWidget(message: _errorMessage!),
                 ],
-                
+
                 if (_successMessage != null) ...[
                   const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
+                      color: Colors.green.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                      border: Border.all(color: Colors.green.withOpacity(0.3)),
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.check_circle,
-                          color: Colors.green,
-                          size: 20,
-                        ),
+                        const Icon(Icons.check_circle, color: Colors.green, size: 20),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
@@ -598,6 +571,3 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
-
-
-

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:client/config/theme_config.dart'; // ✅ Import theme
 import '../../models/new/document_category.dart';
 import '../../services/api_service.dart';
 
@@ -92,10 +93,14 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
     final currentType = _mainTabController.index == 0 ? "personal" : "visa";
 
     return Scaffold(
+      backgroundColor: ThemeConfig.navyBlue, // ✅ Background color
       appBar: AppBar(
         title: const Text("Documents"),
+        backgroundColor: ThemeConfig.goldenYellow, // ✅ AppBar theme
+        foregroundColor: Colors.white,
         bottom: TabBar(
           controller: _mainTabController,
+          indicatorColor: Colors.white,
           onTap: (index) {
             final type = index == 0 ? "personal" : "visa";
             _loadCategories(type);
@@ -128,14 +133,14 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
                       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: selected ? Theme.of(context).primaryColor : Colors.grey[300],
+                        color: selected ? ThemeConfig.goldenYellow : Colors.grey[700],
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Center(
                         child: Text(
                           cat.title,
                           style: TextStyle(
-                            color: selected ? Colors.white : Colors.black,
+                            color: selected ? Colors.white : Colors.white70,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -152,29 +157,35 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
   }
 
   Widget _buildBody(String type) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Colors.white));
     if (_errorMessage != null) return _buildError(type);
     if (_documents.isEmpty) return _buildEmpty();
 
     return RefreshIndicator(
       onRefresh: () async => _loadChecklist(type),
+      color: ThemeConfig.goldenYellow,
       child: ListView.builder(
         itemCount: _documents.length,
         itemBuilder: (context, index) {
           final doc = _documents[index];
           return Card(
+            color: Colors.grey[800], // ✅ Card background
             margin: const EdgeInsets.all(8),
             child: ListTile(
-              title: Text(doc.name),
+              title: Text(doc.name, style: const TextStyle(color: Colors.white)),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Type: ${doc.docTypeName}"),
-                  Text("Created: ${doc.createdAt}"),
-                  Text("Updated: ${doc.updatedAt}"),
+                  Text("Type: ${doc.docTypeName}", style: const TextStyle(color: Colors.white70)),
+                  Text("Created: ${doc.createdAt}", style: const TextStyle(color: Colors.white70)),
+                  Text("Updated: ${doc.updatedAt}", style: const TextStyle(color: Colors.white70)),
                 ],
               ),
               trailing: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ThemeConfig.goldenYellow,
+                  foregroundColor: Colors.white,
+                ),
                 onPressed: () {
                   // TODO: Upload / View
                 },
@@ -192,11 +203,15 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+          const Icon(Icons.error_outline, size: 64, color: Colors.redAccent),
           const SizedBox(height: 16),
-          Text(_errorMessage!),
+          Text(_errorMessage!, style: const TextStyle(color: Colors.white)),
           const SizedBox(height: 16),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ThemeConfig.goldenYellow,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () => _loadCategories(type),
             child: const Text("Retry"),
           ),
@@ -210,9 +225,9 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: const [
-          Icon(Icons.folder_open, size: 64, color: Colors.grey),
+          Icon(Icons.folder_open, size: 64, color: Colors.white70),
           SizedBox(height: 16),
-          Text("No documents found"),
+          Text("No documents found", style: TextStyle(color: Colors.white70)),
         ],
       ),
     );

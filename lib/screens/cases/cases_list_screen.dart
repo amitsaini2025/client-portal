@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:client/config/theme_config.dart';
 import '../../models/new/case.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
@@ -50,7 +51,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
       final result = await ApiService.getClientCases(
         page: page,
         perPage: perPage,
-        selMatterId: AuthService.selectedMatterId!.toString()
+        selMatterId: AuthService.selectedMatterId!.toString(),
       );
 
       if (result['success'] == true) {
@@ -96,30 +97,17 @@ class _CasesListScreenState extends State<CasesListScreen> {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'completed':
-        return const Color(0xFF5E8B7E);
+        return Colors.greenAccent;
       case 'in_progress':
-        return const Color(0xFFF39C12);
+        return Colors.orangeAccent;
       case 'pending_documents':
-        return const Color(0xFFE74C3C);
+        return Colors.redAccent;
       case 'under_review':
-        return const Color(0xFF3498DB);
+        return Colors.blueAccent;
       case 'approved':
-        return const Color(0xFF27AE60);
+        return Colors.lightGreen;
       default:
-        return const Color(0xFFB0B7C3);
-    }
-  }
-
-  Color _getPriorityColor(String priority) {
-    switch (priority.toLowerCase()) {
-      case 'high':
-        return const Color(0xFFE74C3C);
-      case 'medium':
-        return const Color(0xFFF39C12);
-      case 'low':
-        return const Color(0xFF27AE60);
-      default:
-        return const Color(0xFFB0B7C3);
+        return Colors.grey;
     }
   }
 
@@ -143,6 +131,14 @@ class _CasesListScreenState extends State<CasesListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeConfig.navyBlue,
+      appBar: AppBar(
+        title: const Text("My Cases"),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ThemeConfig.goldenYellow,
+        foregroundColor: Colors.white,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -154,7 +150,11 @@ class _CasesListScreenState extends State<CasesListScreen> {
               children: [
                 Text(
                   'My Cases',
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
@@ -163,7 +163,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                   icon: const Icon(Icons.add, size: 18),
                   label: const Text('New Case'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5E8B7E),
+                    backgroundColor: ThemeConfig.goldenYellow,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -182,9 +182,9 @@ class _CasesListScreenState extends State<CasesListScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: ThemeConfig.navyBlue.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE3E8EF)),
+                border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
               ),
               child: Row(
                 children: [
@@ -223,7 +223,11 @@ class _CasesListScreenState extends State<CasesListScreen> {
             // States
             if (isLoading)
               const Expanded(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: ThemeConfig.goldenYellow,
+                  ),
+                ),
               )
             else if (error != null)
               Expanded(
@@ -234,10 +238,17 @@ class _CasesListScreenState extends State<CasesListScreen> {
                       const Icon(Icons.error_outline,
                           size: 64, color: Colors.red),
                       const SizedBox(height: 16),
-                      Text('Error: $error'),
+                      Text(
+                        'Error: $error',
+                        style: const TextStyle(color: Colors.white),
+                      ),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () => _fetchCases(page: 1),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ThemeConfig.goldenYellow,
+                          foregroundColor: Colors.white,
+                        ),
                         child: const Text('Retry'),
                       ),
                     ],
@@ -251,18 +262,18 @@ class _CasesListScreenState extends State<CasesListScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Icon(Icons.folder_open,
-                            size: 64, color: Color(0xFFB0B7C3)),
+                            size: 64, color: Colors.white54),
                         SizedBox(height: 16),
                         Text(
                           'No cases found',
                           style:
-                          TextStyle(fontSize: 18, color: Color(0xFF5E8B7E)),
+                          TextStyle(fontSize: 18, color: Colors.white70),
                         ),
                         SizedBox(height: 8),
                         Text(
                           'Your cases will appear here once they are created',
                           style:
-                          TextStyle(fontSize: 14, color: Color(0xFFB0B7C3)),
+                          TextStyle(fontSize: 14, color: Colors.white54),
                         ),
                       ],
                     ),
@@ -271,6 +282,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
               else
                 Expanded(
                   child: RefreshIndicator(
+                    color: ThemeConfig.goldenYellow,
                     onRefresh: () => _fetchCases(page: 1),
                     child: ListView.builder(
                       controller: _scrollController,
@@ -282,7 +294,11 @@ class _CasesListScreenState extends State<CasesListScreen> {
                         } else {
                           return const Padding(
                             padding: EdgeInsets.all(16.0),
-                            child: Center(child: CircularProgressIndicator()),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: ThemeConfig.goldenYellow,
+                              ),
+                            ),
                           );
                         }
                       },
@@ -297,6 +313,11 @@ class _CasesListScreenState extends State<CasesListScreen> {
 
   Widget _buildCaseCard(Case caseItem) {
     return Card(
+      color: ThemeConfig.navyBlue.withOpacity(0.8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: ThemeConfig.goldenYellow.withOpacity(0.4)),
+      ),
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
         onTap: () {
@@ -319,7 +340,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF30475E),
+                            color: Colors.white,
                           ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
@@ -329,7 +350,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                           caseItem.stageName ?? 'No description available',
                           style: GoogleFonts.inter(
                             fontSize: 14,
-                            color: const Color(0xFF5E8B7E),
+                            color: ThemeConfig.goldenYellow,
                           ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
@@ -337,30 +358,23 @@ class _CasesListScreenState extends State<CasesListScreen> {
                       ],
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _getStatusColor(caseItem.status)
-                              .withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          _getStatusText(caseItem.status),
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w600,
-                            color: _getStatusColor(caseItem.status),
-                            fontSize: 12,
-                          ),
-                        ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(caseItem.status).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      _getStatusText(caseItem.status),
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w600,
+                        color: _getStatusColor(caseItem.status),
+                        fontSize: 12,
                       ),
-                      const SizedBox(height: 8),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -379,15 +393,15 @@ class _CasesListScreenState extends State<CasesListScreen> {
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF30475E),
+                          color: Colors.white,
                         ),
                       ),
                       Text(
-                        caseItem.progressDisplay!,
+                        caseItem.progressDisplay ?? '',
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF5E8B7E),
+                          color: ThemeConfig.goldenYellow,
                         ),
                       ),
                     ],
@@ -395,9 +409,9 @@ class _CasesListScreenState extends State<CasesListScreen> {
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
                     value: (caseItem.progressPercentage ?? 0) / 100,
-                    backgroundColor: const Color(0xFFE3E8EF),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Color(0xFF5E8B7E),
+                    backgroundColor: Colors.white12,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      ThemeConfig.goldenYellow,
                     ),
                   ),
                 ],
@@ -416,13 +430,12 @@ class _CasesListScreenState extends State<CasesListScreen> {
                       child: _buildDetailItem(
                         Icons.person,
                         '${entry.key}: ${entry.value.name}',
-                        const Color(0xFF5E8B7E),
+                        ThemeConfig.goldenYellow,
                       ),
                     );
                   }),
                 ],
               ),
-
 
               const SizedBox(height: 16),
 
@@ -437,7 +450,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                     icon: const Icon(Icons.timeline, size: 18),
                     label: const Text('Timeline'),
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFF5E8B7E),
+                      foregroundColor: ThemeConfig.goldenYellow,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -448,7 +461,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                     icon: const Icon(Icons.visibility, size: 18),
                     label: const Text('View Details'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF5E8B7E),
+                      backgroundColor: ThemeConfig.goldenYellow,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -473,24 +486,28 @@ class _CasesListScreenState extends State<CasesListScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFF0F4F8),
+          color: ThemeConfig.navyBlue.withOpacity(0.7),
           borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 24, color: const Color(0xFF5E8B7E)),
+            Icon(icon, size: 24, color: ThemeConfig.goldenYellow),
             const SizedBox(height: 8),
             Text(
               value,
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF30475E),
+                color: Colors.white,
               ),
             ),
             Text(
               title,
-              style: GoogleFonts.inter(fontSize: 12, color: Color(0xFF5E8B7E)),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: ThemeConfig.goldenYellow,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -505,40 +522,11 @@ class _CasesListScreenState extends State<CasesListScreen> {
       children: [
         Icon(icon, size: 16, color: color),
         const SizedBox(width: 6),
-        Text(text, style: GoogleFonts.inter(fontSize: 13, color: color)),
+        Text(
+          text,
+          style: GoogleFonts.inter(fontSize: 13, color: color),
+        ),
       ],
     );
-  }
-
-  int _calculateProgress(Case caseItem) {
-    switch (caseItem.status.toLowerCase()) {
-      case 'completed':
-        return 100;
-      case 'in_progress':
-        return 65;
-      case 'pending_documents':
-        return 25;
-      case 'under_review':
-        return 50;
-      case 'approved':
-        return 90;
-      default:
-        return 0;
-    }
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = date.difference(now);
-
-    if (difference.inDays == 0) {
-      return 'Today';
-    } else if (difference.inDays == 1) {
-      return 'Tomorrow';
-    } else if (difference.inDays < 0) {
-      return '${difference.inDays.abs()} days ago';
-    } else {
-      return '${difference.inDays} days';
-    }
   }
 }

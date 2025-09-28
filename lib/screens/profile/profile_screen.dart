@@ -1,6 +1,6 @@
+import 'package:client/config/theme_config.dart';
 import 'package:flutter/material.dart';
 import 'package:client/services/api_service.dart';
-
 import '../../services/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -15,13 +15,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _errorMessage;
   Map<String, dynamic>? _profileData;
 
+
   @override
   void initState() {
     super.initState();
     _fetchProfile();
   }
-
-
 
   Future<void> _fetchProfile() async {
     setState(() {
@@ -62,9 +61,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildProfileCard(BuildContext context) {
     final data = _profileData!;
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 4,
+    return Container(
+      decoration: BoxDecoration(
+        color: ThemeConfig.navyBlue,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -72,12 +74,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Avatar
             CircleAvatar(
               radius: 40,
-              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
+              backgroundColor: ThemeConfig.goldenYellow.withOpacity(0.2),
               child: Text(
                 data["first_name"] != null && data["first_name"].isNotEmpty
                     ? data["first_name"][0]
                     : "?",
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),
             const SizedBox(height: 16),
@@ -87,6 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               "${data["first_name"] ?? ""} ${data["last_name"] ?? ""}",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
 
@@ -96,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Text(
               data["email"] ?? "",
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[600],
+                color: Colors.white70,
               ),
             ),
 
@@ -122,21 +125,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: Colors.blueAccent),
-      title: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text(value),
+      leading: Icon(icon, color: ThemeConfig.goldenYellow),
+      title: Text(
+        label,
+        style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white),
+      ),
+      subtitle: Text(value, style: const TextStyle(color: Colors.white70)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
         title: const Text("My Profile"),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
       body: SafeArea(
@@ -144,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: _isLoading
-                ? const CircularProgressIndicator()
+                ? const CircularProgressIndicator(color: ThemeConfig.goldenYellow)
                 : _errorMessage != null
                 ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -161,6 +167,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: _fetchProfile,
                   icon: const Icon(Icons.refresh),
                   label: const Text("Retry"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ThemeConfig.goldenYellow,
+                    foregroundColor: Colors.white,
+                  ),
                 )
               ],
             )

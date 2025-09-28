@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../config/theme_config.dart';
 
 class MattersScreen extends StatefulWidget {
   const MattersScreen({super.key});
@@ -22,9 +23,9 @@ class _MattersScreenState extends State<MattersScreen> {
   void _confirmSelection() {
     if (!AuthService.isMatterSelected) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a matter'),
-          backgroundColor: Colors.redAccent,
+        SnackBar(
+          content: const Text('Please select a matter'),
+          backgroundColor: Colors.redAccent.shade400,
         ),
       );
       return;
@@ -37,11 +38,10 @@ class _MattersScreenState extends State<MattersScreen> {
       arguments: AuthService.selectedMatterId.toString(),
     );
 
-
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Matter confirmed!'),
-        backgroundColor: Colors.green,
+      SnackBar(
+        content: const Text('Matter confirmed!'),
+        backgroundColor: ThemeConfig.navyBlue,
       ),
     );
 
@@ -55,12 +55,11 @@ class _MattersScreenState extends State<MattersScreen> {
         title: const Text(
           'Select Matter',
           style: TextStyle(
-            color: Colors.white,
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: ThemeConfig.navyBlue,
         actions: [
           IconButton(
             icon: const Icon(Icons.check, color: Colors.white),
@@ -74,11 +73,21 @@ class _MattersScreenState extends State<MattersScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+              child: Text(
+                'Error: ${snapshot.error}',
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
           } else if (!snapshot.hasData ||
               snapshot.data!['data'] == null ||
               snapshot.data!['data']['matters'].isEmpty) {
-            return const Center(child: Text('No matters found.'));
+            return Center(
+              child: Text(
+                'No matters found.',
+                style: TextStyle(color: ThemeConfig.navyBlue),
+              ),
+            );
           } else {
             final List matters = snapshot.data!['data']['matters'];
             final selectedMatterId = AuthService.selectedMatterId;
@@ -94,20 +103,22 @@ class _MattersScreenState extends State<MattersScreen> {
                 return GestureDetector(
                   onTap: () async {
                     await AuthService.selectMatter(matterId);
-                    setState(() {}); // refresh UI
+                    setState(() {});
                   },
                   child: Card(
                     elevation: isSelected ? 6 : 2,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: isSelected
-                          ? const BorderSide(
-                        color: Colors.blueAccent,
+                          ? BorderSide(
+                        color: ThemeConfig.navyBlue,
                         width: 2,
                       )
                           : BorderSide.none,
                     ),
-                    color: isSelected ? Colors.blue.shade50 : Colors.white,
+                    color: isSelected
+                        ? ThemeConfig.goldenYellow.withOpacity(0.3)
+                        : Colors.white,
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(
@@ -119,15 +130,16 @@ class _MattersScreenState extends State<MattersScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey[800],
+                          color: ThemeConfig.navyBlue,
                         ),
                       ),
                       trailing: isSelected
-                          ? const Icon(
+                          ? Icon(
                         Icons.check_circle,
-                        color: Colors.blueAccent,
+                        color: ThemeConfig.navyBlue,
                       )
-                          : const Icon(Icons.radio_button_unchecked),
+                          : Icon(Icons.radio_button_unchecked,
+                          color: ThemeConfig.navyBlue.withOpacity(0.6)),
                     ),
                   ),
                 );

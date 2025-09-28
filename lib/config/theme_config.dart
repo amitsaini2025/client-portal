@@ -57,6 +57,9 @@ class ThemeConfig {
   static const Color statusCancelled = Color(0xFFE74C3C);
   static const Color statusUnderReview = Color(0xFF9B59B6);
 
+  static const Color navyBlue = Color(0xFF1E1464);
+  static const Color goldenYellow = Color(0xFFF9B000);
+
   // Light Theme
   static ThemeData get lightTheme {
     return ThemeData(
