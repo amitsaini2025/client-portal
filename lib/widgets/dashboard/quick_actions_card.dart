@@ -4,12 +4,14 @@ class QuickActionsCard extends StatelessWidget {
   final VoidCallback onUploadDocument;
   final VoidCallback onBookAppointment;
   final VoidCallback onSendMessage;
+  final VoidCallback? onViewWorkflow;
 
   const QuickActionsCard({
     super.key,
     required this.onUploadDocument,
     required this.onBookAppointment,
     required this.onSendMessage,
+    this.onViewWorkflow,
   });
 
   @override
@@ -42,7 +44,7 @@ class QuickActionsCard extends StatelessWidget {
                   color: Colors.blue,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: _buildActionButton(
                   context: context,
@@ -52,7 +54,7 @@ class QuickActionsCard extends StatelessWidget {
                   color: Colors.green,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: _buildActionButton(
                   context: context,
@@ -60,6 +62,16 @@ class QuickActionsCard extends StatelessWidget {
                   label: 'Send Message',
                   onTap: onSendMessage,
                   color: Colors.orange,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildActionButton(
+                  context: context,
+                  icon: Icons.timeline,
+                  label: 'View Workflow',
+                  onTap: onViewWorkflow ?? () {},
+                  color: Colors.purple,
                 ),
               ),
             ],

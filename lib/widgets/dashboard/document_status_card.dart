@@ -83,36 +83,6 @@ class DocumentStatusCard extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Progress Bar
-          if (totalDocs > 0) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Overall Progress',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  '${((approvedDocs / totalDocs) * 100).round()}%',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.green,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            LinearProgressIndicator(
-              value: approvedDocs / totalDocs,
-              backgroundColor: Colors.grey.withValues(alpha: 0.3),
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
-              minHeight: 8,
-            ),
-            const SizedBox(height: 24),
-          ],
-
           // Recent Documents
           if (documents.isNotEmpty) ...[
             Text(

@@ -9,6 +9,7 @@ import '../../models/document_status_summary.dart';
 import '../../models/recent_activity.dart';
 import '../../models/task.dart';
 import '../../models/upcoming_deadline_summary.dart';
+import '../../models/workflow_stage.dart';
 import '../../services/api_service.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
@@ -16,6 +17,7 @@ import '../../widgets/dashboard/case_summary_card.dart';
 import '../../widgets/dashboard/document_status_card.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
 import '../../widgets/dashboard/upcoming_deadlines_card.dart';
+import '../../widgets/dashboard/workflow_progress_card.dart';
 import '../appointments/appointments_screen.dart';
 import '../appointments/book_appointment_screen.dart';
 import '../billing/billing_screen.dart';
@@ -47,11 +49,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Deadline> _deadlines = [];
   List<Task> _tasks = [];
   List<RecentActivity> _recentActivity = [];
+  
+  WorkflowStagesResponse? _workflowResponse;
+  bool _isLoadingWorkflow = false;
 
   @override
   void initState() {
     super.initState();
     _loadDashboardData();
+    _loadWorkflowData();
+  }
+
+  Future<void> _loadWorkflowData() async {
+    setState(() {
+      _isLoadingWorkflow = true;
+    });
+
+    try {
+      final response = await ApiService.getWorkflowStages(
+        clientMatterId: int.tryParse(widget.matterId),
+      );
+
+      if (response['success'] == true && response['data'] != null) {
+        setState(() {
+          _workflowResponse = WorkflowStagesResponse.fromJson(response['data']);
+          _isLoadingWorkflow = false;
+        });
+      } else {
+        setState(() {
+          _isLoadingWorkflow = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingWorkflow = false;
+      });
+    }
   }
 
   Future<void> _loadDashboardData() async {
@@ -192,13 +225,62 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onRetry: _loadDashboardData,
       )
           : RefreshIndicator(
-        onRefresh: _loadDashboardData,
+        onRefresh: () async {
+          await Future.wait([
+            _loadDashboardData(),
+            _loadWorkflowData(),
+          ]);
+        },
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildWelcomeSection(),
+              const SizedBox(height: 24),
+              WorkflowProgressCard(
+                workflowResponse: _workflowResponse,
+                isLoading: _isLoadingWorkflow,
+                onTap: () async {
+                  // Get matter name from matters API
+                  try {
+                    final matters = await ApiService.getMatters();
+                    String matterName = 'My Matter';
+                    
+                    if (matters['success'] == true && matters['data'] != null) {
+                      final mattersList = matters['data']['matters'] as List;
+                      final currentMatter = mattersList.firstWhere(
+                        (m) => m['matter_id'].toString() == widget.matterId,
+                        orElse: () => null,
+                      );
+                      
+                      if (currentMatter != null) {
+                        matterName = currentMatter['matter_name'] ?? 'My Matter';
+                      }
+                    }
+                    
+                    if (mounted) {
+                      Navigator.pushNamed(
+                        context,
+                        '/workflow',
+                        arguments: {
+                          'clientMatterId': int.parse(widget.matterId),
+                          'matterName': matterName,
+                        },
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error loading workflow: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                },
+              ),
               const SizedBox(height: 24),
               QuickActionsCard(
                 onUploadDocument: () {
@@ -224,6 +306,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const SendMessageScreen(),
                     ),
                   );
+                },
+                onViewWorkflow: () async {
+                  // Get matter name from matters API
+                  try {
+                    final matters = await ApiService.getMatters();
+                    String matterName = 'My Matter';
+                    
+                    if (matters['success'] == true && matters['data'] != null) {
+                      final mattersList = matters['data']['matters'] as List;
+                      final currentMatter = mattersList.firstWhere(
+                        (m) => m['matter_id'].toString() == widget.matterId,
+                        orElse: () => null,
+                      );
+                      
+                      if (currentMatter != null) {
+                        matterName = currentMatter['matter_name'] ?? 'My Matter';
+                      }
+                    }
+                    
+                    if (mounted) {
+                      Navigator.pushNamed(
+                        context,
+                        '/workflow',
+                        arguments: {
+                          'clientMatterId': int.parse(widget.matterId),
+                          'matterName': matterName,
+                        },
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error loading workflow: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
               const SizedBox(height: 24),

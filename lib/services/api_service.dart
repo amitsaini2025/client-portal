@@ -268,6 +268,69 @@ class ApiService {
     );
   }
 
+  // Workflow Methods
+  static Future<Map<String, dynamic>> getWorkflowStages({int? clientMatterId}) async {
+    final endpoint = clientMatterId != null 
+        ? '${ApiConfig.workflowStagesEndpoint}?client_matter_id=$clientMatterId'
+        : ApiConfig.workflowStagesEndpoint;
+    
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+  static Future<Map<String, dynamic>> getWorkflowStageDetails(int stageId) async {
+    return await _makeRequest(
+      '${ApiConfig.workflowStageDetailsEndpoint}/$stageId',
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+  static Future<Map<String, dynamic>> getWorkflowAllowedChecklist({required int clientMatterId}) async {
+    final endpoint = '${ApiConfig.workflowAllowedChecklistEndpoint}?client_matter_id=$clientMatterId';
+    
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+  static Future<Map<String, dynamic>> uploadWorkflowChecklistDocument({
+    required String filePath,
+    required int allowedChecklistId,
+    required int clientMatterId,
+  }) async {
+    final headers = _buildHeaders();
+    headers.remove('Content-Type'); // Let http package set multipart content type
+    
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse(ApiConfig.getEndpoint(ApiConfig.workflowUploadChecklistEndpoint)),
+    );
+    
+    request.headers.addAll(headers);
+    request.fields['client_matter_id'] = clientMatterId.toString();
+    request.fields['allowed_checklist_id'] = allowedChecklistId.toString();
+    
+    request.files.add(await http.MultipartFile.fromPath('file', filePath));
+    
+    try {
+      final streamedResponse = await request.send().timeout(_timeout);
+      final response = await http.Response.fromStream(streamedResponse);
+      
+      return _handleResponse(response);
+    } catch (e) {
+      throw Exception('Upload failed: ${e.toString()}');
+    }
+  }
+
 
   /*static Future<Map<String, dynamic>> getClientCases() async {
     return await _makeRequest(

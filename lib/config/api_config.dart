@@ -17,6 +17,12 @@ class ApiConfig {
   // Dashboard
   static const String dashboardEndpoint = '/dashboard';
 
+  // Workflow endpoints
+  static const String workflowStagesEndpoint = '/workflow/stages';
+  static const String workflowStageDetailsEndpoint = '/workflow/stages';
+  static const String workflowAllowedChecklistEndpoint = '/workflow/allowed-checklist';
+  static const String workflowUploadChecklistEndpoint = '/workflow/upload-allowed-checklist';
+
   // Client portal specific endpoints
   static const String clientProfileEndpoint = '/profile';
   static const String clientCasesEndpoint = '/recent-cases';

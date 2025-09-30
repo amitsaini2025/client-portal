@@ -7,6 +7,7 @@ import 'package:client/screens/matters/matters_screen.dart';
 import 'package:client/screens/profile/profile_screen.dart';
 import 'package:client/screens/recent_activity/recent_activity.dart';
 import 'package:client/screens/tasks/tasks_screen.dart';
+import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -200,6 +201,18 @@ class MyAppWithTheme extends StatelessWidget {
             '/tasks': (context) => const TasksScreen(),
             '/recent-activity': (context) => const RecentActivityScreen(),
             '/document-management': (context) => const DocumentManagementScreen(),
+          },
+          onGenerateRoute: (settings) {
+            if (settings.name == '/workflow') {
+              final args = settings.arguments as Map<String, dynamic>;
+              return MaterialPageRoute(
+                builder: (context) => WorkflowScreen(
+                  clientMatterId: args['clientMatterId'],
+                  matterName: args['matterName'],
+                ),
+              );
+            }
+            return null;
           },
         );
       },
