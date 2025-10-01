@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../config/api_config.dart';
 import 'auth_service.dart';
 
@@ -36,10 +38,10 @@ class ApiService {
   ) async {
     try {
       final uri = Uri.parse(ApiConfig.getEndpoint(endpoint));
-      
+
       final request = http.Request(method, uri);
       request.headers.addAll(headers);
-      
+
       if (body != null) {
         if (body is Map<String, dynamic>) {
           request.body = jsonEncode(body);
@@ -66,12 +68,12 @@ class ApiService {
   // Handle HTTP response
   static Map<String, dynamic> _handleResponse(http.Response response) {
     final statusCode = response.statusCode;
-    
+
     if (statusCode >= 200 && statusCode < 300) {
       if (response.body.isEmpty) {
         return {'success': true, 'message': 'Operation completed successfully'};
       }
-      
+
       try {
         final data = jsonDecode(response.body);
         return data is Map<String, dynamic> ? data : {'data': data};
@@ -89,30 +91,33 @@ class ApiService {
     try {
       final errorData = jsonDecode(response.body);
       if (errorData is Map<String, dynamic>) {
-        return errorData['message'] ?? 
-               errorData['error'] ?? 
-               ApiConfig.getErrorMessage(statusCode);
+        return errorData['message'] ??
+            errorData['error'] ??
+            ApiConfig.getErrorMessage(statusCode);
       }
     } catch (e) {
       // Ignore JSON parsing errors
     }
-    
+
     return ApiConfig.getErrorMessage(statusCode);
   }
 
   // Build headers for requests
   static Map<String, String> _buildHeaders({bool requiresAuth = true}) {
     final headers = Map<String, String>.from(ApiConfig.defaultHeaders);
-    
+
     if (requiresAuth && _authToken != null) {
       headers['Authorization'] = 'Bearer $_authToken';
     }
-    
+
     return headers;
   }
 
   // Authentication Methods
-  static Future<Map<String, dynamic>> login(String email, String password) async {
+  static Future<Map<String, dynamic>> login(
+    String email,
+    String password,
+  ) async {
     final response = await _makeRequest(
       ApiConfig.loginEndpoint,
       _buildHeaders(requiresAuth: false),
@@ -128,10 +133,10 @@ class ApiService {
     if (response['success'] == true && response['data'] != null) {
       final token = response['data']['token'];
       final clientData = response['data']['client'];
-      
+
       // Set auth token
       setAuthToken(token);
-      
+
       // Store client data in AuthService
       if (clientData != null) {
         // Update AuthService with the new token
@@ -142,7 +147,9 @@ class ApiService {
     return response;
   }
 
-  static Future<Map<String, dynamic>> register(Map<String, dynamic> userData) async {
+  static Future<Map<String, dynamic>> register(
+    Map<String, dynamic> userData,
+  ) async {
     return await _makeRequest(
       ApiConfig.registerEndpoint,
       _buildHeaders(requiresAuth: false),
@@ -167,7 +174,7 @@ class ApiService {
     } finally {
       clearAuth();
     }
-    
+
     return {'success': true, 'message': 'Logged out successfully'};
   }
 
@@ -230,7 +237,9 @@ class ApiService {
     );
   }
 
-  static Future<Map<String, dynamic>> updateClientProfile(Map<String, dynamic> data) async {
+  static Future<Map<String, dynamic>> updateClientProfile(
+    Map<String, dynamic> data,
+  ) async {
     return await _makeRequest(
       ApiConfig.clientProfileEndpoint,
       _buildHeaders(),
@@ -248,16 +257,12 @@ class ApiService {
     );
   }*/
 
-  static Future<Map<String, dynamic>> getDashboard({required String selMatterId}) async {
+  static Future<Map<String, dynamic>> getDashboard({
+    required String selMatterId,
+  }) async {
     final url = '${ApiConfig.dashboardEndpoint}?sel_matter_id=$selMatterId';
-    return await _makeRequest(
-      url,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(url, _buildHeaders(), null, 'GET');
   }
-
 
   static Future<Map<String, dynamic>> getMatters() async {
     return await _makeRequest(
@@ -269,20 +274,20 @@ class ApiService {
   }
 
   // Workflow Methods
-  static Future<Map<String, dynamic>> getWorkflowStages({int? clientMatterId}) async {
-    final endpoint = clientMatterId != null 
-        ? '${ApiConfig.workflowStagesEndpoint}?client_matter_id=$clientMatterId'
-        : ApiConfig.workflowStagesEndpoint;
-    
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+  static Future<Map<String, dynamic>> getWorkflowStages({
+    int? clientMatterId,
+  }) async {
+    final endpoint =
+        clientMatterId != null
+            ? '${ApiConfig.workflowStagesEndpoint}?client_matter_id=$clientMatterId'
+            : ApiConfig.workflowStagesEndpoint;
+
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
-  static Future<Map<String, dynamic>> getWorkflowStageDetails(int stageId) async {
+  static Future<Map<String, dynamic>> getWorkflowStageDetails(
+    int stageId,
+  ) async {
     return await _makeRequest(
       '${ApiConfig.workflowStageDetailsEndpoint}/$stageId',
       _buildHeaders(),
@@ -291,15 +296,13 @@ class ApiService {
     );
   }
 
-  static Future<Map<String, dynamic>> getWorkflowAllowedChecklist({required int clientMatterId}) async {
-    final endpoint = '${ApiConfig.workflowAllowedChecklistEndpoint}?client_matter_id=$clientMatterId';
-    
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+  static Future<Map<String, dynamic>> getWorkflowAllowedChecklist({
+    required int clientMatterId,
+  }) async {
+    final endpoint =
+        '${ApiConfig.workflowAllowedChecklistEndpoint}?client_matter_id=$clientMatterId';
+
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
   static Future<Map<String, dynamic>> uploadWorkflowChecklistDocument({
@@ -308,29 +311,32 @@ class ApiService {
     required int clientMatterId,
   }) async {
     final headers = _buildHeaders();
-    headers.remove('Content-Type'); // Let http package set multipart content type
-    
+    headers.remove(
+      'Content-Type',
+    ); // Let http package set multipart content type
+
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse(ApiConfig.getEndpoint(ApiConfig.workflowUploadChecklistEndpoint)),
+      Uri.parse(
+        ApiConfig.getEndpoint(ApiConfig.workflowUploadChecklistEndpoint),
+      ),
     );
-    
+
     request.headers.addAll(headers);
     request.fields['client_matter_id'] = clientMatterId.toString();
     request.fields['allowed_checklist_id'] = allowedChecklistId.toString();
-    
+
     request.files.add(await http.MultipartFile.fromPath('file', filePath));
-    
+
     try {
       final streamedResponse = await request.send().timeout(_timeout);
       final response = await http.Response.fromStream(streamedResponse);
-      
+
       return _handleResponse(response);
     } catch (e) {
       throw Exception('Upload failed: ${e.toString()}');
     }
   }
-
 
   /*static Future<Map<String, dynamic>> getClientCases() async {
     return await _makeRequest(
@@ -368,12 +374,7 @@ class ApiService {
   }) async {
     final endpoint =
         "${ApiConfig.clientCasesEndpoint}?page=$page&per_page=$perPage&search=$search&status=$status&priority=$priority&sel_matter_id=$selMatterId";
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
   static Future<Map<String, dynamic>> getClientDocuments({
@@ -392,7 +393,6 @@ class ApiService {
     );
   }
 
-
   static Future<Map<String, dynamic>> uploadDocument(
     String filePath,
     String title,
@@ -401,25 +401,25 @@ class ApiService {
   ) async {
     final headers = _buildHeaders();
     headers.remove('Content-Type'); // Let http package set multipart content type
-    
+
     final request = http.MultipartRequest(
       'POST',
       Uri.parse(ApiConfig.getEndpoint(ApiConfig.clientDocumentsEndpoint)),
     );
-    
+
     request.headers.addAll(headers);
     request.fields['title'] = title;
     request.fields['description'] = description;
     if (caseId != null) {
       request.fields['case_id'] = caseId.toString();
     }
-    
+
     request.files.add(await http.MultipartFile.fromPath('document', filePath));
-    
+
     try {
       final streamedResponse = await request.send().timeout(_timeout);
       final response = await http.Response.fromStream(streamedResponse);
-      
+
       return _handleResponse(response);
     } catch (e) {
       throw Exception('Upload failed: ${e.toString()}');
@@ -435,7 +435,9 @@ class ApiService {
     );
   }
 
-  static Future<Map<String, dynamic>> createAppointment(Map<String, dynamic> data) async {
+  static Future<Map<String, dynamic>> createAppointment(
+    Map<String, dynamic> data,
+  ) async {
     return await _makeRequest(
       ApiConfig.clientAppointmentsEndpoint,
       _buildHeaders(),
@@ -453,41 +455,42 @@ class ApiService {
     );
   }
 
-  static Future<Map<String, dynamic>> sendMessage(Map<String, dynamic> data) async {
+  static Future<Map<String, dynamic>> sendMessage(
+    Map<String, dynamic> data,
+  ) async {
     // Check if there are attachments
     final attachments = data['attachments'] as List<String>?;
-    
+
     if (attachments != null && attachments.isNotEmpty) {
       // Send with file attachments using multipart
       final headers = _buildHeaders();
-      headers.remove('Content-Type'); // Let http package set multipart content type
-      
+      headers.remove(
+        'Content-Type',
+      ); // Let http package set multipart content type
+
       final request = http.MultipartRequest(
         'POST',
         Uri.parse(ApiConfig.getEndpoint(ApiConfig.clientMessagesEndpoint)),
       );
-      
+
       request.headers.addAll(headers);
       request.fields['subject'] = data['subject'] ?? '';
       request.fields['message'] = data['message'] ?? '';
-      
+
       // Add file attachments
       for (int i = 0; i < attachments.length; i++) {
         final file = File(attachments[i]);
         if (await file.exists()) {
           request.files.add(
-            await http.MultipartFile.fromPath(
-              'attachments[]',
-              attachments[i],
-            ),
+            await http.MultipartFile.fromPath('attachments[]', attachments[i]),
           );
         }
       }
-      
+
       try {
         final streamedResponse = await request.send().timeout(_timeout);
         final response = await http.Response.fromStream(streamedResponse);
-        
+
         return _handleResponse(response);
       } catch (e) {
         throw Exception('Message send failed: ${e.toString()}');
@@ -556,7 +559,9 @@ class ApiService {
     );
   }
 
-  static Future<List<dynamic>> getDocumentChecklist({String type = "personal"}) async {
+  static Future<List<dynamic>> getDocumentChecklist({
+    String type = "personal",
+  }) async {
     final response = await _makeRequest(
       "${ApiConfig.documentsEndpoint}/$type/checklist",
       _buildHeaders(),
@@ -567,9 +572,11 @@ class ApiService {
     return response['data']['checklist'] ?? [];
   }
 
-
   // Generic methods for backward compatibility
-  static Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> data) async {
+  static Future<Map<String, dynamic>> post(
+    String endpoint,
+    Map<String, dynamic> data,
+  ) async {
     return await _makeRequest(endpoint, _buildHeaders(), data, 'POST');
   }
 
@@ -577,7 +584,10 @@ class ApiService {
     return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
-  static Future<Map<String, dynamic>> put(String endpoint, Map<String, dynamic> data) async {
+  static Future<Map<String, dynamic>> put(
+    String endpoint,
+    Map<String, dynamic> data,
+  ) async {
     return await _makeRequest(endpoint, _buildHeaders(), data, 'PUT');
   }
 
@@ -618,7 +628,7 @@ class ApiService {
 
       final expiryDate = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
       final threshold = DateTime.now().add(ApiConfig.refreshTokenThreshold);
-      
+
       return DateTime.now().isAfter(expiryDate);
     } catch (e) {
       return true;
