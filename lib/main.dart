@@ -4,6 +4,7 @@ import 'package:client/screens/dashboard/recent_case/recent_case_screen.dart';
 import 'package:client/screens/document_management/document_management.dart';
 import 'package:client/screens/documents/documents_screen.dart';
 import 'package:client/screens/matters/matters_screen.dart';
+import 'package:client/screens/pdf/pdf_viewer_screen.dart';
 import 'package:client/screens/profile/profile_screen.dart';
 import 'package:client/screens/recent_activity/recent_activity.dart';
 import 'package:client/screens/tasks/tasks_screen.dart';
@@ -201,6 +202,14 @@ class MyAppWithTheme extends StatelessWidget {
             '/tasks': (context) => const TasksScreen(),
             '/recent-activity': (context) => const RecentActivityScreen(),
             '/document-management': (context) => const DocumentManagementScreen(),
+            '/pdf-viewer': (context) {
+              final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+              return PdfViewerScreen(
+                pdfUrl: args['url'],
+                title: args['title'] ?? 'PDF Document',
+              );
+            },
+
           },
           onGenerateRoute: (settings) {
             if (settings.name == '/workflow') {

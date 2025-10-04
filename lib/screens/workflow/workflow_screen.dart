@@ -371,6 +371,7 @@ class _WorkflowScreenState extends State<WorkflowScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ===== Title Row =====
             Row(
               children: [
                 Expanded(
@@ -384,10 +385,7 @@ class _WorkflowScreenState extends State<WorkflowScreen>
                 ),
                 if (checklist.isMandatory)
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.red.shade50,
                       borderRadius: BorderRadius.circular(4),
@@ -404,16 +402,17 @@ class _WorkflowScreenState extends State<WorkflowScreen>
                   ),
               ],
             ),
+
+            // ===== Description =====
             if (checklist.description != null && checklist.description!.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
                 checklist.description!,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey.shade700,
-                ),
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
               ),
             ],
+
+            // ===== Due Date =====
             if (checklist.hasDueDate) ...[
               const SizedBox(height: 8),
               Row(
@@ -435,33 +434,77 @@ class _WorkflowScreenState extends State<WorkflowScreen>
                 ],
               ),
             ],
+
             const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: isUploading ? null : () => _uploadDocument(checklist),
-                icon: isUploading
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : const Icon(Icons.upload_file),
-                label: Text(isUploading ? 'Uploading...' : 'Upload Document'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
+
+            // ===== Upload or View File Section =====
+            if (checklist.isUpload && checklist.fileName != null) ...[
+              Row(
+                children: [
+                  const Icon(Icons.insert_drive_file, size: 18, color: Colors.green),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      checklist.fileName!,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () {
+                      if (checklist.isUpload == true && checklist.fileUrl != null && checklist.fileUrl!.isNotEmpty) {
+                        Navigator.pushNamed(
+                          context,
+                          '/pdf-viewer',
+                          arguments: {
+                            'url': checklist.fileUrl,
+                            'title': checklist.fileName ?? checklist.checklistName,
+                          },
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('File URL not available')),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.visibility, size: 18),
+                    label: const Text('View'),
+                  ),
+                ],
+              ),
+            ] else ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: isUploading ? null : () => _uploadDocument(checklist),
+                  icon: isUploading
+                      ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                      : const Icon(Icons.upload_file),
+                  label: Text(isUploading ? 'Uploading...' : 'Upload Document'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),
     );
   }
+
 
   Widget _buildErrorWidget(String error, VoidCallback onRetry) {
     return Center(

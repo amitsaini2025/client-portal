@@ -4,10 +4,14 @@ class WorkflowChecklist {
   final String documentType;
   final String? description;
   final String? type;
+  final int? typeId;
   final String? typeName;
   final bool isMandatory;
   final String? dueDate;
   final String? dueTime;
+  final bool isUpload;
+  final String? fileName;
+  final String? fileUrl;
   final String? createdAt;
   final String? updatedAt;
 
@@ -17,10 +21,14 @@ class WorkflowChecklist {
     required this.documentType,
     this.description,
     this.type,
+    this.typeId,
     this.typeName,
     this.isMandatory = false,
     this.dueDate,
     this.dueTime,
+    this.isUpload = false,
+    this.fileName,
+    this.fileUrl,
     this.createdAt,
     this.updatedAt,
   });
@@ -32,10 +40,14 @@ class WorkflowChecklist {
       documentType: json['document_type'] ?? '',
       description: json['description'],
       type: json['type'],
+      typeId: _parseInt(json['type_id']),
       typeName: json['type_name'],
       isMandatory: json['is_mandatory'] ?? false,
       dueDate: json['due_date'],
       dueTime: json['due_time'],
+      isUpload: json['is_upload'] ?? false,
+      fileName: json['file_name'],
+      fileUrl: json['file_url'],
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
     );
@@ -55,10 +67,14 @@ class WorkflowChecklist {
       'document_type': documentType,
       'description': description,
       'type': type,
+      'type_id': typeId,
       'type_name': typeName,
       'is_mandatory': isMandatory,
       'due_date': dueDate,
       'due_time': dueTime,
+      'is_upload': isUpload,
+      'file_name': fileName,
+      'file_url': fileUrl,
       'created_at': createdAt,
       'updated_at': updatedAt,
     };
@@ -88,9 +104,10 @@ class WorkflowChecklist {
 
   @override
   String toString() {
-    return 'WorkflowChecklist(id: $id, name: $checklistName, mandatory: $isMandatory)';
+    return 'WorkflowChecklist(id: $id, name: $checklistName, mandatory: $isMandatory, upload: $isUpload)';
   }
 }
+
 
 class ApplicationInfo {
   final int applicationId;
