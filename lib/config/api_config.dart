@@ -33,6 +33,8 @@ class ApiConfig {
   static const String clientTasksEndpoint = '/upcoming-deadlines';
   static const String recentActivityEndpoint = "/recent-activity";
   static const String documentsEndpoint = "/documents";
+  static const String messagesRecipients = "/messages/recipients";
+  static const String messagesList = "/messages";
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

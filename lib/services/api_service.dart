@@ -572,6 +572,43 @@ class ApiService {
     return response['data']['checklist'] ?? [];
   }
 
+  static Future<Map<String, dynamic>> getChatRecipients() async {
+    return await _makeRequest(
+      ApiConfig.messagesRecipients,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+
+  static Future<Map<String, dynamic>> getWorkflowMessages({
+    required int clientMatterId,
+    required int clientMatterStageId,
+    int page = 1,
+    int limit = 20,
+    String type = 'all',
+    String messageType = 'all',
+  }) async {
+    final params = {
+      'client_matter_id': clientMatterId.toString(),
+      'client_matter_stage_id': clientMatterStageId.toString(),
+      'page': page.toString(),
+      'limit': limit.toString(),
+      'type': type,
+      'message_type': messageType,
+    };
+
+    return await _makeRequest(
+      ApiConfig.messagesList,
+      _buildHeaders(),
+      params,
+      'GET',
+    );
+  }
+
+
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
     String endpoint,
