@@ -1,4 +1,4 @@
-import 'package:client/screens/workflow/workflow_messages_screen.dart';
+import 'package:client/screens/workflow/message/workflow_messages_screen.dart';
 import 'package:client/screens/workflow/workflow_recipients_screen.dart';
 import 'package:flutter/material.dart';
 

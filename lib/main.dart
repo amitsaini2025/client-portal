@@ -8,6 +8,7 @@ import 'package:client/screens/pdf/pdf_viewer_screen.dart';
 import 'package:client/screens/profile/profile_screen.dart';
 import 'package:client/screens/recent_activity/recent_activity.dart';
 import 'package:client/screens/tasks/tasks_screen.dart';
+import 'package:client/screens/workflow/message/workflow_messages_chat_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -209,7 +210,13 @@ class MyAppWithTheme extends StatelessWidget {
                 title: args['title'] ?? 'PDF Document',
               );
             },
-
+            '/workflow-message-detail': (context) {
+              final args =
+              ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+              return WorkflowMessageDetailScreen(
+                messageId: args['messageId'],
+              );
+            },
           },
           onGenerateRoute: (settings) {
             if (settings.name == '/workflow') {

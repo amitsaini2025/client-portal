@@ -35,6 +35,7 @@ class ApiConfig {
   static const String documentsEndpoint = "/documents";
   static const String messagesRecipients = "/messages/recipients";
   static const String messagesList = "/messages";
+  static const String messagesSend = "/messages/send";
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

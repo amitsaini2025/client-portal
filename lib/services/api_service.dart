@@ -608,6 +608,40 @@ class ApiService {
   }
 
 
+  static Future<Map<String, dynamic>> getMessageDetail(int messageId) async {
+    return await _makeRequest(
+      '${ApiConfig.messagesList}/$messageId',
+      _buildHeaders(),
+      {},
+      'GET',
+    );
+  }
+
+  static Future<Map<String, dynamic>> sendChatMessage({
+    required int recipientId,
+    required int clientMatterId,
+    required int clientMatterStageId,
+    required String message,
+    required String subject,
+  }) async {
+    final body = {
+      'recipient_id': recipientId.toString(),
+      'client_matter_id': clientMatterId.toString(),
+      'client_matter_stage_id': clientMatterStageId.toString(),
+      'message': message,
+      'subject': subject,
+    };
+
+    return await _makeRequest(
+      ApiConfig.messagesSend,
+      _buildHeaders(),
+      body,
+      'POST',
+    );
+  }
+
+
+
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
