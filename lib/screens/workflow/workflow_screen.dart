@@ -1,19 +1,13 @@
 import 'package:client/screens/workflow/message/workflow_messages_screen.dart';
 import 'package:client/screens/workflow/workflow_recipients_screen.dart';
+import 'package:client/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 import 'workflow_documents_screen.dart';
 import 'workflow_stages_screen.dart';
 
 class WorkflowScreen extends StatefulWidget {
-  final int clientMatterId;
-  final String matterName;
-
-  const WorkflowScreen({
-    super.key,
-    required this.clientMatterId,
-    required this.matterName,
-  });
+  const WorkflowScreen({super.key});
 
   @override
   State<WorkflowScreen> createState() => _WorkflowScreenState();
@@ -22,6 +16,9 @@ class WorkflowScreen extends StatefulWidget {
 class _WorkflowScreenState extends State<WorkflowScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
+  static const Color navyBlue = Color(0xFF1E1464);
+  static const Color goldenYellow = Color(0xFFF9B000);
 
   @override
   void initState() {
@@ -39,21 +36,32 @@ class _WorkflowScreenState extends State<WorkflowScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: goldenYellow,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Workflow', style: TextStyle(fontSize: 18)),
+            const Text(
+              'Workflow',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             Text(
-              widget.matterName,
+              AuthService.selectedMatterId.toString(),
               style: const TextStyle(
                 fontSize: 12,
-                fontWeight: FontWeight.normal,
+                color: Colors.white70,
               ),
             ),
           ],
         ),
         bottom: TabBar(
           controller: _tabController,
+          labelColor: navyBlue,
+          unselectedLabelColor: Colors.white,
+          indicatorColor: navyBlue,
           tabs: const [
             Tab(text: 'Stages'),
             Tab(text: 'Documents'),
@@ -63,11 +71,10 @@ class _WorkflowScreenState extends State<WorkflowScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          WorkflowStagesScreen(clientMatterId: widget.clientMatterId),
-          WorkflowDocumentsScreen(clientMatterId: widget.clientMatterId),
+        children: const [
+          WorkflowStagesScreen(),
+          WorkflowDocumentsScreen(),
           WorkflowMessagesScreen(
-            clientMatterId: widget.clientMatterId,
             clientMatterStageId: 1,
           ),
         ],

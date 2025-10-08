@@ -18,12 +18,14 @@ class AuthService {
   static const String _biometricEnabledKey = 'biometric_enabled';
   static const String _rememberMeKey = 'remember_me';
   static const String _selectedMatterKey = 'selected_matter_id';
+  static const String _selectedMatterNameKey = 'selected_matter_name';
 
   // Current user data
   static Client? _currentClient;
   static Admin? _currentAdmin;
   static String? _currentToken;
   static int? _selectedMatterId;
+  static String? _selectedMatterName;
 
   // Getters
   static Client? get currentClient => _currentClient;
@@ -33,6 +35,8 @@ class AuthService {
   static String? get currentToken => _currentToken;
 
   static int? get selectedMatterId => _selectedMatterId;
+
+  static String? get selectedMatterName => _selectedMatterName;
 
   static bool get isAuthenticated => _currentToken != null;
 
@@ -54,18 +58,33 @@ class AuthService {
       if (storedMatterId != null) {
         _selectedMatterId = int.tryParse(storedMatterId);
       }
+
+      // Load selected matter name
+      final storedMatterName =
+      await _secureStorage.read(key: _selectedMatterNameKey);
+      if (storedMatterName != null) {
+        _selectedMatterName = storedMatterName;
+      }
     } catch (e) {
       print('Error initializing AuthService: $e');
     }
   }
 
   /// Select a matter
-  static Future<void> selectMatter(int matterId) async {
+  static Future<void> selectMatter({
+    required int matterId,
+    required String matterName,
+  }) async {
     _selectedMatterId = matterId;
+    _selectedMatterName = matterName;
     try {
       await _secureStorage.write(
         key: _selectedMatterKey,
         value: matterId.toString(),
+      );
+      await _secureStorage.write(
+        key: _selectedMatterNameKey,
+        value: matterName,
       );
     } catch (e) {
       print('Error saving selected matter: $e');
@@ -75,8 +94,10 @@ class AuthService {
   /// Clear selected matter
   static Future<void> clearSelectedMatter() async {
     _selectedMatterId = null;
+    _selectedMatterName = null;
     try {
       await _secureStorage.delete(key: _selectedMatterKey);
+      await _secureStorage.delete(key: _selectedMatterNameKey);
     } catch (e) {
       print('Error clearing selected matter: $e');
     }

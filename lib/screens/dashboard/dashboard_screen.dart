@@ -1,5 +1,7 @@
 import 'package:client/config/theme_config.dart';
+import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:flutter/material.dart';
+
 import '../../models/case.dart';
 import '../../models/case_summary.dart';
 import '../../models/dashboard_summary.dart';
@@ -18,14 +20,9 @@ import '../../widgets/dashboard/document_status_card.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
 import '../../widgets/dashboard/upcoming_deadlines_card.dart';
 import '../../widgets/dashboard/workflow_progress_card.dart';
-import '../appointments/appointments_screen.dart';
 import '../appointments/book_appointment_screen.dart';
-import '../billing/billing_screen.dart';
-import '../cases/cases_list_screen.dart';
-import '../documents/documents_screen.dart';
 import '../documents/upload_document_screen.dart';
 import '../messages/send_message_screen.dart';
-import '../tasks/tasks_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String matterId;
@@ -49,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Deadline> _deadlines = [];
   List<Task> _tasks = [];
   List<RecentActivity> _recentActivity = [];
-  
+
   WorkflowStagesResponse? _workflowResponse;
   bool _isLoadingWorkflow = false;
 
@@ -94,7 +91,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
 
     try {
-      final result = await ApiService.getDashboard(selMatterId: widget.matterId);
+      final result = await ApiService.getDashboard(
+        selMatterId: widget.matterId,
+      );
 
       if (result['success'] == true) {
         final data = result['data'];
@@ -112,17 +111,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         List<Case> cases = [];
         if (data['recent_cases'] != null && data['recent_cases'] is List) {
-          cases = (data['recent_cases'] as List)
-              .map((e) => Case.fromJson(Map<String, dynamic>.from(e)))
-              .toList();
+          cases =
+              (data['recent_cases'] as List)
+                  .map((e) => Case.fromJson(Map<String, dynamic>.from(e)))
+                  .toList();
         }
 
         List<Document> documents = [];
         if (data['document_status']?['recent_documents'] != null &&
             data['document_status']['recent_documents'] is List) {
-          documents = (data['document_status']['recent_documents'] as List)
-              .map((e) => Document.fromJson(Map<String, dynamic>.from(e)))
-              .toList();
+          documents =
+              (data['document_status']['recent_documents'] as List)
+                  .map((e) => Document.fromJson(Map<String, dynamic>.from(e)))
+                  .toList();
         }
 
         DocumentStatusSummary? documentStatusSummary;
@@ -135,37 +136,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
         UpcomingDeadlineSummary? upcomingDeadlineSummary;
         if (data['upcoming_deadlines']?['summary'] != null) {
           upcomingDeadlineSummary = UpcomingDeadlineSummary(
-            dueThisWeekCount: data['upcoming_deadlines']['summary']
-            ['due_this_week_count'] ??
+            dueThisWeekCount:
+                data['upcoming_deadlines']['summary']['due_this_week_count'] ??
                 0,
-            appointmentsCount: data['upcoming_deadlines']['summary']
-            ['appointments_count'] ??
+            appointmentsCount:
+                data['upcoming_deadlines']['summary']['appointments_count'] ??
                 0,
             overdueCount:
-            data['upcoming_deadlines']['summary']['overdue_count'] ?? 0,
+                data['upcoming_deadlines']['summary']['overdue_count'] ?? 0,
           );
         }
 
         List<Deadline> deadlines = [];
         if (data['upcoming_deadlines']?['due_this_week_list'] != null &&
             data['upcoming_deadlines']['due_this_week_list'] is List) {
-          deadlines = (data['upcoming_deadlines']['due_this_week_list'] as List)
-              .map((e) => Deadline.fromJson(Map<String, dynamic>.from(e)))
-              .toList();
+          deadlines =
+              (data['upcoming_deadlines']['due_this_week_list'] as List)
+                  .map((e) => Deadline.fromJson(Map<String, dynamic>.from(e)))
+                  .toList();
         }
 
         List<Task> tasks = [];
         if (data['tasks'] != null && data['tasks'] is List) {
-          tasks = (data['tasks'] as List)
-              .map((e) => Task.fromJson(Map<String, dynamic>.from(e)))
-              .toList();
+          tasks =
+              (data['tasks'] as List)
+                  .map((e) => Task.fromJson(Map<String, dynamic>.from(e)))
+                  .toList();
         }
 
         List<RecentActivity> recentActivity = [];
-        if (data['recent_activity'] != null && data['recent_activity'] is List) {
-          recentActivity = (data['recent_activity'] as List)
-              .map((e) => RecentActivity.fromJson(Map<String, dynamic>.from(e)))
-              .toList();
+        if (data['recent_activity'] != null &&
+            data['recent_activity'] is List) {
+          recentActivity =
+              (data['recent_activity'] as List)
+                  .map(
+                    (e) =>
+                        RecentActivity.fromJson(Map<String, dynamic>.from(e)),
+                  )
+                  .toList();
         }
 
         setState(() {
@@ -196,7 +204,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
@@ -217,156 +224,88 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const LoadingWidget(message: 'Loading dashboard...')
-          : _errorMessage != null
-          ? CustomErrorWidget(
-        message: _errorMessage!,
-        onRetry: _loadDashboardData,
-      )
-          : RefreshIndicator(
-        onRefresh: () async {
-          await Future.wait([
-            _loadDashboardData(),
-            _loadWorkflowData(),
-          ]);
-        },
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildWelcomeSection(),
-              const SizedBox(height: 24),
-              WorkflowProgressCard(
-                workflowResponse: _workflowResponse,
-                isLoading: _isLoadingWorkflow,
-                onTap: () async {
-                  // Get matter name from matters API
-                  try {
-                    final matters = await ApiService.getMatters();
-                    String matterName = 'My Matter';
-                    
-                    if (matters['success'] == true && matters['data'] != null) {
-                      final mattersList = matters['data']['matters'] as List;
-                      final currentMatter = mattersList.firstWhere(
-                        (m) => m['matter_id'].toString() == widget.matterId,
-                        orElse: () => null,
-                      );
-                      
-                      if (currentMatter != null) {
-                        matterName = currentMatter['matter_name'] ?? 'My Matter';
-                      }
-                    }
-                    
-                    if (mounted) {
-                      Navigator.pushNamed(
-                        context,
-                        '/workflow',
-                        arguments: {
-                          'clientMatterId': int.parse(widget.matterId),
-                          'matterName': matterName,
+      body:
+          _isLoading
+              ? const LoadingWidget(message: 'Loading dashboard...')
+              : _errorMessage != null
+              ? CustomErrorWidget(
+                message: _errorMessage!,
+                onRetry: _loadDashboardData,
+              )
+              : RefreshIndicator(
+                onRefresh: () async {
+                  await Future.wait([
+                    _loadDashboardData(),
+                    _loadWorkflowData(),
+                  ]);
+                },
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildWelcomeSection(),
+                      const SizedBox(height: 24),
+                      WorkflowProgressCard(
+                        workflowResponse: _workflowResponse,
+                        isLoading: _isLoadingWorkflow,
+                        onTap: () {
+                          Navigator.pushNamed(context, '/workflow');
                         },
-                      );
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Error loading workflow: ${e.toString()}'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  }
-                },
-              ),
-              const SizedBox(height: 24),
-              QuickActionsCard(
-                onUploadDocument: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                      const UploadDocumentScreen(),
-                    ),
-                  );
-                },
-                onBookAppointment: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                      const BookAppointmentScreen(),
-                    ),
-                  );
-                },
-                onSendMessage: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                      const SendMessageScreen(),
-                    ),
-                  );
-                },
-                onViewWorkflow: () async {
-                  // Get matter name from matters API
-                  try {
-                    final matters = await ApiService.getMatters();
-                    String matterName = 'My Matter';
-                    
-                    if (matters['success'] == true && matters['data'] != null) {
-                      final mattersList = matters['data']['matters'] as List;
-                      final currentMatter = mattersList.firstWhere(
-                        (m) => m['matter_id'].toString() == widget.matterId,
-                        orElse: () => null,
-                      );
-                      
-                      if (currentMatter != null) {
-                        matterName = currentMatter['matter_name'] ?? 'My Matter';
-                      }
-                    }
-                    
-                    if (mounted) {
-                      Navigator.pushNamed(
-                        context,
-                        '/workflow',
-                        arguments: {
-                          'clientMatterId': int.parse(widget.matterId),
-                          'matterName': matterName,
+                      ),
+                      const SizedBox(height: 24),
+                      QuickActionsCard(
+                        onUploadDocument: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => const UploadDocumentScreen(),
+                            ),
+                          );
                         },
-                      );
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Error loading workflow: ${e.toString()}'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  }
-                },
+                        onBookAppointment: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => const BookAppointmentScreen(),
+                            ),
+                          );
+                        },
+                        onSendMessage: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const SendMessageScreen(),
+                            ),
+                          );
+                        },
+                        onViewWorkflow: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => const WorkflowScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      CaseSummaryCard(caseSummary: _caseSummary, cases: _cases),
+                      const SizedBox(height: 24),
+                      DocumentStatusCard(
+                        documentStatusSummary: _documentStatusSummary,
+                        documents: _documents,
+                      ),
+                      const SizedBox(height: 24),
+                      UpcomingDeadlinesCard(
+                        upcomingDeadlineSummary: _upcomingDeadlineSummary,
+                        tasks: _tasks,
+                        deadlines: _deadlines,
+                      ),
+                      const SizedBox(height: 24),
+                      _buildRecentActivitySection(),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 24),
-              CaseSummaryCard(
-                  caseSummary: _caseSummary, cases: _cases),
-              const SizedBox(height: 24),
-              DocumentStatusCard(
-                documentStatusSummary: _documentStatusSummary,
-                documents: _documents,
-              ),
-              const SizedBox(height: 24),
-              UpcomingDeadlinesCard(
-                upcomingDeadlineSummary: _upcomingDeadlineSummary,
-                tasks: _tasks,
-                deadlines: _deadlines,
-              ),
-              const SizedBox(height: 24),
-              _buildRecentActivitySection(),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -572,18 +511,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 Text(
                   subtitle,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.white70,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
                 ),
               ],
             ),
           ),
           Text(
             time,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.white54,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.white54),
           ),
         ],
       ),

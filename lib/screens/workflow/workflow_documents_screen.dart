@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 import '../../models/workflow_checklist.dart';
 import '../../services/api_service.dart';
+import '../../services/auth_service.dart';
 
 class WorkflowDocumentsScreen extends StatefulWidget {
-  final int clientMatterId;
 
-  const WorkflowDocumentsScreen({super.key, required this.clientMatterId});
+  const WorkflowDocumentsScreen({super.key});
 
   @override
   State<WorkflowDocumentsScreen> createState() =>
@@ -34,7 +34,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
 
     try {
       final response = await ApiService.getWorkflowAllowedChecklist(
-        clientMatterId: widget.clientMatterId,
+        clientMatterId: AuthService.selectedMatterId ?? 0,
       );
 
       if (response['success'] == true && response['data'] != null) {
@@ -73,7 +73,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
       final response = await ApiService.uploadWorkflowChecklistDocument(
         filePath: filePath,
         allowedChecklistId: checklist.id,
-        clientMatterId: widget.clientMatterId,
+        clientMatterId: AuthService.selectedMatterId ?? 0,
       );
 
       if (response['success'] == true) {

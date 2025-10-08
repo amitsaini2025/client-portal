@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../models/workflow_message.dart';
 import '../../../services/api_service.dart';
+import '../../../services/auth_service.dart';
 
 class WorkflowMessagesScreen extends StatefulWidget {
-  final int clientMatterId;
   final int clientMatterStageId;
 
   const WorkflowMessagesScreen({
     super.key,
-    required this.clientMatterId,
     required this.clientMatterStageId,
   });
 
@@ -39,7 +38,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
     try {
       final response = await ApiService.getWorkflowMessages(
-        clientMatterId: widget.clientMatterId,
+      clientMatterId: AuthService.selectedMatterId!,
         clientMatterStageId: widget.clientMatterStageId,
       );
 

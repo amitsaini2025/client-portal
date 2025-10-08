@@ -194,65 +194,95 @@ class _WorkflowMessageDetailScreenState
         itemCount: _messages.length,
         itemBuilder: (context, index) {
           final msg = _messages[index];
-          final time =
-          DateFormat('hh:mm a').format(DateTime.parse(msg.sentAt).toLocal());
+          final time = DateFormat('hh:mm a')
+              .format(DateTime.parse(msg.sentAt).toLocal());
 
-          return Align(
-            alignment:
-            msg.isSender ? Alignment.centerRight : Alignment.centerLeft,
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color:
-                msg.isSender ? ThemeConfig.navyBlue.withOpacity(0.9) : Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(12),
-                  topRight: const Radius.circular(12),
-                  bottomLeft: Radius.circular(msg.isSender ? 12 : 0),
-                  bottomRight: Radius.circular(msg.isSender ? 0 : 12),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 3,
-                    color: Colors.black.withOpacity(0.08),
-                  )
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (index == 0)
-                    Center(
-                      child: Text(
-                        msg.subject,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: ThemeConfig.navyBlue,
-                        ),
+          final isSender = msg.isSender;
+
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              mainAxisAlignment:
+              isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (!isSender)
+                  const CircleAvatar(
+                    radius: 14,
+                    backgroundColor: Colors.grey,
+                    child: Icon(Icons.person, size: 14, color: Colors.white),
+                  ),
+                if (!isSender) const SizedBox(width: 6),
+
+                // Chat Bubble
+                Flexible(
+                  child: Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isSender
+                          ? ThemeConfig.navyBlue.withOpacity(0.9)
+                          : const Color(0xFFECECEC),
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(18),
+                        topRight: const Radius.circular(18),
+                        bottomLeft: Radius.circular(isSender ? 18 : 4),
+                        bottomRight: Radius.circular(isSender ? 4 : 18),
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 3,
+                          offset: const Offset(1, 2),
+                        )
+                      ],
                     ),
-                  const SizedBox(height: 4),
-                  Text(
-                    msg.message,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: msg.isSender ? Colors.white : Colors.black87,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        if (index == 0)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Center(
+                              child: Text(
+                                msg.subject,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: ThemeConfig.navyBlue,
+                                ),
+                              ),
+                            ),
+                          ),
+                        Text(
+                          msg.message,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: isSender ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          time,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isSender
+                                ? Colors.white70
+                                : Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    time,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: msg.isSender
-                          ? Colors.white70
-                          : Colors.grey.shade600,
-                    ),
+                ),
+
+                if (isSender) const SizedBox(width: 6),
+                if (isSender)
+                  const CircleAvatar(
+                    radius: 14,
+                    backgroundColor: Colors.grey,
+                    child: Icon(Icons.person, size: 14, color: Colors.white),
                   ),
-                ],
-              ),
+              ],
             ),
           );
         },

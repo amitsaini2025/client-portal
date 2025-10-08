@@ -210,6 +210,7 @@ class MyAppWithTheme extends StatelessWidget {
                 title: args['title'] ?? 'PDF Document',
               );
             },
+            'workflow': (context) => const WorkflowScreen(),
             '/workflow-message-detail': (context) {
               final args =
               ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -217,18 +218,6 @@ class MyAppWithTheme extends StatelessWidget {
                 messageId: args['messageId'],
               );
             },
-          },
-          onGenerateRoute: (settings) {
-            if (settings.name == '/workflow') {
-              final args = settings.arguments as Map<String, dynamic>;
-              return MaterialPageRoute(
-                builder: (context) => WorkflowScreen(
-                  clientMatterId: args['clientMatterId'],
-                  matterName: args['matterName'],
-                ),
-              );
-            }
-            return null;
           },
         );
       },

@@ -98,11 +98,12 @@ class _MattersScreenState extends State<MattersScreen> {
               itemBuilder: (context, index) {
                 final matter = matters[index];
                 final matterId = matter['matter_id'];
+                final matterName = matter["matter_name"];
                 final isSelected = selectedMatterId == matterId;
 
                 return GestureDetector(
                   onTap: () async {
-                    await AuthService.selectMatter(matterId);
+                    await AuthService.selectMatter(matterId: matterId, matterName: matterName);
                     setState(() {});
                   },
                   child: Card(

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../models/workflow_stage.dart';
 import '../../services/api_service.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/workflow/workflow_progress_widget.dart';
 
 class WorkflowStagesScreen extends StatefulWidget {
-  final int clientMatterId;
 
-  const WorkflowStagesScreen({super.key, required this.clientMatterId});
+  const WorkflowStagesScreen({super.key});
 
   @override
   State<WorkflowStagesScreen> createState() => _WorkflowStagesScreenState();
@@ -31,7 +31,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
 
     try {
       final response = await ApiService.getWorkflowStages(
-        clientMatterId: widget.clientMatterId,
+        clientMatterId: AuthService.selectedMatterId ?? 0,
       );
 
       if (response['success'] == true && response['data'] != null) {
