@@ -1,12 +1,12 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
+import '../../config/theme_config.dart';
 import '../../models/workflow_checklist.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 
 class WorkflowDocumentsScreen extends StatefulWidget {
-
   const WorkflowDocumentsScreen({super.key});
 
   @override
@@ -15,6 +15,7 @@ class WorkflowDocumentsScreen extends StatefulWidget {
 }
 
 class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
+
   bool _isLoading = true;
   String? _errorMessage;
   WorkflowChecklistResponse? _checklistResponse;
@@ -79,7 +80,9 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
       if (response['success'] == true) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Upload successful')));
+        ).showSnackBar(
+          const SnackBar(content: Text('Upload successful')),
+        );
         _loadChecklistData();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +101,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator(color: ThemeConfig.navyBlue));
     }
 
     if (_errorMessage != null) {
@@ -107,10 +110,16 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
 
     if (_checklistResponse == null ||
         _checklistResponse!.allowedChecklists.isEmpty) {
-      return const Center(child: Text('No documents required.'));
+      return const Center(
+        child: Text(
+          'No documents required.',
+          style: TextStyle(color: ThemeConfig.navyBlue),
+        ),
+      );
     }
 
     return RefreshIndicator(
+      color: ThemeConfig.goldenYellow,
       onRefresh: _loadChecklistData,
       child: ListView(
         padding: const EdgeInsets.all(16),
@@ -128,6 +137,8 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
+      color: Colors.white,
+      elevation: 3,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -135,7 +146,11 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
           children: [
             Text(
               checklist.checklistName,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: ThemeConfig.navyBlue,
+              ),
             ),
             const SizedBox(height: 8),
             if (checklist.isUpload && checklist.fileUrl != null)
@@ -146,6 +161,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
                     child: Text(
                       checklist.fileName ?? '',
                       overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: ThemeConfig.navyBlue),
                     ),
                   ),
                   TextButton.icon(
@@ -165,23 +181,31 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
                         );
                       }
                     },
-                    icon: const Icon(Icons.visibility),
-                    label: const Text('View'),
+                    icon: const Icon(Icons.visibility, color: ThemeConfig.goldenYellow),
+                    label: const Text(
+                      'View',
+                      style: TextStyle(color: ThemeConfig.goldenYellow),
+                    ),
                   ),
                 ],
               )
             else
               ElevatedButton.icon(
-                onPressed:
-                    isUploading ? null : () => _uploadDocument(checklist),
-                icon:
-                    isUploading
-                        ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : const Icon(Icons.upload_file),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ThemeConfig.navyBlue,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: isUploading ? null : () => _uploadDocument(checklist),
+                icon: isUploading
+                    ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+                    : const Icon(Icons.upload_file),
                 label: Text(isUploading ? 'Uploading...' : 'Upload Document'),
               ),
           ],
@@ -200,7 +224,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
           children: [
             const Text(
               'Documents Summary',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: ThemeConfig.navyBlue),
             ),
             const SizedBox(height: 8),
             Row(
@@ -208,13 +232,13 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
                 _buildChip(
                   'Total',
                   _checklistResponse!.totalAllowedChecklists.toString(),
-                  Colors.blue,
+                  ThemeConfig.navyBlue,
                 ),
                 const SizedBox(width: 8),
                 _buildChip(
                   'Required',
                   _checklistResponse!.mandatoryChecklists.toString(),
-                  Colors.red,
+                  ThemeConfig.goldenYellow,
                 ),
               ],
             ),
@@ -242,11 +266,19 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
+            Icon(Icons.error_outline, size: 64, color: ThemeConfig.goldenYellow),
             const SizedBox(height: 16),
-            Text(error, textAlign: TextAlign.center),
+            Text(
+              error,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: ThemeConfig.navyBlue),
+            ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThemeConfig.navyBlue,
+                foregroundColor: Colors.white,
+              ),
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
