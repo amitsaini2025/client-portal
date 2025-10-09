@@ -19,6 +19,7 @@ class AuthService {
   static const String _rememberMeKey = 'remember_me';
   static const String _selectedMatterKey = 'selected_matter_id';
   static const String _selectedMatterNameKey = 'selected_matter_name';
+  static const String _clientMatterStageKey = 'client_matter_stage_id';
 
   // Current user data
   static Client? _currentClient;
@@ -26,6 +27,7 @@ class AuthService {
   static String? _currentToken;
   static int? _selectedMatterId;
   static String? _selectedMatterName;
+  static int? _clientMatterStageId;
 
   // Getters
   static Client? get currentClient => _currentClient;
@@ -37,6 +39,8 @@ class AuthService {
   static int? get selectedMatterId => _selectedMatterId;
 
   static String? get selectedMatterName => _selectedMatterName;
+
+  static int? get clientMatterStageId => _clientMatterStageId;
 
   static bool get isAuthenticated => _currentToken != null;
 
@@ -117,6 +121,29 @@ class AuthService {
       print('Error checking matter selection: $e');
     }
     return false;
+  }
+
+  /// Set clientMatterStageId
+  static Future<void> setClientMatterStageId(int stageId) async {
+    _clientMatterStageId = stageId;
+    try {
+      await _secureStorage.write(
+        key: _clientMatterStageKey,
+        value: stageId.toString(),
+      );
+    } catch (e) {
+      print('Error saving client matter stage id: $e');
+    }
+  }
+
+  /// Clear clientMatterStageId
+  static Future<void> clearClientMatterStageId() async {
+    _clientMatterStageId = null;
+    try {
+      await _secureStorage.delete(key: _clientMatterStageKey);
+    } catch (e) {
+      print('Error clearing client matter stage id: $e');
+    }
   }
 
   /// Login with email/phone and password
@@ -464,12 +491,28 @@ class AuthService {
   }*/
 
   /// Clear all stored data
-  static Future<void> clearAllData() async {
+  /*static Future<void> clearAllData() async {
     await _secureStorage.deleteAll();
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
 
     // Clear API service token
+    ApiService.clearAuthToken();
+  }*/
+
+  static Future<void> clearAllData() async {
+    await _secureStorage.deleteAll();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    // Clear memory
+    _currentToken = null;
+    _currentClient = null;
+    _currentAdmin = null;
+    _selectedMatterId = null;
+    _selectedMatterName = null;
+    _clientMatterStageId = null;
+
     ApiService.clearAuthToken();
   }
 }

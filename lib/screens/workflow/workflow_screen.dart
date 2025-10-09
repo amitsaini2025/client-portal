@@ -3,6 +3,7 @@ import 'package:client/screens/workflow/workflow_recipients_screen.dart';
 import 'package:client/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
+import '../../config/theme_config.dart';
 import 'workflow_documents_screen.dart';
 import 'workflow_stages_screen.dart';
 
@@ -37,6 +38,7 @@ class _WorkflowScreenState extends State<WorkflowScreen>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: goldenYellow,
+        iconTheme: const IconThemeData(color: ThemeConfig.white),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -74,9 +76,7 @@ class _WorkflowScreenState extends State<WorkflowScreen>
         children: const [
           WorkflowStagesScreen(),
           WorkflowDocumentsScreen(),
-          WorkflowMessagesScreen(
-            clientMatterStageId: 1,
-          ),
+          WorkflowMessagesScreen(),
         ],
       ),
     );

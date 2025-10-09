@@ -1,11 +1,12 @@
+import 'package:client/config/theme_config.dart';
 import 'package:flutter/material.dart';
+
 import '../../models/workflow_stage.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/workflow/workflow_progress_widget.dart';
 
 class WorkflowStagesScreen extends StatefulWidget {
-
   const WorkflowStagesScreen({super.key});
 
   @override
@@ -37,6 +38,9 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
       if (response['success'] == true && response['data'] != null) {
         setState(() {
           _workflowResponse = WorkflowStagesResponse.fromJson(response['data']);
+          AuthService.setClientMatterStageId(
+            _workflowResponse!.activeStage!.id,
+          );
           _isLoading = false;
         });
       } else {
@@ -56,7 +60,9 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(color: ThemeConfig.navyBlue),
+      );
     }
 
     if (_error != null) {
@@ -68,6 +74,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     }
 
     return RefreshIndicator(
+      color: ThemeConfig.goldenYellow,
       onRefresh: _loadWorkflowData,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -85,11 +92,14 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
+          Icon(Icons.error_outline, size: 64, color: ThemeConfig.goldenYellow),
           const SizedBox(height: 16),
           Text(error, textAlign: TextAlign.center),
           const SizedBox(height: 16),
           ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ThemeConfig.navyBlue,
+            ),
             onPressed: onRetry,
             icon: const Icon(Icons.refresh),
             label: const Text('Retry'),
@@ -102,32 +112,47 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
   void _showStageDetails(WorkflowStage stage) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(stage.stageName),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Status: ${stage.statusText}'),
-            if (stage.isCurrentStage)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.blue, size: 18),
-                    const SizedBox(width: 8),
-                    const Text('Current Stage',
-                        style: TextStyle(
-                            color: Colors.blue, fontWeight: FontWeight.bold)),
-                  ],
-                ),
+      builder:
+          (context) => AlertDialog(
+            title: Text(
+              stage.stageName,
+              style: const TextStyle(color: ThemeConfig.navyBlue),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Status: ${stage.statusText}'),
+                if (stage.isCurrentStage)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.check_circle,
+                          color: ThemeConfig.goldenYellow,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Current Stage',
+                          style: TextStyle(
+                            color: ThemeConfig.goldenYellow,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
               ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
-        ],
-      ),
+            ],
+          ),
     );
   }
 }
