@@ -18,9 +18,6 @@ class _WorkflowScreenState extends State<WorkflowScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  static const Color navyBlue = Color(0xFF1E1464);
-  static const Color goldenYellow = Color(0xFFF9B000);
-
   @override
   void initState() {
     super.initState();
@@ -36,8 +33,9 @@ class _WorkflowScreenState extends State<WorkflowScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
-        backgroundColor: goldenYellow,
+        backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: ThemeConfig.white),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,9 +59,9 @@ class _WorkflowScreenState extends State<WorkflowScreen>
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: navyBlue,
+          labelColor: ThemeConfig.navyBlue,
           unselectedLabelColor: Colors.white,
-          indicatorColor: navyBlue,
+          indicatorColor: ThemeConfig.navyBlue,
           tabs: const [
             Tab(text: 'Stages'),
             Tab(text: 'Documents'),
@@ -71,13 +69,16 @@ class _WorkflowScreenState extends State<WorkflowScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          WorkflowStagesScreen(),
-          WorkflowDocumentsScreen(),
-          WorkflowMessagesScreen(),
-        ],
+      body: Container(
+        color: ThemeConfig.navyBlue,
+        child: TabBarView(
+          controller: _tabController,
+          children: const [
+            WorkflowStagesScreen(),
+            WorkflowDocumentsScreen(),
+            WorkflowMessagesScreen(),
+          ],
+        ),
       ),
     );
   }

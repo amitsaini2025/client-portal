@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../services/api_service.dart';
+import '../../config/theme_config.dart'; // assuming you have ThemeConfig here
 
 class SendMessageScreen extends StatefulWidget {
   const SendMessageScreen({super.key});
@@ -14,7 +15,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-  
+
   final List<XFile> _selectedImages = [];
   bool _isLoading = false;
 
@@ -32,7 +33,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
         maxHeight: 1080,
         imageQuality: 85,
       );
-      
+
       if (images.isNotEmpty) {
         setState(() {
           _selectedImages.addAll(images);
@@ -51,7 +52,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
         maxHeight: 1080,
         imageQuality: 85,
       );
-      
+
       if (image != null) {
         setState(() {
           _selectedImages.add(image);
@@ -69,7 +70,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
   }
 
   Future<void> _sendMessage() async {
-    if (_subjectController.text.trim().isEmpty || 
+    if (_subjectController.text.trim().isEmpty ||
         _messageController.text.trim().isEmpty) {
       _showErrorSnackBar('Please fill in all required fields');
       return;
@@ -80,16 +81,14 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
     });
 
     try {
-      // Prepare message data
       Map<String, dynamic> messageData = {
         'subject': _subjectController.text.trim(),
         'message': _messageController.text.trim(),
         'attachments': _selectedImages.map((image) => image.path).toList(),
       };
 
-      // Send message via API
       final response = await ApiService.sendMessage(messageData);
-      
+
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -125,22 +124,23 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
 
   void _showImageSourceDialog() {
     showModalBottomSheet(
+      backgroundColor: ThemeConfig.navyBlue,
       context: context,
       builder: (BuildContext context) {
         return SafeArea(
           child: Wrap(
             children: [
               ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Choose from Gallery'),
+                leading: const Icon(Icons.photo_library, color: Colors.white),
+                title: const Text('Choose from Gallery', style: TextStyle(color: Colors.white)),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImages();
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Take Photo'),
+                leading: const Icon(Icons.camera_alt, color: Colors.white),
+                title: const Text('Take Photo', style: TextStyle(color: Colors.white)),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImageFromCamera();
@@ -156,11 +156,11 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
-        title: const Text('Send Message'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: const Text('Send Message', style: TextStyle(color: Colors.white)),
+        backgroundColor: ThemeConfig.goldenYellow,
+        foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -172,7 +172,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
               child: SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               ),
             )
           else
@@ -181,6 +181,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
               child: const Text(
                 'Send',
                 style: TextStyle(
+                  color: Colors.white,
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                 ),
@@ -196,15 +197,22 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             // Subject Field
             TextFormField(
               controller: _subjectController,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Subject *',
+                labelStyle: const TextStyle(color: Colors.white70),
                 hintText: 'Enter message subject',
+                hintStyle: const TextStyle(color: Colors.white54),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                prefixIcon: const Icon(Icons.subject),
+                prefixIcon: const Icon(Icons.subject, color: Colors.white),
                 filled: true,
-                fillColor: Theme.of(context).cardColor,
+                fillColor: ThemeConfig.navyBlue.withOpacity(0.6),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: ThemeConfig.goldenYellow),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               textCapitalization: TextCapitalization.sentences,
             ),
@@ -213,15 +221,22 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             // Message Field
             TextFormField(
               controller: _messageController,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Message *',
+                labelStyle: const TextStyle(color: Colors.white70),
                 hintText: 'Type your message here...',
+                hintStyle: const TextStyle(color: Colors.white54),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                prefixIcon: const Icon(Icons.message),
+                prefixIcon: const Icon(Icons.message, color: Colors.white),
                 filled: true,
-                fillColor: Theme.of(context).cardColor,
+                fillColor: ThemeConfig.navyBlue.withOpacity(0.6),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: ThemeConfig.goldenYellow),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 alignLabelWithHint: true,
               ),
               maxLines: 6,
@@ -233,9 +248,9 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: ThemeConfig.navyBlue.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Theme.of(context).dividerColor),
+                border: Border.all(color: Colors.white24),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,57 +258,43 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Attachments',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        style: TextStyle(
                           fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
                       TextButton.icon(
                         onPressed: _showImageSourceDialog,
-                        icon: const Icon(Icons.add_photo_alternate, size: 20),
-                        label: const Text('Add Photos'),
+                        icon: const Icon(Icons.add_photo_alternate, size: 20, color: Colors.white),
+                        label: const Text('Add Photos', style: TextStyle(color: Colors.white)),
                         style: TextButton.styleFrom(
-                          foregroundColor: Theme.of(context).primaryColor,
+                          foregroundColor: ThemeConfig.goldenYellow,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  
+
                   if (_selectedImages.isEmpty)
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(32),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                        color: Colors.white.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
-                          style: BorderStyle.solid,
+                          color: Colors.white24,
                         ),
                       ),
-                      child: Column(
+                      child: const Column(
                         children: [
-                          Icon(
-                            Icons.photo_library_outlined,
-                            size: 48,
-                            color: Theme.of(context).primaryColor.withValues(alpha: 0.6),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'No photos selected',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Theme.of(context).primaryColor.withValues(alpha: 0.7),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Tap "Add Photos" to attach images',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
-                            ),
-                          ),
+                          Icon(Icons.photo_library_outlined, size: 48, color: Colors.white54),
+                          SizedBox(height: 12),
+                          Text('No photos selected', style: TextStyle(color: Colors.white70)),
+                          SizedBox(height: 4),
+                          Text('Tap "Add Photos" to attach images', style: TextStyle(color: Colors.white54)),
                         ],
                       ),
                     )
@@ -311,21 +312,13 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                       itemBuilder: (context, index) {
                         return Stack(
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: Theme.of(context).dividerColor,
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.file(
-                                  File(_selectedImages[index].path),
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(
+                                File(_selectedImages[index].path),
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
                               ),
                             ),
                             Positioned(
@@ -335,15 +328,11 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                                 onTap: () => _removeImage(index),
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     color: Colors.red,
-                                    borderRadius: BorderRadius.circular(12),
+                                    shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    color: Colors.white,
-                                    size: 16,
-                                  ),
+                                  child: const Icon(Icons.close, color: Colors.white, size: 16),
                                 ),
                               ),
                             ),
@@ -363,56 +352,29 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                 onPressed: _isLoading ? null : _sendMessage,
                 icon: _isLoading
                     ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Icon(Icons.send),
-                label: Text(_isLoading ? 'Sending...' : 'Send Message'),
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+                    : const Icon(Icons.send, color: Colors.white),
+                label: Text(
+                  _isLoading ? 'Sending...' : 'Send Message',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
+                  backgroundColor: ThemeConfig.goldenYellow,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  elevation: 2,
+                  elevation: 4,
                 ),
               ),
             ),
             const SizedBox(height: 20),
-
-            // Info Card
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.blue.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Colors.blue[700],
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Your message will be sent to your case manager. You can attach up to 10 photos with your message.',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.blue[700],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),

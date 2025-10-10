@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
+import '../../config/theme_config.dart';
 import '../../models/new/task.dart';
 import '../../services/api_service.dart';
-import '../../config/theme_config.dart';
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
@@ -57,8 +58,8 @@ class _TasksScreenState extends State<TasksScreen> {
   List<Task> get _filteredTasks {
     return _tasks.where((task) {
       final matchesSearch =
-      (task.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
-          false);
+          (task.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
+              false);
       final matchesStatus =
           _statusFilter == 'all' || task.status == _statusFilter;
       final matchesPriority =
@@ -93,19 +94,6 @@ class _TasksScreenState extends State<TasksScreen> {
     }
   }
 
-  IconData _getPriorityIcon(String priority) {
-    switch (priority) {
-      case 'high':
-        return Icons.priority_high;
-      case 'medium':
-        return Icons.remove;
-      case 'low':
-        return Icons.keyboard_arrow_down;
-      default:
-        return Icons.help;
-    }
-  }
-
   Color _getStatusColor(String status) {
     switch (status) {
       case 'pending':
@@ -136,21 +124,6 @@ class _TasksScreenState extends State<TasksScreen> {
     }
   }
 
-  IconData _getStatusIcon(String status) {
-    switch (status) {
-      case 'pending':
-        return Icons.schedule;
-      case 'in_progress':
-        return Icons.timeline;
-      case 'completed':
-        return Icons.check_circle;
-      case 'cancelled':
-        return Icons.cancel;
-      default:
-        return Icons.help;
-    }
-  }
-
   bool _isDueSoon(DateTime dueDate) {
     final daysUntilDue = dueDate.difference(DateTime.now()).inDays;
     return daysUntilDue <= 3 && daysUntilDue >= 0;
@@ -161,22 +134,19 @@ class _TasksScreenState extends State<TasksScreen> {
     return Scaffold(
       backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
-        title: const Text('Tasks'),
+        title: const Text('Tasks', style: TextStyle(color: Colors.white)),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: _loadTasks,
           ),
         ],
       ),
       body: Column(
-        children: [
-          _buildSearchAndFilters(),
-          Expanded(child: _buildTaskList()),
-        ],
+        children: [_buildSearchAndFilters(), Expanded(child: _buildTaskList())],
       ),
     );
   }
@@ -195,12 +165,13 @@ class _TasksScreenState extends State<TasksScreen> {
             },
             decoration: InputDecoration(
               hintText: 'Search tasks...',
-              prefixIcon: const Icon(Icons.search, color: Colors.white70),
+              hintStyle: TextStyle(color: Colors.white),
+              prefixIcon: const Icon(Icons.search, color: Colors.white),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               filled: true,
-              fillColor: Colors.grey[800],
+              fillColor: Colors.grey[850],
             ),
             style: const TextStyle(color: Colors.white),
           ),
@@ -241,10 +212,16 @@ class _TasksScreenState extends State<TasksScreen> {
 
   Widget _buildFilterChip(String label, String value, String type) {
     final isSelected =
-    type == 'status' ? _statusFilter == value : _priorityFilter == value;
+        type == 'status' ? _statusFilter == value : _priorityFilter == value;
 
     return FilterChip(
-      label: Text(label, style: const TextStyle(color: Colors.white)),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? Colors.black : Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       selected: isSelected,
       onSelected: (selected) {
         setState(() {
@@ -256,9 +233,13 @@ class _TasksScreenState extends State<TasksScreen> {
         });
         _loadTasks();
       },
-      selectedColor: ThemeConfig.goldenYellow.withOpacity(0.2),
-      checkmarkColor: ThemeConfig.goldenYellow,
+      selectedColor: ThemeConfig.goldenYellow,
       backgroundColor: Colors.grey[700],
+      side: BorderSide(
+        color: isSelected ? ThemeConfig.goldenYellow : Colors.grey[600]!,
+        width: 1.2,
+      ),
+      checkmarkColor: Colors.black,
     );
   }
 
@@ -276,17 +257,30 @@ class _TasksScreenState extends State<TasksScreen> {
           children: [
             Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
             const SizedBox(height: 16),
-            Text(_errorMessage!,
-                style: const TextStyle(color: Colors.white),
-                textAlign: TextAlign.center),
+            Text(
+              _errorMessage!,
+              style: const TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadTasks,
               style: ElevatedButton.styleFrom(
                 backgroundColor: ThemeConfig.goldenYellow,
-                foregroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 5,
               ),
-              child: const Text('Retry'),
+              child: const Text(
+                'Retry',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
             ),
           ],
         ),
@@ -302,8 +296,8 @@ class _TasksScreenState extends State<TasksScreen> {
             const SizedBox(height: 16),
             Text(
               _searchQuery.isNotEmpty ||
-                  _statusFilter != 'all' ||
-                  _priorityFilter != 'all'
+                      _statusFilter != 'all' ||
+                      _priorityFilter != 'all'
                   ? 'No tasks match your search'
                   : 'No tasks found',
               style: const TextStyle(color: Colors.white70),
@@ -329,9 +323,9 @@ class _TasksScreenState extends State<TasksScreen> {
 
   Widget _buildTaskCard(Task task) {
     return Card(
-      color: Colors.grey[800],
+      color: Colors.grey[850],
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
+      elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () => _showTaskDetails(task),
@@ -346,11 +340,14 @@ class _TasksScreenState extends State<TasksScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: ThemeConfig.goldenYellow.withOpacity(0.1),
+                      color: ThemeConfig.goldenYellow.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(Icons.task,
-                        color: ThemeConfig.goldenYellow, size: 24),
+                    child: Icon(
+                      Icons.task,
+                      color: ThemeConfig.goldenYellow,
+                      size: 24,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -359,9 +356,10 @@ class _TasksScreenState extends State<TasksScreen> {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
-                        decoration: task.status == 'completed'
-                            ? TextDecoration.lineThrough
-                            : null,
+                        decoration:
+                            task.status == 'completed'
+                                ? TextDecoration.lineThrough
+                                : null,
                       ),
                     ),
                   ),
@@ -370,11 +368,12 @@ class _TasksScreenState extends State<TasksScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(Icons.schedule,
-                      size: 16, color: Colors.white70),
+                  const Icon(Icons.schedule, size: 16, color: Colors.white70),
                   const SizedBox(width: 4),
-                  Text(task.dueDate,
-                      style: const TextStyle(color: Colors.white70)),
+                  Text(
+                    task.dueDate,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
                 ],
               ),
             ],
@@ -398,8 +397,8 @@ class _TasksScreenState extends State<TasksScreen> {
             return Container(
               padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
-                  borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(20))),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
               child: ListView(
                 controller: scrollController,
                 children: [
@@ -408,7 +407,7 @@ class _TasksScreenState extends State<TasksScreen> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: Colors.grey[400],
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -423,12 +422,17 @@ class _TasksScreenState extends State<TasksScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  _buildDetailRow(Icons.schedule, 'Due Date', task.dueDate),
                   _buildDetailRow(
-                      Icons.schedule, 'Due Date', task.dueDate),
-                  _buildDetailRow(Icons.priority_high, 'Priority',
-                      _getPriorityText(task.priority ?? 'unknown')),
-                  _buildDetailRow(Icons.info, 'Status',
-                      _getStatusText(task.status ?? 'unknown')),
+                    Icons.priority_high,
+                    'Priority',
+                    _getPriorityText(task.priority ?? 'unknown'),
+                  ),
+                  _buildDetailRow(
+                    Icons.info,
+                    'Status',
+                    _getStatusText(task.status ?? 'unknown'),
+                  ),
                 ],
               ),
             );
@@ -448,13 +452,12 @@ class _TasksScreenState extends State<TasksScreen> {
           Text(
             '$label: ',
             style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.w600),
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(color: Colors.white),
-            ),
+            child: Text(value, style: const TextStyle(color: Colors.white70)),
           ),
         ],
       ),

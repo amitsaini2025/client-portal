@@ -271,27 +271,13 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const Scaffold(body: LoadingWidget());
-
-    if (_errorMessage != null) {
-      return Scaffold(
-        backgroundColor: ThemeConfig.navyBlue,
-        appBar: AppBar(
-          title: const Text('Documents'),
-          backgroundColor: ThemeConfig.goldenYellow,
-          foregroundColor: Colors.white,
-        ),
-        body: CustomErrorWidget(
-          message: _errorMessage!,
-          onRetry: _loadDocuments,
-        ),
-      );
-    }
-
     return Scaffold(
       backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
-        title: const Text('Documents'),
+        title: const Text(
+          'Documents',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
         actions: [
@@ -299,7 +285,14 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           IconButton(icon: const Icon(Icons.filter_list), onPressed: () {}),
         ],
       ),
-      body: Column(
+      body: _errorMessage != null
+          ? CustomErrorWidget(
+        message: _errorMessage!,
+        onRetry: _loadDocuments,
+      )
+          : _isLoading
+          ? const Center(child: LoadingWidget())
+          : Column(
         children: [
           if (_isUploading || _uploadStatus != null)
             UploadProgress(
