@@ -1,7 +1,7 @@
 class SendMessageResponse {
-  final bool success;
-  final String message;
-  final Data? data;
+  bool success;
+  String message;
+  Data? data;
 
   SendMessageResponse({
     required this.success,
@@ -9,91 +9,90 @@ class SendMessageResponse {
     this.data,
   });
 
-  factory SendMessageResponse.fromJson(Map<String, dynamic> json) {
-    return SendMessageResponse(
-      success: json['success'] ?? false,
-      message: json['message'] ?? '',
-      data: json['data'] != null ? Data.fromJson(json['data']) : null,
-    );
-  }
+  factory SendMessageResponse.fromJson(Map<String, dynamic> json) =>
+      SendMessageResponse(
+        success: json["success"],
+        message: json["message"],
+        data: json["data"] != null ? Data.fromJson(json["data"]) : null,
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'success': success,
-      'message': message,
-      'data': data?.toJson(),
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "message": message,
+    "data": data?.toJson(),
+  };
 }
 
 class Data {
-  final int messageId;
-  final Message? message;
-  final String? sentAt;
+  int? messageId;
+  Message? message;
+  String? sentAt;
+  int? recipientCount;
 
-  Data({
-    required this.messageId,
-    this.message,
-    this.sentAt,
-  });
+  Data({this.messageId, this.message, this.sentAt, this.recipientCount});
 
-  factory Data.fromJson(Map<String, dynamic> json) {
-    return Data(
-      messageId: json['message_id'] ?? 0,
-      message: json['message'] != null ? Message.fromJson(json['message']) : null,
-      sentAt: json['sent_at'],
-    );
-  }
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
+    messageId: json["message_id"],
+    message: json["message"] != null ? Message.fromJson(json["message"]) : null,
+    sentAt: json["sent_at"],
+    recipientCount: json["recipient_count"],
+  );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'message_id': messageId,
-      'message': message?.toJson(),
-      'sent_at': sentAt,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    "message_id": messageId,
+    "message": message?.toJson(),
+    "sent_at": sentAt,
+    "recipient_count": recipientCount,
+  };
 }
 
 class Message {
-  final int id;
-  final String message;
-  final String sender;
-  final int senderId;
-  final int? recipientId;
-  final String sentAt;
-  final bool isRead;
+  int id;
+  String message;
+  String sender;
+  int senderId;
+  List<int> recipientIds;
+  String sentAt;
+  int clientMatterId;
+  int recipientCount;
 
   Message({
     required this.id,
     required this.message,
     required this.sender,
     required this.senderId,
-    this.recipientId,
+    required this.recipientIds,
     required this.sentAt,
-    required this.isRead,
+    required this.clientMatterId,
+    required this.recipientCount,
   });
 
-  factory Message.fromJson(Map<String, dynamic> json) {
-    return Message(
-      id: json['id'] ?? 0,
-      message: json['message'] ?? '',
-      sender: json['sender'] ?? '',
-      senderId: json['sender_id'] ?? 0,
-      recipientId: json['recipient_id'],
-      sentAt: json['sent_at'] ?? '',
-      isRead: json['is_read'] ?? false,
-    );
-  }
+  factory Message.fromJson(Map<String, dynamic> json) => Message(
+    id: json["id"] is int ? json["id"] : int.parse(json["id"].toString()),
+    message: json["message"],
+    sender: json["sender"],
+    senderId: json["sender_id"] is int
+        ? json["sender_id"]
+        : int.parse(json["sender_id"].toString()),
+    recipientIds: List<int>.from(
+        json["recipient_ids"].map((x) => x is int ? x : int.parse(x.toString()))),
+    sentAt: json["sent_at"],
+    clientMatterId: json["client_matter_id"] is int
+        ? json["client_matter_id"]
+        : int.parse(json["client_matter_id"].toString()),
+    recipientCount: json["recipient_count"] is int
+        ? json["recipient_count"]
+        : int.parse(json["recipient_count"].toString()),
+  );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'message': message,
-      'sender': sender,
-      'sender_id': senderId,
-      'recipient_id': recipientId,
-      'sent_at': sentAt,
-      'is_read': isRead,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "message": message,
+    "sender": sender,
+    "sender_id": senderId,
+    "recipient_ids": recipientIds,
+    "sent_at": sentAt,
+    "client_matter_id": clientMatterId,
+    "recipient_count": recipientCount,
+  };
 }

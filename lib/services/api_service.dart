@@ -618,18 +618,12 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> sendChatMessage({
-    required int recipientId,
     required int clientMatterId,
-    required int clientMatterStageId,
     required String message,
-    required String subject,
   }) async {
     final body = {
-      'recipient_id': recipientId.toString(),
       'client_matter_id': clientMatterId.toString(),
-      'client_matter_stage_id': clientMatterStageId.toString(),
       'message': message,
-      'subject': subject,
     };
 
     return await _makeRequest(

@@ -20,8 +20,10 @@ class ApiConfig {
   // Workflow endpoints
   static const String workflowStagesEndpoint = '/workflow/stages';
   static const String workflowStageDetailsEndpoint = '/workflow/stages';
-  static const String workflowAllowedChecklistEndpoint = '/workflow/allowed-checklist';
-  static const String workflowUploadChecklistEndpoint = '/workflow/upload-allowed-checklist';
+  static const String workflowAllowedChecklistEndpoint =
+      '/workflow/allowed-checklist';
+  static const String workflowUploadChecklistEndpoint =
+      '/workflow/upload-allowed-checklist';
 
   // Client portal specific endpoints
   static const String clientProfileEndpoint = '/profile';
@@ -78,4 +80,13 @@ class ApiConfig {
   static String getErrorMessage(int statusCode) {
     return errorMessages[statusCode] ?? 'Unknown error occurred';
   }
+
+  // ----------------------
+  // Pusher configuration
+  // ----------------------
+  static const String pusherAppId = '2058948';
+  static const String pusherAppKey = '0410ad08e960563173b5';
+  static const String pusherAppSecret = 'd2d8b6320636c77dec48';
+  static const String pusherCluster = 'ap2';
+  static const String pusherEncrypted = 'true';
 }
