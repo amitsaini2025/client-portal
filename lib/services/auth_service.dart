@@ -20,11 +20,13 @@ class AuthService {
   static const String _selectedMatterKey = 'selected_matter_id';
   static const String _selectedMatterNameKey = 'selected_matter_name';
   static const String _clientMatterStageKey = 'client_matter_stage_id';
+  static const String _userIdKey = 'user_id';
 
   // Current user data
   static Client? _currentClient;
   static Admin? _currentAdmin;
   static String? _currentToken;
+  static int? _currentUserId;
   static int? _selectedMatterId;
   static String? _selectedMatterName;
   static int? _clientMatterStageId;
@@ -35,6 +37,8 @@ class AuthService {
   static Admin? get currentAdmin => _currentAdmin;
 
   static String? get currentToken => _currentToken;
+
+  static int? get currentUserId => _currentUserId;
 
   static int? get selectedMatterId => _selectedMatterId;
 
@@ -68,6 +72,12 @@ class AuthService {
       await _secureStorage.read(key: _selectedMatterNameKey);
       if (storedMatterName != null) {
         _selectedMatterName = storedMatterName;
+      }
+
+      // Load current user ID
+      final storedUserId = await _secureStorage.read(key: _userIdKey);
+      if (storedUserId != null) {
+        _currentUserId = int.tryParse(storedUserId);
       }
     } catch (e) {
       print('Error initializing AuthService: $e');
@@ -160,16 +170,21 @@ class AuthService {
         final token = response['data']['token'];
         final refreshToken = response['data']['refresh_token'];
         final clientData = response['data']['user'];
+        final userId = clientData != null ? clientData['id'] as int : null;
 
         // Store token securely
         await _secureStorage.write(key: _tokenKey, value: token);
         _currentToken = token;
-        await _secureStorage.write(key: _refreshTokenKey, value: token);
+        await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
 
         // Store user data
         if (clientData != null) {
           _currentClient = Client.fromJson(clientData);
+          _currentUserId = userId;
           await _saveUserData();
+          if (_currentUserId != null) {
+            await _secureStorage.write(key: _userIdKey, value: _currentUserId.toString());
+          }
         }
 
         // Store remember me preference
@@ -229,7 +244,7 @@ class AuthService {
         return {
           'success': true,
           'message':
-              'Registration successful. Please check your email for verification.',
+          'Registration successful. Please check your email for verification.',
         };
       } else {
         return {
@@ -259,11 +274,13 @@ class AuthService {
       await _secureStorage.delete(key: _refreshTokenKey);
       await _secureStorage.delete(key: _userDataKey);
       await _secureStorage.delete(key: _selectedMatterKey);
+      await _secureStorage.delete(key: _userIdKey);
 
       // Clear memory
       _currentToken = null;
       _currentClient = null;
       _currentAdmin = null;
+      _currentUserId = null;
       _selectedMatterId = null;
 
       ApiService.clearAuthToken();
@@ -292,6 +309,7 @@ class AuthService {
       if (userData != null) {
         final data = json.decode(userData);
         _currentClient = Client.fromJson(data);
+        _currentUserId = data['id'];
       }
     } catch (e) {
       print('Error loading user data: $e');
@@ -467,39 +485,7 @@ class AuthService {
     }
   }
 
-  /// Save user data to secure storage
-  /*static Future<void> _saveUserData() async {
-    if (_currentClient != null) {
-      await _secureStorage.write(
-        key: _userDataKey,
-        value: json.encode(_currentClient!.toJson()),
-      );
-    }
-  }*/
-
-  /// Load user data from secure storage
-  /*static Future<void> _loadUserData() async {
-    try {
-      final userData = await _secureStorage.read(key: _userDataKey);
-      if (userData != null) {
-        final data = json.decode(userData);
-        _currentClient = Client.fromJson(data);
-      }
-    } catch (e) {
-      print('Error loading user data: $e');
-    }
-  }*/
-
   /// Clear all stored data
-  /*static Future<void> clearAllData() async {
-    await _secureStorage.deleteAll();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-
-    // Clear API service token
-    ApiService.clearAuthToken();
-  }*/
-
   static Future<void> clearAllData() async {
     await _secureStorage.deleteAll();
     final prefs = await SharedPreferences.getInstance();
@@ -509,6 +495,7 @@ class AuthService {
     _currentToken = null;
     _currentClient = null;
     _currentAdmin = null;
+    _currentUserId = null;
     _selectedMatterId = null;
     _selectedMatterName = null;
     _clientMatterStageId = null;
