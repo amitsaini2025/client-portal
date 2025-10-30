@@ -388,7 +388,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 20),
 
-                        if (_biometricAvailable) ...[
+                        /*if (_biometricAvailable) ...[
                           if (_biometricEnabled)
                             OutlinedButton.icon(
                               onPressed:
@@ -419,10 +419,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           const SizedBox(height: 20),
-                        ],
+                        ],*/
 
                         // Test Login Button
-                        Container(
+                        /*Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: ThemeConfig.goldenYellow.withOpacity(0.1),
@@ -465,11 +465,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ],
                           ),
-                        ),
+                        ),*/
 
                         const SizedBox(height: 20),
 
-                        Row(
+                        /*Row(
                           children: [
                             Expanded(
                               child: Divider(
@@ -491,7 +491,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ],
-                        ),
+                        ),*/
                       ],
                     ),
                   ),
