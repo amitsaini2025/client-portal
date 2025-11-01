@@ -210,7 +210,7 @@ class MyAppWithTheme extends StatelessWidget {
                 title: args['title'] ?? 'PDF Document',
               );
             },
-            'workflow': (context) => const WorkflowScreen(),
+            '/workflow': (context) => const WorkflowScreen(),
             '/workflow-message-detail': (context) {
               final args =
               ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
