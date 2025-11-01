@@ -155,6 +155,13 @@ void main() async {
 
   // Initialize services
   await AuthService.initialize();
+  final prefs = await SharedPreferences.getInstance();
+  final isFirstLaunch = prefs.getBool('first_launch') ?? true;
+
+  if (isFirstLaunch) {
+    await AuthService.clearAllData();
+    await prefs.setBool('first_launch', false);
+  }
   await ApiService.initializeAuthToken();
 
   // Initialize FCM service
