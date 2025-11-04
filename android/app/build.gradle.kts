@@ -18,16 +18,16 @@ val keystoreProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.example.client"
+    namespace = "com.bansalimmigration.clientportal"
     compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "com.example.client"
+        applicationId = "com.bansalimmigration.clientportal"
         minSdk = 23
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 1
+        versionName = "1.0"
     }
 
     signingConfigs {
