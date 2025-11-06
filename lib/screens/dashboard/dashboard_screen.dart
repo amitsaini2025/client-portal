@@ -467,7 +467,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return _buildActivityItem(
               icon: Icons.task,
               title: activity.title,
-              subtitle: activity.description,
+              subtitle: activity.description
+                  .replaceAll('\n', ' ')
+                  .replaceAll('\t', ' ')
+                  .replaceAll(RegExp(r'\s+'), ' ')
+                  .trim(),
               time: activity.timeAgo,
               color: goldenYellow,
             );

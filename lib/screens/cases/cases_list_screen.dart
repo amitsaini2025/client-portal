@@ -139,173 +139,176 @@ class _CasesListScreenState extends State<CasesListScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'My Cases',
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // TODO: Navigate to case creation screen
-                  },
-                  icon: const Icon(Icons.add, size: 18),
-                  label: const Text('New Case'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeConfig.goldenYellow,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Case statistics
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: ThemeConfig.navyBlue.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
-              ),
-              child: Row(
+      body: RefreshIndicator(
+        color: ThemeConfig.goldenYellow,
+        onRefresh: () => _fetchCases(page: 1),
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildStatCard(
-                    'Total Cases',
-                    cases.length.toString(),
-                    Icons.folder,
+                  Text(
+                    'My Cases',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                  const SizedBox(width: 24),
-                  _buildStatCard(
-                    'Active Cases',
-                    cases.where((c) => c.status != 'completed').length.toString(),
-                    Icons.work,
-                  ),
-                  const SizedBox(width: 24),
-                  _buildStatCard(
-                    'Pending Documents',
-                    cases
-                        .where((c) => c.status == 'pending_documents')
-                        .length
-                        .toString(),
-                    Icons.pending,
-                  ),
-                  const SizedBox(width: 24),
-                  _buildStatCard(
-                    'Completed',
-                    cases.where((c) => c.status == 'completed').length.toString(),
-                    Icons.check_circle,
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      // TODO: Navigate to case creation screen
+                    },
+                    icon: const Icon(Icons.add, size: 18),
+                    label: const Text('New Case'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ThemeConfig.goldenYellow,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
-            // States
-            if (isLoading)
-              const Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: ThemeConfig.goldenYellow,
-                  ),
+              // Case statistics
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: ThemeConfig.navyBlue.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color: ThemeConfig.goldenYellow.withOpacity(0.5)),
                 ),
-              )
-            else if (error != null)
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline,
-                          size: 64, color: Colors.red),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Error: $error',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => _fetchCases(page: 1),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ThemeConfig.goldenYellow,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    _buildStatCard(
+                      'Total Cases',
+                      cases.length.toString(),
+                      Icons.folder,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildStatCard(
+                      'Active Cases',
+                      cases
+                          .where((c) => c.status != 'completed')
+                          .length
+                          .toString(),
+                      Icons.work,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildStatCard(
+                      'Pending Documents',
+                      cases
+                          .where((c) => c.status == 'pending_documents')
+                          .length
+                          .toString(),
+                      Icons.pending,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildStatCard(
+                      'Completed',
+                      cases
+                          .where((c) => c.status == 'completed')
+                          .length
+                          .toString(),
+                      Icons.check_circle,
+                    ),
+                  ],
                 ),
-              )
-            else if (cases.isEmpty)
-                Expanded(
-                  child: Center(
+              ),
+
+              const SizedBox(height: 24),
+
+              if (isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40),
+                    child: CircularProgressIndicator(
+                      color: ThemeConfig.goldenYellow,
+                    ),
+                  ),
+                )
+              else if (error != null)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.folder_open,
-                            size: 64, color: Colors.white54),
-                        SizedBox(height: 16),
+                      children: [
+                        const Icon(Icons.error_outline,
+                            size: 64, color: Colors.red),
+                        const SizedBox(height: 16),
                         Text(
-                          'No cases found',
-                          style:
-                          TextStyle(fontSize: 18, color: Colors.white70),
+                          'Error: ',
+                          style: const TextStyle(color: Colors.white),
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Your cases will appear here once they are created',
-                          style:
-                          TextStyle(fontSize: 14, color: Colors.white54),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => _fetchCases(page: 1),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ThemeConfig.goldenYellow,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Retry'),
                         ),
                       ],
                     ),
                   ),
                 )
-              else
-                Expanded(
-                  child: RefreshIndicator(
-                    color: ThemeConfig.goldenYellow,
-                    onRefresh: () => _fetchCases(page: 1),
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: cases.length + (isFetchingMore ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index < cases.length) {
-                          final caseItem = cases[index];
-                          return _buildCaseCard(caseItem);
-                        } else {
-                          return const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: ThemeConfig.goldenYellow,
-                              ),
-                            ),
-                          );
-                        }
-                      },
+              else if (cases.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 60),
+                    child: Center(
+                      child: Column(
+                        children: const [
+                          Icon(Icons.folder_open,
+                              size: 64, color: Colors.white54),
+                          SizedBox(height: 16),
+                          Text(
+                            'No cases found',
+                            style:
+                            TextStyle(fontSize: 18, color: Colors.white70),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Your cases will appear here once they are created',
+                            style:
+                            TextStyle(fontSize: 14, color: Colors.white54),
+                          ),
+                        ],
+                      ),
                     ),
+                  )
+                else
+                  Column(
+                    children: [
+                      for (final caseItem in cases) _buildCaseCard(caseItem),
+                      if (isFetchingMore)
+                        const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: ThemeConfig.goldenYellow,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -482,36 +485,42 @@ class _CasesListScreenState extends State<CasesListScreen> {
   }
 
   Widget _buildStatCard(String title, String value, IconData icon) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: ThemeConfig.navyBlue.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 24, color: ThemeConfig.goldenYellow),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: GoogleFonts.spaceGrotesk(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      decoration: BoxDecoration(
+        color: ThemeConfig.navyBlue.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 24, color: ThemeConfig.goldenYellow),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: ThemeConfig.goldenYellow,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
-            Text(
-              title,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: ThemeConfig.goldenYellow,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

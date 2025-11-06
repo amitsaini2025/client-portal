@@ -28,53 +28,42 @@ class QuickActionsCard extends StatelessWidget {
         children: [
           Text(
             'Quick Actions',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: _buildActionButton(
-                  context: context,
-                  icon: Icons.upload_file,
-                  label: 'Upload Document',
-                  onTap: onUploadDocument,
-                  color: Colors.blue,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildActionButton(
-                  context: context,
-                  icon: Icons.schedule,
-                  label: 'Book Appointment',
-                  onTap: onBookAppointment,
-                  color: Colors.green,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildActionButton(
-                  context: context,
-                  icon: Icons.message,
-                  label: 'Send Message',
-                  onTap: onSendMessage,
-                  color: Colors.orange,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildActionButton(
-                  context: context,
-                  icon: Icons.timeline,
-                  label: 'View Workflow',
-                  onTap: onViewWorkflow ?? () {},
-                  color: Colors.purple,
-                ),
-              ),
-            ],
+          _buildActionButton(
+            context: context,
+            icon: Icons.upload_file,
+            label: 'Upload Document',
+            onTap: onUploadDocument,
+            color: Colors.blue,
+          ),
+          const SizedBox(height: 12),
+          _buildActionButton(
+            context: context,
+            icon: Icons.schedule,
+            label: 'Book Appointment',
+            onTap: onBookAppointment,
+            color: Colors.green,
+          ),
+          const SizedBox(height: 12),
+          _buildActionButton(
+            context: context,
+            icon: Icons.message,
+            label: 'Send Message',
+            onTap: onSendMessage,
+            color: Colors.orange,
+          ),
+          const SizedBox(height: 12),
+          _buildActionButton(
+            context: context,
+            icon: Icons.timeline,
+            label: 'View Workflow',
+            onTap: onViewWorkflow ?? () {},
+            color: Colors.purple,
           ),
         ],
       ),
@@ -92,23 +81,26 @@ class QuickActionsCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        width: double.infinity, // match parent width
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16), // smaller height
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
+          color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
+          border: Border.all(color: color.withOpacity(0.3)),
         ),
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: color,
+            Icon(icon, color: color, size: 24), // smaller icon
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -116,6 +108,3 @@ class QuickActionsCard extends StatelessWidget {
     );
   }
 }
-
-
-
