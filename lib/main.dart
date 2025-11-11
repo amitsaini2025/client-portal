@@ -5,6 +5,7 @@ import 'package:client/screens/document_management/document_management.dart';
 import 'package:client/screens/documents/documents_screen.dart';
 import 'package:client/screens/matters/matters_screen.dart';
 import 'package:client/screens/pdf/pdf_viewer_screen.dart';
+import 'package:client/screens/profile/edit_profile_screen.dart';
 import 'package:client/screens/profile/profile_screen.dart';
 import 'package:client/screens/recent_activity/recent_activity.dart';
 import 'package:client/screens/tasks/tasks_screen.dart';
@@ -201,17 +202,21 @@ class MyAppWithTheme extends StatelessWidget {
             '/matters': (context) => const MattersScreen(),
             '/dashboard': (context) {
               final matterId =
-              ModalRoute.of(context)!.settings.arguments as String;
+                  ModalRoute.of(context)!.settings.arguments as String;
               return DashboardScreen(matterId: matterId);
             },
             '/profile': (context) => const ProfileScreen(),
+            '/profile/edit': (context) => const EditProfileScreen(),
             '/recent-cases': (context) => const CasesListScreen(),
             '/documents': (context) => const DocumentsScreen(),
             '/tasks': (context) => const TasksScreen(),
             '/recent-activity': (context) => const RecentActivityScreen(),
-            '/document-management': (context) => const DocumentManagementScreen(),
+            '/document-management':
+                (context) => const DocumentManagementScreen(),
             '/pdf-viewer': (context) {
-              final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+              final args =
+                  ModalRoute.of(context)!.settings.arguments
+                      as Map<String, dynamic>;
               return PdfViewerScreen(
                 pdfUrl: args['url'],
                 title: args['title'] ?? 'PDF Document',
@@ -220,10 +225,9 @@ class MyAppWithTheme extends StatelessWidget {
             '/workflow': (context) => const WorkflowScreen(),
             '/workflow-message-detail': (context) {
               final args =
-              ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-              return WorkflowMessageDetailScreen(
-                messageId: args['messageId'],
-              );
+                  ModalRoute.of(context)!.settings.arguments
+                      as Map<String, dynamic>;
+              return WorkflowMessageDetailScreen(messageId: args['messageId']);
             },
           },
         );
@@ -249,7 +253,9 @@ class AuthWrapper extends StatelessWidget {
 
         if (snapshot.data == true) {
           if (AuthService.isMatterSelected) {
-            return DashboardScreen(matterId: AuthService.selectedMatterId!.toString());
+            return DashboardScreen(
+              matterId: AuthService.selectedMatterId!.toString(),
+            );
           } else {
             return const MattersScreen();
           }

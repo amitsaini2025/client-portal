@@ -55,6 +55,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
+  Future<void> _openEditProfile() async {
+    final result = await Navigator.of(context).pushNamed('/profile/edit');
+    if (!mounted) return;
+    if (result == true) {
+      _fetchProfile();
+    }
+  }
+
   Widget _buildProfileCard(BuildContext context) {
     final data = _profileData!;
     return Container(
@@ -92,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 gradient: LinearGradient(
                   colors: [
                     ThemeConfig.goldenYellow,
-                    ThemeConfig.goldenYellow.withOpacity(0.6)
+                    ThemeConfig.goldenYellow.withOpacity(0.6),
                   ],
                 ),
               ),
@@ -208,66 +216,109 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
         elevation: 4,
         backgroundColor: ThemeConfig.goldenYellow,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.white),
+            tooltip: 'Edit Profile',
+            onPressed: _isLoading ? null : () => _openEditProfile(),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: _isLoading
-                ? const CircularProgressIndicator(color: ThemeConfig.goldenYellow)
-                : _errorMessage != null
-                ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 48),
-                const SizedBox(height: 12),
-                Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: _fetchProfile,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Retry"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeConfig.goldenYellow,
-                    foregroundColor: Colors.white,
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
-                )
-              ],
-            )
-                : SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildProfileCard(context),
-                  const SizedBox(height: 30),
+            child:
+                _isLoading
+                    ? const CircularProgressIndicator(
+                      color: ThemeConfig.goldenYellow,
+                    )
+                    : _errorMessage != null
+                    ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: _fetchProfile,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text("Retry"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ThemeConfig.goldenYellow,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                    : SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          _buildProfileCard(context),
+                          const SizedBox(height: 30),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed:
+                                  _isLoading ? null : () => _openEditProfile(),
+                              icon: const Icon(Icons.edit),
+                              label: const Text(
+                                "Edit Information",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(double.infinity, 52),
+                                backgroundColor: ThemeConfig.goldenYellow,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
 
-                  // Logout button
-                  ElevatedButton.icon(
-                    onPressed: () => _handleLogout(context),
-                    icon: const Icon(Icons.logout),
-                    label: const Text(
-                      "Logout",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 52),
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                          // Logout button
+                          ElevatedButton.icon(
+                            onPressed: () => _handleLogout(context),
+                            icon: const Icon(Icons.logout),
+                            label: const Text(
+                              "Logout",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 52),
+                              backgroundColor: Colors.redAccent,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              elevation: 5,
+                              shadowColor: Colors.red.withOpacity(0.4),
+                            ),
+                          ),
+                        ],
                       ),
-                      elevation: 5,
-                      shadowColor: Colors.red.withOpacity(0.4),
                     ),
-                  ),
-                ],
-              ),
-            ),
           ),
         ),
       ),
