@@ -17,6 +17,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'widgets/user_nav.dart';
 import 'dart:io' show Platform;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +28,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
+import 'config/stripe_config.dart';
 
 final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(
   ThemeMode.light,
@@ -151,6 +153,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = StripeConfig.publishableKey;
+  Stripe.merchantIdentifier = StripeConfig.merchantIdentifier;
+  await Stripe.instance.applySettings();
   Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 

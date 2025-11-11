@@ -25,6 +25,12 @@ The LegiComply Client Portal is a comprehensive Flutter application designed for
 - **Charts**: fl_chart
 - **UI Components**: Material Design 3
 
+### Payments
+- **Processor**: Stripe Payment Sheet (`flutter_stripe`)
+- **Configuration**: `lib/config/stripe_config.dart` (publishable key bundled for client usage)
+- **Server Requirement**: Move the secret key to a secure backend endpoint before production and expose a `/payment-intents` API that the app can call.
+- **Web**: `web/index.html` includes `https://js.stripe.com/v3/` for Stripe.js support.
+
 ### Project Structure
 ```
 lib/

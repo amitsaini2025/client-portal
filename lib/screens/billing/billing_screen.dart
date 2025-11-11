@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import '../../models/invoice.dart';
+import '../../config/stripe_config.dart';
+import '../../services/stripe_service.dart';
 
 class BillingScreen extends StatefulWidget {
   const BillingScreen({super.key});
@@ -15,6 +18,8 @@ class _BillingScreenState extends State<BillingScreen> {
   String? _errorMessage;
   String _searchQuery = '';
   String _statusFilter = 'all';
+  bool _isProcessingPayment = false;
+  int? _processingInvoiceId;
 
   @override
   void initState() {
@@ -156,6 +161,121 @@ class _BillingScreenState extends State<BillingScreen> {
 
   bool _isOverdue(DateTime dueDate, String status) {
     return dueDate.isBefore(DateTime.now()) && status != 'paid';
+  }
+
+  bool _isProcessingInvoice(int invoiceId) {
+    return _isProcessingPayment && _processingInvoiceId == invoiceId;
+  }
+
+  Future<void> _handlePayInvoice(Invoice invoice) async {
+    if (_isProcessingInvoice(invoice.id)) {
+      return;
+    }
+
+    final totalAmount = invoice.totalAmount;
+    if (totalAmount == null || totalAmount <= 0) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('This invoice does not have a payable amount yet.'),
+          ),
+        );
+      }
+      return;
+    }
+
+    final currency =
+        (invoice.currency ?? StripeConfig.defaultCurrency).toLowerCase();
+    final amountInMinorUnit = StripeService.amountToMinorUnit(totalAmount);
+    final description = invoice.notes?.isNotEmpty == true
+        ? invoice.notes!
+        : 'Payment for ${invoice.displayInvoiceNumber}';
+
+    setState(() {
+      _isProcessingPayment = true;
+      _processingInvoiceId = invoice.id;
+    });
+
+    try {
+      final paymentIntent = await StripeService.createPaymentIntent(
+        amountInMinorUnit: amountInMinorUnit,
+        currency: currency,
+        description: description,
+        metadata: {
+          'invoice_id': invoice.id.toString(),
+          if (invoice.invoiceNumber != null)
+            'invoice_number': invoice.invoiceNumber!,
+        },
+      );
+
+      final clientSecret = paymentIntent['client_secret'] as String?;
+      if (clientSecret == null || clientSecret.isEmpty) {
+        throw Exception(
+          'Missing Stripe client secret. Please contact support.',
+        );
+      }
+
+      await StripeService.initPaymentSheet(
+        clientSecret: clientSecret,
+        style: Theme.of(context).brightness == Brightness.dark
+            ? ThemeMode.dark
+            : ThemeMode.light,
+      );
+
+      await StripeService.presentPaymentSheet();
+
+      if (!mounted) return;
+      setState(() {
+        _invoices = _invoices
+            .map(
+              (existing) => existing.id == invoice.id
+                  ? existing.copyWith(
+                      status: 'paid',
+                      paidDate: DateTime.now(),
+                      updatedAt: DateTime.now(),
+                    )
+                  : existing,
+            )
+            .toList();
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Payment confirmed for ${invoice.displayInvoiceNumber}.',
+          ),
+          backgroundColor: Colors.green[600],
+        ),
+      );
+    } on StripeException catch (error) {
+      if (!mounted) return;
+      final wasCancelled =
+          error.error.code == FailureCode.Canceled ||
+              error.error.message?.toLowerCase() == 'canceled';
+      final message = wasCancelled
+          ? 'Payment cancelled.'
+          : (error.error.message ?? 'Payment failed. Please try again.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (error, stackTrace) {
+      debugPrint('Stripe payment error: $error');
+      debugPrint('Stripe payment stack trace: $stackTrace');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Unable to process payment right now. Please try again shortly.',
+          ),
+        ),
+      );
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _isProcessingPayment = false;
+        _processingInvoiceId = null;
+      });
+    }
   }
 
   @override
@@ -396,6 +516,7 @@ class _BillingScreenState extends State<BillingScreen> {
 
   Widget _buildInvoiceCard(Invoice invoice) {
     final isOverdue = invoice.dueDate != null ? _isOverdue(invoice.dueDate!, invoice.status ?? 'draft') : false;
+    final isProcessing = _isProcessingInvoice(invoice.id);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -404,9 +525,7 @@ class _BillingScreenState extends State<BillingScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
-        onTap: () {
-          _showInvoiceDetails(invoice);
-        },
+        onTap: isProcessing ? null : () => _showInvoiceDetails(invoice),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -549,6 +668,30 @@ class _BillingScreenState extends State<BillingScreen> {
                     ],
                   ),
                 ),
+
+              if (isProcessing) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Processing payment...',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7),
+                          ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
@@ -615,20 +758,50 @@ class _BillingScreenState extends State<BillingScreen> {
                   if (invoice.status == 'pending' || invoice.status == 'overdue')
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          // TODO: Implement payment functionality
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Payment functionality not implemented yet')),
+                      child: Builder(
+                        builder: (_) {
+                          final processing = _isProcessingInvoice(invoice.id);
+                          return ElevatedButton(
+                            onPressed: processing
+                                ? null
+                                : () {
+                                    Navigator.of(context).pop();
+                                    _handlePayInvoice(invoice);
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              disabledBackgroundColor:
+                                  Colors.green.withValues(alpha: 0.6),
+                            ),
+                            child: processing
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const SizedBox(
+                                        height: 18,
+                                        width: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Text('Processing...'),
+                                    ],
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Icon(Icons.payment),
+                                      SizedBox(width: 8),
+                                      Text('Pay Now'),
+                                    ],
+                                  ),
                           );
                         },
-                        icon: const Icon(Icons.payment),
-                        label: const Text('Pay Now'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
                       ),
                     ),
                   
