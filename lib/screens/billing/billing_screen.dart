@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
 import 'package:intl/intl.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
-import '../../models/invoice.dart';
+
 import '../../config/stripe_config.dart';
+import '../../models/invoice.dart';
 import '../../services/stripe_service.dart';
 
 class BillingScreen extends StatefulWidget {
@@ -101,9 +102,15 @@ class _BillingScreenState extends State<BillingScreen> {
 
   List<Invoice> get _filteredInvoices {
     return _invoices.where((invoice) {
-      final matchesSearch = (invoice.invoiceNumber?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
-                           (invoice.notes?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
-      final matchesStatus = _statusFilter == 'all' || invoice.status == _statusFilter;
+      final matchesSearch =
+          (invoice.invoiceNumber?.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ??
+              false) ||
+          (invoice.notes?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
+              false);
+      final matchesStatus =
+          _statusFilter == 'all' || invoice.status == _statusFilter;
       return matchesSearch && matchesStatus;
     }).toList();
   }
@@ -187,9 +194,10 @@ class _BillingScreenState extends State<BillingScreen> {
     final currency =
         (invoice.currency ?? StripeConfig.defaultCurrency).toLowerCase();
     final amountInMinorUnit = StripeService.amountToMinorUnit(totalAmount);
-    final description = invoice.notes?.isNotEmpty == true
-        ? invoice.notes!
-        : 'Payment for ${invoice.displayInvoiceNumber}';
+    final description =
+        invoice.notes?.isNotEmpty == true
+            ? invoice.notes!
+            : 'Payment for ${invoice.displayInvoiceNumber}';
 
     setState(() {
       _isProcessingPayment = true;
@@ -217,26 +225,29 @@ class _BillingScreenState extends State<BillingScreen> {
 
       await StripeService.initPaymentSheet(
         clientSecret: clientSecret,
-        style: Theme.of(context).brightness == Brightness.dark
-            ? ThemeMode.dark
-            : ThemeMode.light,
+        style:
+            Theme.of(context).brightness == Brightness.dark
+                ? ThemeMode.dark
+                : ThemeMode.light,
       );
 
       await StripeService.presentPaymentSheet();
 
       if (!mounted) return;
       setState(() {
-        _invoices = _invoices
-            .map(
-              (existing) => existing.id == invoice.id
-                  ? existing.copyWith(
-                      status: 'paid',
-                      paidDate: DateTime.now(),
-                      updatedAt: DateTime.now(),
-                    )
-                  : existing,
-            )
-            .toList();
+        _invoices =
+            _invoices
+                .map(
+                  (existing) =>
+                      existing.id == invoice.id
+                          ? existing.copyWith(
+                            status: 'paid',
+                            paidDate: DateTime.now(),
+                            updatedAt: DateTime.now(),
+                          )
+                          : existing,
+                )
+                .toList();
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -251,13 +262,14 @@ class _BillingScreenState extends State<BillingScreen> {
       if (!mounted) return;
       final wasCancelled =
           error.error.code == FailureCode.Canceled ||
-              error.error.message?.toLowerCase() == 'canceled';
-      final message = wasCancelled
-          ? 'Payment cancelled.'
-          : (error.error.message ?? 'Payment failed. Please try again.');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+          error.error.message?.toLowerCase() == 'canceled';
+      final message =
+          wasCancelled
+              ? 'Payment cancelled.'
+              : (error.error.message ?? 'Payment failed. Please try again.');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } catch (error, stackTrace) {
       debugPrint('Stripe payment error: $error');
       debugPrint('Stripe payment stack trace: $stackTrace');
@@ -280,12 +292,18 @@ class _BillingScreenState extends State<BillingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final totalAmount = _invoices.fold(0.0, (sum, invoice) => sum + (invoice.totalAmount ?? 0.0));
+    final totalAmount = _invoices.fold(
+      0.0,
+      (sum, invoice) => sum + (invoice.totalAmount ?? 0.0),
+    );
     final paidAmount = _invoices
         .where((invoice) => invoice.status == 'paid')
         .fold(0.0, (sum, invoice) => sum + (invoice.totalAmount ?? 0.0));
     final pendingAmount = _invoices
-        .where((invoice) => invoice.status == 'pending' || invoice.status == 'overdue')
+        .where(
+          (invoice) =>
+              invoice.status == 'pending' || invoice.status == 'overdue',
+        )
         .fold(0.0, (sum, invoice) => sum + (invoice.totalAmount ?? 0.0));
 
     return Scaffold(
@@ -296,7 +314,7 @@ class _BillingScreenState extends State<BillingScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: Colors.black),
             onPressed: _loadInvoices,
           ),
         ],
@@ -378,7 +396,7 @@ class _BillingScreenState extends State<BillingScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Status Filter
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -403,72 +421,77 @@ class _BillingScreenState extends State<BillingScreen> {
 
           // Invoices List
           Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _errorMessage != null
+            child:
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _errorMessage != null
                     ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              size: 64,
-                              color: Colors.red[300],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              _errorMessage!,
-                              style: Theme.of(context).textTheme.bodyLarge,
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: _loadInvoices,
-                              child: const Text('Retry'),
-                            ),
-                          ],
-                        ),
-                      )
-                    : _filteredInvoices.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.receipt_long,
-                                  size: 64,
-                                  color: Colors.grey[400],
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  _searchQuery.isNotEmpty || _statusFilter != 'all'
-                                      ? 'No invoices match your search'
-                                      : 'No invoices found',
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : RefreshIndicator(
-                            onRefresh: _loadInvoices,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              itemCount: _filteredInvoices.length,
-                              itemBuilder: (context, index) {
-                                final invoice = _filteredInvoices[index];
-                                return _buildInvoiceCard(invoice);
-                              },
-                            ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 64,
+                            color: Colors.red[300],
                           ),
+                          const SizedBox(height: 16),
+                          Text(
+                            _errorMessage!,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: _loadInvoices,
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    )
+                    : _filteredInvoices.isEmpty
+                    ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.receipt_long,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            _searchQuery.isNotEmpty || _statusFilter != 'all'
+                                ? 'No invoices match your search'
+                                : 'No invoices found',
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                    )
+                    : RefreshIndicator(
+                      onRefresh: _loadInvoices,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: _filteredInvoices.length,
+                        itemBuilder: (context, index) {
+                          final invoice = _filteredInvoices[index];
+                          return _buildInvoiceCard(invoice);
+                        },
+                      ),
+                    ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryCard(String title, String value, IconData icon, Color color) {
+  Widget _buildSummaryCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -515,15 +538,16 @@ class _BillingScreenState extends State<BillingScreen> {
   }
 
   Widget _buildInvoiceCard(Invoice invoice) {
-    final isOverdue = invoice.dueDate != null ? _isOverdue(invoice.dueDate!, invoice.status ?? 'draft') : false;
+    final isOverdue =
+        invoice.dueDate != null
+            ? _isOverdue(invoice.dueDate!, invoice.status ?? 'draft')
+            : false;
     final isProcessing = _isProcessingInvoice(invoice.id);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: isProcessing ? null : () => _showInvoiceDetails(invoice),
         borderRadius: BorderRadius.circular(12),
@@ -537,7 +561,9 @@ class _BillingScreenState extends State<BillingScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                      color: Theme.of(
+                        context,
+                      ).primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -553,14 +579,16 @@ class _BillingScreenState extends State<BillingScreen> {
                       children: [
                         Text(
                           invoice.invoiceNumber ?? 'INV-${invoice.id}',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         Text(
                           invoice.notes ?? 'No description',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).textTheme.bodyMedium?.color
+                                ?.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -577,12 +605,19 @@ class _BillingScreenState extends State<BillingScreen> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(invoice.status ?? 'draft').withValues(alpha: 0.1),
+                          color: _getStatusColor(
+                            invoice.status ?? 'draft',
+                          ).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: _getStatusColor(invoice.status ?? 'draft').withValues(alpha: 0.3),
+                            color: _getStatusColor(
+                              invoice.status ?? 'draft',
+                            ).withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
@@ -596,8 +631,12 @@ class _BillingScreenState extends State<BillingScreen> {
                             const SizedBox(width: 4),
                             Text(
                               _getStatusText(invoice.status ?? 'draft'),
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: _getStatusColor(invoice.status ?? 'draft'),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color: _getStatusColor(
+                                  invoice.status ?? 'draft',
+                                ),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -609,54 +648,63 @@ class _BillingScreenState extends State<BillingScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-              
+
               Row(
                 children: [
                   Icon(
                     Icons.calendar_today,
                     size: 16,
-                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     'Due: ${invoice.dueDate != null ? DateFormat('MMM d, y').format(invoice.dueDate!) : 'No due date'}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Icon(
                     Icons.schedule,
                     size: 16,
-                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     'Created: ${DateFormat('MMM d, y').format(invoice.createdAt)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
-              
+
               if (isOverdue)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: Colors.red.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.warning,
-                        size: 14,
-                        color: Colors.red[700],
-                      ),
+                      Icon(Icons.warning, size: 14, color: Colors.red[700]),
                       const SizedBox(width: 4),
                       Text(
                         'Payment Overdue',
@@ -682,12 +730,10 @@ class _BillingScreenState extends State<BillingScreen> {
                     Text(
                       'Processing payment...',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7),
-                          ),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                      ),
                     ),
                   ],
                 ),
@@ -713,7 +759,9 @@ class _BillingScreenState extends State<BillingScreen> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -729,7 +777,7 @@ class _BillingScreenState extends State<BillingScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   Text(
                     invoice.invoiceNumber ?? 'INV-${invoice.id}',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -740,71 +788,94 @@ class _BillingScreenState extends State<BillingScreen> {
                   Text(
                     invoice.notes ?? 'No description',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7),
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.color?.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
-                  _buildDetailRow(Icons.attach_money, 'Amount', 
-                    '\$${NumberFormat('#,##0.00').format(invoice.totalAmount ?? 0.0)}'),
-                  _buildDetailRow(Icons.info, 'Status', _getStatusText(invoice.status ?? 'draft')),
-                  _buildDetailRow(Icons.calendar_today, 'Due Date', 
-                    invoice.dueDate != null ? DateFormat('EEEE, MMMM d, y').format(invoice.dueDate!) : 'No due date'),
-                  _buildDetailRow(Icons.schedule, 'Created', 
-                    DateFormat('MMM d, y').format(invoice.createdAt)),
-                  
+
+                  _buildDetailRow(
+                    Icons.attach_money,
+                    'Amount',
+                    '\$${NumberFormat('#,##0.00').format(invoice.totalAmount ?? 0.0)}',
+                  ),
+                  _buildDetailRow(
+                    Icons.info,
+                    'Status',
+                    _getStatusText(invoice.status ?? 'draft'),
+                  ),
+                  _buildDetailRow(
+                    Icons.calendar_today,
+                    'Due Date',
+                    invoice.dueDate != null
+                        ? DateFormat('EEEE, MMMM d, y').format(invoice.dueDate!)
+                        : 'No due date',
+                  ),
+                  _buildDetailRow(
+                    Icons.schedule,
+                    'Created',
+                    DateFormat('MMM d, y').format(invoice.createdAt),
+                  ),
+
                   const SizedBox(height: 24),
-                  
-                  if (invoice.status == 'pending' || invoice.status == 'overdue')
+
+                  if (invoice.status == 'pending' ||
+                      invoice.status == 'overdue')
                     SizedBox(
                       width: double.infinity,
                       child: Builder(
                         builder: (_) {
                           final processing = _isProcessingInvoice(invoice.id);
                           return ElevatedButton(
-                            onPressed: processing
-                                ? null
-                                : () {
-                                    Navigator.of(context).pop();
-                                    _handlePayInvoice(invoice);
-                                  },
+                            onPressed:
+                                processing
+                                    ? null
+                                    : () {
+                                      Navigator.of(context).pop();
+                                      _handlePayInvoice(invoice);
+                                    },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
                               foregroundColor: Colors.white,
-                              disabledBackgroundColor:
-                                  Colors.green.withValues(alpha: 0.6),
+                              disabledBackgroundColor: Colors.green.withValues(
+                                alpha: 0.6,
+                              ),
                             ),
-                            child: processing
-                                ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const SizedBox(
-                                        height: 18,
-                                        width: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white,
+                            child:
+                                processing
+                                    ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const SizedBox(
+                                          height: 18,
+                                          width: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      const Text('Processing...'),
-                                    ],
-                                  )
-                                : Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: const [
-                                      Icon(Icons.payment),
-                                      SizedBox(width: 8),
-                                      Text('Pay Now'),
-                                    ],
-                                  ),
+                                        const SizedBox(width: 12),
+                                        const Text('Processing...'),
+                                      ],
+                                    )
+                                    : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Icon(Icons.payment),
+                                        SizedBox(width: 8),
+                                        Text('Pay Now'),
+                                      ],
+                                    ),
                           );
                         },
                       ),
                     ),
-                  
+
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
@@ -812,7 +883,11 @@ class _BillingScreenState extends State<BillingScreen> {
                         Navigator.of(context).pop();
                         // TODO: Implement download functionality
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Download functionality not implemented yet')),
+                          const SnackBar(
+                            content: Text(
+                              'Download functionality not implemented yet',
+                            ),
+                          ),
                         );
                       },
                       icon: const Icon(Icons.download),
@@ -841,15 +916,12 @@ class _BillingScreenState extends State<BillingScreen> {
           const SizedBox(width: 12),
           Text(
             '$label: ',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           Expanded(
-            child: Text(
-              value,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(value, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),

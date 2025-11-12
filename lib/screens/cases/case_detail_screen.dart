@@ -88,7 +88,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
         name: 'Passport Copy',
         status: 'approved',
         uploadedAt: DateTime.now().subtract(const Duration(days: 5)),
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
+        //createdAt: DateTime.now().subtract(const Duration(days: 5)),
         updatedAt: DateTime.now().subtract(const Duration(days: 5)),
       ),
       Document(
@@ -96,15 +96,15 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
         name: 'Academic Transcripts',
         status: 'pending_review',
         uploadedAt: DateTime.now().subtract(const Duration(days: 2)),
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        //createdAt: DateTime.now().subtract(const Duration(days: 2)),
         updatedAt: DateTime.now().subtract(const Duration(days: 2)),
       ),
       Document(
         id: 3,
-        title: 'Financial Statements',
+        //title: 'Financial Statements',
         status: 'rejected',
         uploadedAt: DateTime.now().subtract(const Duration(days: 7)),
-        createdAt: DateTime.now().subtract(const Duration(days: 7)),
+        //createdAt: DateTime.now().subtract(const Duration(days: 7)),
         updatedAt: DateTime.now().subtract(const Duration(days: 7)),
       ),
     ];

@@ -48,12 +48,7 @@ class StripeService {
         .timeout(
       StripeConfig.paymentTimeout,
       onTimeout: () {
-        throw const StripeException(
-          error: StripeError(
-            type: StripeErrorType.apiConnectionError,
-            message: 'Payment request timed out. Please try again.',
-          ),
-        );
+        throw Exception('Payment request timed out. Please try again.');
       },
     );
 
@@ -62,12 +57,7 @@ class StripeService {
 
     if (statusCode < 200 || statusCode >= 300) {
       debugPrint('Stripe createPaymentIntent error $statusCode: $body');
-      throw StripeException(
-        error: StripeError(
-          type: StripeErrorType.apiError,
-          message: 'Unable to create payment intent. Please try again.',
-        ),
-      );
+      throw Exception('Unable to create payment intent. Please try again.');
     }
 
     return jsonDecode(body) as Map<String, dynamic>;
@@ -81,7 +71,7 @@ class StripeService {
       paymentSheetParameters: SetupPaymentSheetParameters(
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: StripeConfig.merchantDisplayName,
-        merchantCountryCode: StripeConfig.merchantCountryCode,
+        //merchantCountryCode: StripeConfig.merchantCountryCode,
         style: style,
         appearance: const PaymentSheetAppearance(
           colors: PaymentSheetAppearanceColors(

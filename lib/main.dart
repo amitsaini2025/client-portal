@@ -1,6 +1,5 @@
 import 'package:client/screens/auth/reset_password_screen.dart';
 import 'package:client/screens/cases/cases_list_screen.dart';
-import 'package:client/screens/dashboard/recent_case/recent_case_screen.dart';
 import 'package:client/screens/document_management/document_management.dart';
 import 'package:client/screens/documents/documents_screen.dart';
 import 'package:client/screens/matters/matters_screen.dart';
@@ -17,7 +16,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
 import 'widgets/user_nav.dart';
 import 'dart:io' show Platform;
 import 'package:shared_preferences/shared_preferences.dart';
