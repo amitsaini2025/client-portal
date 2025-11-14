@@ -29,18 +29,20 @@ class Task {
 
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
-      id: json['id'],
-      title: json['title'],
-      dueDate: json['due_date'],
-      dueDatetime: json['due_datetime'],
-      status: json['status'],
-      daysUntil: (json['days_until'] as num).toDouble(),
-      priority: json['priority'],
-      type: json['type'],
-      isOverdue: json['is_overdue'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-      lastUpdated: json['last_updated'],
+      id: json['id'] ?? 0,
+      title: json['title']?.toString() ?? 'Untitled Task',
+      dueDate: json['due_date']?.toString() ?? 'No due date',
+      dueDatetime: json['due_datetime']?.toString() ?? '',
+      status: json['status']?.toString() ?? 'pending',
+      daysUntil: (json['days_until'] != null)
+          ? (json['days_until'] as num).toDouble()
+          : 0.0,
+      priority: json['priority']?.toString() ?? 'low',
+      type: json['type']?.toString() ?? '',
+      isOverdue: json['is_overdue'] ?? false,
+      createdAt: json['created_at']?.toString() ?? '',
+      updatedAt: json['updated_at']?.toString() ?? '',
+      lastUpdated: json['last_updated']?.toString() ?? '',
     );
   }
 

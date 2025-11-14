@@ -182,7 +182,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              activity.description.isNotEmpty ? activity.description : "No description",
+              activity.description.isNotEmpty ? activity.description.replaceAll(RegExp(r'[\n\r\t]+'), ' ') : "No description",
               style: const TextStyle(color: Colors.white70),
             ),
             const SizedBox(height: 4),
@@ -241,7 +241,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _buildDetailRow("Description", activity.description.isNotEmpty ? activity.description : "No description"),
+                  _buildDetailRow("Description", activity.description.isNotEmpty ? activity.description.replaceAll(RegExp(r'[\n\r\t]+'), ' ') : "No description"),
                   _buildDetailRow("Task Group", activity.taskGroup),
                   _buildDetailRow("Created At", activity.createdAt),
                   _buildDetailRow("Updated At", activity.updatedAt),

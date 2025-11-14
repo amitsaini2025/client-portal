@@ -184,6 +184,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                     // Title Field
                     TextFormField(
                       controller: _titleController,
+                      style: const TextStyle(color: Colors.white),
                       decoration: _inputDecoration(
                         label: 'Appointment Title *',
                         icon: Icons.event,
@@ -199,6 +200,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
 
                     // Description Field
                     TextFormField(
+                      style: const TextStyle(color: Colors.white),
                       controller: _descriptionController,
                       decoration: _inputDecoration(
                         label: 'Description (optional)',
