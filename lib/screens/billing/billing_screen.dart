@@ -210,9 +210,9 @@ class _BillingScreenState extends State<BillingScreen> {
         currency: currency,
         description: description,
         metadata: {
-          'invoice_id': invoice.id.toString(),
+          'order_id': invoice.id.toString(),
           if (invoice.invoiceNumber != null)
-            'invoice_number': invoice.invoiceNumber!,
+            'order_number': invoice.invoiceNumber!,
         },
       );
 

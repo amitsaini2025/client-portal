@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:client/config/api_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -11,7 +12,7 @@ class StripeService {
   const StripeService._();
 
   static final Uri _paymentIntentUri =
-      Uri.parse('https://api.stripe.com/v1/payment_intents');
+      Uri.parse('${ApiConfig.baseUrl}/payments/create-payment-intent');
 
   static Future<Map<String, dynamic>> createPaymentIntent({
     required int amountInMinorUnit,
