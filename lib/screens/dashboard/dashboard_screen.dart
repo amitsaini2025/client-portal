@@ -219,7 +219,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text("Feature not implemented yet"),
+                  content: Text("This feature will be available in a future update."),
                 ),
               );
             },
@@ -266,7 +266,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onUploadDocument: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("Feature not completed yet"),
+                              content: Text("This feature will be available in a future update."),
                             ),
                           );
                           /*Navigator.of(context).push(
@@ -279,7 +279,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onBookAppointment: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("Feature not completed yet"),
+                              content: Text("This feature will be available in a future update."),
                             ),
                           );
                           /*Navigator.of(context).push(
@@ -292,7 +292,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onSendMessage: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("Feature not completed yet"),
+                              content: Text("This feature will be available in a future update."),
                             ),
                           );
                           /*Navigator.of(context).push(
@@ -312,7 +312,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onBilling: (){
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("Feature not completed yet"),
+                              content: Text("This feature will be available in a future update."),
                             ),
                           );
                           /*Navigator.of(context).push(
@@ -325,7 +325,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onPersonalInformationUpload: (){
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text("Feature not completed yet"),
+                              content: Text("This feature will be available in a future update."),
                             ),
                           );
                           /*Navigator.of(context).push(
