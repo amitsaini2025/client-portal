@@ -1,13 +1,17 @@
 import 'package:client/models/case_summary.dart';
 import 'package:flutter/material.dart';
+
 import '../../models/case.dart';
-import '../../screens/cases/cases_list_screen.dart';
 
 class CaseSummaryCard extends StatelessWidget {
   final CaseSummary? caseSummary;
   final List<Case> cases;
 
-  const CaseSummaryCard({super.key, required this.caseSummary,required this.cases});
+  const CaseSummaryCard({
+    super.key,
+    required this.caseSummary,
+    required this.cases,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -168,9 +172,9 @@ class CaseSummaryCard extends StatelessWidget {
           ),
           Text(
             label,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: color.withValues(alpha: 0.8)),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color.withValues(alpha: 0.8),
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -207,7 +211,11 @@ class CaseSummaryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  caseItem.title,
+                  caseItem.title
+                      .replaceAll('\n', ' ')
+                      .replaceAll('\t', ' ')
+                      .replaceAll(RegExp(r'\s+'), ' ')
+                      .trim(),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -216,7 +224,12 @@ class CaseSummaryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  caseItem.caseNumber.toString(),
+                  caseItem.caseNumber
+                      .toString()
+                      .replaceAll('\n', ' ')
+                      .replaceAll('\t', ' ')
+                      .replaceAll(RegExp(r'\s+'), ' ')
+                      .trim(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(
                       context,
@@ -279,6 +292,3 @@ class CaseSummaryCard extends StatelessWidget {
     }
   }
 }
-
-
-

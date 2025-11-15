@@ -216,7 +216,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Feature not implemented yet"),
+                ),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.person_outline),
@@ -258,27 +264,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const SizedBox(height: 24),
                       QuickActionsCard(
                         onUploadDocument: () {
-                          Navigator.of(context).push(
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Feature not completed yet"),
+                            ),
+                          );
+                          /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const UploadDocumentScreen(),
                             ),
-                          );
+                          );*/
                         },
                         onBookAppointment: () {
-                          Navigator.of(context).push(
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Feature not completed yet"),
+                            ),
+                          );
+                          /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const BookAppointmentScreen(),
                             ),
-                          );
+                          );*/
                         },
                         onSendMessage: () {
-                          Navigator.of(context).push(
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Feature not completed yet"),
+                            ),
+                          );
+                          /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const SendMessageScreen(),
                             ),
-                          );
+                          );*/
                         },
                         onViewWorkflow: () {
                           Navigator.of(context).push(
@@ -289,20 +310,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           );
                         },
                         onBilling: (){
-                          Navigator.of(context).push(
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Feature not completed yet"),
+                            ),
+                          );
+                          /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const BillingScreen(),
                             ),
-                          );
+                          );*/
                         },
                         onPersonalInformationUpload: (){
-                          Navigator.of(context).push(
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Feature not completed yet"),
+                            ),
+                          );
+                          /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const PersonalInformationUploadScreen(),
                             ),
-                          );
+                          );*/
                         },
                       ),
                       const SizedBox(height: 24),

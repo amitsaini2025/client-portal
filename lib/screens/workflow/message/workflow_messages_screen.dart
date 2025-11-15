@@ -21,7 +21,7 @@ class PusherService {
 
   static void init_() async {
     try {
-      var key = "0410ad08e960563173b5";
+      /*var key = "0410ad08e960563173b5";
       var cluster = "ap2";
       var channelName = "private-user.${AuthService.currentUserId}";
 
@@ -37,7 +37,7 @@ class PusherService {
       );
 
       await pusher.subscribe(channelName: channelName);
-      await pusher.connect();
+      await pusher.connect();*/
     } catch (e) {
       log("ERROR: $e");
     }
