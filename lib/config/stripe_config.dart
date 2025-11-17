@@ -2,7 +2,12 @@ class StripeConfig {
   const StripeConfig._();
 
   static const String publishableKey =
-      'pk_test_XXXX';
+      'pk_test_51HAz4JFeMJ48bwS4Www5LApVIBY6KqnGtsdKjpQleJDJIXAS0V8qrKecEO0MEoBnzcqmIo5GFBnXCtJEsj7H6FIH00kSSk38hr';
+
+  static const String secretKey = String.fromEnvironment(
+    'sk_test_51HAz4JFeMJ48bwS4dB2PdVBvrIueL4Tpir8re630NvjMdE8VX4tQMv5UXvq0CNZsMiNPuc2hl8XOKUxhgpguj61C00Peq8Mbm2',
+    defaultValue: '',
+  );
 
   /// WARNING: Never ship secret keys in production builds.
   /// This constant is included temporarily for integration purposes and
