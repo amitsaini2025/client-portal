@@ -10,7 +10,7 @@ class StripeConfig {
   /// Provide the Stripe secret key via runtime configuration. In debug builds
   /// you can supply the value with `--dart-define STRIPE_SECRET_KEY=...`.
   static const String secretKey = String.fromEnvironment(
-    'STRIPE_SECRET_KEY',
+    'sk_test_51HAz4JFeMJ48bwS4dB2PdVBvrIueL4Tpir8re630NvjMdE8VX4tQMv5UXvq0CNZsMiNPuc2hl8XOKUxhgpguj61C00Peq8Mbm2',
     defaultValue: '',
   );
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:client/services/stripe_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -176,6 +177,7 @@ class AuthService {
         await _secureStorage.write(key: _tokenKey, value: token);
         _currentToken = token;
         await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
+        await AuthManager.saveAuthToken(token);
 
         // Store user data
         if (clientData != null) {
@@ -454,6 +456,7 @@ class AuthService {
         final newToken = response['data']['token'];
         await _secureStorage.write(key: _tokenKey, value: newToken);
         _currentToken = newToken;
+        await AuthManager.saveAuthToken(newToken);
 
         // Update API service with new token
         ApiService.setAuthToken(newToken);

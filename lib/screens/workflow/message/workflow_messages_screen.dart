@@ -59,9 +59,9 @@ class PusherService {
   }
 
   static void onConnectionStateChange(
-    dynamic currentState,
-    dynamic previousState,
-  ) {
+      dynamic currentState,
+      dynamic previousState,
+      ) {
     log("Connection: $currentState");
   }
 
@@ -126,15 +126,15 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       sender: msgDetail.sender,
       senderId: msgDetail.senderId,
       recipientIds:
-          msgDetail.recipientIds
-              .map(
-                (r) => Recipient(
-                  recipientId: r.recipientId,
-                  recipient: r.recipient,
-                  recipientShortname: r.recipientShortname,
-                ),
-              )
-              .toList(),
+      msgDetail.recipientIds
+          .map(
+            (r) => Recipient(
+          recipientId: r.recipientId,
+          recipient: r.recipient,
+          recipientShortname: r.recipientShortname,
+        ),
+      )
+          .toList(),
       sentAt: msgDetail.sentAt.toIso8601String(),
       clientMatterId: msgDetail.clientMatterId,
       recipientCount: msgDetail.recipientCount,
@@ -264,23 +264,31 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      body:
-          _isLoading
-              ? Center(
-                child: CircularProgressIndicator(
-                  color: ThemeConfig.goldenYellow,
-                ),
-              )
-              : _error != null
-              ? _buildErrorWidget(_error!)
-              : _messages.isEmpty
-              ? _buildEmptyWidget()
-              : Column(
-                children: [
-                  Expanded(child: _buildMessageList()),
-                  _buildMessageInput(),
-                ],
-              ),
+      body: _isLoading
+          ? Center(
+        child: CircularProgressIndicator(
+          color: ThemeConfig.goldenYellow,
+        ),
+      )
+          : _error != null
+          ? _buildErrorWidget(_error!)
+          : _messages.isEmpty
+          ? _buildEmptyWidget()
+          : Column(
+        children: [
+          Expanded(child: _buildMessageList()),
+          _buildMessageInput(),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80.0, right: 16.0), // Move up by increasing bottom padding
+        child: FloatingActionButton(
+          onPressed: _loadWorkflowMessages,
+          backgroundColor: ThemeConfig.goldenYellow,
+          child: const Icon(Icons.refresh, color: Colors.white),
+        ),
+      ),
     );
   }
 
@@ -312,7 +320,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
               margin: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
                 mainAxisAlignment:
-                    isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+                isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   if (!isSender)
@@ -336,10 +344,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color:
-                            isSender
-                                ? ThemeConfig.navyBlue.withOpacity(0.9)
-                                : Colors.white,
+                        color: isSender
+                            ? ThemeConfig.navyBlue.withOpacity(0.9)
+                            : Colors.white,
                         borderRadius: BorderRadius.only(
                           topLeft: const Radius.circular(16),
                           topRight: const Radius.circular(16),
@@ -371,10 +378,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                               time,
                               style: TextStyle(
                                 fontSize: 11,
-                                color:
-                                    isSender
-                                        ? Colors.white70
-                                        : Colors.grey.shade600,
+                                color: isSender
+                                    ? Colors.white70
+                                    : Colors.grey.shade600,
                               ),
                             ),
                           ),
@@ -437,24 +443,23 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
             CircleAvatar(
               radius: 22,
               backgroundColor: ThemeConfig.navyBlue,
-              child:
-                  _isSending
-                      ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                      : IconButton(
-                        icon: const Icon(
-                          Icons.send,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        onPressed: _sendMessage,
-                      ),
+              child: _isSending
+                  ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+                  : IconButton(
+                icon: const Icon(
+                  Icons.send,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                onPressed: _sendMessage,
+              ),
             ),
           ],
         ),

@@ -264,42 +264,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const SizedBox(height: 24),
                       QuickActionsCard(
                         onUploadDocument: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("This feature will be available in a future update."),
-                            ),
-                          );
-                          /*Navigator.of(context).push(
+                          Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const UploadDocumentScreen(),
                             ),
-                          );*/
+                          );
                         },
                         onBookAppointment: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("This feature will be available in a future update."),
-                            ),
-                          );
-                          /*Navigator.of(context).push(
+                          Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const BookAppointmentScreen(),
                             ),
-                          );*/
+                          );
                         },
                         onSendMessage: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("This feature will be available in a future update."),
-                            ),
-                          );
-                          /*Navigator.of(context).push(
+                          Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const SendMessageScreen(),
                             ),
-                          );*/
+                          );
                         },
                         onViewWorkflow: () {
                           Navigator.of(context).push(
@@ -310,30 +295,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           );
                         },
                         onBilling: (){
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("This feature will be available in a future update."),
-                            ),
-                          );
-                          /*Navigator.of(context).push(
+                          Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const BillingScreen(),
                             ),
-                          );*/
+                          );
                         },
                         onPersonalInformationUpload: (){
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("This feature will be available in a future update."),
-                            ),
-                          );
-                          /*Navigator.of(context).push(
+                          Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const PersonalInformationUploadScreen(),
                             ),
-                          );*/
+                          );
                         },
                       ),
                       const SizedBox(height: 24),
