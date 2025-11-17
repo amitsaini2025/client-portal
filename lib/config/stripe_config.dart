@@ -2,7 +2,7 @@ class StripeConfig {
   const StripeConfig._();
 
   static const String publishableKey =
-      'pk_test_51HAz4JFeMJ48bwS4Www5LApVIBY6KqnGtsdKjpQleJDJIXAS0V8qrKecEO0MEoBnzcqmIo5GFBnXCtJEsj7H6FIH00kSSk38hr';
+      'pk_test_XXXX';
 
   /// WARNING: Never ship secret keys in production builds.
   /// This constant is included temporarily for integration purposes and
