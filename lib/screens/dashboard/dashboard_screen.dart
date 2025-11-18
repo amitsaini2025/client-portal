@@ -15,6 +15,7 @@ import '../../models/task.dart';
 import '../../models/upcoming_deadline_summary.dart';
 import '../../models/workflow_stage.dart';
 import '../../services/api_service.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/dashboard/case_summary_card.dart';
@@ -209,7 +210,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: GestureDetector(
+          onTap: () {
+            showDialog(
+              context: context,
+              builder:
+                  (context) => AlertDialog(
+                    title: const Text("Change Matter"),
+                    content: const Text(
+                      "Do you want to change the selected matter?",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("No"),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pushNamed(context, '/matters');
+                        },
+                        child: const Text("Yes"),
+                      ),
+                    ],
+                  ),
+            );
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AuthService.selectedMatterName ?? '',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                "ID: ${AuthService.selectedMatterId ?? ''}",
+                style: const TextStyle(fontSize: 12, color: Colors.white70),
+              ),
+            ],
+          ),
+        ),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -219,7 +263,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text("This feature will be available in a future update."),
+                  content: Text(
+                    "This feature will be available in a future update.",
+                  ),
                 ),
               );
             },
@@ -289,24 +335,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onViewWorkflow: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder:
-                                  (context) => const WorkflowScreen(),
+                              builder: (context) => const WorkflowScreen(),
                             ),
                           );
                         },
-                        onBilling: (){
+                        onBilling: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder:
-                                  (context) => const BillingScreen(),
+                              builder: (context) => const BillingScreen(),
                             ),
                           );
                         },
-                        onPersonalInformationUpload: (){
+                        onPersonalInformationUpload: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
-                                  (context) => const PersonalInformationUploadScreen(),
+                                  (context) =>
+                                      const PersonalInformationUploadScreen(),
                             ),
                           );
                         },
@@ -491,11 +536,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return _buildActivityItem(
               icon: Icons.task,
               title: activity.title,
-              subtitle: activity.description
-                  .replaceAll('\n', ' ')
-                  .replaceAll('\t', ' ')
-                  .replaceAll(RegExp(r'\s+'), ' ')
-                  .trim(),
+              subtitle:
+                  activity.description
+                      .replaceAll('\n', ' ')
+                      .replaceAll('\t', ' ')
+                      .replaceAll(RegExp(r'\s+'), ' ')
+                      .trim(),
               time: activity.timeAgo,
               color: goldenYellow,
             );
