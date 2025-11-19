@@ -1,3 +1,24 @@
+class ChecklistItem {
+  final int id;
+  final String name;
+
+  ChecklistItem({required this.id, required this.name});
+
+  factory ChecklistItem.fromJson(Map<String, dynamic> json) {
+    return ChecklistItem(
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      name: json['name'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
+  }
+}
+
 class WorkflowStage {
   final int id;
   final String name;
@@ -6,6 +27,8 @@ class WorkflowStage {
   final bool isCurrentStage;
   final String? createdAt;
   final String? updatedAt;
+  final int allowedChecklistCount;
+  final List<ChecklistItem> allowedChecklist;
 
   WorkflowStage({
     required this.id,
@@ -15,25 +38,29 @@ class WorkflowStage {
     this.isCurrentStage = false,
     this.createdAt,
     this.updatedAt,
+    this.allowedChecklistCount = 0,
+    this.allowedChecklist = const [],
   });
 
   factory WorkflowStage.fromJson(Map<String, dynamic> json) {
+    var checklist = <ChecklistItem>[];
+    if (json['allowed_checklist'] != null) {
+      checklist = (json['allowed_checklist'] as List)
+          .map((item) => ChecklistItem.fromJson(item))
+          .toList();
+    }
+
     return WorkflowStage(
-      id: _parseInt(json['id']) ?? 0,
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
       name: json['name'] ?? '',
       stageName: json['stage_name'] ?? json['name'] ?? '',
       isActive: json['is_active'] ?? false,
       isCurrentStage: json['is_current_stage'] ?? false,
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
+      allowedChecklistCount: json['allowed_checklist_count'] ?? 0,
+      allowedChecklist: checklist,
     );
-  }
-
-  static int? _parseInt(dynamic value) {
-    if (value == null) return null;
-    if (value is int) return value;
-    if (value is String) return int.tryParse(value);
-    return null;
   }
 
   Map<String, dynamic> toJson() {
@@ -45,6 +72,8 @@ class WorkflowStage {
       'is_current_stage': isCurrentStage,
       'created_at': createdAt,
       'updated_at': updatedAt,
+      'allowed_checklist_count': allowedChecklistCount,
+      'allowed_checklist': allowedChecklist.map((e) => e.toJson()).toList(),
     };
   }
 
@@ -58,6 +87,7 @@ class WorkflowStage {
     return 'WorkflowStage(id: $id, name: $name, isActive: $isActive)';
   }
 }
+
 
 class ActiveStageInfo {
   final int id;

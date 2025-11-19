@@ -133,11 +133,24 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Checklist Name
             Text(
               checklist.checklistName,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
+            const SizedBox(height: 4),
+            // Checklist Type
+            if (checklist.type != null && checklist.type!.isNotEmpty)
+              Text(
+                'Type: ${checklist.type}',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey.shade700,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
             const SizedBox(height: 8),
+            // Upload / View Section
             if (checklist.isUpload && checklist.fileUrl != null)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -174,8 +187,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
               ElevatedButton.icon(
                 onPressed:
                 isUploading ? null : () => _uploadDocument(checklist),
-                icon:
-                isUploading
+                icon: isUploading
                     ? const SizedBox(
                   width: 16,
                   height: 16,

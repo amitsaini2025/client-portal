@@ -12,6 +12,9 @@ class WorkflowChecklist {
   final bool isUpload;
   final String? fileName;
   final String? fileUrl;
+  final int? docStatusId;
+  final String? docStatusText;
+  final String? docRejectionReason;
   final String? createdAt;
   final String? updatedAt;
 
@@ -29,6 +32,9 @@ class WorkflowChecklist {
     this.isUpload = false,
     this.fileName,
     this.fileUrl,
+    this.docStatusId,
+    this.docStatusText,
+    this.docRejectionReason,
     this.createdAt,
     this.updatedAt,
   });
@@ -48,6 +54,9 @@ class WorkflowChecklist {
       isUpload: json['is_upload'] ?? false,
       fileName: json['file_name'],
       fileUrl: json['file_url'],
+      docStatusId: _parseInt(json['doc_status_id']),
+      docStatusText: json['doc_status_text'],
+      docRejectionReason: json['doc_rejection_reason'],
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
     );
@@ -75,6 +84,9 @@ class WorkflowChecklist {
       'is_upload': isUpload,
       'file_name': fileName,
       'file_url': fileUrl,
+      'doc_status_id': docStatusId,
+      'doc_status_text': docStatusText,
+      'doc_rejection_reason': docRejectionReason,
       'created_at': createdAt,
       'updated_at': updatedAt,
     };
@@ -104,7 +116,7 @@ class WorkflowChecklist {
 
   @override
   String toString() {
-    return 'WorkflowChecklist(id: $id, name: $checklistName, mandatory: $isMandatory, upload: $isUpload)';
+    return 'WorkflowChecklist(id: $id, name: $checklistName, mandatory: $isMandatory, upload: $isUpload, docStatusId: $docStatusId)';
   }
 }
 

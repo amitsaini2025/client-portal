@@ -230,12 +230,12 @@ class WorkflowProgressWidget extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: isCurrent
                     ? [
-                        BoxShadow(
-                          color: color.withOpacity(0.3),
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                        ),
-                      ]
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  ),
+                ]
                     : null,
               ),
               child: Icon(
@@ -283,7 +283,7 @@ class WorkflowProgressWidget extends StatelessWidget {
                     stage.stageName,
                     style: TextStyle(
                       fontWeight:
-                          isCurrent ? FontWeight.bold : FontWeight.w500,
+                      isCurrent ? FontWeight.bold : FontWeight.w500,
                       fontSize: 14,
                       color: isCurrent
                           ? Theme.of(context).colorScheme.primary
@@ -298,6 +298,52 @@ class WorkflowProgressWidget extends StatelessWidget {
                       color: Colors.grey.shade600,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  // Allowed Checklist Count
+                  Text(
+                    'Allowed Checklist Count: ${stage.allowedChecklistCount}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  // Allowed Checklist Items
+                  if (stage.allowedChecklist.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Allowed Checklist:',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        ...stage.allowedChecklist.map(
+                              (item) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.check,
+                                  size: 14,
+                                  color: Colors.green,
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    item.name,
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -306,6 +352,7 @@ class WorkflowProgressWidget extends StatelessWidget {
       ],
     );
   }
+
 }
 
 // Compact version for dashboard

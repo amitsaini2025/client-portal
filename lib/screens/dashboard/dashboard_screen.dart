@@ -438,6 +438,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               _buildStatItem(
                 icon: Icons.folder_open,
+                label: 'Total Matters',
+                value: _caseSummary!.totalMatters.toString(),
+              ),
+              const SizedBox(width: 24),
+              _buildStatItem(
+                icon: Icons.folder_open,
                 label: 'Active Cases',
                 value: _dashboardSummary!.activeCases.toString(),
               ),
@@ -447,12 +453,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 label: 'Documents',
                 value: _dashboardSummary!.totalDocuments.toString(),
               ),
-              const SizedBox(width: 24),
+              /*const SizedBox(width: 24),
               _buildStatItem(
                 icon: Icons.schedule,
                 label: 'Deadlines',
                 value: _dashboardSummary!.totalAppointments.toString(),
-              ),
+              ),*/
             ],
           ),
         ],
