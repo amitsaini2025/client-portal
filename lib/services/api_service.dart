@@ -649,6 +649,22 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> getUnreadMessageCount({
+    required int clientMatterId,
+  }) async {
+    final params = {
+      'client_matter_id': clientMatterId.toString(),
+    };
+
+    return await _makeRequest(
+      ApiConfig.messageUnreadCount,
+      _buildHeaders(),
+      params,
+      'GET',
+    );
+  }
+
+
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(

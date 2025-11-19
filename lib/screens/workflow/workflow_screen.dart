@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../config/theme_config.dart';
 import 'workflow_documents_screen.dart';
 import 'workflow_stages_screen.dart';
+import '../../services/api_service.dart';
 
 class WorkflowScreen extends StatefulWidget {
   const WorkflowScreen({super.key});
@@ -17,11 +18,28 @@ class WorkflowScreen extends StatefulWidget {
 class _WorkflowScreenState extends State<WorkflowScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _unreadCount = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _fetchUnreadCount();
+  }
+
+  Future<void> _fetchUnreadCount() async {
+    try {
+      final response = await ApiService.getUnreadMessageCount(
+        clientMatterId: AuthService.selectedMatterId!,
+      );
+      if (response['success'] == true) {
+        setState(() {
+          _unreadCount = response['data']['unread_count'] ?? 0;
+        });
+      }
+    } catch (e) {
+      debugPrint('Failed to fetch unread count: $e');
+    }
   }
 
   @override
@@ -48,13 +66,13 @@ class _WorkflowScreenState extends State<WorkflowScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(
+            /*Text(
               AuthService.selectedMatterId.toString(),
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.white70,
               ),
-            ),
+            ),*/
           ],
         ),
         bottom: TabBar(
@@ -62,10 +80,36 @@ class _WorkflowScreenState extends State<WorkflowScreen>
           labelColor: ThemeConfig.navyBlue,
           unselectedLabelColor: Colors.white,
           indicatorColor: ThemeConfig.navyBlue,
-          tabs: const [
-            Tab(text: 'Stages'),
-            Tab(text: 'Documents'),
-            Tab(text: 'Chat'),
+          tabs: [
+            const Tab(text: 'Stages'),
+            const Tab(text: 'Documents'),
+            Tab(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Chat'),
+                  if (_unreadCount > 0) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _unreadCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ],
         ),
       ),
