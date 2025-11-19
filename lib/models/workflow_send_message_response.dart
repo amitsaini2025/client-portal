@@ -70,6 +70,8 @@ class MessageDetail {
   final DateTime sentAt;
   final int clientMatterId;
   final int recipientCount;
+  bool? isRead;      // <-- add this
+  String? readAt;
 
   MessageDetail({
     required this.id,
@@ -81,6 +83,8 @@ class MessageDetail {
     required this.sentAt,
     required this.clientMatterId,
     required this.recipientCount,
+    this.isRead,
+    this.readAt,
   });
 
   factory MessageDetail.fromJson(Map<String, dynamic> json) {
@@ -97,6 +101,8 @@ class MessageDetail {
       sentAt: DateTime.parse(json['sent_at'] ?? DateTime.now().toIso8601String()),
       clientMatterId: int.tryParse(json['client_matter_id'].toString()) ?? 0,
       recipientCount: int.tryParse(json['recipient_count'].toString()) ?? 0,
+      isRead: json['is_read'],
+      readAt: json['read_at']
     );
   }
 
@@ -111,6 +117,8 @@ class MessageDetail {
       'sent_at': sentAt.toIso8601String(),
       'client_matter_id': clientMatterId,
       'recipient_count': recipientCount,
+      'is_read': isRead,                 // <-- add this
+      'read_at': readAt,
     };
   }
 }

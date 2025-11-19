@@ -190,12 +190,12 @@ class _WorkflowMessageDetailScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDetailRow('Message ID', _message!.id.toString(), icon: Icons.tag),
+        /*_buildDetailRow('Message ID', _message!.id.toString(), icon: Icons.tag),
         _buildDetailRow('Client Matter ID', _message!.clientMatterId.toString(),
             icon: Icons.folder),
         _buildDetailRow(
             'Recipient Count', _message!.recipientCount.toString(),
-            icon: Icons.group),
+            icon: Icons.group),*/
         _buildDetailRow('Created At', _formatDateTime(_message!.createdAt),
             icon: Icons.calendar_today),
         _buildDetailRow('Updated At', _formatDateTime(_message!.updatedAt),

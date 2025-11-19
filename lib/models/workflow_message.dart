@@ -63,8 +63,8 @@ class Message {
   final List<Recipient> recipientIds;
   final int recipientCount;
   final String sentAt;
-  final bool? isRead;
-  final String? readAt;
+  bool? isRead;
+  String? readAt;
   final int clientMatterId;
   final String createdAt;
   final String updatedAt;

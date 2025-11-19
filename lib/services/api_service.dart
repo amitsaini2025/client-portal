@@ -635,6 +635,19 @@ class ApiService {
   }
 
 
+  static Future<Map<String, dynamic>> markMessageAsRead({
+    required int messageId,
+  }) async {
+    final url = '${ApiConfig.messageRead}/$messageId/read';
+    final headers = _buildHeaders();
+    final body = {};
+    return await _makeRequest(
+      url,
+      headers,
+      body,
+      'POST',
+    );
+  }
 
 
   // Generic methods for backward compatibility

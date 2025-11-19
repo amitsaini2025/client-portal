@@ -57,41 +57,6 @@ class PusherService {
       }
     }
   }
-
-  static void onConnectionStateChange(
-      dynamic currentState,
-      dynamic previousState,
-      ) {
-    log("Connection: $currentState");
-  }
-
-  static void onError(String message, int? code, dynamic e) {
-    log("onError: $message code: $code exception: $e");
-  }
-
-  static void onSubscriptionSucceeded(String channelName, dynamic data) {
-    log("onSubscriptionSucceeded: $channelName data: $data");
-  }
-
-  static void onSubscriptionError(String message, dynamic e) {
-    log("onSubscriptionError: $message Exception: $e");
-  }
-
-  static dynamic onAuthorizer(channel, socketId, _) async {
-    var token = AuthService.currentToken;
-    var baseUrl = AppConfig.apiBaseUrl;
-    var authUrl = "$baseUrl/broadcasting/auth";
-    var result = await http.post(
-      Uri.parse(authUrl),
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: 'socket_id=$socketId&channel_name=$channel',
-    );
-    return jsonDecode(result.body);
-  }
 }
 
 class WorkflowMessagesScreen extends StatefulWidget {
@@ -114,7 +79,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
     super.initState();
     _loadWorkflowMessages();
 
-    // Initialize Pusher
     PusherService.onMessageReceived = _handleIncomingMessage;
     PusherService.init_();
   }
@@ -125,15 +89,12 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       message: msgDetail.message,
       sender: msgDetail.sender,
       senderId: msgDetail.senderId,
-      recipientIds:
-      msgDetail.recipientIds
-          .map(
-            (r) => Recipient(
-          recipientId: r.recipientId,
-          recipient: r.recipient,
-          recipientShortname: r.recipientShortname,
-        ),
-      )
+      recipientIds: msgDetail.recipientIds
+          .map((r) => Recipient(
+        recipientId: r.recipientId,
+        recipient: r.recipient,
+        recipientShortname: r.recipientShortname,
+      ))
           .toList(),
       sentAt: msgDetail.sentAt.toIso8601String(),
       clientMatterId: msgDetail.clientMatterId,
@@ -143,12 +104,37 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       createdAt: msgDetail.sentAt.toIso8601String(),
       updatedAt: msgDetail.sentAt.toIso8601String(),
       senderShortname: msgDetail.senderShortname,
+      isRead: msgDetail.isRead ?? false,
+      readAt: msgDetail.readAt,
     );
 
     setState(() {
       _messages.add(newMessage);
     });
+
+    if (!(newMessage.isRead ?? false)) {
+      _markMessageAsRead(newMessage.id);
+    }
     _scrollToBottom();
+  }
+
+
+  Future<void> _markMessageAsRead(int messageId) async {
+    try {
+      final response = await ApiService.markMessageAsRead(messageId: messageId);
+
+      if (response['success'] == true) {
+        setState(() {
+          final msgIndex = _messages.indexWhere((m) => m.id == messageId);
+          if (msgIndex != -1) {
+            _messages[msgIndex].isRead = true;
+            _messages[msgIndex].readAt = DateTime.now().toIso8601String();
+          }
+        });
+      }
+    } catch (e) {
+      log('Failed to mark message $messageId as read: $e');
+    }
   }
 
   Future<void> _loadWorkflowMessages() async {
@@ -169,6 +155,14 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
           _messages = parsed.data.messages;
           _isLoading = false;
         });
+
+        // Mark visible messages as read
+        for (final msg in _messages) {
+          if (!(msg.isRead ?? false) && !msg.isSender) {
+            await _markMessageAsRead(msg.id);
+          }
+        }
+
         WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
       } else {
         setState(() {
@@ -192,15 +186,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
     try {
       final base = _messages.isNotEmpty ? _messages.first : null;
-      if (base == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("No message context found."),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
-        return;
-      }
+      if (base == null) return;
 
       final responseJson = await ApiService.sendChatMessage(
         clientMatterId: base.clientMatterId,
@@ -208,17 +194,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       );
 
       final response = SendMessageResponse.fromJson(responseJson);
-
       if (response.success && response.data.message != null) {
         _handleIncomingMessage(response.data.message);
         _messageController.clear();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Failed to send message"),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -266,9 +244,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       backgroundColor: const Color(0xFFF5F5F5),
       body: _isLoading
           ? Center(
-        child: CircularProgressIndicator(
-          color: ThemeConfig.goldenYellow,
-        ),
+        child: CircularProgressIndicator(color: ThemeConfig.goldenYellow),
       )
           : _error != null
           ? _buildErrorWidget(_error!)
@@ -279,15 +255,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
           Expanded(child: _buildMessageList()),
           _buildMessageInput(),
         ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80.0, right: 16.0), // Move up by increasing bottom padding
-        child: FloatingActionButton(
-          onPressed: _loadWorkflowMessages,
-          backgroundColor: ThemeConfig.goldenYellow,
-          child: const Icon(Icons.refresh, color: Colors.white),
-        ),
       ),
     );
   }
@@ -308,6 +275,18 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
               ? msg.sender
               : msg.recipientIds.map((r) => r.recipient).join(", ");
 
+          // Determine tick icons
+          Icon tickIcon;
+          if (!isSender) {
+            tickIcon = const Icon(Icons.check, size: 14, color: Colors.transparent); // hide for received
+          } else {
+            if (msg.isRead ?? false) {
+              tickIcon = const Icon(Icons.done_all, size: 16, color: Colors.blue);
+            } else {
+              tickIcon = const Icon(Icons.done_all, size: 16, color: Colors.grey);
+            }
+          }
+
           return GestureDetector(
             onTap: () {
               Navigator.pushNamed(
@@ -319,8 +298,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
             child: Container(
               margin: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
-                mainAxisAlignment:
-                isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+                mainAxisAlignment: isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   if (!isSender)
@@ -339,14 +317,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                   if (!isSender) const SizedBox(width: 8),
                   Flexible(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       decoration: BoxDecoration(
-                        color: isSender
-                            ? ThemeConfig.navyBlue.withOpacity(0.9)
-                            : Colors.white,
+                        color: isSender ? ThemeConfig.navyBlue.withOpacity(0.9) : Colors.white,
                         borderRadius: BorderRadius.only(
                           topLeft: const Radius.circular(16),
                           topRight: const Radius.circular(16),
@@ -364,6 +337,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Message text
                           Text(
                             msg.message,
                             style: TextStyle(
@@ -371,23 +345,46 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                               color: isSender ? Colors.white : Colors.black87,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: Text(
-                              time,
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: isSender
-                                    ? Colors.white70
-                                    : Colors.grey.shade600,
-                              ),
+                          const SizedBox(height: 6),
+                          // Sent time
+                          Text(
+                            _formatDateTime(msg.sentAt),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isSender ? Colors.white70 : Colors.grey.shade600,
                             ),
+                          ),
+                          const SizedBox(height: 2),
+                          // Tick and readAt vertically
+                          //if (!isSender)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Tick icon only if message is read
+                              if (msg.isRead ?? false)
+                                Icon(
+                                  Icons.done_all,
+                                  size: 16,
+                                  color: Colors.blue,
+                                ),
+                              if (msg.isRead ?? false) const SizedBox(width: 4),
+                              // Read timestamp
+                              if (msg.isRead ?? false && msg.readAt != null)
+                                Text(
+                                  _formatDateTime(msg.readAt!),
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                   ),
+
                   if (isSender) const SizedBox(width: 8),
                   if (isSender)
                     CircleAvatar(
@@ -407,6 +404,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
             ),
           );
         },
+
       ),
     );
   }
@@ -424,10 +422,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                   color: Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(25),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: TextField(
                   controller: _messageController,
                   decoration: const InputDecoration(
@@ -453,11 +448,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                 ),
               )
                   : IconButton(
-                icon: const Icon(
-                  Icons.send,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                icon: const Icon(Icons.send, color: Colors.white, size: 20),
                 onPressed: _sendMessage,
               ),
             ),
@@ -474,16 +465,11 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
         children: [
           const Icon(Icons.error_outline, color: Colors.redAccent, size: 60),
           const SizedBox(height: 16),
-          Text(
-            error,
-            style: const TextStyle(color: Colors.redAccent, fontSize: 16),
-          ),
+          Text(error, style: const TextStyle(color: Colors.redAccent, fontSize: 16)),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: _loadWorkflowMessages,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ThemeConfig.goldenYellow,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: ThemeConfig.goldenYellow),
             child: const Text('Retry'),
           ),
         ],
@@ -496,16 +482,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.chat_bubble_outline,
-            size: 80,
-            color: Colors.grey.shade400,
-          ),
+          Icon(Icons.chat_bubble_outline, size: 80, color: Colors.grey.shade400),
           const SizedBox(height: 16),
-          Text(
-            'No messages available',
-            style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-          ),
+          Text('No messages available', style: TextStyle(fontSize: 16, color: Colors.grey.shade600)),
         ],
       ),
     );
