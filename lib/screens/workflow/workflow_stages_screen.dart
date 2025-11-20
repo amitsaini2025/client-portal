@@ -110,49 +110,57 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
   }
 
   void _showStageDetails(WorkflowStage stage) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(
-              stage.stageName,
-              style: const TextStyle(color: ThemeConfig.navyBlue),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Status: ${stage.statusText}'),
-                if (stage.isCurrentStage)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.check_circle,
-                          color: ThemeConfig.goldenYellow,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Current Stage',
-                          style: TextStyle(
+    if (stage.allowedChecklistCount > 0) {
+      Navigator.pushNamed(
+        context,
+        '/workflow-documents',
+        arguments: {'stageId': stage.id, 'stageName': stage.stageName},
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: Text(
+                stage.stageName,
+                style: const TextStyle(color: ThemeConfig.navyBlue),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Status: ${stage.statusText}'),
+                  if (stage.isCurrentStage)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.check_circle,
                             color: ThemeConfig.goldenYellow,
-                            fontWeight: FontWeight.bold,
+                            size: 18,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Text(
+                            'Current Stage',
+                            style: TextStyle(
+                              color: ThemeConfig.goldenYellow,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Close'),
+                ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
-              ),
-            ],
-          ),
-    );
+      );
+    }
   }
 }

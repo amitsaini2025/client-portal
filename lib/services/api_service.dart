@@ -296,14 +296,30 @@ class ApiService {
     );
   }
 
-  static Future<Map<String, dynamic>> getWorkflowAllowedChecklist({
+  /*static Future<Map<String, dynamic>> getWorkflowAllowedChecklist({
     required int clientMatterId,
   }) async {
     final endpoint =
         '${ApiConfig.workflowAllowedChecklistEndpoint}?client_matter_id=$clientMatterId';
 
     return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
+  }*/
+
+  static Future<Map<String, dynamic>> getWorkflowAllowedChecklist({
+    required int clientMatterId,
+    int? stageId,
+  }) async {
+    String endpoint =
+        '${ApiConfig.workflowAllowedChecklistEndpoint}?client_matter_id=$clientMatterId';
+
+    // Add only if stageId is provided
+    if (stageId != null) {
+      endpoint += '&stage_id=$stageId';
+    }
+
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
+
 
   static Future<Map<String, dynamic>> uploadWorkflowChecklistDocument({
     required String filePath,

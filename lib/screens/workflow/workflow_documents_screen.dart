@@ -1,13 +1,16 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
+import '../../config/theme_config.dart';
 import '../../models/workflow_checklist.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 
 class WorkflowDocumentsScreen extends StatefulWidget {
+  final int? stageId;
+  final String? stageName;
 
-  const WorkflowDocumentsScreen({super.key});
+  const WorkflowDocumentsScreen({super.key, this.stageId, this.stageName});
 
   @override
   State<WorkflowDocumentsScreen> createState() =>
@@ -35,23 +38,18 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
     try {
       final response = await ApiService.getWorkflowAllowedChecklist(
         clientMatterId: AuthService.selectedMatterId ?? 0,
+        stageId: widget.stageId,
       );
 
       if (response['success'] == true && response['data'] != null) {
-        setState(() {
-          _checklistResponse = WorkflowChecklistResponse.fromJson(
-            response['data'],
-          );
-        });
+        _checklistResponse = WorkflowChecklistResponse.fromJson(
+          response['data'],
+        );
       } else {
-        setState(() {
-          _errorMessage = response['message'] ?? 'Failed to load checklist';
-        });
+        _errorMessage = response['message'] ?? 'Failed to load checklist';
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
+      _errorMessage = e.toString();
     } finally {
       setState(() => _isLoading = false);
     }
@@ -77,9 +75,9 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
       );
 
       if (response['success'] == true) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Upload successful')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Upload successful')),
+        );
         _loadChecklistData();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -87,9 +85,9 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Upload failed: $e')),
+      );
     } finally {
       setState(() => _uploadingStates[checklist.id] = false);
     }
@@ -97,6 +95,36 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final content = _buildContent();
+
+    if (widget.stageId != null) {
+      String stageName = widget.stageName ?? "Document";
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            stageName,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 1.2,
+            ),
+          ),
+          centerTitle: true,
+          elevation: 4,
+          backgroundColor: ThemeConfig.goldenYellow,
+          iconTheme: const IconThemeData(
+            color: Colors.white,
+          ),
+        ),
+        body: content,
+      );
+    }
+
+    // Case 2 → stageId is NULL → No AppBar
+    return content;
+  }
+
+  Widget _buildContent() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -126,6 +154,23 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
   Widget _buildChecklistItem(WorkflowChecklist checklist) {
     final isUploading = _uploadingStates[checklist.id] ?? false;
 
+    Color statusColor;
+    String statusText;
+
+    if (checklist.docStatusId == 0) {
+      statusColor = Colors.blue;
+      statusText = checklist.docStatusText ?? "In progress";
+    } else if (checklist.docStatusId == 1) {
+      statusColor = Colors.green;
+      statusText = checklist.docStatusText ?? "Approved";
+    } else if (checklist.docStatusId == 2) {
+      statusColor = Colors.red;
+      statusText = checklist.docStatusText ?? "Rejected";
+    } else {
+      statusColor = Colors.grey;
+      statusText = checklist.docStatusText ?? "Not uploaded";
+    }
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -133,24 +178,59 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Checklist Name
             Text(
               checklist.checklistName,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
+
             const SizedBox(height: 4),
-            // Checklist Type
-            if (checklist.type != null && checklist.type!.isNotEmpty)
+
+            if (checklist.typeName != null && checklist.typeName!.isNotEmpty)
               Text(
-                'Type: ${checklist.type}',
+                checklist.typeName!,
                 style: TextStyle(
                   fontSize: 13,
                   color: Colors.grey.shade700,
                   fontStyle: FontStyle.italic,
                 ),
               ),
-            const SizedBox(height: 8),
-            // Upload / View Section
+
+            const SizedBox(height: 10),
+
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+              decoration: BoxDecoration(
+                color: statusColor.withOpacity(0.1),
+                border: Border.all(color: statusColor),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                statusText,
+                style: TextStyle(
+                  color: statusColor,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+
+            if (checklist.docRejectionReason != null &&
+                checklist.docRejectionReason!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  "Reason: ${checklist.docRejectionReason}",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.red,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+
+            const SizedBox(height: 10),
+
+            // Upload / View section
             if (checklist.isUpload && checklist.fileUrl != null)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -163,20 +243,14 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
                   ),
                   TextButton.icon(
                     onPressed: () {
-                      if (checklist.fileUrl!.isNotEmpty) {
-                        Navigator.pushNamed(
-                          context,
-                          '/pdf-viewer',
-                          arguments: {
-                            'url': checklist.fileUrl,
-                            'title': checklist.fileName,
-                          },
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('File not available')),
-                        );
-                      }
+                      Navigator.pushNamed(
+                        context,
+                        '/pdf-viewer',
+                        arguments: {
+                          'url': checklist.fileUrl,
+                          'title': checklist.fileName,
+                        },
+                      );
                     },
                     icon: const Icon(Icons.visibility),
                     label: const Text('View'),
@@ -194,7 +268,8 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
                     : const Icon(Icons.upload_file),
-                label: Text(isUploading ? 'Uploading...' : 'Upload Document'),
+                label:
+                Text(isUploading ? 'Uploading...' : 'Upload Document'),
               ),
           ],
         ),

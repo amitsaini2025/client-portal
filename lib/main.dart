@@ -9,6 +9,7 @@ import 'package:client/screens/profile/profile_screen.dart';
 import 'package:client/screens/recent_activity/recent_activity.dart';
 import 'package:client/screens/tasks/tasks_screen.dart';
 import 'package:client/screens/workflow/message/workflow_message_detail_screen.dart';
+import 'package:client/screens/workflow/workflow_documents_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -186,6 +187,7 @@ void main() async {
 
 class MyAppWithTheme extends StatelessWidget {
   const MyAppWithTheme({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
@@ -233,6 +235,12 @@ class MyAppWithTheme extends StatelessWidget {
                       as Map<String, dynamic>;
               return WorkflowMessageDetailScreen(messageId: args['messageId']);
             },
+            '/workflow-documents': (context) {
+              final args =
+                  ModalRoute.of(context)!.settings.arguments
+                      as Map<String, dynamic>;
+              return WorkflowDocumentsScreen(stageId: args['stageId'], stageName: args['stageName'],);
+            },
           },
         );
       },
@@ -279,6 +287,7 @@ class AuthWrapper extends StatelessWidget {
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
   @override
   LoginPageState createState() => LoginPageState();
 }
@@ -1132,12 +1141,14 @@ class _DashboardScaffoldState extends State<DashboardScaffold> {
 class _SidebarNavItem {
   final String label;
   final IconData icon;
+
   _SidebarNavItem(this.label, this.icon);
 }
 
 // Update DashboardPage to use DashboardScaffold
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold();
@@ -1146,13 +1157,16 @@ class DashboardPage extends StatelessWidget {
 
 class ClientFormPage extends StatefulWidget {
   final Map<String, dynamic> initialData;
+
   const ClientFormPage({super.key, required this.initialData});
+
   @override
   ClientFormPageState createState() => ClientFormPageState();
 }
 
 class ClientFormPageState extends State<ClientFormPage> {
   final _formKey = GlobalKey<FormState>();
+
   // Personal Info
   String firstName = '';
   String lastName = '';
@@ -1727,6 +1741,7 @@ class ClientFormPageState extends State<ClientFormPage> {
 
 class DocumentUploadPage extends StatefulWidget {
   const DocumentUploadPage({super.key});
+
   @override
   DocumentUploadPageState createState() => DocumentUploadPageState();
 }
@@ -1805,6 +1820,7 @@ class DocumentUploadPageState extends State<DocumentUploadPage> {
 
 class AppointmentsPage extends StatefulWidget {
   const AppointmentsPage({super.key});
+
   @override
   AppointmentsPageState createState() => AppointmentsPageState();
 }
@@ -2092,6 +2108,7 @@ class AppointmentsPageState extends State<AppointmentsPage> {
 
 class CreateAppointmentPage extends StatefulWidget {
   const CreateAppointmentPage({super.key});
+
   @override
   CreateAppointmentPageState createState() => CreateAppointmentPageState();
 }
@@ -2364,6 +2381,7 @@ class CreateAppointmentPageState extends State<CreateAppointmentPage> {
 
 class MessagesPage extends StatefulWidget {
   const MessagesPage({super.key});
+
   @override
   MessagesPageState createState() => MessagesPageState();
 }
@@ -3147,6 +3165,7 @@ class _DocumentUploaderState extends State<DocumentUploader> {
 
 class CaseStatusTracker extends StatelessWidget {
   const CaseStatusTracker({super.key});
+
   final List<Map<String, String>> steps = const [
     {'name': 'Awaiting Documents', 'status': 'completed'},
     {'name': 'Information Submitted', 'status': 'completed'},
@@ -3237,6 +3256,7 @@ class CaseStatusTracker extends StatelessWidget {
 
 class AppointmentScheduler extends StatefulWidget {
   const AppointmentScheduler({super.key});
+
   @override
   AppointmentSchedulerState createState() => AppointmentSchedulerState();
 }
