@@ -1,6 +1,6 @@
 import 'package:client/config/theme_config.dart';
 import 'package:client/screens/billing/billing_screen.dart';
-import 'package:client/screens/dashboard/personal_info/personal_information_upload_screen.dart';
+import 'package:client/screens/dashboard/personal_info/personal_information_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -351,7 +351,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             MaterialPageRoute(
                               builder:
                                   (context) =>
-                                      const PersonalInformationUploadScreen(),
+                                      const PersonalInformationScreen(),
                             ),
                           );
                         },
