@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../../models/personal_information/occupation.dart';
 
 class OccupationSkillsWidget extends StatefulWidget {
-  const OccupationSkillsWidget({super.key});
+  final List<Occupation> occupations;
+
+  const OccupationSkillsWidget({super.key, required this.occupations});
 
   @override
   State<OccupationSkillsWidget> createState() => _OccupationSkillsWidgetState();
@@ -10,27 +13,12 @@ class OccupationSkillsWidget extends StatefulWidget {
 class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
   bool isEditing = false;
 
-  // Sample skills data
-  List<Map<String, String>> skills = [
-    {
-      "Skill Assessment": "Engineers Australia",
-      "Assessment Date": "12/08/2022",
-      "Nominated Occupation": "Mechanical Engineering Technician",
-      "Occupation Code": "233914",
-      "Expiry Date": "12/08/2025",
-      "Reference No": "HS8A92K",
-      "Assessing Authority": "EA",
-      "Visa Subclass": "189",
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// HEADER
           _buildSectionTitle(
             "Occupation & Skills",
             icon: Icons.assessment_rounded,
@@ -39,26 +27,27 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             onEdit: () => setState(() => isEditing = !isEditing),
             onAdd: () {
               setState(() {
-                skills.add({
-                  "Skill Assessment": "",
-                  "Assessment Date": "",
-                  "Nominated Occupation": "",
-                  "Occupation Code": "",
-                  "Expiry Date": "",
-                  "Reference No": "",
-                  "Assessing Authority": "",
-                  "Visa Subclass": "",
-                });
+                widget.occupations.add(
+                  Occupation(
+                    id: DateTime.now().millisecondsSinceEpoch,
+                    skillAssessment: "",
+                    nominatedOccupation: "",
+                    occupationCode: "",
+                    assessingAuthority: "",
+                    visaSubclass: "",
+                    assessmentDate: "",
+                    expiryDate: "",
+                    referenceNo: "",
+                    relevantOccupation: false,
+                  ),
+                );
               });
             },
           ),
-
           const SizedBox(height: 18),
-
-          /// Render all skill cards
-          ...skills.map((skill) => Column(
+          ...widget.occupations.map((occupation) => Column(
             children: [
-              _buildSkillCard(skill),
+              _buildSkillCard(occupation),
               const SizedBox(height: 18),
             ],
           )),
@@ -67,9 +56,6 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
     );
   }
 
-  // -------------------------------------------------------------------------
-  // SECTION HEADER
-  // -------------------------------------------------------------------------
   Widget _buildSectionTitle(
       String title, {
         required bool isEditing,
@@ -125,10 +111,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
     );
   }
 
-  // -------------------------------------------------------------------------
-  // SKILL CARD
-  // -------------------------------------------------------------------------
-  Widget _buildSkillCard(Map<String, String> skill) {
+  Widget _buildSkillCard(Occupation occupation) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -143,88 +126,89 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /*_leftBlueBar(),
-          const SizedBox(width: 14),*/
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Wrap(
-                  spacing: 26,
-                  runSpacing: 14,
-                  children: [
-                    _buildEditableRow("Skill Assessment", skill),
-                    _buildEditableRow("Assessment Date", skill),
-                    _buildEditableRow("Nominated Occupation", skill),
-                    _buildEditableRow("Occupation Code", skill),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Wrap(
-                  spacing: 26,
-                  runSpacing: 14,
-                  children: [
-                    _buildEditableRow("Expiry Date", skill),
-                    _buildEditableRow("Reference No", skill),
-                    _buildEditableRow("Assessing Authority", skill),
-                    _buildEditableRow("Visa Subclass", skill),
-                  ],
-                ),
-              ],
-            ),
+          Wrap(
+            spacing: 26,
+            runSpacing: 14,
+            children: [
+              _buildEditableRow(
+                  "Skill Assessment", occupation.skillAssessment,
+                      (val) => occupation.skillAssessment = val),
+              _buildEditableRow(
+                  "Assessment Date", occupation.assessmentDate,
+                      (val) => occupation.assessmentDate = val),
+              _buildEditableRow(
+                  "Nominated Occupation", occupation.nominatedOccupation,
+                      (val) => occupation.nominatedOccupation = val),
+              _buildEditableRow(
+                  "Occupation Code", occupation.occupationCode,
+                      (val) => occupation.occupationCode = val),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Wrap(
+            spacing: 26,
+            runSpacing: 14,
+            children: [
+              _buildEditableRow(
+                  "Expiry Date", occupation.expiryDate,
+                      (val) => occupation.expiryDate = val),
+              _buildEditableRow(
+                  "Reference No", occupation.referenceNo,
+                      (val) => occupation.referenceNo = val),
+              _buildEditableRow(
+                  "Assessing Authority", occupation.assessingAuthority,
+                      (val) => occupation.assessingAuthority = val),
+              _buildEditableRow(
+                  "Visa Subclass", occupation.visaSubclass ?? "",
+                      (val) => occupation.visaSubclass = val),
+              _buildCheckboxRow(
+                  "Relevant", occupation.relevantOccupation,
+                      (val) => occupation.relevantOccupation = val),
+            ],
           ),
         ],
       ),
     );
   }
 
-  // -------------------------------------------------------------------------
-  // LEFT BLUE BAR
-  // -------------------------------------------------------------------------
-  Widget _leftBlueBar() {
-    return Container(
-      width: 4,
-      height: 180,
-      decoration: BoxDecoration(
-        color: Colors.blue,
-        borderRadius: BorderRadius.circular(4),
-      ),
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // EDITABLE ROW
-  // -------------------------------------------------------------------------
-  Widget _buildEditableRow(String key, Map<String, String> skill) {
+  Widget _buildEditableRow(String label, String value, Function(String) onChanged) {
     return SizedBox(
       child: TextFormField(
-        initialValue: skill[key],
+        initialValue: value,
         enabled: isEditing,
-        onChanged: (val) {
-          setState(() {
-            skill[key] = val;
-          });
-        },
+        onChanged: onChanged,
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: Colors.black87,
         ),
         decoration: InputDecoration(
-          labelText: key.toUpperCase(),
+          labelText: label.toUpperCase(),
           labelStyle: const TextStyle(
             color: Colors.grey,
             fontSize: 13,
             letterSpacing: 0.2,
           ),
           border: const OutlineInputBorder(),
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
       ),
+    );
+  }
+
+  Widget _buildCheckboxRow(String label, bool value, Function(bool) onChanged) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+        Checkbox(
+          value: value,
+          onChanged: isEditing ? (val) => onChanged(val ?? false) : null,
+        ),
+      ],
     );
   }
 }

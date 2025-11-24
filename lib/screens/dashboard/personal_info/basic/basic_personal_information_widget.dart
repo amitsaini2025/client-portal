@@ -1,53 +1,97 @@
 import 'package:flutter/material.dart';
 
+import '../../../../models/personal_information/basic_information.dart';
+import '../../../../models/personal_information/email.dart';
+import '../../../../models/personal_information/phone.dart';
+
 class BasicPersonalInformationWidget extends StatefulWidget {
-  const BasicPersonalInformationWidget({super.key});
+  final BasicInformation? basicInfo;
+  final List<Phone>? phones;
+  final List<Email>? emails;
+
+  const BasicPersonalInformationWidget({
+    super.key,
+    this.basicInfo,
+    this.phones,
+    this.emails,
+  });
 
   @override
-  State<BasicPersonalInformationWidget> createState() => _BasicPersonalInformationWidgetState();
+  State<BasicPersonalInformationWidget> createState() =>
+      _BasicPersonalInformationWidgetState();
 }
 
-class _BasicPersonalInformationWidgetState extends State<BasicPersonalInformationWidget> {
+class _BasicPersonalInformationWidgetState
+    extends State<BasicPersonalInformationWidget> {
   bool isEditing = false;
 
   @override
   Widget build(BuildContext context) {
+    final basic = widget.basicInfo;
+    final phones = widget.phones ?? [];
+    final emails = widget.emails ?? [];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        /// ---------------- BASIC INFO ----------------
         _buildSectionTitle('Basic Information', showEdit: true),
         const SizedBox(height: 12),
+
         _buildInfoCard([
-          _buildEditableRow('Name', 'Test User'),
-          _buildEditableRow('Client ID', 'VIPL2400001'),
-          _buildEditableRow('Date of Birth', '22/06/1989'),
-          _buildEditableRow('Age', '39 years 7 months'),
-          _buildEditableRow('Gender', 'Male'),
-          _buildEditableRow('Marital Status', 'Married'),
+          _buildEditableRow('Name', basic?.fullName ?? '-'),
+          _buildEditableRow('Client ID', basic?.clientId ?? '-'),
+          _buildEditableRow('Date of Birth', basic?.dateOfBirth ?? '-'),
+          _buildEditableRow('Age', basic?.age ?? '-'),
+          _buildEditableRow('Gender', basic?.gender ?? '-'),
+          _buildEditableRow('Marital Status', basic?.maritalStatus ?? '-'),
         ]),
 
         const SizedBox(height: 24),
 
+        /// ---------------- PHONE NUMBERS ----------------
         _buildSectionTitle('Phone Numbers', showEdit: true, showAdd: true),
         const SizedBox(height: 12),
-        _buildInfoCard([
-          _buildEditableRow('Personal', '+919888888888'),
-          _buildEditableRow('Mobile', '+914444444444'),
-        ]),
+
+        _buildInfoCard(
+          phones.isEmpty
+              ? [_buildEditableRow('No Phone Records', '')]
+              : phones
+              .map((p) => _buildEditableRow(
+            p.type ?? 'Phone',
+            "${p.countryCode ?? ''} ${p.phone ?? ''}",
+          ))
+              .toList(),
+        ),
 
         const SizedBox(height: 24),
 
+        /// ---------------- EMAILS ----------------
         _buildSectionTitle('Email Addresses', showEdit: true, showAdd: true),
         const SizedBox(height: 12),
-        _buildInfoCard([
-          _buildEditableRow('Work', 'vipulcmca123@yahoo.co.in'),
-          _buildEditableRow('Personal', 'viplucmca@yahoo.co.in'),
-        ]),
+
+        _buildInfoCard(
+          emails.isEmpty
+              ? [_buildEditableRow('No Email Records', '')]
+              : emails
+              .map((e) => _buildEditableRow(
+            e.type ?? 'Email',
+            e.email ?? '',
+          ))
+              .toList(),
+        ),
       ],
     );
   }
 
-  Widget _buildSectionTitle(String title, {bool showEdit = false, bool showAdd = false}) {
+  // ------------------------------------------------------
+  // SECTION TITLE WITH EDIT & ADD BUTTONS
+  // ------------------------------------------------------
+  Widget _buildSectionTitle(
+      String title, {
+        bool showEdit = false,
+        bool showAdd = false,
+      }) {
     return Row(
       children: [
         Icon(
@@ -106,6 +150,9 @@ class _BasicPersonalInformationWidgetState extends State<BasicPersonalInformatio
     );
   }
 
+  // ------------------------------------------------------
+  // WHITE CARD CONTAINER
+  // ------------------------------------------------------
   Widget _buildInfoCard(List<Widget> children) {
     return Container(
       width: double.infinity,
@@ -121,6 +168,9 @@ class _BasicPersonalInformationWidgetState extends State<BasicPersonalInformatio
     );
   }
 
+  // ------------------------------------------------------
+  // EDITABLE TEXT FIELD ROW
+  // ------------------------------------------------------
   Widget _buildEditableRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -134,9 +184,14 @@ class _BasicPersonalInformationWidgetState extends State<BasicPersonalInformatio
         ),
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
-          labelStyle: const TextStyle(color: Colors.grey, fontSize: 13, letterSpacing: 0.2),
+          labelStyle: const TextStyle(
+            color: Colors.grey,
+            fontSize: 13,
+            letterSpacing: 0.2,
+          ),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
       ),
     );

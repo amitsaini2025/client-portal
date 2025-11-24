@@ -681,6 +681,21 @@ class ApiService {
   }
 
 
+  static Future<Map<String, dynamic>> getClientPersonalDetail({
+    String tab = 'all',
+  }) async {
+    String endpoint =
+        '${ApiConfig.getClientPersonalDetailEndpoint}?tab=$tab';
+
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(

@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../../../models/personal_information/qualification.dart';
 
 class EducationalQualificationsWidget extends StatefulWidget {
-  const EducationalQualificationsWidget({super.key});
+  final List<Qualification> qualifications;
+
+  const EducationalQualificationsWidget({
+    super.key,
+    required this.qualifications,
+  });
 
   @override
   State<EducationalQualificationsWidget> createState() =>
@@ -11,32 +17,6 @@ class EducationalQualificationsWidget extends StatefulWidget {
 class _EducationalQualificationsWidgetState
     extends State<EducationalQualificationsWidget> {
   bool isEditing = false;
-
-  // Sample data for educational qualifications
-  List<Map<String, String>> qualifications = [
-    {
-      "Level": "Masters Degree",
-      "Name": "MCA",
-      "Institution": "BBDNITM",
-      "Campus": "Lucknow",
-      "Country": "India",
-      "Status": "Completed",
-      "Start Date": "01/07/2006",
-      "Finish Date": "30/06/2009",
-      "Relevant": "Yes",
-    },
-    {
-      "Level": "Bachelor Degree",
-      "Name": "BSC",
-      "Institution": "RHPG college",
-      "Campus": "Kashipur",
-      "Country": "India",
-      "Status": "Completed",
-      "Start Date": "01/07/2003",
-      "Finish Date": "30/06/2006",
-      "Relevant": "Yes",
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -49,42 +29,44 @@ class _EducationalQualificationsWidgetState
             showEdit: true,
             showAdd: true,
             isEditing: isEditing,
-            onEdit: () {
-              setState(() => isEditing = !isEditing);
-            },
+            onEdit: () => setState(() => isEditing = !isEditing),
             onAdd: () {
               setState(() {
-                qualifications.add({
-                  "Level": "",
-                  "Name": "",
-                  "Institution": "",
-                  "Campus": "",
-                  "Country": "",
-                  "Status": "",
-                  "Start Date": "",
-                  "Finish Date": "",
-                  "Relevant": "No",
-                });
+                widget.qualifications.add(
+                  Qualification(
+                    id: DateTime.now().millisecondsSinceEpoch,
+                    level: "",
+                    name: "",
+                    collegeName: "",
+                    campus: "",
+                    country: "",
+                    state: "",
+                    startDate: "",
+                    finishDate: "",
+                    relevantQualification: false,
+                    specialistEducation: false,
+                    stemQualification: false,
+                    regionalStudy: false,
+                  ),
+                );
               });
             },
           ),
           const SizedBox(height: 18),
 
-          /// Render all qualifications as editable cards
-          ...qualifications.map((qual) => Column(
-            children: [
-              _buildQualificationCard(qual),
-              const SizedBox(height: 18),
-            ],
-          )),
+          ...widget.qualifications.map(
+                (qual) => Column(
+              children: [
+                _buildQualificationCard(qual),
+                const SizedBox(height: 18),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  /// ----------------------------
-  /// SECTION TITLE
-  /// ----------------------------
   Widget _buildSectionTitle(
       String title, {
         required bool showEdit,
@@ -95,10 +77,7 @@ class _EducationalQualificationsWidgetState
       }) {
     return Row(
       children: [
-        const Icon(
-          Icons.school_rounded,
-          color: Colors.white,
-        ),
+        const Icon(Icons.school_rounded, color: Colors.white),
         const SizedBox(width: 8),
         Text(
           title,
@@ -144,10 +123,7 @@ class _EducationalQualificationsWidgetState
     );
   }
 
-  /// ----------------------------
-  /// QUALIFICATION CARD
-  /// ----------------------------
-  Widget _buildQualificationCard(Map<String, String> qualification) {
+  Widget _buildQualificationCard(Qualification qual) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -165,53 +141,65 @@ class _EducationalQualificationsWidgetState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildEditableRow("Level", qualification),
-          _buildEditableRow("Name", qualification),
-          _buildEditableRow("Institution", qualification),
-          _buildEditableRow("Campus", qualification),
-          _buildEditableRow("Country", qualification),
-          _buildEditableRow("Status", qualification),
-          _buildEditableRow("Start Date", qualification),
-          _buildEditableRow("Finish Date", qualification),
-          _buildEditableRow("Relevant", qualification),
+          _buildEditableRow("Level", qual.level, (val) => qual.level = val),
+          _buildEditableRow("Name", qual.name, (val) => qual.name = val),
+          _buildEditableRow(
+              "Institution", qual.collegeName, (val) => qual.collegeName = val),
+          _buildEditableRow("Campus", qual.campus, (val) => qual.campus = val),
+          _buildEditableRow("Country", qual.country, (val) => qual.country = val),
+          _buildEditableRow("State", qual.state ?? "", (val) => qual.state = val),
+          _buildEditableRow("Start Date", qual.startDate, (val) => qual.startDate = val),
+          _buildEditableRow("Finish Date", qual.finishDate, (val) => qual.finishDate = val),
+          _buildCheckboxRow(
+              "Relevant", qual.relevantQualification, (val) => qual.relevantQualification = val),
+          _buildCheckboxRow(
+              "Specialist Education", qual.specialistEducation, (val) => qual.specialistEducation = val),
+          _buildCheckboxRow(
+              "STEM Qualification", qual.stemQualification, (val) => qual.stemQualification = val),
+          _buildCheckboxRow(
+              "Regional Study", qual.regionalStudy, (val) => qual.regionalStudy = val),
         ],
       ),
     );
   }
 
-  /// ----------------------------
-  /// EDITABLE ROW
-  /// ----------------------------
-  Widget _buildEditableRow(String key, Map<String, String> qualification) {
+  Widget _buildEditableRow(
+      String label, String value, Function(String) onChanged) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
-        initialValue: qualification[key],
+        initialValue: value,
         enabled: isEditing,
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: Colors.black87,
         ),
-        onChanged: (val) {
-          setState(() {
-            qualification[key] = val;
-          });
-        },
+        onChanged: (val) => onChanged(val),
         decoration: InputDecoration(
-          labelText: key.toUpperCase(),
+          labelText: label.toUpperCase(),
           labelStyle: const TextStyle(
             color: Colors.grey,
             fontSize: 13,
             letterSpacing: 0.2,
           ),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
       ),
+    );
+  }
+
+  Widget _buildCheckboxRow(String label, bool value, Function(bool) onChanged) {
+    return Row(
+      children: [
+        Expanded(child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600))),
+        Checkbox(
+          value: value,
+          onChanged: isEditing ? (val) => onChanged(val ?? false) : null,
+        ),
+      ],
     );
   }
 }

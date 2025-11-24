@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../../models/personal_information/experience.dart';
 
 class WorkExperienceWidget extends StatefulWidget {
-  const WorkExperienceWidget({super.key});
+  final List<Experience> experiences;
+
+  const WorkExperienceWidget({super.key, required this.experiences});
 
   @override
   State<WorkExperienceWidget> createState() => _WorkExperienceWidgetState();
@@ -10,39 +13,12 @@ class WorkExperienceWidget extends StatefulWidget {
 class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   bool isEditing = false;
 
-  // Sample work experience data
-  List<Map<String, String>> workExperiences = [
-    {
-      "Job Title": "Senior Software Engineer",
-      "ANZSCO Code": "123456",
-      "Employer Name": "Bansal Immigration",
-      "Country": "India",
-      "Address": "Patiyala",
-      "Job Type": "Full-time",
-      "Start Date": "26/12/2024",
-      "Finish Date": "26/12/2027",
-      "Relevant": "Yes",
-    },
-    {
-      "Job Title": "Software Engineer",
-      "ANZSCO Code": "13579",
-      "Employer Name": "Effectual Infotech",
-      "Country": "India",
-      "Address": "Chandigarh",
-      "Job Type": "Full-time",
-      "Start Date": "26/12/2017",
-      "Finish Date": "31/03/2023",
-      "Relevant": "Yes",
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Header
           _buildSectionTitle(
             "Work Experience",
             icon: Icons.work_rounded,
@@ -51,26 +27,28 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
             onEdit: () => setState(() => isEditing = !isEditing),
             onAdd: () {
               setState(() {
-                workExperiences.add({
-                  "Job Title": "",
-                  "ANZSCO Code": "",
-                  "Employer Name": "",
-                  "Country": "",
-                  "Address": "",
-                  "Job Type": "",
-                  "Start Date": "",
-                  "Finish Date": "",
-                  "Relevant": "No",
-                });
+                widget.experiences.add(
+                  Experience(
+                    id: DateTime.now().millisecondsSinceEpoch,
+                    jobTitle: "",
+                    jobCode: "",
+                    country: "",
+                    startDate: "",
+                    finishDate: "",
+                    relevantExperience: false,
+                    employerName: "",
+                    state: "",
+                    jobType: "",
+                    fteMultiplier: 1.0,
+                  ),
+                );
               });
             },
           ),
           const SizedBox(height: 18),
-
-          /// Work Experience Cards
-          ...workExperiences.map((work) => Column(
+          ...widget.experiences.map((exp) => Column(
             children: [
-              _buildWorkCard(work),
+              _buildWorkCard(exp),
               const SizedBox(height: 18),
             ],
           )),
@@ -79,9 +57,6 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     );
   }
 
-  // -------------------------------------------------------------------------
-  // SECTION HEADER
-  // -------------------------------------------------------------------------
   Widget _buildSectionTitle(
       String title, {
         required IconData icon,
@@ -137,10 +112,7 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     );
   }
 
-  // -------------------------------------------------------------------------
-  // WORK EXPERIENCE CARD
-  // -------------------------------------------------------------------------
-  Widget _buildWorkCard(Map<String, String> work) {
+  Widget _buildWorkCard(Experience exp) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -155,77 +127,58 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /*_leftBlueBar(),
-          const SizedBox(width: 14),*/
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildEditableRow("Job Title", work),
-                _buildEditableRow("ANZSCO Code", work),
-                _buildEditableRow("Employer Name", work),
-                _buildEditableRow("Country", work),
-                _buildEditableRow("Address", work),
-                _buildEditableRow("Job Type", work),
-                _buildEditableRow("Start Date", work),
-                _buildEditableRow("Finish Date", work),
-                _buildEditableRow("Relevant", work),
-              ],
-            ),
-          ),
+          _buildEditableRow("Job Title", exp.jobTitle, (val) => exp.jobTitle = val),
+          _buildEditableRow("ANZSCO Code", exp.jobCode, (val) => exp.jobCode = val),
+          _buildEditableRow("Employer Name", exp.employerName, (val) => exp.employerName = val),
+          _buildEditableRow("Country", exp.country, (val) => exp.country = val),
+          _buildEditableRow("State", exp.state ?? "", (val) => exp.state = val),
+          _buildEditableRow("Job Type", exp.jobType, (val) => exp.jobType = val),
+          _buildEditableRow("Start Date", exp.startDate, (val) => exp.startDate = val),
+          _buildEditableRow("Finish Date", exp.finishDate, (val) => exp.finishDate = val),
+          _buildCheckboxRow("Relevant", exp.relevantExperience, (val) => exp.relevantExperience = val),
         ],
       ),
     );
   }
 
-  // -------------------------------------------------------------------------
-  // LEFT BLUE BAR
-  // -------------------------------------------------------------------------
-  Widget _leftBlueBar() {
-    return Container(
-      width: 4,
-      height: 200,
-      decoration: BoxDecoration(
-        color: Colors.blue,
-        borderRadius: BorderRadius.circular(4),
-      ),
-    );
-  }
-
-  // -------------------------------------------------------------------------
-  // EDITABLE ROW
-  // -------------------------------------------------------------------------
-  Widget _buildEditableRow(String key, Map<String, String> work) {
+  Widget _buildEditableRow(String label, String value, Function(String) onChanged) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
-        initialValue: work[key],
+        initialValue: value,
         enabled: isEditing,
-        onChanged: (val) {
-          setState(() {
-            work[key] = val;
-          });
-        },
+        onChanged: (val) => onChanged(val),
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: Colors.black87,
         ),
         decoration: InputDecoration(
-          labelText: key.toUpperCase(),
+          labelText: label.toUpperCase(),
           labelStyle: const TextStyle(
             color: Colors.grey,
             fontSize: 13,
             letterSpacing: 0.2,
           ),
           border: const OutlineInputBorder(),
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
       ),
+    );
+  }
+
+  Widget _buildCheckboxRow(String label, bool value, Function(bool) onChanged) {
+    return Row(
+      children: [
+        Expanded(child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600))),
+        Checkbox(
+          value: value,
+          onChanged: isEditing ? (val) => onChanged(val ?? false) : null,
+        ),
+      ],
     );
   }
 }

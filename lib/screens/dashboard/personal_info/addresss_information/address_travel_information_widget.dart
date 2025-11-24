@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import '../../../../models/personal_information/address.dart';
+import '../../../../models/personal_information/travel.dart';
 
 class AddressAndTravelInformationWidget extends StatefulWidget {
-  const AddressAndTravelInformationWidget({super.key});
+  final List<Address> addresses;
+  final List<Travel> travels;
+
+  const AddressAndTravelInformationWidget({
+    super.key,
+    required this.addresses,
+    required this.travels,
+  });
 
   @override
   State<AddressAndTravelInformationWidget> createState() =>
@@ -19,64 +28,69 @@ class _AddressAndTravelInformationWidgetState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ---------------------------------------------------------
-          // ADDRESS INFORMATION
-          // ---------------------------------------------------------
+          /// ---------------------------------------------------------
+          /// ADDRESS INFORMATION
+          /// ---------------------------------------------------------
           _buildSectionTitle(
             "Address Information",
             icon: Icons.home_rounded,
             isEditing: isEditingAddress,
             onEdit: () => setState(() => isEditingAddress = !isEditingAddress),
-            onAdd: () {},
+            onAdd: () {
+              // Handle adding new address
+            },
             showAdd: true,
           ),
           const SizedBox(height: 12),
-          _buildInfoCard([
-            _buildEditableRow("Address",
-                "Kelly Road, Valley View, SA, 5093", isEditingAddress),
-            _buildEditableRow("Start Date", "18/10/2023", isEditingAddress),
-            _buildEditableRow("End Date", "16/05/2025", isEditingAddress),
-            _buildEditableRow("Regional Code", "Regional City SA",
-                isEditingAddress),
-            const Divider(height: 30),
-            _buildEditableRow("Address",
-                "6 Lisbon Street, Glen Waverley, VIC, 3150", isEditingAddress),
-            _buildEditableRow("Start Date", "", isEditingAddress),
-            _buildEditableRow("End Date", "", isEditingAddress),
-            _buildEditableRow(
-                "Regional Code", "Metro Area VIC", isEditingAddress),
-          ]),
+
+          ...widget.addresses.map(
+                (address) => _buildInfoCard([
+              _buildEditableRow("Search Address", address.searchAddress, isEditingAddress),
+              _buildEditableRow("Address Line 1", address.addressLine1 ?? "-", isEditingAddress),
+              _buildEditableRow("Address Line 2", address.addressLine2 ?? "-", isEditingAddress),
+              _buildEditableRow("Suburb", address.suburb, isEditingAddress),
+              _buildEditableRow("State", address.state, isEditingAddress),
+              _buildEditableRow("Postcode", address.postcode.toString(), isEditingAddress),
+              _buildEditableRow("Country", address.country, isEditingAddress),
+              _buildEditableRow("Regional Code", address.regionalCode ?? "-", isEditingAddress),
+              _buildEditableRow("Start Date", address.startDate.toString(), isEditingAddress),
+              _buildEditableRow("End Date", address.endDate ?? "-", isEditingAddress),
+              _buildEditableRow("Is Current", address.isCurrent ? "Yes" : "No", isEditingAddress),
+            ]),
+          ),
 
           const SizedBox(height: 28),
 
-          // ---------------------------------------------------------
-          // TRAVEL INFORMATION
-          // ---------------------------------------------------------
+          /// ---------------------------------------------------------
+          /// TRAVEL INFORMATION
+          /// ---------------------------------------------------------
           _buildSectionTitle(
             "Travel Information",
             icon: Icons.flight_takeoff_rounded,
             isEditing: isEditingTravel,
             onEdit: () => setState(() => isEditingTravel = !isEditingTravel),
-            onAdd: () {},
+            onAdd: () {
+              // Handle adding new travel
+            },
             showAdd: true,
           ),
           const SizedBox(height: 12),
-          _buildInfoCard([
-            _buildEditableRow(
-                "Country Visited", "India", isEditingTravel),
-            _buildEditableRow(
-                "Arrival Date", "01/05/2024", isEditingTravel),
-            _buildEditableRow(
-                "Departure Date", "30/06/2024", isEditingTravel),
-            _buildEditableRow("Travel Purpose", "Travel1", isEditingTravel),
-          ]),
+
+          ...widget.travels.map(
+                (travel) => _buildInfoCard([
+              _buildEditableRow("Country Visited", travel.countryVisited, isEditingTravel),
+              _buildEditableRow("Arrival Date", travel.arrivalDate, isEditingTravel),
+              _buildEditableRow("Departure Date", travel.departureDate, isEditingTravel),
+              _buildEditableRow("Travel Purpose", travel.purpose, isEditingTravel),
+            ]),
+          ),
         ],
       ),
     );
   }
 
   // ---------------------------------------------------------------
-  // SECTION TITLE (HEADER STYLE SAME AS BASIC PERSONAL INFO SCREEN)
+  // SECTION TITLE
   // ---------------------------------------------------------------
   Widget _buildSectionTitle(
       String title, {
@@ -134,12 +148,13 @@ class _AddressAndTravelInformationWidgetState
   }
 
   // ---------------------------------------------------------------
-  // WHITE CARD CONTAINER (SAME STYLE AS BASIC PERSONAL INFO)
+  // INFO CARD
   // ---------------------------------------------------------------
   Widget _buildInfoCard(List<Widget> children) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -152,7 +167,7 @@ class _AddressAndTravelInformationWidgetState
   }
 
   // ---------------------------------------------------------------
-  // EDITABLE ROW USING TEXTFORMFIELD
+  // EDITABLE ROW
   // ---------------------------------------------------------------
   Widget _buildEditableRow(String label, String value, bool enabled) {
     return Padding(
@@ -173,8 +188,7 @@ class _AddressAndTravelInformationWidgetState
             letterSpacing: 0.2,
           ),
           border: const OutlineInputBorder(),
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
       ),
     );

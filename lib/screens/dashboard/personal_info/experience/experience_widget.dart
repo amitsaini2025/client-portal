@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../../../models/personal_information/experience.dart';
+
 class ExperienceWidget extends StatefulWidget {
-  const ExperienceWidget({super.key});
+  final List<Experience> experiences;
+
+  const ExperienceWidget({super.key, required this.experiences});
 
   @override
   State<ExperienceWidget> createState() => _ExperienceWidgetState();
@@ -10,34 +14,14 @@ class ExperienceWidget extends StatefulWidget {
 class _ExperienceWidgetState extends State<ExperienceWidget> {
   bool isEditing = false;
 
-  List<Map<String, dynamic>> experiences = [
-    {
-      "jobTitle": "Senior Software Engineer",
-      "anzsco": "123456",
-      "employer": "Bansal Immigration",
-      "country": "India",
-      "address": "Patiyala",
-      "jobType": "Full-time",
-      "startDate": "26/12/2024",
-      "finishDate": "26/12/2027",
-      "relevant": true,
-    },
-    {
-      "jobTitle": "Software Engineer",
-      "anzsco": "13579",
-      "employer": "Effectual Infotech",
-      "country": "India",
-      "address": "Chandigarh",
-      "jobType": "Full-time",
-      "startDate": "26/12/2017",
-      "finishDate": "31/03/2023",
-      "relevant": true,
-    },
-  ];
-
-  // List for dropdown items
   final List<String> jobTypes = ["Full-time", "Part-time", "Contract"];
-  final List<String> countries = ["India", "Nepal", "Australia", "USA", "Canada"];
+  final List<String> countries = [
+    "India",
+    "Nepal",
+    "Australia",
+    "USA",
+    "Canada",
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -45,18 +29,15 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('Experience', showEdit: true, showAdd: true),
-
         const SizedBox(height: 16),
-
-        ...List.generate(experiences.length, (index) {
+        ...List.generate(widget.experiences.length, (index) {
           return Column(
             children: [
-              _buildExperienceCard(index),
+              _buildExperienceCard(widget.experiences[index]),
               const SizedBox(height: 20),
             ],
           );
         }),
-
         const SizedBox(height: 20),
       ],
     );
@@ -65,12 +46,15 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
   // ---------------------------
   // SECTION TITLE
   // ---------------------------
-  Widget _buildSectionTitle(String title, {bool showEdit = false, bool showAdd = false}) {
+  Widget _buildSectionTitle(
+    String title, {
+    bool showEdit = false,
+    bool showAdd = false,
+  }) {
     return Row(
       children: [
         const Icon(Icons.work, color: Colors.white),
         const SizedBox(width: 8),
-
         Text(
           title,
           style: const TextStyle(
@@ -80,12 +64,9 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
           ),
         ),
         const Spacer(),
-
         if (showEdit)
           InkWell(
-            onTap: () {
-              setState(() => isEditing = !isEditing);
-            },
+            onTap: () => setState(() => isEditing = !isEditing),
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -100,24 +81,26 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
               ),
             ),
           ),
-
         if (showAdd) const SizedBox(width: 10),
-
         if (showAdd)
           InkWell(
             onTap: () {
               setState(() {
-                experiences.add({
-                  "jobTitle": "",
-                  "anzsco": "",
-                  "employer": "",
-                  "country": "India",
-                  "address": "",
-                  "jobType": "Full-time",
-                  "startDate": "",
-                  "finishDate": "",
-                  "relevant": false,
-                });
+                widget.experiences.add(
+                  Experience(
+                    id: DateTime.now().millisecondsSinceEpoch,
+                    jobTitle: "",
+                    jobCode: "",
+                    employerName: "",
+                    country: "India",
+                    state: null,
+                    jobType: "Full-time",
+                    startDate: "",
+                    finishDate: "",
+                    relevantExperience: false,
+                    fteMultiplier: 0,
+                  ),
+                );
               });
             },
             child: Container(
@@ -137,9 +120,7 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
   // ---------------------------
   // EXPERIENCE CARD
   // ---------------------------
-  Widget _buildExperienceCard(int index) {
-    final item = experiences[index];
-
+  Widget _buildExperienceCard(Experience exp) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
@@ -154,48 +135,78 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
           Align(
             alignment: Alignment.topRight,
             child: InkWell(
-              onTap: isEditing
-                  ? () {
-                setState(() => experiences.removeAt(index));
-              }
-                  : null,
-              child: isEditing
-                  ? const Icon(Icons.remove_circle, color: Colors.red)
-                  : const SizedBox(),
+              onTap:
+                  isEditing
+                      ? () => setState(() => widget.experiences.remove(exp))
+                      : null,
+              child:
+                  isEditing
+                      ? const Icon(Icons.remove_circle, color: Colors.red)
+                      : const SizedBox(),
             ),
           ),
 
-          _buildEditableRow("Job Title", item["jobTitle"], (val) => item["jobTitle"] = val),
-          _buildEditableRow("ANZSCO Code", item["anzsco"], (val) => item["anzsco"] = val),
-          _buildEditableRow("Employer Name", item["employer"], (val) => item["employer"] = val),
+          _buildEditableRow(
+            "Job Title",
+            exp.jobTitle,
+            (val) => exp.jobTitle = val,
+          ),
+          _buildEditableRow(
+            "ANZSCO Code",
+            exp.jobCode,
+            (val) => exp.jobCode = val,
+          ),
+          _buildEditableRow(
+            "Employer Name",
+            exp.employerName,
+            (val) => exp.employerName = val,
+          ),
 
           _buildDropdownRow(
             label: "Country",
-            value: item["country"],
+            value: exp.country,
             items: countries,
-            onChanged: (v) => setState(() => item["country"] = v),
+            onChanged: (v) => setState(() => exp.country = v ?? exp.country),
           ),
 
-          _buildEditableRow("Address", item["address"], (val) => item["address"] = val),
+          _buildEditableRow(
+            "Address",
+            exp.state ?? "",
+            (val) => exp.state = val,
+          ),
 
           _buildDropdownRow(
             label: "Job Type",
-            value: item["jobType"],
+            value: exp.jobType,
             items: jobTypes,
-            onChanged: (v) => setState(() => item["jobType"] = v),
+            onChanged: (v) => setState(() => exp.jobType = v ?? exp.jobType),
           ),
 
-          _buildEditableRow("Start Date", item["startDate"], (val) => item["startDate"] = val),
-          _buildEditableRow("Finish Date", item["finishDate"], (val) => item["finishDate"] = val),
+          _buildEditableRow(
+            "Start Date",
+            exp.startDate,
+            (val) => exp.startDate = val,
+          ),
+          _buildEditableRow(
+            "Finish Date",
+            exp.finishDate,
+            (val) => exp.finishDate = val,
+          ),
 
           Row(
             children: [
-              const Text("Relevant?", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+              const Text(
+                "Relevant?",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+              ),
               Checkbox(
-                value: item["relevant"],
-                onChanged: isEditing
-                    ? (val) => setState(() => item["relevant"] = val)
-                    : null,
+                value: exp.relevantExperience,
+                onChanged:
+                    isEditing
+                        ? (val) => setState(
+                          () => exp.relevantExperience = val ?? false,
+                        )
+                        : null,
               ),
             ],
           ),
@@ -207,7 +218,11 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
   // ---------------------------
   // TEXT FIELD ROW
   // ---------------------------
-  Widget _buildEditableRow(String label, String value, Function(String) onChanged) {
+  Widget _buildEditableRow(
+    String label,
+    String value,
+    Function(String) onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
@@ -217,7 +232,10 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
         ),
         style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
@@ -240,16 +258,20 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
             isDense: true,
             value: value,
-            items: items.map((e) {
-              return DropdownMenuItem(value: e, child: Text(e));
-            }).toList(),
+            items:
+                items
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
             onChanged: isEditing ? onChanged : null,
           ),
         ),
