@@ -8,8 +8,8 @@ class Address {
   final int postcode;
   final String country;
   final String? regionalCode;
-  final String? startDate;
-  final String? endDate;
+  late final String? startDate;
+  late final String? endDate;
   final bool isCurrent;
 
   Address({

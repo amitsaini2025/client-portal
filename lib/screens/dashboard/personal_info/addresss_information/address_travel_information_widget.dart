@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import '../../../../models/personal_information/address.dart';
 import '../../../../models/personal_information/travel.dart';
 
@@ -22,6 +24,35 @@ class _AddressAndTravelInformationWidgetState
   bool isEditingAddress = false;
   bool isEditingTravel = false;
 
+  // ---------------------------------------------------------------
+  // DATE PICKER
+  // ---------------------------------------------------------------
+  Future<String?> _pickDate(String current) async {
+    DateTime initial;
+    try {
+      final parts = current.split('/');
+      initial = DateTime(
+        int.parse(parts[2]),
+        int.parse(parts[1]),
+        int.parse(parts[0]),
+      );
+    } catch (_) {
+      initial = DateTime.now();
+    }
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(1950),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      return DateFormat("dd/MM/yyyy").format(picked);
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -36,9 +67,7 @@ class _AddressAndTravelInformationWidgetState
             icon: Icons.home_rounded,
             isEditing: isEditingAddress,
             onEdit: () => setState(() => isEditingAddress = !isEditingAddress),
-            onAdd: () {
-              // Handle adding new address
-            },
+            onAdd: () {},
             showAdd: true,
           ),
           const SizedBox(height: 12),
@@ -53,8 +82,13 @@ class _AddressAndTravelInformationWidgetState
               _buildEditableRow("Postcode", address.postcode.toString(), isEditingAddress),
               _buildEditableRow("Country", address.country, isEditingAddress),
               _buildEditableRow("Regional Code", address.regionalCode ?? "-", isEditingAddress),
-              _buildEditableRow("Start Date", address.startDate.toString(), isEditingAddress),
-              _buildEditableRow("End Date", address.endDate ?? "-", isEditingAddress),
+
+              /// ---------- DATE PICKERS ----------
+              _buildDateRow("Start Date", address.startDate ?? "-", isEditingAddress,
+                      (val) => address.startDate = val),
+              _buildDateRow("End Date", address.endDate ?? "-", isEditingAddress,
+                      (val) => address.endDate = val),
+
               _buildEditableRow("Is Current", address.isCurrent ? "Yes" : "No", isEditingAddress),
             ]),
           ),
@@ -69,9 +103,7 @@ class _AddressAndTravelInformationWidgetState
             icon: Icons.flight_takeoff_rounded,
             isEditing: isEditingTravel,
             onEdit: () => setState(() => isEditingTravel = !isEditingTravel),
-            onAdd: () {
-              // Handle adding new travel
-            },
+            onAdd: () {},
             showAdd: true,
           ),
           const SizedBox(height: 12),
@@ -79,8 +111,13 @@ class _AddressAndTravelInformationWidgetState
           ...widget.travels.map(
                 (travel) => _buildInfoCard([
               _buildEditableRow("Country Visited", travel.countryVisited, isEditingTravel),
-              _buildEditableRow("Arrival Date", travel.arrivalDate, isEditingTravel),
-              _buildEditableRow("Departure Date", travel.departureDate, isEditingTravel),
+
+              /// ---------- DATE PICKERS ----------
+              _buildDateRow("Arrival Date", travel.arrivalDate, isEditingTravel,
+                      (val) => travel.arrivalDate = val!),
+              _buildDateRow("Departure Date", travel.departureDate, isEditingTravel,
+                      (val) => travel.departureDate = val!),
+
               _buildEditableRow("Travel Purpose", travel.purpose, isEditingTravel),
             ]),
           ),
@@ -167,7 +204,7 @@ class _AddressAndTravelInformationWidgetState
   }
 
   // ---------------------------------------------------------------
-  // EDITABLE ROW
+  // NORMAL EDITABLE ROW
   // ---------------------------------------------------------------
   Widget _buildEditableRow(String label, String value, bool enabled) {
     return Padding(
@@ -188,7 +225,58 @@ class _AddressAndTravelInformationWidgetState
             letterSpacing: 0.2,
           ),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------
+  // DATE PICKER ROW
+  // ---------------------------------------------------------------
+  Widget _buildDateRow(
+      String label,
+      String value,
+      bool enabled,
+      ValueChanged<String?> onChanged,
+      ) {
+    final controller = TextEditingController(text: value);
+
+    return GestureDetector(
+      onTap: enabled
+          ? () async {
+        final newDate = await _pickDate(controller.text);
+        if (newDate != null) {
+          controller.text = newDate;
+          onChanged(newDate);
+          setState(() {});
+        }
+      }
+          : null,
+      child: AbsorbPointer(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: TextFormField(
+            controller: controller,
+            enabled: enabled,
+            readOnly: true,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: InputDecoration(
+              labelText: label.toUpperCase(),
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+            ),
+          ),
         ),
       ),
     );

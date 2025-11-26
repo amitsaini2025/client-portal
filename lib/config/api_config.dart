@@ -41,6 +41,7 @@ class ApiConfig {
   static const String messageRead = "/messages";
   static const String messageUnreadCount = "/messages/unread-count";
   static const String getClientPersonalDetailEndpoint = "/get-client-personal-detail";
+  static const String updateClientBasicDetail = "/update-client-basic-detail";
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

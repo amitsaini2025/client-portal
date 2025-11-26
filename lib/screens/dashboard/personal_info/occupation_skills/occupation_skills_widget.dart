@@ -136,7 +136,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
               _buildEditableRow(
                   "Skill Assessment", occupation.skillAssessment,
                       (val) => occupation.skillAssessment = val),
-              _buildEditableRow(
+              _buildDateRow(
                   "Assessment Date", occupation.assessmentDate,
                       (val) => occupation.assessmentDate = val),
               _buildEditableRow(
@@ -152,7 +152,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             spacing: 26,
             runSpacing: 14,
             children: [
-              _buildEditableRow(
+              _buildDateRow(
                   "Expiry Date", occupation.expiryDate,
                       (val) => occupation.expiryDate = val),
               _buildEditableRow(
@@ -194,6 +194,50 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
           ),
           border: const OutlineInputBorder(),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateRow(String label, String value, Function(String) onChanged) {
+    TextEditingController controller = TextEditingController(text: value);
+    return SizedBox(
+      child: TextFormField(
+        controller: controller,
+        enabled: isEditing,
+        readOnly: true,
+        onTap: isEditing
+            ? () async {
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: value.isNotEmpty
+                ? DateTime.tryParse(value) ?? DateTime.now()
+                : DateTime.now(),
+            firstDate: DateTime(1900),
+            lastDate: DateTime(2100),
+          );
+          if (pickedDate != null) {
+            String formattedDate = "${pickedDate.year}-${pickedDate.month.toString().padLeft(2,'0')}-${pickedDate.day.toString().padLeft(2,'0')}";
+            controller.text = formattedDate;
+            onChanged(formattedDate);
+          }
+        }
+            : null,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.black87,
+        ),
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          labelStyle: const TextStyle(
+            color: Colors.grey,
+            fontSize: 13,
+            letterSpacing: 0.2,
+          ),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          suffixIcon: isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
         ),
       ),
     );

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../models/personal_information/basic_information.dart';
 import '../../../../models/personal_information/email.dart';
 import '../../../../models/personal_information/phone.dart';
+import '../../../../services/api_service.dart';
 
 class BasicPersonalInformationWidget extends StatefulWidget {
   final BasicInformation? basicInfo;
@@ -25,73 +27,192 @@ class _BasicPersonalInformationWidgetState
     extends State<BasicPersonalInformationWidget> {
   bool isEditing = false;
 
+  late TextEditingController firstNameCtrl;
+  late TextEditingController lastNameCtrl;
+  late TextEditingController dobCtrl;
+  late TextEditingController genderCtrl;
+  late TextEditingController maritalStatusCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final basic = widget.basicInfo;
+
+    String first = "";
+    String last = "";
+    if (basic?.fullName != null) {
+      final parts = basic!.fullName!.split(" ");
+      first = parts.first;
+      last = parts.length > 1 ? parts.sublist(1).join(" ") : "";
+    }
+
+    firstNameCtrl = TextEditingController(text: first);
+    lastNameCtrl = TextEditingController(text: last);
+    genderCtrl = TextEditingController(text: basic?.gender ?? "");
+    maritalStatusCtrl = TextEditingController(text: basic?.maritalStatus ?? "");
+    dobCtrl = TextEditingController(text: basic?.dateOfBirth ?? "");
+  }
+
+  Future<void> _pickDOB() async {
+    DateTime initial;
+    try {
+      final parts = dobCtrl.text.split('/');
+      initial = DateTime(
+        int.parse(parts[2]),
+        int.parse(parts[1]),
+        int.parse(parts[0]),
+      );
+    } catch (_) {
+      initial = DateTime.now().subtract(const Duration(days: 365 * 20));
+    }
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      dobCtrl.text = DateFormat("dd/MM/yyyy").format(picked);
+    }
+  }
+
+  Future<void> _saveData() async {
+    try {
+      final res = await ApiService.updateClientBasicDetail(
+        firstName: firstNameCtrl.text,
+        lastName: lastNameCtrl.text,
+        dob: dobCtrl.text,
+        gender: genderCtrl.text,
+        maritalStatus: maritalStatusCtrl.text,
+      );
+
+      if (res["success"] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Updated Successfully!")),
+        );
+
+        setState(() {
+          isEditing = false;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res["message"] ?? "Update failed")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final basic = widget.basicInfo;
     final phones = widget.phones ?? [];
     final emails = widget.emails ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /// ---------------- BASIC INFO ----------------
         _buildSectionTitle('Basic Information', showEdit: true),
         const SizedBox(height: 12),
 
         _buildInfoCard([
-          _buildEditableRow('Name', basic?.fullName ?? '-'),
-          _buildEditableRow('Client ID', basic?.clientId ?? '-'),
-          _buildEditableRow('Date of Birth', basic?.dateOfBirth ?? '-'),
-          _buildEditableRow('Age', basic?.age ?? '-'),
-          _buildEditableRow('Gender', basic?.gender ?? '-'),
-          _buildEditableRow('Marital Status', basic?.maritalStatus ?? '-'),
+          _buildTextField('First Name', firstNameCtrl),
+          _buildTextField('Last Name', lastNameCtrl),
+          _buildDOBField('Date of Birth', dobCtrl),
+          _buildTextField('Gender', genderCtrl),
+          _buildTextField('Marital Status', maritalStatusCtrl),
         ]),
 
         const SizedBox(height: 24),
 
-        /// ---------------- PHONE NUMBERS ----------------
         _buildSectionTitle('Phone Numbers', showEdit: true, showAdd: true),
         const SizedBox(height: 12),
 
+        // ---------------- UPDATED PHONE UI ----------------
         _buildInfoCard(
           phones.isEmpty
-              ? [_buildEditableRow('No Phone Records', '')]
-              : phones
-              .map((p) => _buildEditableRow(
-            p.type ?? 'Phone',
-            "${p.countryCode ?? ''} ${p.phone ?? ''}",
-          ))
-              .toList(),
+              ? [_buildStaticField('No Phone Records', '')]
+              : phones.map((p) {
+            final phoneCtrl = TextEditingController(
+              text: "${p.countryCode ?? ''} ${p.phone ?? ''}",
+            );
+            return _buildTextField(
+              p.type ?? 'Phone Number',
+              phoneCtrl,
+            );
+          }).toList(),
         ),
 
         const SizedBox(height: 24),
 
-        /// ---------------- EMAILS ----------------
         _buildSectionTitle('Email Addresses', showEdit: true, showAdd: true),
         const SizedBox(height: 12),
 
+        // ---------------- UPDATED EMAIL UI ----------------
         _buildInfoCard(
           emails.isEmpty
-              ? [_buildEditableRow('No Email Records', '')]
-              : emails
-              .map((e) => _buildEditableRow(
-            e.type ?? 'Email',
-            e.email ?? '',
-          ))
-              .toList(),
+              ? [_buildStaticField('No Email Records', '')]
+              : emails.map((e) {
+            final emailCtrl = TextEditingController(text: e.email ?? "");
+            return _buildTextField(
+              e.type ?? 'Email Address',
+              emailCtrl,
+            );
+          }).toList(),
         ),
       ],
     );
   }
 
-  // ------------------------------------------------------
-  // SECTION TITLE WITH EDIT & ADD BUTTONS
-  // ------------------------------------------------------
-  Widget _buildSectionTitle(
-      String title, {
-        bool showEdit = false,
-        bool showAdd = false,
-      }) {
+  Widget _buildTextField(String label, TextEditingController ctrl) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: TextFormField(
+        controller: ctrl,
+        enabled: isEditing, // enables grey/active style
+        readOnly: true,     // important for DOB field so tap works properly
+        style: const TextStyle(
+          fontSize: 14,
+          color: Colors.black87,
+          fontWeight: FontWeight.w600,
+        ),
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDOBField(String label, TextEditingController ctrl) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: isEditing ? _pickDOB : null,
+      child: AbsorbPointer(
+        absorbing: true,
+        child: _buildTextField(label, ctrl),
+      ),
+    );
+  }
+
+  Widget _buildStaticField(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Text("$label: $value"),
+    );
+  }
+
+  Widget _buildSectionTitle(String title,
+      {bool showEdit = false, bool showAdd = false}) {
     return Row(
       children: [
         Icon(
@@ -112,47 +233,48 @@ class _BasicPersonalInformationWidgetState
           ),
         ),
         const Spacer(),
-
         if (showEdit)
           InkWell(
             onTap: () {
-              setState(() {
-                isEditing = !isEditing;
-              });
+              if (isEditing) {
+                _saveData();
+              } else {
+                setState(() => isEditing = true);
+              }
             },
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Icon(
-                isEditing ? Icons.check : Icons.edit,
-                color: Colors.blue,
-                size: 20,
-              ),
-            ),
+            child: _editButton(),
           ),
-
         if (showAdd) const SizedBox(width: 8),
         if (showAdd)
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
+            decoration: _buttonDecoration(),
             child: const Icon(Icons.add, color: Colors.blue, size: 20),
           ),
       ],
     );
   }
 
-  // ------------------------------------------------------
-  // WHITE CARD CONTAINER
-  // ------------------------------------------------------
+  Widget _editButton() {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: _buttonDecoration(),
+      child: Icon(
+        isEditing ? Icons.check : Icons.edit,
+        color: Colors.blue,
+        size: 20,
+      ),
+    );
+  }
+
+  BoxDecoration _buttonDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: Colors.grey.shade300),
+    );
+  }
+
   Widget _buildInfoCard(List<Widget> children) {
     return Container(
       width: double.infinity,
@@ -162,38 +284,7 @@ class _BasicPersonalInformationWidgetState
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
-      ),
-    );
-  }
-
-  // ------------------------------------------------------
-  // EDITABLE TEXT FIELD ROW
-  // ------------------------------------------------------
-  Widget _buildEditableRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: TextFormField(
-        initialValue: value,
-        enabled: isEditing,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          labelStyle: const TextStyle(
-            color: Colors.grey,
-            fontSize: 13,
-            letterSpacing: 0.2,
-          ),
-          border: const OutlineInputBorder(),
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        ),
-      ),
+          crossAxisAlignment: CrossAxisAlignment.start, children: children),
     );
   }
 }

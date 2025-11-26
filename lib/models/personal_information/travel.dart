@@ -1,8 +1,8 @@
 class Travel {
   final int id;
   final String countryVisited;
-  final String arrivalDate;
-  final String departureDate;
+  String arrivalDate;
+  String departureDate;
   final String purpose;
 
   Travel({

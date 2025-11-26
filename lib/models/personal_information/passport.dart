@@ -2,8 +2,8 @@ class Passport {
   final int id;
   final String passportNumber;
   final String country;
-  final String issueDate;
-  final String expiryDate;
+  late final String issueDate;
+  late final String expiryDate;
 
   Passport({
     required this.id,

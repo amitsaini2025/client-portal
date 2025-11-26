@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../models/personal_information/experience.dart';
 
 class WorkExperienceWidget extends StatefulWidget {
@@ -12,6 +13,39 @@ class WorkExperienceWidget extends StatefulWidget {
 
 class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   bool isEditing = false;
+
+  Future<void> _pickDate(Function(String) onChanged, String currentValue) async {
+    DateTime initial;
+
+    try {
+      if (currentValue.isNotEmpty) {
+        final parts = currentValue.split('/');
+        initial = DateTime(
+          int.parse(parts[2]),
+          int.parse(parts[1]),
+          int.parse(parts[0]),
+        );
+      } else {
+        initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+      }
+    } catch (_) {
+      initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+    }
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+    );
+
+    if (picked != null) {
+      final formatted = DateFormat("dd/MM/yyyy").format(picked);
+      setState(() {
+        onChanged(formatted);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,8 +170,18 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
           _buildEditableRow("Country", exp.country, (val) => exp.country = val),
           _buildEditableRow("State", exp.state ?? "", (val) => exp.state = val),
           _buildEditableRow("Job Type", exp.jobType, (val) => exp.jobType = val),
-          _buildEditableRow("Start Date", exp.startDate, (val) => exp.startDate = val),
-          _buildEditableRow("Finish Date", exp.finishDate, (val) => exp.finishDate = val),
+
+          /// -----------------------------
+          /// DATE PICKER FOR START & FINISH
+          /// -----------------------------
+          _buildDateRow("Start Date", exp.startDate, (val) => exp.startDate = val),
+
+          SizedBox(
+            height: 12,
+          ),
+          
+          _buildDateRow("Finish Date", exp.finishDate, (val) => exp.finishDate = val),
+
           _buildCheckboxRow("Relevant", exp.relevantExperience, (val) => exp.relevantExperience = val),
         ],
       ),
@@ -169,6 +213,60 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
       ),
     );
   }
+
+  Widget _buildDateRow(String label, String value, Function(String) onChanged) {
+    final controller = TextEditingController(text: value);
+
+    return GestureDetector(
+      onTap: isEditing
+          ? () async {
+        DateTime initial;
+        try {
+          if (controller.text.isNotEmpty) {
+            final parts = controller.text.split('/');
+            initial = DateTime(
+              int.parse(parts[2]),
+              int.parse(parts[1]),
+              int.parse(parts[0]),
+            );
+          } else {
+            initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+          }
+        } catch (_) {
+          initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+        }
+
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: initial,
+          firstDate: DateTime(1950),
+          lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+        );
+
+        if (picked != null) {
+          final formatted = DateFormat("dd/MM/yyyy").format(picked);
+          setState(() {
+            controller.text = formatted;
+            onChanged(formatted);
+          });
+        }
+      }
+          : null,
+      child: AbsorbPointer(
+        absorbing: true,
+        child: TextFormField(
+          controller: controller,
+          enabled: isEditing,
+          decoration: InputDecoration(
+            labelText: label.toUpperCase(),
+            border: const OutlineInputBorder(),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          ),
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildCheckboxRow(String label, bool value, Function(bool) onChanged) {
     return Row(

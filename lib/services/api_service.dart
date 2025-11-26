@@ -695,6 +695,31 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> updateClientBasicDetail({
+    required String firstName,
+    required String lastName,
+    required String dob,
+    required String gender,
+    required String maritalStatus,
+  }) async {
+    const endpoint = ApiConfig.updateClientBasicDetail;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "first_name": firstName,
+        "last_name": lastName,
+        "date_of_birth": dob,
+        "gender": gender,
+        "marital_status": maritalStatus,
+      },
+      "POST",
+    );
+    print("UPDATE RESPONSE: $response");
+    return response;
+  }
+
 
 
   // Generic methods for backward compatibility

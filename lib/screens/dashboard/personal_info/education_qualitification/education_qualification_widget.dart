@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../models/personal_information/qualification.dart';
 
 class EducationalQualificationsWidget extends StatefulWidget {
@@ -17,6 +18,39 @@ class EducationalQualificationsWidget extends StatefulWidget {
 class _EducationalQualificationsWidgetState
     extends State<EducationalQualificationsWidget> {
   bool isEditing = false;
+
+  Future<void> _pickDate(Function(String) onChanged, String currentValue) async {
+    DateTime initial;
+
+    try {
+      if (currentValue.isNotEmpty) {
+        final parts = currentValue.split('/');
+        initial = DateTime(
+          int.parse(parts[2]),
+          int.parse(parts[1]),
+          int.parse(parts[0]),
+        );
+      } else {
+        initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+      }
+    } catch (_) {
+      initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+    }
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+    );
+
+    if (picked != null) {
+      final formatted = DateFormat("dd/MM/yyyy").format(picked);
+      setState(() {
+        onChanged(formatted);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,26 +177,39 @@ class _EducationalQualificationsWidgetState
         children: [
           _buildEditableRow("Level", qual.level, (val) => qual.level = val),
           _buildEditableRow("Name", qual.name, (val) => qual.name = val),
-          _buildEditableRow(
-              "Institution", qual.collegeName, (val) => qual.collegeName = val),
+          _buildEditableRow("Institution", qual.collegeName,
+                  (val) => qual.collegeName = val),
           _buildEditableRow("Campus", qual.campus, (val) => qual.campus = val),
           _buildEditableRow("Country", qual.country, (val) => qual.country = val),
           _buildEditableRow("State", qual.state ?? "", (val) => qual.state = val),
-          _buildEditableRow("Start Date", qual.startDate, (val) => qual.startDate = val),
-          _buildEditableRow("Finish Date", qual.finishDate, (val) => qual.finishDate = val),
-          _buildCheckboxRow(
-              "Relevant", qual.relevantQualification, (val) => qual.relevantQualification = val),
-          _buildCheckboxRow(
-              "Specialist Education", qual.specialistEducation, (val) => qual.specialistEducation = val),
-          _buildCheckboxRow(
-              "STEM Qualification", qual.stemQualification, (val) => qual.stemQualification = val),
-          _buildCheckboxRow(
-              "Regional Study", qual.regionalStudy, (val) => qual.regionalStudy = val),
+
+          /// ----------------------------
+          /// DATE PICKER ADDED BELOW
+          /// ----------------------------
+          _buildDateRow("Start Date", qual.startDate,
+                  (val) => qual.startDate = val),
+
+          SizedBox(
+            height: 12,
+          ),
+          
+          _buildDateRow("Finish Date", qual.finishDate,
+                  (val) => qual.finishDate = val),
+
+          _buildCheckboxRow("Relevant", qual.relevantQualification,
+                  (val) => qual.relevantQualification = val),
+          _buildCheckboxRow("Specialist Education", qual.specialistEducation,
+                  (val) => qual.specialistEducation = val),
+          _buildCheckboxRow("STEM Qualification", qual.stemQualification,
+                  (val) => qual.stemQualification = val),
+          _buildCheckboxRow("Regional Study", qual.regionalStudy,
+                  (val) => qual.regionalStudy = val),
         ],
       ),
     );
   }
 
+  // NORMAL TEXT FIELD (unchanged)
   Widget _buildEditableRow(
       String label, String value, Function(String) onChanged) {
     return Padding(
@@ -190,6 +237,61 @@ class _EducationalQualificationsWidgetState
       ),
     );
   }
+
+  // DATE PICKER FIELD (NEW)
+  Widget _buildDateRow(String label, String value, Function(String) onChanged) {
+    final controller = TextEditingController(text: value);
+
+    return GestureDetector(
+      onTap: isEditing
+          ? () async {
+        DateTime initial;
+        try {
+          if (controller.text.isNotEmpty) {
+            final parts = controller.text.split('/');
+            initial = DateTime(
+              int.parse(parts[2]),
+              int.parse(parts[1]),
+              int.parse(parts[0]),
+            );
+          } else {
+            initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+          }
+        } catch (_) {
+          initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+        }
+
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: initial,
+          firstDate: DateTime(1950),
+          lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+        );
+
+        if (picked != null) {
+          final formatted = DateFormat("dd/MM/yyyy").format(picked);
+          setState(() {
+            controller.text = formatted;  // Update the controller
+            onChanged(formatted);         // Update the model
+          });
+        }
+      }
+          : null,
+      child: AbsorbPointer(
+        absorbing: true,
+        child: TextFormField(
+          controller: controller, // use controller instead of initialValue
+          enabled: isEditing,
+          decoration: InputDecoration(
+            labelText: label.toUpperCase(),
+            border: const OutlineInputBorder(),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          ),
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildCheckboxRow(String label, bool value, Function(bool) onChanged) {
     return Row(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../models/personal_information/passport.dart';
 import '../../../../models/personal_information/visa.dart';
@@ -21,6 +22,34 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
   bool isPassportEditing = false;
   bool isVisaEditing = false;
 
+  // --------------------- DATE PICKER ----------------------
+  Future<String?> _pickDate(String current) async {
+    DateTime initial;
+
+    try {
+      final parts = current.split('/');
+      initial = DateTime(
+        int.parse(parts[2]),
+        int.parse(parts[1]),
+        int.parse(parts[0]),
+      );
+    } catch (_) {
+      initial = DateTime.now();
+    }
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(1950),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      return DateFormat("dd/MM/yyyy").format(picked);
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -39,8 +68,14 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
               (p) => _buildInfoCard([
             _buildEditableRow("Passport Number", p.passportNumber, isPassportEditing),
             _buildEditableRow("Country", p.country, isPassportEditing),
-            _buildEditableRow("Issued Date", p.issueDate, isPassportEditing),
-            _buildEditableRow("Expiry Date", p.expiryDate, isPassportEditing),
+
+            // ------- DATE PICKER FIELDS -------
+            _buildDateRow("Issued Date", p.issueDate, isPassportEditing, (newVal) {
+              setState(() => p.issueDate = newVal!);
+            }),
+            _buildDateRow("Expiry Date", p.expiryDate, isPassportEditing, (newVal) {
+              setState(() => p.expiryDate = newVal!);
+            }),
           ]),
         ),
 
@@ -60,14 +95,21 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
             _buildEditableRow("Visa Country", v.visaCountry, isVisaEditing),
             _buildEditableRow("Visa Type", v.visaType, isVisaEditing),
             _buildEditableRow("Description", v.visaDescription, isVisaEditing),
-            _buildEditableRow("Grant Date", v.visaGrantDate, isVisaEditing),
-            _buildEditableRow("Expiry Date", v.visaExpiryDate, isVisaEditing),
+
+            // ------- DATE PICKER FIELDS -------
+            _buildDateRow("Grant Date", v.visaGrantDate, isVisaEditing, (newVal) {
+              setState(() => v.visaGrantDate = newVal!);
+            }),
+            _buildDateRow("Expiry Date", v.visaExpiryDate, isVisaEditing, (newVal) {
+              setState(() => v.visaExpiryDate = newVal!);
+            }),
           ]),
         ),
       ],
     );
   }
 
+  // --------------------- SECTION TITLE ----------------------
   Widget _buildSectionTitle(
       String title, {
         required bool showEdit,
@@ -120,6 +162,7 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
+  // --------------------- CARD WRAPPER ----------------------
   Widget _buildInfoCard(List<Widget> children) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -135,6 +178,7 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
+  // --------------------- NORMAL TEXT FIELD ----------------------
   Widget _buildEditableRow(String label, String? value, bool editable) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -152,6 +196,52 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,
             vertical: 10,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --------------------- DATE PICKER ROW ----------------------
+  Widget _buildDateRow(
+      String label,
+      String? value,
+      bool editable,
+      ValueChanged<String?> onChanged,
+      ) {
+    final controller = TextEditingController(text: value ?? "");
+
+    return GestureDetector(
+      onTap: editable
+          ? () async {
+        final newDate = await _pickDate(controller.text);
+        if (newDate != null) {
+          controller.text = newDate;
+          onChanged(newDate);
+        }
+      }
+          : null,
+      child: AbsorbPointer(
+        absorbing: true,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: TextFormField(
+            controller: controller,
+            enabled: editable,
+            readOnly: true,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: InputDecoration(
+              labelText: label.toUpperCase(),
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+            ),
           ),
         ),
       ),
