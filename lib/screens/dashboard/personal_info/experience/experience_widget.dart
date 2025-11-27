@@ -21,13 +21,6 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
   bool isEditing = false;
 
   final List<String> jobTypes = ["Full-time", "Part-time", "Contract"];
-  final List<String> countries = [
-    "India",
-    "Nepal",
-    "Australia",
-    "USA",
-    "Canada",
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -49,14 +42,11 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
     );
   }
 
-  // ---------------------------
-  // SECTION TITLE
-  // ---------------------------
   Widget _buildSectionTitle(
-    String title, {
-    bool showEdit = false,
-    bool showAdd = false,
-  }) {
+      String title, {
+        bool showEdit = false,
+        bool showAdd = false,
+      }) {
     return Row(
       children: [
         const Icon(Icons.work, color: Colors.white),
@@ -123,9 +113,6 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
     );
   }
 
-  // ---------------------------
-  // EXPERIENCE CARD
-  // ---------------------------
   Widget _buildExperienceCard(Experience exp) {
     return Container(
       width: double.infinity,
@@ -137,48 +124,47 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Remove Icon
           Align(
             alignment: Alignment.topRight,
             child: InkWell(
               onTap:
-                  isEditing
-                      ? () => setState(() => widget.experiences.remove(exp))
-                      : null,
+              isEditing
+                  ? () => setState(() => widget.experiences.remove(exp))
+                  : null,
               child:
-                  isEditing
-                      ? const Icon(Icons.remove_circle, color: Colors.red)
-                      : const SizedBox(),
+              isEditing
+                  ? const Icon(Icons.remove_circle, color: Colors.red)
+                  : const SizedBox(),
             ),
           ),
 
           _buildEditableRow(
             "Job Title",
             exp.jobTitle,
-            (val) => exp.jobTitle = val,
+                (val) => exp.jobTitle = val,
           ),
           _buildEditableRow(
             "ANZSCO Code",
             exp.jobCode,
-            (val) => exp.jobCode = val,
+                (val) => exp.jobCode = val,
           ),
           _buildEditableRow(
             "Employer Name",
             exp.employerName,
-            (val) => exp.employerName = val,
+                (val) => exp.employerName = val,
           ),
 
           _buildDropdownRow(
             label: "Country",
             value: exp.country,
-            items: countries,
+            items: widget.countries.map((c) => c.name).toList(),
             onChanged: (v) => setState(() => exp.country = v ?? exp.country),
           ),
 
           _buildEditableRow(
             "Address",
             exp.state ?? "",
-            (val) => exp.state = val,
+                (val) => exp.state = val,
           ),
 
           _buildDropdownRow(
@@ -191,15 +177,15 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
           _buildDateRow(
             "Start Date",
             exp.startDate,
-            (val) => exp.startDate = val,
+                (val) => exp.startDate = val,
           ),
 
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
 
           _buildDateRow(
             "Finish Date",
             exp.finishDate,
-            (val) => exp.finishDate = val,
+                (val) => exp.finishDate = val,
           ),
 
           Row(
@@ -211,11 +197,11 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
               Checkbox(
                 value: exp.relevantExperience,
                 onChanged:
-                    isEditing
-                        ? (val) => setState(
-                          () => exp.relevantExperience = val ?? false,
-                        )
-                        : null,
+                isEditing
+                    ? (val) => setState(
+                      () => exp.relevantExperience = val ?? false,
+                )
+                    : null,
               ),
             ],
           ),
@@ -224,14 +210,11 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
     );
   }
 
-  // ---------------------------
-  // TEXT FIELD ROW
-  // ---------------------------
   Widget _buildEditableRow(
-    String label,
-    String value,
-    Function(String) onChanged,
-  ) {
+      String label,
+      String value,
+      Function(String) onChanged,
+      ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
@@ -252,9 +235,6 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
     );
   }
 
-  // ---------------------------
-  // DROPDOWN ROW
-  // ---------------------------
   Widget _buildDropdownRow({
     required String label,
     required String value,
@@ -273,24 +253,36 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
           ),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
         ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            isDense: true,
-            value: value,
-            items:
-                items
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-            onChanged: isEditing ? onChanged : null,
-          ),
+        child: Row(
+          children: [
+            Expanded(
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  isDense: true,
+                  isExpanded: true,
+
+                  value: value,
+                  items: items
+                      .map(
+                        (e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(
+                        e,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                      .toList(),
+                  onChanged: isEditing ? onChanged : null,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  // ---------------------------
-  // DATE PICKER ROW
-  // ---------------------------
   Widget _buildDateRow(String label, String value, Function(String) onChanged) {
     TextEditingController controller = TextEditingController(text: value);
 
@@ -301,25 +293,25 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
         enabled: isEditing,
         readOnly: true,
         onTap:
-            isEditing
-                ? () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate:
-                        value.isNotEmpty
-                            ? DateTime.tryParse(value) ?? DateTime.now()
-                            : DateTime.now(),
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime(2100),
-                  );
-                  if (pickedDate != null) {
-                    String formattedDate =
-                        "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-                    controller.text = formattedDate;
-                    onChanged(formattedDate);
-                  }
-                }
-                : null,
+        isEditing
+            ? () async {
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate:
+            value.isNotEmpty
+                ? DateTime.tryParse(value) ?? DateTime.now()
+                : DateTime.now(),
+            firstDate: DateTime(1900),
+            lastDate: DateTime(2100),
+          );
+          if (pickedDate != null) {
+            String formattedDate =
+                "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+            controller.text = formattedDate;
+            onChanged(formattedDate);
+          }
+        }
+            : null,
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
@@ -329,7 +321,7 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
           ),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
           suffixIcon:
-              isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
+          isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
         ),
         style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
       ),

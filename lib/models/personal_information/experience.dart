@@ -1,14 +1,14 @@
 class Experience {
   final int id;
-  late final String jobTitle;
-  late final String jobCode;
-  late final String country;
-  late final String startDate;
-  late final String finishDate;
-  late final bool relevantExperience;
-  late final String employerName;
-  late final String? state;
-  late final String jobType;
+  String jobTitle;
+  String jobCode;
+  String country;
+  String startDate;
+  String finishDate;
+  bool relevantExperience;
+  String employerName;
+  String? state;
+  String jobType;
   final double fteMultiplier;
 
   Experience({

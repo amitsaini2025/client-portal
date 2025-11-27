@@ -1,17 +1,17 @@
 class Qualification {
   final int id;
-  late final String level;
-  late final String name;
-  late final String collegeName;
-  late final String campus;
-  late final String country;
-  late final String? state;
-  late final String startDate;
-  late final String finishDate;
-  late final bool relevantQualification;
-  late final bool specialistEducation;
-  late final bool stemQualification;
-  late final bool regionalStudy;
+  String level;
+  String name;
+  String collegeName;
+  String campus;
+  String country;
+  String? state;
+  String startDate;
+  String finishDate;
+  bool relevantQualification;
+  bool specialistEducation;
+  bool stemQualification;
+  bool regionalStudy;
 
   Qualification({
     required this.id,
