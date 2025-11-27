@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
 import '../../../../models/personal_information/experience.dart';
 
 class WorkExperienceWidget extends StatefulWidget {
   final List<Experience> experiences;
+  final List<Country> countries;
 
-  const WorkExperienceWidget({super.key, required this.experiences});
+  const WorkExperienceWidget({
+    super.key,
+    required this.experiences,
+    required this.countries,
+  });
 
   @override
   State<WorkExperienceWidget> createState() => _WorkExperienceWidgetState();
@@ -14,7 +21,10 @@ class WorkExperienceWidget extends StatefulWidget {
 class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   bool isEditing = false;
 
-  Future<void> _pickDate(Function(String) onChanged, String currentValue) async {
+  Future<void> _pickDate(
+      Function(String) onChanged,
+      String currentValue,
+      ) async {
     DateTime initial;
 
     try {
@@ -80,12 +90,11 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
             },
           ),
           const SizedBox(height: 18),
-          ...widget.experiences.map((exp) => Column(
-            children: [
-              _buildWorkCard(exp),
-              const SizedBox(height: 18),
-            ],
-          )),
+          ...widget.experiences.map(
+                (exp) => Column(
+              children: [_buildWorkCard(exp), const SizedBox(height: 18)],
+            ),
+          ),
         ],
       ),
     );
@@ -164,31 +173,99 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildEditableRow("Job Title", exp.jobTitle, (val) => exp.jobTitle = val),
-          _buildEditableRow("ANZSCO Code", exp.jobCode, (val) => exp.jobCode = val),
-          _buildEditableRow("Employer Name", exp.employerName, (val) => exp.employerName = val),
-          _buildEditableRow("Country", exp.country, (val) => exp.country = val),
+          _buildEditableRow(
+            "Job Title",
+            exp.jobTitle,
+                (val) => exp.jobTitle = val,
+          ),
+          _buildEditableRow(
+            "ANZSCO Code",
+            exp.jobCode,
+                (val) => exp.jobCode = val,
+          ),
+          _buildEditableRow(
+            "Employer Name",
+            exp.employerName,
+                (val) => exp.employerName = val,
+          ),
+
+          // ----------------------------
+          // COUNTRY DROPDOWN
+          // ----------------------------
+          _buildCountryDropdown(exp),
+
           _buildEditableRow("State", exp.state ?? "", (val) => exp.state = val),
-          _buildEditableRow("Job Type", exp.jobType, (val) => exp.jobType = val),
+          _buildEditableRow(
+            "Job Type",
+            exp.jobType,
+                (val) => exp.jobType = val,
+          ),
 
           /// -----------------------------
           /// DATE PICKER FOR START & FINISH
           /// -----------------------------
-          _buildDateRow("Start Date", exp.startDate, (val) => exp.startDate = val),
-
-          SizedBox(
-            height: 12,
+          _buildDateRow(
+            "Start Date",
+            exp.startDate,
+                (val) => exp.startDate = val,
           ),
-          
-          _buildDateRow("Finish Date", exp.finishDate, (val) => exp.finishDate = val),
 
-          _buildCheckboxRow("Relevant", exp.relevantExperience, (val) => exp.relevantExperience = val),
+          const SizedBox(height: 12),
+
+          _buildDateRow(
+            "Finish Date",
+            exp.finishDate,
+                (val) => exp.finishDate = val,
+          ),
+
+          _buildCheckboxRow(
+            "Relevant",
+            exp.relevantExperience,
+                (val) => exp.relevantExperience = val,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildEditableRow(String label, String value, Function(String) onChanged) {
+  // COUNTRY DROPDOWN
+  Widget _buildCountryDropdown(Experience exp) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: InputDecorator(
+        decoration: const InputDecoration(
+          labelText: "COUNTRY",
+          border: OutlineInputBorder(),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            value: exp.country.isEmpty ? null : exp.country,
+            items: widget.countries.map((country) {
+              return DropdownMenuItem<String>(
+                value: country.name,
+                child: Text(country.name),
+              );
+            }).toList(),
+            onChanged: isEditing
+                ? (val) {
+              setState(() {
+                exp.country = val ?? "";
+              });
+            }
+                : null,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditableRow(
+      String label,
+      String value,
+      Function(String) onChanged,
+      ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -208,7 +285,10 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
             letterSpacing: 0.2,
           ),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
         ),
       ),
     );
@@ -230,10 +310,12 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
               int.parse(parts[0]),
             );
           } else {
-            initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+            initial =
+                DateTime.now().subtract(const Duration(days: 365 * 5));
           }
         } catch (_) {
-          initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+          initial =
+              DateTime.now().subtract(const Duration(days: 365 * 5));
         }
 
         final picked = await showDatePicker(
@@ -260,18 +342,23 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
           decoration: InputDecoration(
             labelText: label.toUpperCase(),
             border: const OutlineInputBorder(),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           ),
         ),
       ),
     );
   }
 
-
   Widget _buildCheckboxRow(String label, bool value, Function(bool) onChanged) {
     return Row(
       children: [
-        Expanded(child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600))),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
         Checkbox(
           value: value,
           onChanged: isEditing ? (val) => onChanged(val ?? false) : null,

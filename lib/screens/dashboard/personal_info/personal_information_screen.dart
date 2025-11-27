@@ -1,3 +1,4 @@
+import 'package:client/models/personal_information/basic_information_post/country/country_model.dart';
 import 'package:flutter/material.dart';
 import 'package:client/config/theme_config.dart';
 import 'package:client/services/api_service.dart';
@@ -23,6 +24,7 @@ class PersonalInformationScreen extends StatefulWidget {
 class _PersonalInformationScreenState
     extends State<PersonalInformationScreen> {
   ClientPersonalDetail? personalDetail;
+  List<Country> countries = [];
   bool isLoading = true;
   String? errorMessage;
 
@@ -30,8 +32,10 @@ class _PersonalInformationScreenState
   void initState() {
     super.initState();
     _loadPersonalDetails();
+    _loadCountries();
   }
 
+  /// Load personal details
   Future<void> _loadPersonalDetails() async {
     try {
       final response = await ApiService.getClientPersonalDetail(tab: "all");
@@ -51,6 +55,21 @@ class _PersonalInformationScreenState
     } catch (e) {
       setState(() {
         errorMessage = e.toString();
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadCountries() async {
+    final response = await ApiService.getCountries();
+    if (response["success"] == true) {
+      final parsed = CountryResponse.fromJson(response);
+      setState(() {
+        countries = parsed.data;
+      });
+    } else {
+      setState(() {
+        errorMessage = response["message"] ?? "Something went wrong";
         isLoading = false;
       });
     }
@@ -80,6 +99,7 @@ class _PersonalInformationScreenState
           : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             BasicPersonalInformationWidget(
               basicInfo: personalDetail!.basicInformation,
@@ -90,19 +110,23 @@ class _PersonalInformationScreenState
             TravelDocumentsWidget(
               passports: personalDetail!.passports,
               visas: personalDetail!.visas,
+              countries: countries,
             ),
             const SizedBox(height: 20),
             AddressAndTravelInformationWidget(
               addresses: personalDetail!.addresses,
               travels: personalDetail!.travels,
+              countries: countries,
             ),
             const SizedBox(height: 20),
             EducationalQualificationsWidget(
               qualifications: personalDetail!.qualifications,
+              countries: countries,
             ),
             const SizedBox(height: 20),
             WorkExperienceWidget(
               experiences: personalDetail!.experiences,
+              countries: countries,
             ),
             const SizedBox(height: 20),
             OccupationSkillsWidget(
@@ -111,6 +135,7 @@ class _PersonalInformationScreenState
             const SizedBox(height: 20),
             ExperienceWidget(
               experiences: personalDetail!.experiences,
+              countries: countries,
             ),
             const SizedBox(height: 20),
           ],

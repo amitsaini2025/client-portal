@@ -1,10 +1,10 @@
 class Visa {
-  final int id;
-  final String visaCountry;
-  final String visaType;
-  final String visaDescription;
-  late final String visaExpiryDate;
-  late final String visaGrantDate;
+  int id;
+  String visaCountry;
+  String visaType;
+  String visaDescription;
+  String visaExpiryDate;
+  String visaGrantDate;
 
   Visa({
     required this.id,

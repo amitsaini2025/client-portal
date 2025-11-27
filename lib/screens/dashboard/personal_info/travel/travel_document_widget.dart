@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
 import '../../../../models/personal_information/passport.dart';
 import '../../../../models/personal_information/visa.dart';
 
 class TravelDocumentsWidget extends StatefulWidget {
   final List<Passport> passports;
   final List<Visa> visas;
+  final List<Country> countries;
 
   const TravelDocumentsWidget({
     super.key,
     required this.passports,
     required this.visas,
+    required this.countries,
   });
 
   @override
@@ -67,9 +70,17 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         ...widget.passports.map(
               (p) => _buildInfoCard([
             _buildEditableRow("Passport Number", p.passportNumber, isPassportEditing),
-            _buildEditableRow("Country", p.country, isPassportEditing),
 
-            // ------- DATE PICKER FIELDS -------
+            // COUNTRY DROPDOWN
+            _buildCountryDropdown(
+              label: "Country",
+              selected: p.country!.isEmpty ? null : p.country,
+              editable: isPassportEditing,
+              onChanged: (value) {
+                setState(() => p.country = value ?? "");
+              },
+            ),
+
             _buildDateRow("Issued Date", p.issueDate, isPassportEditing, (newVal) {
               setState(() => p.issueDate = newVal!);
             }),
@@ -92,11 +103,19 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
 
         ...widget.visas.map(
               (v) => _buildInfoCard([
-            _buildEditableRow("Visa Country", v.visaCountry, isVisaEditing),
+            // 🔥 REPLACED TEXT FIELD WITH COUNTRY DROPDOWN
+            _buildCountryDropdown(
+              label: "Visa Country",
+              selected: v.visaCountry.isEmpty ? null : v.visaCountry,
+              editable: isVisaEditing,
+              onChanged: (value) {
+                setState(() => v.visaCountry = value ?? "");
+              },
+            ),
+
             _buildEditableRow("Visa Type", v.visaType, isVisaEditing),
             _buildEditableRow("Description", v.visaDescription, isVisaEditing),
 
-            // ------- DATE PICKER FIELDS -------
             _buildDateRow("Grant Date", v.visaGrantDate, isVisaEditing, (newVal) {
               setState(() => v.visaGrantDate = newVal!);
             }),
@@ -202,6 +221,47 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
+  // --------------------- COUNTRY DROPDOWN ----------------------
+  Widget _buildCountryDropdown({
+    required String label,
+    required String? selected,
+    required bool editable,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+        child: editable
+            ? DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: selected,
+            isExpanded: true,
+            onChanged: onChanged,
+            items: widget.countries.map((c) {
+              return DropdownMenuItem(
+                value: c.name,
+                child: Text(c.name),
+              );
+            }).toList(),
+          ),
+        )
+            : Text(
+          selected ?? "",
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.black87,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
   // --------------------- DATE PICKER ROW ----------------------
   Widget _buildDateRow(
       String label,
@@ -227,8 +287,8 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
           padding: const EdgeInsets.only(bottom: 14),
           child: TextFormField(
             controller: controller,
-            enabled: editable,
             readOnly: true,
+            enabled: editable,
             style: const TextStyle(
               fontSize: 14,
               color: Colors.black87,

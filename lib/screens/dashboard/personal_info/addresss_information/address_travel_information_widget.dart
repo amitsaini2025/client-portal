@@ -3,15 +3,18 @@ import 'package:intl/intl.dart';
 
 import '../../../../models/personal_information/address.dart';
 import '../../../../models/personal_information/travel.dart';
+import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
 
 class AddressAndTravelInformationWidget extends StatefulWidget {
   final List<Address> addresses;
   final List<Travel> travels;
+  final List<Country> countries;
 
   const AddressAndTravelInformationWidget({
     super.key,
     required this.addresses,
     required this.travels,
+    required this.countries,
   });
 
   @override
@@ -80,14 +83,32 @@ class _AddressAndTravelInformationWidgetState
               _buildEditableRow("Suburb", address.suburb, isEditingAddress),
               _buildEditableRow("State", address.state, isEditingAddress),
               _buildEditableRow("Postcode", address.postcode.toString(), isEditingAddress),
-              _buildEditableRow("Country", address.country, isEditingAddress),
+
+              /// ---------- COUNTRY DROPDOWN ADDED ----------
+              _buildCountryDropdown(
+                label: "Country",
+                editable: isEditingAddress,
+                selected: address.country,
+                onChanged: (val) {
+                  setState(() => address.country = val ?? "");
+                },
+              ),
+
               _buildEditableRow("Regional Code", address.regionalCode ?? "-", isEditingAddress),
 
               /// ---------- DATE PICKERS ----------
-              _buildDateRow("Start Date", address.startDate ?? "-", isEditingAddress,
-                      (val) => address.startDate = val),
-              _buildDateRow("End Date", address.endDate ?? "-", isEditingAddress,
-                      (val) => address.endDate = val),
+              _buildDateRow(
+                "Start Date",
+                address.startDate ?? "-",
+                isEditingAddress,
+                    (val) => address.startDate = val,
+              ),
+              _buildDateRow(
+                "End Date",
+                address.endDate ?? "-",
+                isEditingAddress,
+                    (val) => address.endDate = val,
+              ),
 
               _buildEditableRow("Is Current", address.isCurrent ? "Yes" : "No", isEditingAddress),
             ]),
@@ -110,13 +131,29 @@ class _AddressAndTravelInformationWidgetState
 
           ...widget.travels.map(
                 (travel) => _buildInfoCard([
-              _buildEditableRow("Country Visited", travel.countryVisited, isEditingTravel),
+              /// ---------- COUNTRY DROPDOWN ADDED ----------
+              _buildCountryDropdown(
+                label: "Country Visited",
+                editable: isEditingTravel,
+                selected: travel.countryVisited,
+                onChanged: (val) {
+                  setState(() => travel.countryVisited = val ?? "");
+                },
+              ),
 
               /// ---------- DATE PICKERS ----------
-              _buildDateRow("Arrival Date", travel.arrivalDate, isEditingTravel,
-                      (val) => travel.arrivalDate = val!),
-              _buildDateRow("Departure Date", travel.departureDate, isEditingTravel,
-                      (val) => travel.departureDate = val!),
+              _buildDateRow(
+                "Arrival Date",
+                travel.arrivalDate,
+                isEditingTravel,
+                    (val) => travel.arrivalDate = val!,
+              ),
+              _buildDateRow(
+                "Departure Date",
+                travel.departureDate,
+                isEditingTravel,
+                    (val) => travel.departureDate = val!,
+              ),
 
               _buildEditableRow("Travel Purpose", travel.purpose, isEditingTravel),
             ]),
@@ -228,6 +265,49 @@ class _AddressAndTravelInformationWidgetState
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,
             vertical: 10,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------
+  // COUNTRY DROPDOWN (NEW)
+  // ---------------------------------------------------------------
+  Widget _buildCountryDropdown({
+    required String label,
+    required String? selected,
+    required bool editable,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+        child: editable
+            ? DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: selected!.isEmpty ? null : selected,
+            isExpanded: true,
+            onChanged: onChanged,
+            items: widget.countries.map((c) {
+              return DropdownMenuItem(
+                value: c.name,
+                child: Text(c.name),
+              );
+            }).toList(),
+          ),
+        )
+            : Text(
+          selected ?? "",
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.black87,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
 import '../../../../models/personal_information/qualification.dart';
 
 class EducationalQualificationsWidget extends StatefulWidget {
   final List<Qualification> qualifications;
+  final List<Country> countries;
 
   const EducationalQualificationsWidget({
     super.key,
     required this.qualifications,
+    required this.countries,
   });
 
   @override
@@ -180,19 +183,22 @@ class _EducationalQualificationsWidgetState
           _buildEditableRow("Institution", qual.collegeName,
                   (val) => qual.collegeName = val),
           _buildEditableRow("Campus", qual.campus, (val) => qual.campus = val),
-          _buildEditableRow("Country", qual.country, (val) => qual.country = val),
+
+          // ----------------------------
+          // COUNTRY DROPDOWN
+          // ----------------------------
+          _buildCountryDropdown(qual),
+
           _buildEditableRow("State", qual.state ?? "", (val) => qual.state = val),
 
-          /// ----------------------------
-          /// DATE PICKER ADDED BELOW
-          /// ----------------------------
+          // ----------------------------
+          // DATE PICKERS
+          // ----------------------------
           _buildDateRow("Start Date", qual.startDate,
                   (val) => qual.startDate = val),
 
-          SizedBox(
-            height: 12,
-          ),
-          
+          const SizedBox(height: 12),
+
           _buildDateRow("Finish Date", qual.finishDate,
                   (val) => qual.finishDate = val),
 
@@ -209,7 +215,40 @@ class _EducationalQualificationsWidgetState
     );
   }
 
-  // NORMAL TEXT FIELD (unchanged)
+  // COUNTRY DROPDOWN
+  Widget _buildCountryDropdown(Qualification qual) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: InputDecorator(
+        decoration: const InputDecoration(
+          labelText: "COUNTRY",
+          border: OutlineInputBorder(),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            value: qual.country.isEmpty ? null : qual.country,
+            items: widget.countries.map((country) {
+              return DropdownMenuItem<String>(
+                value: country.name,
+                child: Text(country.name),
+              );
+            }).toList(),
+            onChanged: isEditing
+                ? (val) {
+              setState(() {
+                qual.country = val ?? "";
+              });
+            }
+                : null,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // NORMAL TEXT FIELD
   Widget _buildEditableRow(
       String label, String value, Function(String) onChanged) {
     return Padding(
@@ -238,7 +277,7 @@ class _EducationalQualificationsWidgetState
     );
   }
 
-  // DATE PICKER FIELD (NEW)
+  // DATE PICKER FIELD
   Widget _buildDateRow(String label, String value, Function(String) onChanged) {
     final controller = TextEditingController(text: value);
 
@@ -271,8 +310,8 @@ class _EducationalQualificationsWidgetState
         if (picked != null) {
           final formatted = DateFormat("dd/MM/yyyy").format(picked);
           setState(() {
-            controller.text = formatted;  // Update the controller
-            onChanged(formatted);         // Update the model
+            controller.text = formatted;
+            onChanged(formatted);
           });
         }
       }
@@ -280,19 +319,20 @@ class _EducationalQualificationsWidgetState
       child: AbsorbPointer(
         absorbing: true,
         child: TextFormField(
-          controller: controller, // use controller instead of initialValue
+          controller: controller,
           enabled: isEditing,
           decoration: InputDecoration(
             labelText: label.toUpperCase(),
             border: const OutlineInputBorder(),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           ),
         ),
       ),
     );
   }
 
-
+  // CHECKBOX ROW
   Widget _buildCheckboxRow(String label, bool value, Function(bool) onChanged) {
     return Row(
       children: [

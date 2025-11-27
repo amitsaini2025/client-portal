@@ -1,9 +1,9 @@
 class Travel {
-  final int id;
-  final String countryVisited;
+  int id;
+  String countryVisited;
   String arrivalDate;
   String departureDate;
-  final String purpose;
+  String purpose;
 
   Travel({
     required this.id,

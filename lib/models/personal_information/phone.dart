@@ -16,11 +16,11 @@ class Phone {
   });
 
   factory Phone.fromJson(Map<String, dynamic> json) => Phone(
-    id: json["id"],
-    phone: json["phone"],
-    type: json["type"],
-    isPrimary: json["is_primary"],
-    countryCode: json["country_code"],
-    extension: json["extension"],
+    id: json["id"] ?? 0,
+    phone: json["phone"] ?? "",
+    type: json["type"] ?? "",
+    isPrimary: json["is_primary"] ?? false,
+    countryCode: json["country_code"] ?? "",
+    extension: json["extension"] ?? "",
   );
 }

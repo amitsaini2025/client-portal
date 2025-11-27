@@ -1,16 +1,16 @@
 class Address {
-  final int id;
-  final String searchAddress;
-  final String? addressLine1;
-  final String? addressLine2;
-  final String suburb;
-  final String state;
-  final int postcode;
-  final String country;
-  final String? regionalCode;
-  late final String? startDate;
-  late final String? endDate;
-  final bool isCurrent;
+  int id;
+  String searchAddress;
+  String? addressLine1;
+  String? addressLine2;
+  String suburb;
+  String state;
+  int postcode;
+  String country;
+  String? regionalCode;
+  String? startDate;
+  String? endDate;
+  bool isCurrent;
 
   Address({
     required this.id,

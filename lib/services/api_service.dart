@@ -695,6 +695,18 @@ class ApiService {
     );
   }
 
+
+  static Future<Map<String, dynamic>> getCountries() async {
+    String endpoint = '${ApiConfig.baseUrl}/countries';
+
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
   static Future<Map<String, dynamic>> updateClientBasicDetail({
     required String firstName,
     required String lastName,

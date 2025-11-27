@@ -1,23 +1,23 @@
 class Passport {
-  final int id;
-  final String passportNumber;
-  final String country;
-  late final String issueDate;
-  late final String expiryDate;
+  int? id;
+  String? passportNumber;
+  String? country;
+  String? issueDate;
+  String? expiryDate;
 
   Passport({
-    required this.id,
-    required this.passportNumber,
-    required this.country,
-    required this.issueDate,
-    required this.expiryDate,
+    this.id,
+    this.passportNumber,
+    this.country,
+    this.issueDate,
+    this.expiryDate,
   });
 
   factory Passport.fromJson(Map<String, dynamic> json) => Passport(
-    id: json["id"],
-    passportNumber: json["passport_number"],
-    country: json["country"],
-    issueDate: json["issue_date"],
+    id: json["id"],                                           // may be null
+    passportNumber: json["passport_number"] ?? "",            // safe default
+    country: json["country"] ?? "",
+    issueDate: json["issue_date"],                            // allow null
     expiryDate: json["expiry_date"],
   );
 }
