@@ -29,8 +29,9 @@ class _BasicPersonalInformationWidgetState
   late TextEditingController firstNameCtrl;
   late TextEditingController lastNameCtrl;
   late TextEditingController dobCtrl;
-  late TextEditingController genderCtrl;
-  late TextEditingController maritalStatusCtrl;
+
+  String genderValue = "";
+  String maritalStatusValue = "";
 
   bool isEditingBasic = false;
   bool isEditingPhones = false;
@@ -38,6 +39,17 @@ class _BasicPersonalInformationWidgetState
   // Phone list & controllers
   final List<TextEditingController> phoneControllers = [];
   final List<Phone> phoneList = [];
+
+  // Dropdown options
+  final List<String> genderOptions = ["Male", "Female", "Other"];
+  final List<String> maritalStatusOptions = [
+    "Single",
+    "Married",
+    "De Facto",
+    "Separated",
+    "Divorced",
+    "Widowed"
+  ];
 
   @override
   void initState() {
@@ -51,9 +63,9 @@ class _BasicPersonalInformationWidgetState
     }
     firstNameCtrl = TextEditingController(text: first);
     lastNameCtrl = TextEditingController(text: last);
-    genderCtrl = TextEditingController(text: basic?.gender ?? "");
-    maritalStatusCtrl = TextEditingController(text: basic?.maritalStatus ?? "");
     dobCtrl = TextEditingController(text: basic?.dateOfBirth ?? "");
+    genderValue = basic?.gender ?? "";
+    maritalStatusValue = basic?.maritalStatus ?? "";
 
     if (widget.phones != null) {
       phoneList.addAll(widget.phones!);
@@ -97,8 +109,8 @@ class _BasicPersonalInformationWidgetState
         firstName: firstNameCtrl.text,
         lastName: lastNameCtrl.text,
         dob: dobCtrl.text,
-        gender: genderCtrl.text,
-        maritalStatus: maritalStatusCtrl.text,
+        gender: genderValue,
+        maritalStatus: maritalStatusValue,
       );
 
       if (res["success"] == true) {
@@ -154,15 +166,6 @@ class _BasicPersonalInformationWidgetState
         SnackBar(content: Text(res["message"] ?? "Phone update failed")),
       );
     }
-
-
-    try {
-
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
-    }
   }
 
   // ======== Add Phone Field ========
@@ -188,8 +191,10 @@ class _BasicPersonalInformationWidgetState
           _buildTextField('First Name', firstNameCtrl, isBasic: true),
           _buildTextField('Last Name', lastNameCtrl, isBasic: true),
           _buildDOBField('Date of Birth', dobCtrl),
-          _buildTextField('Gender', genderCtrl, isBasic: true),
-          _buildTextField('Marital Status', maritalStatusCtrl, isBasic: true),
+          _buildDropdownField('Gender', genderValue, genderOptions,
+                  (value) => setState(() => genderValue = value)),
+          _buildDropdownField('Marital Status', maritalStatusValue, maritalStatusOptions,
+                  (value) => setState(() => maritalStatusValue = value)),
         ]),
 
         const SizedBox(height: 24),
@@ -245,6 +250,37 @@ class _BasicPersonalInformationWidgetState
       ),
     );
   }
+
+  Widget _buildDropdownField(
+      String label,
+      String value,
+      List<String> options,
+      ValueChanged<String> onChangedNonNull,
+      ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: DropdownButtonFormField<String>(
+        value: value.isNotEmpty ? value : null,
+        items: options
+            .map((e) => DropdownMenuItem<String>(
+          value: e,
+          child: Text(e),
+        ))
+            .toList(),
+        onChanged: isEditingBasic
+            ? (val) {
+          if (val != null) onChangedNonNull(val);
+        }
+            : null,
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildDOBField(String label, TextEditingController ctrl) {
     return GestureDetector(
