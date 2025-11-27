@@ -743,6 +743,23 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> updateClientPhoneDetail(
+      List<Map<String, dynamic>> phones) async {
+    const endpoint = ApiConfig.updateClientPhoneDetail;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "phones": phones,
+      },
+      "POST",
+    );
+
+    print("UPDATE PHONE RESPONSE: $response");
+    return response;
+  }
+
 
 
   // Generic methods for backward compatibility
