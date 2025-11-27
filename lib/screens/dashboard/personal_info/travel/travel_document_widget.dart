@@ -1,3 +1,4 @@
+import 'package:client/models/personal_information/basic_information_post/visa_types/visa_type.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -9,12 +10,14 @@ class TravelDocumentsWidget extends StatefulWidget {
   final List<Passport> passports;
   final List<Visa> visas;
   final List<Country> countries;
+  final List<VisaType> visaTypes;
 
   const TravelDocumentsWidget({
     super.key,
     required this.passports,
     required this.visas,
     required this.countries,
+    required this.visaTypes,
   });
 
   @override
@@ -68,8 +71,12 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         const SizedBox(height: 12),
 
         ...widget.passports.map(
-              (p) => _buildInfoCard([
-            _buildEditableRow("Passport Number", p.passportNumber, isPassportEditing),
+          (p) => _buildInfoCard([
+            _buildEditableRow(
+              "Passport Number",
+              p.passportNumber,
+              isPassportEditing,
+            ),
 
             // COUNTRY DROPDOWN
             _buildCountryDropdown(
@@ -81,10 +88,14 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
               },
             ),
 
-            _buildDateRow("Issued Date", p.issueDate, isPassportEditing, (newVal) {
+            _buildDateRow("Issued Date", p.issueDate, isPassportEditing, (
+              newVal,
+            ) {
               setState(() => p.issueDate = newVal!);
             }),
-            _buildDateRow("Expiry Date", p.expiryDate, isPassportEditing, (newVal) {
+            _buildDateRow("Expiry Date", p.expiryDate, isPassportEditing, (
+              newVal,
+            ) {
               setState(() => p.expiryDate = newVal!);
             }),
           ]),
@@ -102,8 +113,8 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         const SizedBox(height: 12),
 
         ...widget.visas.map(
-              (v) => _buildInfoCard([
-            // 🔥 REPLACED TEXT FIELD WITH COUNTRY DROPDOWN
+          (v) => _buildInfoCard([
+            // VISA COUNTRY DROPDOWN
             _buildCountryDropdown(
               label: "Visa Country",
               selected: v.visaCountry.isEmpty ? null : v.visaCountry,
@@ -113,13 +124,25 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
               },
             ),
 
-            _buildEditableRow("Visa Type", v.visaType, isVisaEditing),
+            _buildVisaTypeDropdown(
+              label: "Visa Type",
+              selectedId: int.tryParse(v.visaType),
+              editable: isVisaEditing,
+              onChanged: (id) {
+                setState(() => v.id = id ?? 0);
+              },
+            ),
+
             _buildEditableRow("Description", v.visaDescription, isVisaEditing),
 
-            _buildDateRow("Grant Date", v.visaGrantDate, isVisaEditing, (newVal) {
+            _buildDateRow("Grant Date", v.visaGrantDate, isVisaEditing, (
+              newVal,
+            ) {
               setState(() => v.visaGrantDate = newVal!);
             }),
-            _buildDateRow("Expiry Date", v.visaExpiryDate, isVisaEditing, (newVal) {
+            _buildDateRow("Expiry Date", v.visaExpiryDate, isVisaEditing, (
+              newVal,
+            ) {
               setState(() => v.visaExpiryDate = newVal!);
             }),
           ]),
@@ -130,17 +153,16 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
 
   // --------------------- SECTION TITLE ----------------------
   Widget _buildSectionTitle(
-      String title, {
-        required bool showEdit,
-        required bool showAdd,
-        required bool isEditing,
-        required VoidCallback onEdit,
-      }) {
+    String title, {
+    required bool showEdit,
+    required bool showAdd,
+    required bool isEditing,
+    required VoidCallback onEdit,
+  }) {
     return Row(
       children: [
         const Icon(Icons.file_copy, color: Colors.white),
         const SizedBox(width: 8),
-
         Text(
           title,
           style: const TextStyle(
@@ -149,9 +171,7 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
             color: Colors.white,
           ),
         ),
-
         const Spacer(),
-
         if (showAdd)
           Container(
             padding: const EdgeInsets.all(8),
@@ -162,7 +182,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
             child: const Icon(Icons.add, color: Colors.blue),
           ),
         const SizedBox(width: 8),
-
         InkWell(
           onTap: onEdit,
           child: Container(
@@ -234,24 +253,79 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
+        ),
+        child:
+            editable
+                ? DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: selected,
+                    isExpanded: true,
+                    onChanged: onChanged,
+                    items:
+                        widget.countries
+                            .map(
+                              (c) => DropdownMenuItem(
+                                value: c.name,
+                                child: Text(c.name),
+                              ),
+                            )
+                            .toList(),
+                  ),
+                )
+                : Text(
+                  selected ?? "",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+      ),
+    );
+  }
+
+  // --------------------- VISA TYPE DROPDOWN ----------------------
+  Widget _buildVisaTypeDropdown({
+    required String label,
+    required int? selectedId, // ID from server, e.g., 16
+    required bool editable,
+    required ValueChanged<int?> onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          border: const OutlineInputBorder(),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
         child: editable
             ? DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: selected,
+          child: DropdownButton<int>(
+            value: widget.visaTypes.any((vt) => vt.id == selectedId)
+                ? selectedId
+                : null,
             isExpanded: true,
             onChanged: onChanged,
-            items: widget.countries.map((c) {
-              return DropdownMenuItem(
-                value: c.name,
-                child: Text(c.name),
+            items: widget.visaTypes.map((v) {
+              return DropdownMenuItem<int>(
+                value: v.id,
+                child: Text(v.title),
               );
             }).toList(),
           ),
         )
             : Text(
-          selected ?? "",
+          selectedId != null
+              ? (widget.visaTypes.firstWhere(
+                (vt) => vt.id == selectedId,
+            orElse: () => VisaType(id: 0, title: "", nickName: ''),
+          ).title)
+              : "",
           style: const TextStyle(
             fontSize: 14,
             color: Colors.black87,
@@ -262,25 +336,27 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
+
   // --------------------- DATE PICKER ROW ----------------------
   Widget _buildDateRow(
-      String label,
-      String? value,
-      bool editable,
-      ValueChanged<String?> onChanged,
-      ) {
+    String label,
+    String? value,
+    bool editable,
+    ValueChanged<String?> onChanged,
+  ) {
     final controller = TextEditingController(text: value ?? "");
 
     return GestureDetector(
-      onTap: editable
-          ? () async {
-        final newDate = await _pickDate(controller.text);
-        if (newDate != null) {
-          controller.text = newDate;
-          onChanged(newDate);
-        }
-      }
-          : null,
+      onTap:
+          editable
+              ? () async {
+                final newDate = await _pickDate(controller.text);
+                if (newDate != null) {
+                  controller.text = newDate;
+                  onChanged(newDate);
+                }
+              }
+              : null,
       child: AbsorbPointer(
         absorbing: true,
         child: Padding(

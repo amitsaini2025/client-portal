@@ -707,6 +707,17 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> getVisaTypes() async {
+    String endpoint = "${ApiConfig.baseUrl}/visa-types";
+
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      "GET",
+    );
+  }
+
   static Future<Map<String, dynamic>> updateClientBasicDetail({
     required String firstName,
     required String lastName,

@@ -11,6 +11,7 @@ import 'package:client/screens/dashboard/personal_info/work_experience/work_expe
 import 'package:client/screens/dashboard/personal_info/occupation_skills/occupation_skills_widget.dart';
 import 'package:client/screens/dashboard/personal_info/experience/experience_widget.dart';
 
+import '../../../models/personal_information/basic_information_post/visa_types/visa_type.dart';
 import '../../../models/personal_information/client_personal_detail_response.dart';
 
 class PersonalInformationScreen extends StatefulWidget {
@@ -25,6 +26,8 @@ class _PersonalInformationScreenState
     extends State<PersonalInformationScreen> {
   ClientPersonalDetail? personalDetail;
   List<Country> countries = [];
+  List<VisaType> visaTypes = []; // 🔥 Added for visa types
+
   bool isLoading = true;
   String? errorMessage;
 
@@ -33,6 +36,7 @@ class _PersonalInformationScreenState
     super.initState();
     _loadPersonalDetails();
     _loadCountries();
+    _loadVisaTypes(); // 🔥 Fetch visa types
   }
 
   /// Load personal details
@@ -60,6 +64,7 @@ class _PersonalInformationScreenState
     }
   }
 
+  /// Load countries
   Future<void> _loadCountries() async {
     final response = await ApiService.getCountries();
     if (response["success"] == true) {
@@ -71,6 +76,28 @@ class _PersonalInformationScreenState
       setState(() {
         errorMessage = response["message"] ?? "Something went wrong";
         isLoading = false;
+      });
+    }
+  }
+
+  /// Load visa types
+  Future<void> _loadVisaTypes() async {
+    try {
+      final response = await ApiService.getVisaTypes();
+
+      if (response["success"] == true) {
+        final parsed = VisaTypeResponse.fromJson(response);
+        setState(() {
+          visaTypes = parsed.data;
+        });
+      } else {
+        setState(() {
+          errorMessage = response["message"] ?? "Failed to load visa types";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
       });
     }
   }
@@ -111,6 +138,7 @@ class _PersonalInformationScreenState
               passports: personalDetail!.passports,
               visas: personalDetail!.visas,
               countries: countries,
+              visaTypes: visaTypes,
             ),
             const SizedBox(height: 20),
             AddressAndTravelInformationWidget(
