@@ -133,7 +133,6 @@ class _BasicPersonalInformationWidgetState
         _buildSectionTitle('Phone Numbers', showEdit: true, showAdd: true),
         const SizedBox(height: 12),
 
-        // ---------------- UPDATED PHONE UI ----------------
         _buildInfoCard(
           phones.isEmpty
               ? [_buildStaticField('No Phone Records', '')]
@@ -153,7 +152,6 @@ class _BasicPersonalInformationWidgetState
         _buildSectionTitle('Email Addresses', showEdit: true, showAdd: true),
         const SizedBox(height: 12),
 
-        // ---------------- UPDATED EMAIL UI ----------------
         _buildInfoCard(
           emails.isEmpty
               ? [_buildStaticField('No Email Records', '')]
@@ -169,13 +167,14 @@ class _BasicPersonalInformationWidgetState
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController ctrl) {
+  Widget _buildTextField(String label, TextEditingController ctrl,
+      {bool readOnly = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
         controller: ctrl,
-        enabled: isEditing, // enables grey/active style
-        readOnly: true,     // important for DOB field so tap works properly
+        readOnly: readOnly || !isEditing, // <-- important
+        enabled: !readOnly,                // <-- disable native focus for read-only
         style: const TextStyle(
           fontSize: 14,
           color: Colors.black87,
@@ -195,14 +194,15 @@ class _BasicPersonalInformationWidgetState
 
   Widget _buildDOBField(String label, TextEditingController ctrl) {
     return GestureDetector(
-      behavior: HitTestBehavior.translucent,
       onTap: isEditing ? _pickDOB : null,
-      child: AbsorbPointer(
-        absorbing: true,
-        child: _buildTextField(label, ctrl),
+      child: _buildTextField(
+        label,
+        ctrl,
+        readOnly: true,
       ),
     );
   }
+
 
   Widget _buildStaticField(String label, String value) {
     return Padding(
