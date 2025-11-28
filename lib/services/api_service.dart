@@ -761,6 +761,21 @@ class ApiService {
   }
 
 
+  static Future<Map<String, dynamic>> updateClientEmailDetail(
+      List<Map<String, dynamic>> emails) async {
+    const endpoint = ApiConfig.updateClientEmailDetail;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "emails": emails,
+      },
+      "POST",
+    );
+    return response;
+  }
+
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(

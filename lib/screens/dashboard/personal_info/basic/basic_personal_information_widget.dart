@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -25,7 +27,7 @@ class BasicPersonalInformationWidget extends StatefulWidget {
 
 class _BasicPersonalInformationWidgetState
     extends State<BasicPersonalInformationWidget> {
-  // Basic info controllers
+  // ===== Controllers =====
   late TextEditingController firstNameCtrl;
   late TextEditingController lastNameCtrl;
   late TextEditingController dobCtrl;
@@ -35,12 +37,17 @@ class _BasicPersonalInformationWidgetState
 
   bool isEditingBasic = false;
   bool isEditingPhones = false;
+  bool isEditingEmails = false;
 
-  // Phone list & controllers
+  // ===== Phone list & controllers =====
   final List<TextEditingController> phoneControllers = [];
   final List<Phone> phoneList = [];
 
-  // Dropdown options
+  // ===== Email list & controllers =====
+  final List<TextEditingController> emailControllers = [];
+  final List<Email> emailList = [];
+
+  // ===== Dropdown options =====
   final List<String> genderOptions = ["Male", "Female", "Other"];
   final List<String> maritalStatusOptions = [
     "Single",
@@ -56,8 +63,8 @@ class _BasicPersonalInformationWidgetState
     super.initState();
     final basic = widget.basicInfo;
     String first = "", last = "";
-    if (basic?.fullName != null) {
-      final parts = basic!.fullName!.split(" ");
+    if (basic?.fullName != null && basic!.fullName!.isNotEmpty) {
+      final parts = basic.fullName!.split(" ");
       first = parts.first;
       last = parts.length > 1 ? parts.sublist(1).join(" ") : "";
     }
@@ -67,16 +74,25 @@ class _BasicPersonalInformationWidgetState
     genderValue = basic?.gender ?? "";
     maritalStatusValue = basic?.maritalStatus ?? "";
 
+    // ===== Phones =====
     if (widget.phones != null) {
       phoneList.addAll(widget.phones!);
       for (var p in phoneList) {
         phoneControllers.add(TextEditingController(
-            text: "${p.countryCode ?? ''} ${p.phone ?? ''}"));
+            text: "${p.countryCode ?? ''} ${p.phone ?? ''}".trim()));
+      }
+    }
+
+    // ===== Emails =====
+    if (widget.emails != null) {
+      emailList.addAll(widget.emails!);
+      for (var e in emailList) {
+        emailControllers.add(TextEditingController(text: e.email ?? ""));
       }
     }
   }
 
-  // ======== DOB Picker ========
+  // ===== DOB Picker =====
   Future<void> _pickDOB() async {
     DateTime initial;
     try {
@@ -102,7 +118,7 @@ class _BasicPersonalInformationWidgetState
     }
   }
 
-  // ======== Save Basic Info ========
+  // ===== Save Basic Info =====
   Future<void> _saveBasicInfo() async {
     try {
       final res = await ApiService.updateClientBasicDetail(
@@ -130,7 +146,7 @@ class _BasicPersonalInformationWidgetState
     }
   }
 
-  // ======== Save Phone Numbers ========
+  // ===== Save Phones =====
   Future<void> _savePhones() async {
     List<Map<String, dynamic>> payload = [];
     for (int i = 0; i < phoneList.length; i++) {
@@ -147,7 +163,7 @@ class _BasicPersonalInformationWidgetState
       }
 
       payload.add({
-        "id": phoneList[i].id,
+        "id": phoneList[i].id ?? 0, // ensure id is not null
         "phone": number,
         "type": phoneList[i].type ?? "Other",
         "country_code": countryCode,
@@ -168,7 +184,36 @@ class _BasicPersonalInformationWidgetState
     }
   }
 
-  // ======== Add Phone Field ========
+  // ===== Save Emails =====
+  Future<void> _saveEmails() async {
+    List<Map<String, dynamic>> payload = [];
+    for (int i = 0; i < emailList.length; i++) {
+      final emailText = emailControllers[i].text.trim();
+      if (emailText.isEmpty) continue;
+
+      payload.add({
+        "id": emailList[i].id ?? 0, // ensure id is not null
+        "email": emailText,
+        "type": emailList[i].type ?? "Other",
+      });
+    }
+
+    String jsonPayload = jsonEncode(payload);
+    final res = await ApiService.updateClientEmailDetail(payload);
+
+    if (res["success"] == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Emails Updated Successfully!")),
+      );
+      setState(() => isEditingEmails = false);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res["message"] ?? "Email update failed")),
+      );
+    }
+  }
+
+  // ===== Add Phone =====
   void _addPhoneField() {
     setState(() {
       phoneList.add(
@@ -177,10 +222,16 @@ class _BasicPersonalInformationWidgetState
     });
   }
 
+  // ===== Add Email =====
+  void _addEmailField() {
+    setState(() {
+      emailList.add(Email(id: 0, email: "", type: "Other", isPrimary: false));
+      emailControllers.add(TextEditingController(text: ""));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final emails = widget.emails ?? [];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -215,22 +266,24 @@ class _BasicPersonalInformationWidgetState
         const SizedBox(height: 24),
 
         // ===== EMAILS =====
-        _buildSectionTitle('Email Addresses', showEdit: false, showAdd: false, isBasic: false),
+        _buildSectionTitle('Email Addresses', showEdit: true, showAdd: true, isBasic: false, isEmail: true),
         const SizedBox(height: 12),
         _buildInfoCard(
-          emails.isEmpty
+          emailList.isEmpty
               ? [_buildStaticField('No Email Records', '')]
-              : emails.map((e) {
-            final emailCtrl = TextEditingController(text: e.email ?? "");
-            return _buildTextField(e.type ?? 'Email Address', emailCtrl, isBasic: false);
-          }).toList(),
+              : List.generate(emailList.length, (index) {
+            return _buildTextField(
+                emailList[index].type ?? 'Email Address', emailControllers[index],
+                isBasic: false);
+          }),
         ),
       ],
     );
   }
 
+  // ===== UI Helpers =====
   Widget _buildTextField(String label, TextEditingController ctrl, {required bool isBasic}) {
-    bool editable = isBasic ? isEditingBasic : isEditingPhones;
+    bool editable = isBasic ? isEditingBasic : (isEditingPhones || isEditingEmails);
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
@@ -281,7 +334,6 @@ class _BasicPersonalInformationWidgetState
     );
   }
 
-
   Widget _buildDOBField(String label, TextEditingController ctrl) {
     return GestureDetector(
       onTap: isEditingBasic ? _pickDOB : null,
@@ -297,7 +349,7 @@ class _BasicPersonalInformationWidgetState
   }
 
   Widget _buildSectionTitle(String title,
-      {bool showEdit = false, bool showAdd = false, required bool isBasic}) {
+      {bool showEdit = false, bool showAdd = false, required bool isBasic, bool isEmail = false}) {
     return Row(
       children: [
         Icon(
@@ -322,24 +374,21 @@ class _BasicPersonalInformationWidgetState
           InkWell(
             onTap: () {
               if (isBasic) {
-                if (isEditingBasic) {
-                  _saveBasicInfo();
-                } else {
-                  setState(() => isEditingBasic = true);
-                }
+                if (isEditingBasic) _saveBasicInfo();
+                else setState(() => isEditingBasic = true);
+              } else if (isEmail) {
+                if (isEditingEmails) _saveEmails();
+                else setState(() => isEditingEmails = true);
               } else {
-                if (isEditingPhones) {
-                  _savePhones();
-                } else {
-                  setState(() => isEditingPhones = true);
-                }
+                if (isEditingPhones) _savePhones();
+                else setState(() => isEditingPhones = true);
               }
             },
-            child: _editButton(isBasic: isBasic),
+            child: _editButton(isBasic: isBasic, isEmail: isEmail),
           ),
         if (showAdd && !isBasic)
           InkWell(
-            onTap: _addPhoneField,
+            onTap: isEmail ? _addEmailField : _addPhoneField,
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: _buttonDecoration(),
@@ -350,8 +399,12 @@ class _BasicPersonalInformationWidgetState
     );
   }
 
-  Widget _editButton({required bool isBasic}) {
-    bool editing = isBasic ? isEditingBasic : isEditingPhones;
+  Widget _editButton({required bool isBasic, bool isEmail = false}) {
+    bool editing = isBasic
+        ? isEditingBasic
+        : isEmail
+        ? isEditingEmails
+        : isEditingPhones;
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: _buttonDecoration(),

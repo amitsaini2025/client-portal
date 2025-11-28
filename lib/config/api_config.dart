@@ -43,6 +43,8 @@ class ApiConfig {
   static const String getClientPersonalDetailEndpoint = "/get-client-personal-detail";
   static const String updateClientBasicDetail = "/update-client-basic-detail";
   static const String updateClientPhoneDetail = "/update-client-phone-detail";
+  static const String updateClientEmailDetail = "/update-client-email-detail";
+
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

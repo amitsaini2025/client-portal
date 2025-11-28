@@ -1,14 +1,14 @@
 class Email {
-  final int id;
+  final int? id;
   final String email;
   final String type;
-  final bool isPrimary;
+  final bool? isPrimary;
 
   Email({
-    required this.id,
+    this.id,
     required this.email,
     required this.type,
-    required this.isPrimary,
+    this.isPrimary,
   });
 
   factory Email.fromJson(Map<String, dynamic> json) => Email(
