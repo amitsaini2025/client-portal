@@ -822,6 +822,24 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> updateClientTravelDetail(
+      List<Map<String, dynamic>> travels,
+      ) async {
+    const endpoint = ApiConfig.updateClientTravelDetail;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "travels": travels,
+      },
+      "POST",
+    );
+
+    return response;
+  }
+
+
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(

@@ -92,7 +92,7 @@ class _AddressAndTravelInformationWidgetState
   // ---------------------------------------------------------------
   Future<void> _saveTravels() async {
     try {
-      /*final travelsPayload = widget.travels.map((t) => t.toJson()).toList();
+      final travelsPayload = widget.travels.map((t) => t.toJson()).toList();
       final response = await ApiService.updateClientTravelDetail(travelsPayload);
       if (response['success'] == true || response['status'] == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -105,7 +105,7 @@ class _AddressAndTravelInformationWidgetState
               content: Text(
                   response['message'] ?? 'Failed to update travels')),
         );
-      }*/
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),

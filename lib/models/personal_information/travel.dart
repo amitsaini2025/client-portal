@@ -20,4 +20,14 @@ class Travel {
     departureDate: json["departure_date"],
     purpose: json["purpose"],
   );
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "country_visited": countryVisited,
+      "arrival_date": arrivalDate,
+      "departure_date": departureDate,
+      "purpose": purpose,
+    };
+  }
 }
