@@ -810,6 +810,18 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> updateClientAddressDetail(
+      List<Map<String, dynamic>> addresses) async {
+    final response = await _makeRequest(
+      ApiConfig.updateClientAddressDetail,
+      _buildHeaders(),
+      {"addresses": addresses},
+      "POST",
+    );
+
+    return response;
+  }
+
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
