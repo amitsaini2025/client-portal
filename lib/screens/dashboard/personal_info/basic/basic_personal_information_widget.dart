@@ -151,7 +151,7 @@ class _BasicPersonalInformationWidgetState
     List<Map<String, dynamic>> payload = [];
     for (int i = 0; i < phoneList.length; i++) {
       final text = phoneControllers[i].text.trim();
-      if (text.isEmpty) continue;
+      if (text.isEmpty || phoneList[i].type == "Personal") continue;
 
       String countryCode = "";
       String number = text;
@@ -163,7 +163,7 @@ class _BasicPersonalInformationWidgetState
       }
 
       payload.add({
-        "id": phoneList[i].id ?? 0, // ensure id is not null
+        "id": phoneList[i].id ?? 0,
         "phone": number,
         "type": phoneList[i].type ?? "Other",
         "country_code": countryCode,
@@ -189,16 +189,15 @@ class _BasicPersonalInformationWidgetState
     List<Map<String, dynamic>> payload = [];
     for (int i = 0; i < emailList.length; i++) {
       final emailText = emailControllers[i].text.trim();
-      if (emailText.isEmpty) continue;
+      if (emailText.isEmpty || emailList[i].type == "Personal") continue;
 
       payload.add({
-        "id": emailList[i].id ?? 0, // ensure id is not null
+        "id": emailList[i].id ?? 0,
         "email": emailText,
         "type": emailList[i].type ?? "Other",
       });
     }
 
-    String jsonPayload = jsonEncode(payload);
     final res = await ApiService.updateClientEmailDetail(payload);
 
     if (res["success"] == true) {
@@ -257,9 +256,11 @@ class _BasicPersonalInformationWidgetState
           phoneList.isEmpty
               ? [_buildStaticField('No Phone Records', '')]
               : List.generate(phoneList.length, (index) {
-            return _buildTextField(
-                phoneList[index].type ?? 'Phone Number', phoneControllers[index],
-                isBasic: false);
+            return _buildTextFieldPhone(
+              phoneList[index].type ?? 'Phone Number',
+              phoneControllers[index],
+              type: phoneList[index].type ?? 'Other',
+            );
           }),
         ),
 
@@ -272,9 +273,11 @@ class _BasicPersonalInformationWidgetState
           emailList.isEmpty
               ? [_buildStaticField('No Email Records', '')]
               : List.generate(emailList.length, (index) {
-            return _buildTextField(
-                emailList[index].type ?? 'Email Address', emailControllers[index],
-                isBasic: false);
+            return _buildTextFieldEmail(
+              emailList[index].type ?? 'Email Address',
+              emailControllers[index],
+              type: emailList[index].type ?? 'Other',
+            );
           }),
         ),
       ],
@@ -283,7 +286,51 @@ class _BasicPersonalInformationWidgetState
 
   // ===== UI Helpers =====
   Widget _buildTextField(String label, TextEditingController ctrl, {required bool isBasic}) {
-    bool editable = isBasic ? isEditingBasic : (isEditingPhones || isEditingEmails);
+    bool editable = isBasic ? isEditingBasic : false;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: TextFormField(
+        controller: ctrl,
+        readOnly: !editable,
+        enabled: editable,
+        style: const TextStyle(
+          fontSize: 14,
+          color: Colors.black87,
+          fontWeight: FontWeight.w600,
+        ),
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextFieldPhone(String label, TextEditingController ctrl, {required String type}) {
+    bool editable = type == "Personal" ? false : isEditingPhones;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: TextFormField(
+        controller: ctrl,
+        readOnly: !editable,
+        enabled: editable,
+        style: const TextStyle(
+          fontSize: 14,
+          color: Colors.black87,
+          fontWeight: FontWeight.w600,
+        ),
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextFieldEmail(String label, TextEditingController ctrl, {required String type}) {
+    bool editable = type == "Personal" ? false : isEditingEmails;
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(

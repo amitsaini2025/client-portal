@@ -776,6 +776,40 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> updateClientPassportDetail(
+      List<Map<String, dynamic>> passports,
+      ) async {
+    const endpoint = ApiConfig.updateClientPassportDetail;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "passports": passports,
+      },
+      "POST",
+    );
+
+    return response;
+  }
+
+  static Future<Map<String, dynamic>> updateClientVisaDetail(
+      List<Map<String, dynamic>> visas,
+      ) async {
+    const endpoint = ApiConfig.updateClientVisaDetail;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "visas": visas,
+      },
+      "POST",
+    );
+
+    return response;
+  }
+
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
