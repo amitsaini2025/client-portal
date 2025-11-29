@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
 import '../../../../models/personal_information/passport.dart';
 import '../../../../models/personal_information/visa.dart';
+import '../../../../services/api_service.dart';
 
 class TravelDocumentsWidget extends StatefulWidget {
   final List<Passport> passports;
@@ -56,109 +57,132 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     return null;
   }
 
+  // --------------------- SAVE PASSPORT ----------------------
+  Future<void> _savePassports() async {
+    final payload = widget.passports.map((p) {
+      return {
+        "id": p.id ?? 0,
+        "passport_number": p.passportNumber ?? "",
+        "country": p.country ?? "",
+        "issue_date": p.issueDate ?? "",
+        "expiry_date": p.expiryDate ?? "",
+      };
+    }).toList();
+
+    final res = await ApiService.updateClientPassportDetail(payload);
+    if (res["success"] == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passports updated successfully")),
+      );
+      setState(() => isPassportEditing = false);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res["message"] ?? "Passport update failed")),
+      );
+    }
+  }
+
+  // --------------------- SAVE VISA ----------------------
+  Future<void> _saveVisas() async {
+    final payload = widget.visas.map((v) {
+      return {
+        "id": v.id ?? 0,
+        "visa_country": v.visaCountry ?? "",
+        "visa_type": v.visaType ?? "",
+        "visa_description": v.visaDescription ?? "",
+        "visa_grant_date": v.visaGrantDate ?? "",
+        "visa_expiry_date": v.visaExpiryDate ?? "",
+      };
+    }).toList();
+
+    final res = await ApiService.updateClientVisaDetail(payload);
+    if (res["success"] == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Visas updated successfully")),
+      );
+      setState(() => isVisaEditing = false);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res["message"] ?? "Visa update failed")),
+      );
+    }
+  }
+
+  // --------------------- BUILD ----------------------
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ===== PASSPORT SECTION =====
         _buildSectionTitle(
           "Passport Information",
           showEdit: true,
           showAdd: true,
           isEditing: isPassportEditing,
-          onEdit: () => setState(() => isPassportEditing = !isPassportEditing),
+          onEdit: () {
+            if (isPassportEditing) {
+              _savePassports();
+            } else {
+              setState(() => isPassportEditing = true);
+            }
+          },
+          onAdd: () {
+            setState(() {
+              widget.passports.add(
+                Passport(id: 0, passportNumber: "", country: "", issueDate: "", expiryDate: ""),
+              );
+            });
+          },
         ),
         const SizedBox(height: 12),
-
-        ...widget.passports.map(
-          (p) => _buildInfoCard([
-            _buildEditableRow(
-              "Passport Number",
-              p.passportNumber,
-              isPassportEditing,
-            ),
-
-            // COUNTRY DROPDOWN
-            _buildCountryDropdown(
-              label: "Country",
-              selected: p.country!.isEmpty ? null : p.country,
-              editable: isPassportEditing,
-              onChanged: (value) {
-                setState(() => p.country = value ?? "");
-              },
-            ),
-
-            _buildDateRow("Issued Date", p.issueDate, isPassportEditing, (
-              newVal,
-            ) {
-              setState(() => p.issueDate = newVal!);
-            }),
-            _buildDateRow("Expiry Date", p.expiryDate, isPassportEditing, (
-              newVal,
-            ) {
-              setState(() => p.expiryDate = newVal!);
-            }),
-          ]),
-        ),
+        ...widget.passports.map((p) => _buildPassportCard(p)),
 
         const SizedBox(height: 24),
 
+        // ===== VISA SECTION =====
         _buildSectionTitle(
           "Visa Information",
           showEdit: true,
           showAdd: true,
           isEditing: isVisaEditing,
-          onEdit: () => setState(() => isVisaEditing = !isVisaEditing),
+          onEdit: () {
+            if (isVisaEditing) {
+              _saveVisas();
+            } else {
+              setState(() => isVisaEditing = true);
+            }
+          },
+          onAdd: () {
+            setState(() {
+              widget.visas.add(
+                Visa(
+                  id: 0,
+                  visaCountry: "",
+                  visaType: "",
+                  visaDescription: "",
+                  visaGrantDate: "",
+                  visaExpiryDate: "",
+                ),
+              );
+            });
+          },
         ),
         const SizedBox(height: 12),
-
-        ...widget.visas.map(
-          (v) => _buildInfoCard([
-            // VISA COUNTRY DROPDOWN
-            _buildCountryDropdown(
-              label: "Visa Country",
-              selected: v.visaCountry.isEmpty ? null : v.visaCountry,
-              editable: isVisaEditing,
-              onChanged: (value) {
-                setState(() => v.visaCountry = value ?? "");
-              },
-            ),
-
-            _buildVisaTypeDropdown(
-              label: "Visa Type",
-              selectedId: int.tryParse(v.visaType),
-              editable: isVisaEditing,
-              onChanged: (id) {
-                setState(() => v.id = id ?? 0);
-              },
-            ),
-
-            _buildEditableRow("Description", v.visaDescription, isVisaEditing),
-
-            _buildDateRow("Grant Date", v.visaGrantDate, isVisaEditing, (
-              newVal,
-            ) {
-              setState(() => v.visaGrantDate = newVal!);
-            }),
-            _buildDateRow("Expiry Date", v.visaExpiryDate, isVisaEditing, (
-              newVal,
-            ) {
-              setState(() => v.visaExpiryDate = newVal!);
-            }),
-          ]),
-        ),
+        ...widget.visas.map((v) => _buildVisaCard(v)),
       ],
     );
   }
 
   // --------------------- SECTION TITLE ----------------------
   Widget _buildSectionTitle(
-    String title, {
-    required bool showEdit,
-    required bool showAdd,
-    required bool isEditing,
-    required VoidCallback onEdit,
-  }) {
+      String title, {
+        required bool showEdit,
+        required bool showAdd,
+        required bool isEditing,
+        required VoidCallback onEdit,
+        required VoidCallback onAdd
+      }) {
     return Row(
       children: [
         const Icon(Icons.file_copy, color: Colors.white),
@@ -200,6 +224,42 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
+  // --------------------- PASSPORT CARD ----------------------
+  Widget _buildPassportCard(Passport p) {
+    return _buildInfoCard([
+      _buildEditableRow("Passport Number", p.passportNumber, isPassportEditing, (val) => p.passportNumber = val),
+      _buildCountryDropdown(
+        label: "Country",
+        selected: p.country,
+        editable: isPassportEditing,
+        onChanged: (val) => setState(() => p.country = val ?? ""),
+      ),
+      _buildDateRow("Issued Date", p.issueDate, isPassportEditing, (val) => p.issueDate = val ?? ""),
+      _buildDateRow("Expiry Date", p.expiryDate, isPassportEditing, (val) => p.expiryDate = val ?? ""),
+    ]);
+  }
+
+  // --------------------- VISA CARD ----------------------
+  Widget _buildVisaCard(Visa v) {
+    return _buildInfoCard([
+      _buildCountryDropdown(
+        label: "Visa Country",
+        selected: v.visaCountry,
+        editable: isVisaEditing,
+        onChanged: (val) => setState(() => v.visaCountry = val ?? ""),
+      ),
+      _buildVisaTypeDropdown(
+        label: "Visa Type",
+        selectedId: int.tryParse(v.visaType),
+        editable: isVisaEditing,
+        onChanged: (id) => setState(() => v.visaType = id?.toString() ?? ""),
+      ),
+      _buildEditableRow("Description", v.visaDescription, isVisaEditing, (val) => v.visaDescription = val),
+      _buildDateRow("Grant Date", v.visaGrantDate, isVisaEditing, (val) => v.visaGrantDate = val ?? ""),
+      _buildDateRow("Expiry Date", v.visaExpiryDate, isVisaEditing, (val) => v.visaExpiryDate = val ?? ""),
+    ]);
+  }
+
   // --------------------- CARD WRAPPER ----------------------
   Widget _buildInfoCard(List<Widget> children) {
     return Container(
@@ -209,33 +269,27 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
-      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
     );
   }
 
-  // --------------------- NORMAL TEXT FIELD ----------------------
-  Widget _buildEditableRow(String label, String? value, bool editable) {
+  // --------------------- TEXT FIELD ----------------------
+  Widget _buildEditableRow(String label, String? value, bool editable, ValueChanged<String> onChanged) {
+    final controller = TextEditingController(text: value ?? "");
+    controller.selection = TextSelection.fromPosition(TextPosition(offset: controller.text.length));
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
-        initialValue: value ?? "",
+        controller: controller,
         enabled: editable,
-        style: const TextStyle(
-          fontSize: 14,
-          color: Colors.black87,
-          fontWeight: FontWeight.w600,
-        ),
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
+        onChanged: onChanged,
       ),
     );
   }
@@ -253,37 +307,20 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
-        child:
-            editable
-                ? DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: selected,
-                    isExpanded: true,
-                    onChanged: onChanged,
-                    items:
-                        widget.countries
-                            .map(
-                              (c) => DropdownMenuItem(
-                                value: c.name,
-                                child: Text(c.name),
-                              ),
-                            )
-                            .toList(),
-                  ),
-                )
-                : Text(
-                  selected ?? "",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+        child: editable
+            ? DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: selected?.isEmpty ?? true ? null : selected,
+            isExpanded: true,
+            onChanged: onChanged,
+            items: widget.countries
+                .map((c) => DropdownMenuItem(value: c.name, child: Text(c.name)))
+                .toList(),
+          ),
+        )
+            : Text(selected ?? "", style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
       ),
     );
   }
@@ -291,7 +328,7 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
   // --------------------- VISA TYPE DROPDOWN ----------------------
   Widget _buildVisaTypeDropdown({
     required String label,
-    required int? selectedId, // ID from server, e.g., 16
+    required int? selectedId,
     required bool editable,
     required ValueChanged<int?> onChanged,
   }) {
@@ -306,57 +343,34 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         child: editable
             ? DropdownButtonHideUnderline(
           child: DropdownButton<int>(
-            value: widget.visaTypes.any((vt) => vt.id == selectedId)
-                ? selectedId
-                : null,
+            value: widget.visaTypes.any((v) => v.id == selectedId) ? selectedId : null,
             isExpanded: true,
             onChanged: onChanged,
-            items: widget.visaTypes.map((v) {
-              return DropdownMenuItem<int>(
-                value: v.id,
-                child: Text(v.title),
-              );
-            }).toList(),
+            items: widget.visaTypes
+                .map((v) => DropdownMenuItem<int>(value: v.id, child: Text(v.title)))
+                .toList(),
           ),
         )
             : Text(
           selectedId != null
-              ? (widget.visaTypes.firstWhere(
-                (vt) => vt.id == selectedId,
-            orElse: () => VisaType(id: 0, title: "", nickName: ''),
-          ).title)
+              ? (widget.visaTypes.firstWhere((vt) => vt.id == selectedId, orElse: () => VisaType(id: 0, title: "", nickName: '')).title)
               : "",
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
     );
   }
 
-
-  // --------------------- DATE PICKER ROW ----------------------
-  Widget _buildDateRow(
-    String label,
-    String? value,
-    bool editable,
-    ValueChanged<String?> onChanged,
-  ) {
+  // --------------------- DATE ROW ----------------------
+  Widget _buildDateRow(String label, String? value, bool editable, ValueChanged<String?> onChanged) {
     final controller = TextEditingController(text: value ?? "");
-
     return GestureDetector(
-      onTap:
-          editable
-              ? () async {
-                final newDate = await _pickDate(controller.text);
-                if (newDate != null) {
-                  controller.text = newDate;
-                  onChanged(newDate);
-                }
-              }
-              : null,
+      onTap: editable
+          ? () async {
+        final newDate = await _pickDate(controller.text);
+        if (newDate != null) onChanged(newDate);
+      }
+          : null,
       child: AbsorbPointer(
         absorbing: true,
         child: Padding(
@@ -365,18 +379,11 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
             controller: controller,
             readOnly: true,
             enabled: editable,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
             decoration: InputDecoration(
               labelText: label.toUpperCase(),
               border: const OutlineInputBorder(),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             ),
           ),
         ),

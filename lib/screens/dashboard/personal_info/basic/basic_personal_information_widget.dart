@@ -433,7 +433,7 @@ class _BasicPersonalInformationWidgetState
             },
             child: _editButton(isBasic: isBasic, isEmail: isEmail),
           ),
-        if (showAdd && !isBasic)
+        /*if (showAdd && !isBasic)
           InkWell(
             onTap: isEmail ? _addEmailField : _addPhoneField,
             child: Container(
@@ -441,7 +441,7 @@ class _BasicPersonalInformationWidgetState
               decoration: _buttonDecoration(),
               child: const Icon(Icons.add, color: Colors.blue, size: 20),
             ),
-          ),
+          ),*/
       ],
     );
   }
