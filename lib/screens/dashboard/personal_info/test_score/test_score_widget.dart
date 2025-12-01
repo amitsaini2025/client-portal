@@ -1,3 +1,4 @@
+import 'package:client/services/api_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../models/personal_information/test_score.dart';
@@ -5,7 +6,10 @@ import '../../../../models/personal_information/test_score.dart';
 class TestScoresWidget extends StatefulWidget {
   final List<TestScore> testScores;
 
-  const TestScoresWidget({super.key, required this.testScores});
+  const TestScoresWidget({
+    super.key,
+    required this.testScores,
+  });
 
   @override
   State<TestScoresWidget> createState() => _TestScoresWidgetState();
@@ -13,44 +17,84 @@ class TestScoresWidget extends StatefulWidget {
 
 class _TestScoresWidgetState extends State<TestScoresWidget> {
   bool isEditing = false;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle(
-            "Test Scores",
-            icon: Icons.assignment_rounded,
-            isEditing: isEditing,
-            onEdit: () => setState(() => isEditing = !isEditing),
-            onAdd: () {
-              setState(() {
-                widget.testScores.add(
-                  TestScore(
-                    id: DateTime.now().millisecondsSinceEpoch,
-                    testType: '',
-                  ),
-                );
-              });
-            },
-            showAdd: false,
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionTitle(
+                "Test Scores",
+                icon: Icons.assignment_rounded,
+                isEditing: isEditing,
+                onEdit: () async {
+                  if (isEditing) {
+                    await _updateTestScores();
+                  }
+                  setState(() => isEditing = !isEditing);
+                },
+                onAdd: () {
+                  setState(() {
+                    widget.testScores.add(
+                      TestScore(
+                        id: DateTime.now().millisecondsSinceEpoch,
+                        testType: '',
+                      ),
+                    );
+                  });
+                },
+                showAdd: true,
+              ),
+              const SizedBox(height: 16),
+              ...widget.testScores.map(
+                (score) => Column(
+                  children: [
+                    _buildTestScoreCard(score),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          ...widget.testScores.map(
-            (score) => Column(
-              children: [
-                _buildTestScoreCard(score),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+        /*if (isLoading)
+          Container(
+            color: Colors.black.withOpacity(0.3),
+            child: const Center(child: CircularProgressIndicator()),
+          ),*/
+      ],
     );
   }
 
+  Future<void> _updateTestScores() async {
+    setState(() => isLoading = true);
+
+    final result = await ApiService.updateClientTestScoreDetail(
+      widget.testScores.map((e) => e.toJson()).toList(),
+    );
+
+    if (result['success'] == true) {
+      final updatedScores = result['data']['test_scores'] as List;
+      for (int i = 0; i < updatedScores.length; i++) {
+        widget.testScores[i].id = updatedScores[i]['id'];
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Test scores updated successfully')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? 'Update failed')),
+      );
+    }
+
+    setState(() => isLoading = false);
+  }
+
+  // ---------------- UI Components (same as your existing widget) ----------------
   Widget _buildSectionTitle(
     String title, {
     required bool isEditing,
@@ -113,13 +157,6 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.grey.shade300),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

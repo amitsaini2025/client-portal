@@ -888,6 +888,20 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> updateClientTestScoreDetail(
+      List<Map<String, dynamic>> testScores) async {
+    const endpoint = ApiConfig.updateClientTestScoreDetail;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {"test_scores": testScores},
+      "POST",
+    );
+
+    return response;
+  }
+
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(

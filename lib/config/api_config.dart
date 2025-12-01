@@ -51,6 +51,7 @@ class ApiConfig {
   static const String updateClientQualificationDetail = "/update-client-qualification-detail";
   static const String updateClientExperienceDetail = "/update-client-experience-detail";
   static const String updateClientOccupationDetail = "/update-client-occupation-detail";
+  static const String updateClientTestScoreDetail = "/update-client-testscore-detail";
 
 
   // API settings
