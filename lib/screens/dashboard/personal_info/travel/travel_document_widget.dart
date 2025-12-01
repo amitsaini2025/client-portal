@@ -118,7 +118,7 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         _buildSectionTitle(
           "Passport Information",
           showEdit: true,
-          showAdd: true,
+          showAdd: false,
           isEditing: isPassportEditing,
           onEdit: () {
             if (isPassportEditing) {
@@ -144,7 +144,7 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         _buildSectionTitle(
           "Visa Information",
           showEdit: true,
-          showAdd: true,
+          showAdd: false,
           isEditing: isVisaEditing,
           onEdit: () {
             if (isVisaEditing) {

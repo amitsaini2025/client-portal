@@ -48,6 +48,7 @@ class ApiConfig {
   static const String updateClientVisaDetail = "/update-client-visa-detail";
   static const String updateClientAddressDetail = "/update-client-address-detail";
   static const String updateClientTravelDetail = "/update-client-travel-detail";
+  static const String updateClientQualificationDetail = "/update-client-qualification-detail";
 
 
   // API settings

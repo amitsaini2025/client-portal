@@ -23,7 +23,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             "Occupation & Skills",
             icon: Icons.assessment_rounded,
             isEditing: isEditing,
-            showAdd: true,
+            showAdd: false,
             onEdit: () => setState(() => isEditing = !isEditing),
             onAdd: () {
               setState(() {

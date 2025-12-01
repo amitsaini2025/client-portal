@@ -839,6 +839,24 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> updateClientQualificationDetail(
+      List<Map<String, dynamic>> qualifications,
+      ) async {
+    const endpoint = ApiConfig.updateClientQualificationDetail;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "qualifications": qualifications,
+      },
+      "POST",
+    );
+
+    return response;
+  }
+
+
 
 
   // Generic methods for backward compatibility

@@ -132,7 +132,7 @@ class _AddressAndTravelInformationWidgetState
               }
             },
             onAdd: () {},
-            showAdd: true,
+            showAdd: false,
           ),
           const SizedBox(height: 12),
 
@@ -204,7 +204,7 @@ class _AddressAndTravelInformationWidgetState
               }
             },
             onAdd: () {},
-            showAdd: true,
+            showAdd: false,
           ),
           const SizedBox(height: 12),
 

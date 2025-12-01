@@ -27,7 +27,7 @@ class _ExperienceWidgetState extends State<ExperienceWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Experience', showEdit: true, showAdd: true),
+        _buildSectionTitle('Experience', showEdit: true, showAdd: false),
         const SizedBox(height: 16),
         ...List.generate(widget.experiences.length, (index) {
           return Column(

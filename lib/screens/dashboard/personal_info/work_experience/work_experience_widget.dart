@@ -67,7 +67,7 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
             "Work Experience",
             icon: Icons.work_rounded,
             isEditing: isEditing,
-            showAdd: true,
+            showAdd: false,
             onEdit: () => setState(() => isEditing = !isEditing),
             onAdd: () {
               setState(() {
