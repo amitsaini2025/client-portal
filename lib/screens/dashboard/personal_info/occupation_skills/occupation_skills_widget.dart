@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../models/personal_information/occupation.dart';
+import '../../../../services/api_service.dart';
 
 class OccupationSkillsWidget extends StatefulWidget {
   final List<Occupation> occupations;
@@ -12,47 +13,93 @@ class OccupationSkillsWidget extends StatefulWidget {
 
 class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
   bool isEditing = false;
+  bool isLoading = false;
+
+  Future<void> _saveOccupations() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiService.updateClientOccupationDetail(
+        widget.occupations.map((e) => e.toJson()).toList(),
+      );
+
+      if (response["success"] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Occupation details updated successfully")),
+        );
+        setState(() {
+          isEditing = false;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response["message"] ?? "Update failed")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle(
-            "Occupation & Skills",
-            icon: Icons.assessment_rounded,
-            isEditing: isEditing,
-            showAdd: false,
-            onEdit: () => setState(() => isEditing = !isEditing),
-            onAdd: () {
-              setState(() {
-                widget.occupations.add(
-                  Occupation(
-                    id: DateTime.now().millisecondsSinceEpoch,
-                    skillAssessment: "",
-                    nominatedOccupation: "",
-                    occupationCode: "",
-                    assessingAuthority: "",
-                    visaSubclass: "",
-                    assessmentDate: "",
-                    expiryDate: "",
-                    referenceNo: "",
-                    relevantOccupation: false,
-                  ),
-                );
-              });
-            },
-          ),
-          const SizedBox(height: 18),
-          ...widget.occupations.map((occupation) => Column(
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSkillCard(occupation),
+              _buildSectionTitle(
+                "Occupation & Skills",
+                icon: Icons.assessment_rounded,
+                isEditing: isEditing,
+                showAdd: false,
+                onEdit: () {
+                  if (isEditing) {
+                    _saveOccupations();
+                  } else {
+                    setState(() => isEditing = true);
+                  }
+                },
+                onAdd: () {
+                  setState(() {
+                    widget.occupations.add(
+                      Occupation(
+                        id: DateTime.now().millisecondsSinceEpoch,
+                        skillAssessment: "",
+                        nominatedOccupation: "",
+                        occupationCode: "",
+                        assessingAuthority: "",
+                        visaSubclass: "",
+                        assessmentDate: "",
+                        expiryDate: "",
+                        referenceNo: "",
+                        relevantOccupation: false,
+                      ),
+                    );
+                  });
+                },
+              ),
               const SizedBox(height: 18),
+              ...widget.occupations.map((occupation) => Column(
+                children: [
+                  _buildSkillCard(occupation),
+                  const SizedBox(height: 18),
+                ],
+              )),
             ],
-          )),
-        ],
-      ),
+          ),
+        ),
+        /*if (isLoading)
+          const Center(child: CircularProgressIndicator()),*/
+      ],
     );
   }
 
@@ -217,7 +264,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             lastDate: DateTime(2100),
           );
           if (pickedDate != null) {
-            String formattedDate = "${pickedDate.year}-${pickedDate.month.toString().padLeft(2,'0')}-${pickedDate.day.toString().padLeft(2,'0')}";
+            String formattedDate = "${pickedDate.day.toString().padLeft(2,'0')}/${pickedDate.month.toString().padLeft(2,'0')}/${pickedDate.year}";
             controller.text = formattedDate;
             onChanged(formattedDate);
           }

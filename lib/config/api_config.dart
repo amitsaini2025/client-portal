@@ -50,6 +50,7 @@ class ApiConfig {
   static const String updateClientTravelDetail = "/update-client-travel-detail";
   static const String updateClientQualificationDetail = "/update-client-qualification-detail";
   static const String updateClientExperienceDetail = "/update-client-experience-detail";
+  static const String updateClientOccupationDetail = "/update-client-occupation-detail";
 
 
   // API settings
