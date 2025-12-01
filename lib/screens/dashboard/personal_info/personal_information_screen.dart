@@ -1,4 +1,5 @@
 import 'package:client/models/personal_information/basic_information_post/country/country_model.dart';
+import 'package:client/screens/dashboard/personal_info/test_score/test_score_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:client/config/theme_config.dart';
 import 'package:client/services/api_service.dart';
@@ -161,11 +162,13 @@ class _PersonalInformationScreenState
               occupations: personalDetail!.occupations,
             ),
             const SizedBox(height: 20),
-            ExperienceWidget(
+            TestScoresWidget(testScores: personalDetail!.testScores),
+            const SizedBox(height: 20)
+            /*ExperienceWidget(
               experiences: personalDetail!.experiences,
               countries: countries,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 20),*/
           ],
         ),
       ),
