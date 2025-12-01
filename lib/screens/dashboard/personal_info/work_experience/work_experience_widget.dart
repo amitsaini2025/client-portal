@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
 import '../../../../models/personal_information/experience.dart';
+import '../../../../services/api_service.dart';
 
 class WorkExperienceWidget extends StatefulWidget {
   final List<Experience> experiences;
@@ -20,6 +21,7 @@ class WorkExperienceWidget extends StatefulWidget {
 
 class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   bool isEditing = false;
+  bool isLoading = false;
 
   Future<void> _pickDate(
       Function(String) onChanged,
@@ -57,46 +59,92 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     }
   }
 
+  Future<void> _saveExperiences() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiService.updateClientExperienceDetail(
+        widget.experiences.map((e) => e.toJson()).toList(),
+      );
+
+      // You can handle response here
+      if (response["success"] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Experiences updated successfully")),
+        );
+        setState(() => isEditing = false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response["message"] ?? "Update failed")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle(
-            "Work Experience",
-            icon: Icons.work_rounded,
-            isEditing: isEditing,
-            showAdd: false,
-            onEdit: () => setState(() => isEditing = !isEditing),
-            onAdd: () {
-              setState(() {
-                widget.experiences.add(
-                  Experience(
-                    id: DateTime.now().millisecondsSinceEpoch,
-                    jobTitle: "",
-                    jobCode: "",
-                    country: "",
-                    startDate: "",
-                    finishDate: "",
-                    relevantExperience: false,
-                    employerName: "",
-                    state: "",
-                    jobType: "",
-                    fteMultiplier: 1.0,
-                  ),
-                );
-              });
-            },
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionTitle(
+                "Work Experience",
+                icon: Icons.work_rounded,
+                isEditing: isEditing,
+                showAdd: false,
+                onEdit: () {
+                  if (isEditing) {
+                    _saveExperiences();
+                  } else {
+                    setState(() => isEditing = true);
+                  }
+                },
+                onAdd: () {
+                  setState(() {
+                    widget.experiences.add(
+                      Experience(
+                        id: DateTime.now().millisecondsSinceEpoch,
+                        jobTitle: "",
+                        jobCode: "",
+                        country: "",
+                        startDate: "",
+                        finishDate: "",
+                        relevantExperience: false,
+                        employerName: "",
+                        state: "",
+                        jobType: "",
+                        fteMultiplier: 1.0,
+                      ),
+                    );
+                  });
+                },
+              ),
+              const SizedBox(height: 18),
+              ...widget.experiences.map(
+                    (exp) => Column(
+                  children: [_buildWorkCard(exp), const SizedBox(height: 18)],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 18),
-          ...widget.experiences.map(
-                (exp) => Column(
-              children: [_buildWorkCard(exp), const SizedBox(height: 18)],
-            ),
-          ),
-        ],
-      ),
+        ),
+        /*if (isLoading)
+          const Center(
+            child: CircularProgressIndicator(),
+          ),*/
+      ],
     );
   }
 
@@ -188,36 +236,24 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
             exp.employerName,
                 (val) => exp.employerName = val,
           ),
-
-          // ----------------------------
-          // COUNTRY DROPDOWN
-          // ----------------------------
           _buildCountryDropdown(exp),
-
           _buildEditableRow("State", exp.state ?? "", (val) => exp.state = val),
           _buildEditableRow(
             "Job Type",
             exp.jobType,
                 (val) => exp.jobType = val,
           ),
-
-          /// -----------------------------
-          /// DATE PICKER FOR START & FINISH
-          /// -----------------------------
           _buildDateRow(
             "Start Date",
             exp.startDate,
                 (val) => exp.startDate = val,
           ),
-
           const SizedBox(height: 12),
-
           _buildDateRow(
             "Finish Date",
             exp.finishDate,
                 (val) => exp.finishDate = val,
           ),
-
           _buildCheckboxRow(
             "Relevant",
             exp.relevantExperience,
@@ -228,7 +264,6 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     );
   }
 
-  // COUNTRY DROPDOWN
   Widget _buildCountryDropdown(Experience exp) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),

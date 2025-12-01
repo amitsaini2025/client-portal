@@ -857,6 +857,22 @@ class ApiService {
   }
 
 
+  static Future<Map<String, dynamic>> updateClientExperienceDetail(
+      List<Map<String, dynamic>> experiences,
+      ) async {
+    const endpoint = ApiConfig.updateClientExperienceDetail;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "experiences": experiences,
+      },
+      "POST",
+    );
+
+    return response;
+  }
 
 
   // Generic methods for backward compatibility
