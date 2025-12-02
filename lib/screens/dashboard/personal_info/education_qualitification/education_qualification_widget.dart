@@ -25,8 +25,8 @@ class _EducationalQualificationsWidgetState
   bool isEditing = false;
 
   List<Map<String, dynamic>> convertQualificationsToJson(
-    List<Qualification> list,
-  ) {
+      List<Qualification> list,
+      ) {
     return list.map((q) {
       return {
         "id": q.id,
@@ -47,9 +47,9 @@ class _EducationalQualificationsWidgetState
   }
 
   Future<void> _pickDate(
-    Function(String) onChanged,
-    String currentValue,
-  ) async {
+      Function(String) onChanged,
+      String currentValue,
+      ) async {
     DateTime initial;
 
     try {
@@ -112,7 +112,8 @@ class _EducationalQualificationsWidgetState
             onEdit: () async {
               if (isEditing) {
                 final json = convertQualificationsToJson(widget.qualifications);
-                final response = await ApiService.updateClientQualificationDetail(json);
+                final response =
+                await ApiService.updateClientQualificationDetail(json);
 
                 if (response['success'] == true || response['status'] == 200) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -140,7 +141,7 @@ class _EducationalQualificationsWidgetState
           const SizedBox(height: 18),
 
           ...widget.qualifications.map(
-            (qual) => Column(
+                (qual) => Column(
               children: [
                 _buildQualificationCard(qual),
                 const SizedBox(height: 18),
@@ -153,13 +154,13 @@ class _EducationalQualificationsWidgetState
   }
 
   Widget _buildSectionTitle(
-    String title, {
-    required bool showEdit,
-    required bool showAdd,
-    required bool isEditing,
-    required VoidCallback onEdit,
-    VoidCallback? onAdd,
-  }) {
+      String title, {
+        required bool showEdit,
+        required bool showAdd,
+        required bool isEditing,
+        required VoidCallback onEdit,
+        VoidCallback? onAdd,
+      }) {
     return Row(
       children: [
         const Icon(Icons.school_rounded, color: Colors.white),
@@ -218,7 +219,7 @@ class _EducationalQualificationsWidgetState
           _buildEditableRow(
             "Institution",
             qual.collegeName,
-            (val) => qual.collegeName = val,
+                (val) => qual.collegeName = val,
           ),
           _buildEditableRow("Campus", qual.campus, (val) => qual.campus = val),
 
@@ -227,13 +228,13 @@ class _EducationalQualificationsWidgetState
           _buildEditableRow(
             "State",
             qual.state ?? "",
-            (val) => qual.state = val,
+                (val) => qual.state = val,
           ),
 
           _buildDateRow(
             "Start Date",
             qual.startDate,
-            (val) => qual.startDate = val,
+                (val) => qual.startDate = val,
           ),
 
           const SizedBox(height: 12),
@@ -241,28 +242,44 @@ class _EducationalQualificationsWidgetState
           _buildDateRow(
             "Finish Date",
             qual.finishDate,
-            (val) => qual.finishDate = val,
+                (val) => qual.finishDate = val,
           ),
 
           _buildCheckboxRow(
             "Relevant",
             qual.relevantQualification,
-            (val) => qual.relevantQualification = val,
+                (val) {
+              setState(() {
+                qual.relevantQualification = val;
+              });
+            },
           ),
           _buildCheckboxRow(
             "Specialist Education",
             qual.specialistEducation,
-            (val) => qual.specialistEducation = val,
+                (val) {
+              setState(() {
+                qual.specialistEducation = val;
+              });
+            },
           ),
           _buildCheckboxRow(
             "STEM Qualification",
             qual.stemQualification,
-            (val) => qual.stemQualification = val,
+                (val) {
+              setState(() {
+                qual.stemQualification = val;
+              });
+            },
           ),
           _buildCheckboxRow(
             "Regional Study",
             qual.regionalStudy,
-            (val) => qual.regionalStudy = val,
+                (val) {
+              setState(() {
+                qual.regionalStudy = val;
+              });
+            },
           ),
         ],
       ),
@@ -283,20 +300,20 @@ class _EducationalQualificationsWidgetState
             isExpanded: true,
             value: qual.level.isEmpty ? null : qual.level,
             items:
-                qualificationLevels
-                    .map(
-                      (level) =>
-                          DropdownMenuItem(value: level, child: Text(level)),
-                    )
-                    .toList(),
+            qualificationLevels
+                .map(
+                  (level) =>
+                  DropdownMenuItem(value: level, child: Text(level)),
+            )
+                .toList(),
             onChanged:
-                isEditing
-                    ? (val) {
-                      setState(() {
-                        qual.level = val ?? "";
-                      });
-                    }
-                    : null,
+            isEditing
+                ? (val) {
+              setState(() {
+                qual.level = val ?? "";
+              });
+            }
+                : null,
           ),
         ),
       ),
@@ -317,20 +334,20 @@ class _EducationalQualificationsWidgetState
             isExpanded: true,
             value: qual.country.isEmpty ? null : qual.country,
             items:
-                widget.countries.map((country) {
-                  return DropdownMenuItem<String>(
-                    value: country.name,
-                    child: Text(country.name),
-                  );
-                }).toList(),
+            widget.countries.map((country) {
+              return DropdownMenuItem<String>(
+                value: country.name,
+                child: Text(country.name),
+              );
+            }).toList(),
             onChanged:
-                isEditing
-                    ? (val) {
-                      setState(() {
-                        qual.country = val ?? "";
-                      });
-                    }
-                    : null,
+            isEditing
+                ? (val) {
+              setState(() {
+                qual.country = val ?? "";
+              });
+            }
+                : null,
           ),
         ),
       ),
@@ -338,10 +355,10 @@ class _EducationalQualificationsWidgetState
   }
 
   Widget _buildEditableRow(
-    String label,
-    String value,
-    Function(String) onChanged,
-  ) {
+      String label,
+      String value,
+      Function(String) onChanged,
+      ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -375,44 +392,44 @@ class _EducationalQualificationsWidgetState
 
     return GestureDetector(
       onTap:
-          isEditing
-              ? () async {
-                DateTime initial;
-                try {
-                  if (controller.text.isNotEmpty) {
-                    final parts = controller.text.split('/');
-                    initial = DateTime(
-                      int.parse(parts[2]),
-                      int.parse(parts[1]),
-                      int.parse(parts[0]),
-                    );
-                  } else {
-                    initial = DateTime.now().subtract(
-                      const Duration(days: 365 * 5),
-                    );
-                  }
-                } catch (_) {
-                  initial = DateTime.now().subtract(
-                    const Duration(days: 365 * 5),
-                  );
-                }
+      isEditing
+          ? () async {
+        DateTime initial;
+        try {
+          if (controller.text.isNotEmpty) {
+            final parts = controller.text.split('/');
+            initial = DateTime(
+              int.parse(parts[2]),
+              int.parse(parts[1]),
+              int.parse(parts[0]),
+            );
+          } else {
+            initial = DateTime.now().subtract(
+              const Duration(days: 365 * 5),
+            );
+          }
+        } catch (_) {
+          initial = DateTime.now().subtract(
+            const Duration(days: 365 * 5),
+          );
+        }
 
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: initial,
-                  firstDate: DateTime(1950),
-                  lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
-                );
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: initial,
+          firstDate: DateTime(1950),
+          lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+        );
 
-                if (picked != null) {
-                  final formatted = DateFormat("dd/MM/yyyy").format(picked);
-                  setState(() {
-                    controller.text = formatted;
-                    onChanged(formatted);
-                  });
-                }
-              }
-              : null,
+        if (picked != null) {
+          final formatted = DateFormat("dd/MM/yyyy").format(picked);
+          setState(() {
+            controller.text = formatted;
+            onChanged(formatted);
+          });
+        }
+      }
+          : null,
       child: AbsorbPointer(
         absorbing: true,
         child: TextFormField(
@@ -442,7 +459,13 @@ class _EducationalQualificationsWidgetState
         ),
         Checkbox(
           value: value,
-          onChanged: isEditing ? (val) => onChanged(val ?? false) : null,
+          onChanged: isEditing
+              ? (val) {
+            setState(() {
+              onChanged(val ?? false);
+            });
+          }
+              : null,
         ),
       ],
     );
