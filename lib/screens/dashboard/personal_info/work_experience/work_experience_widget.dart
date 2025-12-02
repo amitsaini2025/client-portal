@@ -24,9 +24,9 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   bool isLoading = false;
 
   Future<void> _pickDate(
-      Function(String) onChanged,
-      String currentValue,
-      ) async {
+    Function(String) onChanged,
+    String currentValue,
+  ) async {
     DateTime initial;
 
     try {
@@ -80,9 +80,9 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     } finally {
       setState(() {
         isLoading = false;
@@ -132,7 +132,7 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
               ),
               const SizedBox(height: 18),
               ...widget.experiences.map(
-                    (exp) => Column(
+                (exp) => Column(
                   children: [_buildWorkCard(exp), const SizedBox(height: 18)],
                 ),
               ),
@@ -148,13 +148,13 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   }
 
   Widget _buildSectionTitle(
-      String title, {
-        required IconData icon,
-        required bool isEditing,
-        required VoidCallback onEdit,
-        bool showAdd = false,
-        VoidCallback? onAdd,
-      }) {
+    String title, {
+    required IconData icon,
+    required bool isEditing,
+    required VoidCallback onEdit,
+    bool showAdd = false,
+    VoidCallback? onAdd,
+  }) {
     return Row(
       children: [
         Icon(icon, color: Colors.white),
@@ -223,40 +223,40 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
           _buildEditableRow(
             "Job Title",
             exp.jobTitle,
-                (val) => exp.jobTitle = val,
+            (val) => exp.jobTitle = val,
           ),
           _buildEditableRow(
             "ANZSCO Code",
             exp.jobCode,
-                (val) => exp.jobCode = val,
+            (val) => exp.jobCode = val,
           ),
           _buildEditableRow(
             "Employer Name",
             exp.employerName,
-                (val) => exp.employerName = val,
+            (val) => exp.employerName = val,
           ),
           _buildCountryDropdown(exp),
           _buildEditableRow("State", exp.state ?? "", (val) => exp.state = val),
           _buildEditableRow(
             "Job Type",
             exp.jobType,
-                (val) => exp.jobType = val,
+            (val) => exp.jobType = val,
           ),
           _buildDateRow(
             "Start Date",
             exp.startDate,
-                (val) => exp.startDate = val,
+            (val) => exp.startDate = val,
           ),
           const SizedBox(height: 12),
           _buildDateRow(
             "Finish Date",
             exp.finishDate,
-                (val) => exp.finishDate = val,
+            (val) => exp.finishDate = val,
           ),
           _buildCheckboxRow(
             "Relevant",
             exp.relevantExperience,
-                (val) => exp.relevantExperience = val,
+            (val) => exp.relevantExperience = val,
           ),
         ],
       ),
@@ -276,19 +276,21 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
           child: DropdownButton<String>(
             isExpanded: true,
             value: exp.country.isEmpty ? null : exp.country,
-            items: widget.countries.map((country) {
-              return DropdownMenuItem<String>(
-                value: country.name,
-                child: Text(country.name),
-              );
-            }).toList(),
-            onChanged: isEditing
-                ? (val) {
-              setState(() {
-                exp.country = val ?? "";
-              });
-            }
-                : null,
+            items:
+                widget.countries.map((country) {
+                  return DropdownMenuItem<String>(
+                    value: country.name,
+                    child: Text(country.name),
+                  );
+                }).toList(),
+            onChanged:
+                isEditing
+                    ? (val) {
+                      setState(() {
+                        exp.country = val ?? "";
+                      });
+                    }
+                    : null,
           ),
         ),
       ),
@@ -296,10 +298,10 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   }
 
   Widget _buildEditableRow(
-      String label,
-      String value,
-      Function(String) onChanged,
-      ) {
+    String label,
+    String value,
+    Function(String) onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -332,42 +334,45 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     final controller = TextEditingController(text: value);
 
     return GestureDetector(
-      onTap: isEditing
-          ? () async {
-        DateTime initial;
-        try {
-          if (controller.text.isNotEmpty) {
-            final parts = controller.text.split('/');
-            initial = DateTime(
-              int.parse(parts[2]),
-              int.parse(parts[1]),
-              int.parse(parts[0]),
-            );
-          } else {
-            initial =
-                DateTime.now().subtract(const Duration(days: 365 * 5));
-          }
-        } catch (_) {
-          initial =
-              DateTime.now().subtract(const Duration(days: 365 * 5));
-        }
+      onTap:
+          isEditing
+              ? () async {
+                DateTime initial;
+                try {
+                  if (controller.text.isNotEmpty) {
+                    final parts = controller.text.split('/');
+                    initial = DateTime(
+                      int.parse(parts[2]),
+                      int.parse(parts[1]),
+                      int.parse(parts[0]),
+                    );
+                  } else {
+                    initial = DateTime.now().subtract(
+                      const Duration(days: 365 * 5),
+                    );
+                  }
+                } catch (_) {
+                  initial = DateTime.now().subtract(
+                    const Duration(days: 365 * 5),
+                  );
+                }
 
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: initial,
-          firstDate: DateTime(1950),
-          lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
-        );
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: initial,
+                  firstDate: DateTime(1950),
+                  lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+                );
 
-        if (picked != null) {
-          final formatted = DateFormat("dd/MM/yyyy").format(picked);
-          setState(() {
-            controller.text = formatted;
-            onChanged(formatted);
-          });
-        }
-      }
-          : null,
+                if (picked != null) {
+                  final formatted = DateFormat("dd/MM/yyyy").format(picked);
+                  setState(() {
+                    controller.text = formatted;
+                    onChanged(formatted);
+                  });
+                }
+              }
+              : null,
       child: AbsorbPointer(
         absorbing: true,
         child: TextFormField(
@@ -376,8 +381,10 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
           decoration: InputDecoration(
             labelText: label.toUpperCase(),
             border: const OutlineInputBorder(),
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
           ),
         ),
       ),
@@ -395,7 +402,14 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
         ),
         Checkbox(
           value: value,
-          onChanged: isEditing ? (val) => onChanged(val ?? false) : null,
+          onChanged:
+              isEditing
+                  ? (val) {
+                    setState(() {
+                      onChanged(val ?? false);
+                    });
+                  }
+                  : null,
         ),
       ],
     );

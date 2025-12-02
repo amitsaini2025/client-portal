@@ -97,8 +97,6 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             ],
           ),
         ),
-        /*if (isLoading)
-          const Center(child: CircularProgressIndicator()),*/
       ],
     );
   }
@@ -213,7 +211,11 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                       (val) => occupation.visaSubclass = val),
               _buildCheckboxRow(
                   "Relevant", occupation.relevantOccupation,
-                      (val) => occupation.relevantOccupation = val),
+                      (val) {
+                    setState(() {
+                      occupation.relevantOccupation = val;
+                    });
+                  }),
             ],
           ),
         ],
@@ -266,7 +268,9 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
           if (pickedDate != null) {
             String formattedDate = "${pickedDate.day.toString().padLeft(2,'0')}/${pickedDate.month.toString().padLeft(2,'0')}/${pickedDate.year}";
             controller.text = formattedDate;
-            onChanged(formattedDate);
+            setState(() {
+              onChanged(formattedDate);
+            });
           }
         }
             : null,
@@ -297,7 +301,13 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
         Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
         Checkbox(
           value: value,
-          onChanged: isEditing ? (val) => onChanged(val ?? false) : null,
+          onChanged: isEditing
+              ? (val) {
+            setState(() {
+              onChanged(val ?? false);
+            });
+          }
+              : null,
         ),
       ],
     );

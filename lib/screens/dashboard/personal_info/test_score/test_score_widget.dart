@@ -47,7 +47,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                     );
                   });
                 },
-                showAdd: true,
+                showAdd: false,
               ),
               const SizedBox(height: 16),
               ...widget.testScores.map(
