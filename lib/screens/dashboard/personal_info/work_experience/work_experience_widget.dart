@@ -266,32 +266,30 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   Widget _buildCountryDropdown(Experience exp) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: InputDecorator(
+      child: DropdownButtonFormField<String>(
+        value: exp.country.isEmpty ? null : exp.country,
+        isExpanded: true,
+        items:
+            widget.countries
+                .map(
+                  (country) => DropdownMenuItem<String>(
+                    value: country.name,
+                    child: Text(country.name),
+                  ),
+                )
+                .toList(),
+        onChanged:
+            isEditing
+                ? (val) {
+                  setState(() {
+                    exp.country = val ?? "";
+                  });
+                }
+                : null,
         decoration: const InputDecoration(
           labelText: "COUNTRY",
           border: OutlineInputBorder(),
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: exp.country.isEmpty ? null : exp.country,
-            items:
-                widget.countries.map((country) {
-                  return DropdownMenuItem<String>(
-                    value: country.name,
-                    child: Text(country.name),
-                  );
-                }).toList(),
-            onChanged:
-                isEditing
-                    ? (val) {
-                      setState(() {
-                        exp.country = val ?? "";
-                      });
-                    }
-                    : null,
-          ),
         ),
       ),
     );

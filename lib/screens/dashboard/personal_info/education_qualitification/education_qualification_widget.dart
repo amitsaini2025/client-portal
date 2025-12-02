@@ -289,32 +289,28 @@ class _EducationalQualificationsWidgetState
   Widget _buildLevelDropdown(Qualification qual) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: InputDecorator(
+      child: DropdownButtonFormField<String>(
+        value: qual.level.isEmpty ? null : qual.level,
+        isExpanded: true,
+        items: qualificationLevels
+            .map(
+              (level) => DropdownMenuItem(
+            value: level,
+            child: Text(level),
+          ),
+        )
+            .toList(),
+        onChanged: isEditing
+            ? (val) {
+          setState(() {
+            qual.level = val ?? "";
+          });
+        }
+            : null,
         decoration: const InputDecoration(
           labelText: "LEVEL",
           border: OutlineInputBorder(),
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: qual.level.isEmpty ? null : qual.level,
-            items:
-            qualificationLevels
-                .map(
-                  (level) =>
-                  DropdownMenuItem(value: level, child: Text(level)),
-            )
-                .toList(),
-            onChanged:
-            isEditing
-                ? (val) {
-              setState(() {
-                qual.level = val ?? "";
-              });
-            }
-                : null,
-          ),
         ),
       ),
     );
@@ -323,32 +319,26 @@ class _EducationalQualificationsWidgetState
   Widget _buildCountryDropdown(Qualification qual) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: InputDecorator(
+      child: DropdownButtonFormField<String>(
+        value: qual.country.isEmpty ? null : qual.country,
+        isExpanded: true,
+        items: widget.countries
+            .map((country) => DropdownMenuItem<String>(
+          value: country.name,
+          child: Text(country.name),
+        ))
+            .toList(),
+        onChanged: isEditing
+            ? (val) {
+          setState(() {
+            qual.country = val ?? "";
+          });
+        }
+            : null,
         decoration: const InputDecoration(
           labelText: "COUNTRY",
           border: OutlineInputBorder(),
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: qual.country.isEmpty ? null : qual.country,
-            items:
-            widget.countries.map((country) {
-              return DropdownMenuItem<String>(
-                value: country.name,
-                child: Text(country.name),
-              );
-            }).toList(),
-            onChanged:
-            isEditing
-                ? (val) {
-              setState(() {
-                qual.country = val ?? "";
-              });
-            }
-                : null,
-          ),
         ),
       ),
     );
