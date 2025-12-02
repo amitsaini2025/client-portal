@@ -29,6 +29,7 @@ class _BasicPersonalInformationWidgetState
     extends State<BasicPersonalInformationWidget> {
   late TextEditingController firstNameCtrl;
   late TextEditingController lastNameCtrl;
+  late TextEditingController clientIdCtrl;
   late TextEditingController dobCtrl;
 
   String genderValue = "";
@@ -66,6 +67,7 @@ class _BasicPersonalInformationWidgetState
     }
     firstNameCtrl = TextEditingController(text: first);
     lastNameCtrl = TextEditingController(text: last);
+    clientIdCtrl = TextEditingController(text: basic?.clientId ?? "");
     dobCtrl = TextEditingController(text: basic?.dateOfBirth ?? "");
     genderValue = basic?.gender ?? "";
     maritalStatusValue = basic?.maritalStatus ?? "";
@@ -227,6 +229,7 @@ class _BasicPersonalInformationWidgetState
         _buildInfoCard([
           _buildTextField('First Name', firstNameCtrl, isBasic: true),
           _buildTextField('Last Name', lastNameCtrl, isBasic: true),
+          _buildTextField('Client ID', clientIdCtrl, isBasic: false), // always non-editable
           _buildDOBField('Date of Birth', dobCtrl),
           _buildDropdownField('Gender', genderValue, genderOptions,
                   (value) => setState(() => genderValue = value)),
@@ -271,6 +274,9 @@ class _BasicPersonalInformationWidgetState
 
   Widget _buildTextField(String label, TextEditingController ctrl, {required bool isBasic}) {
     bool editable = isBasic ? isEditingBasic : false;
+    // client ID field is never editable
+    if (label == 'Client ID') editable = false;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
@@ -368,7 +374,10 @@ class _BasicPersonalInformationWidgetState
   Widget _buildDOBField(String label, TextEditingController ctrl) {
     return GestureDetector(
       onTap: isEditingBasic ? _pickDOB : null,
-      child: _buildTextField(label, ctrl, isBasic: true),
+      child: AbsorbPointer(
+        absorbing: true,
+        child: _buildTextField(label, ctrl, isBasic: true),
+      ),
     );
   }
 
@@ -417,15 +426,6 @@ class _BasicPersonalInformationWidgetState
             },
             child: _editButton(isBasic: isBasic, isEmail: isEmail),
           ),
-        /*if (showAdd && !isBasic)
-          InkWell(
-            onTap: isEmail ? _addEmailField : _addPhoneField,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: _buttonDecoration(),
-              child: const Icon(Icons.add, color: Colors.blue, size: 20),
-            ),
-          ),*/
       ],
     );
   }
