@@ -29,7 +29,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
   bool isPassportEditing = false;
   bool isVisaEditing = false;
 
-  // --------------------- DATE PICKER ----------------------
   Future<String?> _pickDate(String current) async {
     DateTime initial;
 
@@ -57,7 +56,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     return null;
   }
 
-  // --------------------- SAVE PASSPORT ----------------------
   Future<void> _savePassports() async {
     final payload = widget.passports.map((p) {
       return {
@@ -82,7 +80,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     }
   }
 
-  // --------------------- SAVE VISA ----------------------
   Future<void> _saveVisas() async {
     final payload = widget.visas.map((v) {
       return {
@@ -108,13 +105,11 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     }
   }
 
-  // --------------------- BUILD ----------------------
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ===== PASSPORT SECTION =====
         _buildSectionTitle(
           "Passport Information",
           showEdit: true,
@@ -140,7 +135,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
 
         const SizedBox(height: 24),
 
-        // ===== VISA SECTION =====
         _buildSectionTitle(
           "Visa Information",
           showEdit: true,
@@ -174,7 +168,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
-  // --------------------- SECTION TITLE ----------------------
   Widget _buildSectionTitle(
       String title, {
         required bool showEdit,
@@ -224,7 +217,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
-  // --------------------- PASSPORT CARD ----------------------
   Widget _buildPassportCard(Passport p) {
     return _buildInfoCard([
       _buildEditableRow("Passport Number", p.passportNumber, isPassportEditing, (val) => p.passportNumber = val),
@@ -239,7 +231,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     ]);
   }
 
-  // --------------------- VISA CARD ----------------------
   Widget _buildVisaCard(Visa v) {
     return _buildInfoCard([
       _buildCountryDropdown(
@@ -260,7 +251,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     ]);
   }
 
-  // --------------------- CARD WRAPPER ----------------------
   Widget _buildInfoCard(List<Widget> children) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -273,7 +263,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
-  // --------------------- TEXT FIELD ----------------------
   Widget _buildEditableRow(String label, String? value, bool editable, ValueChanged<String> onChanged) {
     final controller = TextEditingController(text: value ?? "");
     controller.selection = TextSelection.fromPosition(TextPosition(offset: controller.text.length));
@@ -294,7 +283,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
-  // --------------------- COUNTRY DROPDOWN ----------------------
   Widget _buildCountryDropdown({
     required String label,
     required String? selected,
@@ -325,7 +313,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
-  // --------------------- VISA TYPE DROPDOWN ----------------------
   Widget _buildVisaTypeDropdown({
     required String label,
     required int? selectedId,
@@ -361,7 +348,6 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     );
   }
 
-  // --------------------- DATE ROW ----------------------
   Widget _buildDateRow(String label, String? value, bool editable, ValueChanged<String?> onChanged) {
     final controller = TextEditingController(text: value ?? "");
     return GestureDetector(

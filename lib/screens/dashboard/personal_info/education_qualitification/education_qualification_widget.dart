@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
 import '../../../../models/personal_information/qualification.dart';
-import '../../../../services/api_service.dart'; // <-- Add this
+import '../../../../services/api_service.dart';
 
 class EducationalQualificationsWidget extends StatefulWidget {
   final List<Qualification> qualifications;
@@ -94,9 +94,6 @@ class _EducationalQualificationsWidgetState
             isEditing: isEditing,
             onEdit: () async {
               if (isEditing) {
-                // -----------------------------
-                // SAVE → API CALL
-                // -----------------------------
                 final json = convertQualificationsToJson(widget.qualifications);
 
                 final response = await ApiService.updateClientQualificationDetail(

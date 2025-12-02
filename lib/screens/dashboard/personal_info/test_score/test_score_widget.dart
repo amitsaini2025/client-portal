@@ -94,7 +94,6 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
     setState(() => isLoading = false);
   }
 
-  // ---------------- UI Components (same as your existing widget) ----------------
   Widget _buildSectionTitle(
     String title, {
     required bool isEditing,

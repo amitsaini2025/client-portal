@@ -1,11 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../../models/personal_information/address.dart';
-import '../../../../models/personal_information/travel.dart';
 import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
+import '../../../../models/personal_information/travel.dart';
 import '../../../../services/api_service.dart';
 
 class AddressAndTravelInformationWidget extends StatefulWidget {
@@ -64,10 +62,10 @@ class _AddressAndTravelInformationWidgetState
   // ---------------------------------------------------------------
   Future<void> _saveAddresses() async {
     try {
-      final addressesPayload =
-      widget.addresses.map((a) => a.toJson()).toList();
-      final response =
-      await ApiService.updateClientAddressDetail(addressesPayload);
+      final addressesPayload = widget.addresses.map((a) => a.toJson()).toList();
+      final response = await ApiService.updateClientAddressDetail(
+        addressesPayload,
+      );
       if (response['success'] == true || response['status'] == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Addresses updated successfully')),
@@ -76,14 +74,14 @@ class _AddressAndTravelInformationWidgetState
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-                  response['message'] ?? 'Failed to update addresses')),
+            content: Text(response['message'] ?? 'Failed to update addresses'),
+          ),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -93,7 +91,9 @@ class _AddressAndTravelInformationWidgetState
   Future<void> _saveTravels() async {
     try {
       final travelsPayload = widget.travels.map((t) => t.toJson()).toList();
-      final response = await ApiService.updateClientTravelDetail(travelsPayload);
+      final response = await ApiService.updateClientTravelDetail(
+        travelsPayload,
+      );
       if (response['success'] == true || response['status'] == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Travels updated successfully')),
@@ -102,14 +102,14 @@ class _AddressAndTravelInformationWidgetState
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-                  response['message'] ?? 'Failed to update travels')),
+            content: Text(response['message'] ?? 'Failed to update travels'),
+          ),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -137,45 +137,74 @@ class _AddressAndTravelInformationWidgetState
           const SizedBox(height: 12),
 
           ...widget.addresses.map(
-                (address) => _buildInfoCard([
+            (address) => _buildInfoCard([
               _buildEditableRow(
-                  "Search Address", address.searchAddress, isEditingAddress,
-                      (val) => address.searchAddress = val),
+                "Search Address",
+                address.searchAddress,
+                isEditingAddress,
+                (val) => address.searchAddress = val,
+              ),
               _buildEditableRow(
-                  "Address Line 1", address.addressLine1 ?? "-", isEditingAddress,
-                      (val) => address.addressLine1 = val),
+                "Address Line 1",
+                address.addressLine1 ?? "-",
+                isEditingAddress,
+                (val) => address.addressLine1 = val,
+              ),
               _buildEditableRow(
-                  "Address Line 2", address.addressLine2 ?? "-", isEditingAddress,
-                      (val) => address.addressLine2 = val),
-              _buildEditableRow("Suburb", address.suburb, isEditingAddress,
-                      (val) => address.suburb = val),
-              _buildEditableRow("State", address.state, isEditingAddress,
-                      (val) => address.state = val),
+                "Address Line 2",
+                address.addressLine2 ?? "-",
+                isEditingAddress,
+                (val) => address.addressLine2 = val,
+              ),
               _buildEditableRow(
-                  "Postcode", address.postcode.toString(), isEditingAddress,
-                      (val) => address.postcode = int.tryParse(val) ?? address.postcode),
+                "Suburb",
+                address.suburb,
+                isEditingAddress,
+                (val) => address.suburb = val,
+              ),
+              _buildEditableRow(
+                "State",
+                address.state,
+                isEditingAddress,
+                (val) => address.state = val,
+              ),
+              _buildEditableRow(
+                "Postcode",
+                address.postcode.toString(),
+                isEditingAddress,
+                (val) =>
+                    address.postcode = int.tryParse(val) ?? address.postcode,
+              ),
               _buildCountryDropdown(
                 label: "Country",
                 editable: isEditingAddress,
                 selected: address.country,
                 onChanged: (val) => setState(() => address.country = val ?? ""),
               ),
-              _buildEditableRow("Regional Code", address.regionalCode ?? "-", isEditingAddress,
-                      (val) => address.regionalCode = val),
+              _buildEditableRow(
+                "Regional Code",
+                address.regionalCode ?? "-",
+                isEditingAddress,
+                (val) => address.regionalCode = val,
+              ),
               _buildDateRow(
                 "Start Date",
                 address.startDate ?? "-",
                 isEditingAddress,
-                    (val) => address.startDate = val,
+                (val) => address.startDate = val,
               ),
               _buildDateRow(
                 "End Date",
                 address.endDate ?? "-",
                 isEditingAddress,
-                    (val) => address.endDate = val,
+                (val) => address.endDate = val,
               ),
-              _buildEditableRow("Is Current", address.isCurrent ? "Yes" : "No", isEditingAddress,
-                      (val) => address.isCurrent = val.toLowerCase() == "yes"),
+              _buildEditableRow(
+                "Is Current",
+                address.isCurrent ? "Yes" : "No",
+                isEditingAddress,
+                (val) => address.isCurrent = val.toLowerCase() == "yes",
+              ),
             ]),
           ),
 
@@ -188,7 +217,6 @@ class _AddressAndTravelInformationWidgetState
                 label: const Text("Save Addresses"),
               ),
             ),*/
-
           const SizedBox(height: 28),
 
           /// TRAVEL INFORMATION
@@ -209,27 +237,32 @@ class _AddressAndTravelInformationWidgetState
           const SizedBox(height: 12),
 
           ...widget.travels.map(
-                (travel) => _buildInfoCard([
+            (travel) => _buildInfoCard([
               _buildCountryDropdown(
                 label: "Country Visited",
                 editable: isEditingTravel,
                 selected: travel.countryVisited,
-                onChanged: (val) => setState(() => travel.countryVisited = val ?? ""),
+                onChanged:
+                    (val) => setState(() => travel.countryVisited = val ?? ""),
               ),
               _buildDateRow(
                 "Arrival Date",
                 travel.arrivalDate,
                 isEditingTravel,
-                    (val) => travel.arrivalDate = val!,
+                (val) => travel.arrivalDate = val!,
               ),
               _buildDateRow(
                 "Departure Date",
                 travel.departureDate,
                 isEditingTravel,
-                    (val) => travel.departureDate = val!,
+                (val) => travel.departureDate = val!,
               ),
-              _buildEditableRow("Travel Purpose", travel.purpose, isEditingTravel,
-                      (val) => travel.purpose = val),
+              _buildEditableRow(
+                "Travel Purpose",
+                travel.purpose,
+                isEditingTravel,
+                (val) => travel.purpose = val,
+              ),
             ]),
           ),
         ],
@@ -241,13 +274,13 @@ class _AddressAndTravelInformationWidgetState
   // SECTION TITLE
   // ---------------------------------------------------------------
   Widget _buildSectionTitle(
-      String title, {
-        required bool isEditing,
-        required VoidCallback onEdit,
-        required VoidCallback onAdd,
-        required IconData icon,
-        bool showAdd = false,
-      }) {
+    String title, {
+    required bool isEditing,
+    required VoidCallback onEdit,
+    required VoidCallback onAdd,
+    required IconData icon,
+    bool showAdd = false,
+  }) {
     return Row(
       children: [
         Icon(icon, color: Colors.white),
@@ -318,7 +351,11 @@ class _AddressAndTravelInformationWidgetState
   // NORMAL EDITABLE ROW
   // ---------------------------------------------------------------
   Widget _buildEditableRow(
-      String label, String value, bool enabled, ValueChanged<String> onChanged) {
+    String label,
+    String value,
+    bool enabled,
+    ValueChanged<String> onChanged,
+  ) {
     final controller = TextEditingController(text: value);
 
     return Padding(
@@ -364,30 +401,37 @@ class _AddressAndTravelInformationWidgetState
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        ),
-        child: editable
-            ? DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: selected!.isEmpty ? null : selected,
-            isExpanded: true,
-            onChanged: onChanged,
-            items: widget.countries
-                .map((c) => DropdownMenuItem(
-              value: c.name,
-              child: Text(c.name),
-            ))
-                .toList(),
-          ),
-        )
-            : Text(
-          selected ?? "",
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
           ),
         ),
+        child:
+            editable
+                ? DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: selected!.isEmpty ? null : selected,
+                    isExpanded: true,
+                    onChanged: onChanged,
+                    items:
+                        widget.countries
+                            .map(
+                              (c) => DropdownMenuItem(
+                                value: c.name,
+                                child: Text(c.name),
+                              ),
+                            )
+                            .toList(),
+                  ),
+                )
+                : Text(
+                  selected ?? "",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
       ),
     );
   }
@@ -396,20 +440,25 @@ class _AddressAndTravelInformationWidgetState
   // DATE PICKER ROW
   // ---------------------------------------------------------------
   Widget _buildDateRow(
-      String label, String value, bool enabled, ValueChanged<String?> onChanged) {
+    String label,
+    String value,
+    bool enabled,
+    ValueChanged<String?> onChanged,
+  ) {
     final controller = TextEditingController(text: value);
 
     return GestureDetector(
-      onTap: enabled
-          ? () async {
-        final newDate = await _pickDate(controller.text);
-        if (newDate != null) {
-          controller.text = newDate;
-          onChanged(newDate);
-          setState(() {});
-        }
-      }
-          : null,
+      onTap:
+          enabled
+              ? () async {
+                final newDate = await _pickDate(controller.text);
+                if (newDate != null) {
+                  controller.text = newDate;
+                  onChanged(newDate);
+                  setState(() {});
+                }
+              }
+              : null,
       child: AbsorbPointer(
         child: Padding(
           padding: const EdgeInsets.only(bottom: 14),

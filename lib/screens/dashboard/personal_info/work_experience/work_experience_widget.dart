@@ -69,7 +69,6 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
         widget.experiences.map((e) => e.toJson()).toList(),
       );
 
-      // You can handle response here
       if (response["success"] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Experiences updated successfully")),

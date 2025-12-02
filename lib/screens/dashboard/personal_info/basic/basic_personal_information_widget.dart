@@ -27,7 +27,6 @@ class BasicPersonalInformationWidget extends StatefulWidget {
 
 class _BasicPersonalInformationWidgetState
     extends State<BasicPersonalInformationWidget> {
-  // ===== Controllers =====
   late TextEditingController firstNameCtrl;
   late TextEditingController lastNameCtrl;
   late TextEditingController dobCtrl;
@@ -39,15 +38,12 @@ class _BasicPersonalInformationWidgetState
   bool isEditingPhones = false;
   bool isEditingEmails = false;
 
-  // ===== Phone list & controllers =====
   final List<TextEditingController> phoneControllers = [];
   final List<Phone> phoneList = [];
 
-  // ===== Email list & controllers =====
   final List<TextEditingController> emailControllers = [];
   final List<Email> emailList = [];
 
-  // ===== Dropdown options =====
   final List<String> genderOptions = ["Male", "Female", "Other"];
   final List<String> maritalStatusOptions = [
     "Single",
@@ -74,7 +70,6 @@ class _BasicPersonalInformationWidgetState
     genderValue = basic?.gender ?? "";
     maritalStatusValue = basic?.maritalStatus ?? "";
 
-    // ===== Phones =====
     if (widget.phones != null) {
       phoneList.addAll(widget.phones!);
       for (var p in phoneList) {
@@ -83,7 +78,6 @@ class _BasicPersonalInformationWidgetState
       }
     }
 
-    // ===== Emails =====
     if (widget.emails != null) {
       emailList.addAll(widget.emails!);
       for (var e in emailList) {
@@ -92,7 +86,6 @@ class _BasicPersonalInformationWidgetState
     }
   }
 
-  // ===== DOB Picker =====
   Future<void> _pickDOB() async {
     DateTime initial;
     try {
@@ -118,7 +111,6 @@ class _BasicPersonalInformationWidgetState
     }
   }
 
-  // ===== Save Basic Info =====
   Future<void> _saveBasicInfo() async {
     try {
       final res = await ApiService.updateClientBasicDetail(
@@ -146,7 +138,6 @@ class _BasicPersonalInformationWidgetState
     }
   }
 
-  // ===== Save Phones =====
   Future<void> _savePhones() async {
     List<Map<String, dynamic>> payload = [];
     for (int i = 0; i < phoneList.length; i++) {
@@ -184,7 +175,6 @@ class _BasicPersonalInformationWidgetState
     }
   }
 
-  // ===== Save Emails =====
   Future<void> _saveEmails() async {
     List<Map<String, dynamic>> payload = [];
     for (int i = 0; i < emailList.length; i++) {
@@ -212,7 +202,6 @@ class _BasicPersonalInformationWidgetState
     }
   }
 
-  // ===== Add Phone =====
   void _addPhoneField() {
     setState(() {
       phoneList.add(
@@ -221,7 +210,6 @@ class _BasicPersonalInformationWidgetState
     });
   }
 
-  // ===== Add Email =====
   void _addEmailField() {
     setState(() {
       emailList.add(Email(id: 0, email: "", type: "Other", isPrimary: false));
@@ -234,7 +222,6 @@ class _BasicPersonalInformationWidgetState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ===== BASIC INFO =====
         _buildSectionTitle('Basic Information', showEdit: true, isBasic: true),
         const SizedBox(height: 12),
         _buildInfoCard([
@@ -249,7 +236,6 @@ class _BasicPersonalInformationWidgetState
 
         const SizedBox(height: 24),
 
-        // ===== PHONE NUMBERS =====
         _buildSectionTitle('Phone Numbers', showEdit: true, showAdd: true, isBasic: false),
         const SizedBox(height: 12),
         _buildInfoCard(
@@ -266,7 +252,6 @@ class _BasicPersonalInformationWidgetState
 
         const SizedBox(height: 24),
 
-        // ===== EMAILS =====
         _buildSectionTitle('Email Addresses', showEdit: true, showAdd: true, isBasic: false, isEmail: true),
         const SizedBox(height: 12),
         _buildInfoCard(
@@ -284,7 +269,6 @@ class _BasicPersonalInformationWidgetState
     );
   }
 
-  // ===== UI Helpers =====
   Widget _buildTextField(String label, TextEditingController ctrl, {required bool isBasic}) {
     bool editable = isBasic ? isEditingBasic : false;
     return Padding(
