@@ -111,7 +111,6 @@ class _AddressAndTravelInformationWidgetState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// ADDRESS INFORMATION
           _buildSectionTitle(
             "Address Information",
             icon: Icons.home_rounded,
