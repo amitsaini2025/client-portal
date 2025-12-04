@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -274,7 +272,6 @@ class _BasicPersonalInformationWidgetState
 
   Widget _buildTextField(String label, TextEditingController ctrl, {required bool isBasic}) {
     bool editable = isBasic ? isEditingBasic : false;
-    // client ID field is never editable
     if (label == 'Client ID') editable = false;
 
     return Padding(
