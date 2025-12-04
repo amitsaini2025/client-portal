@@ -28,9 +28,6 @@ class _AddressAndTravelInformationWidgetState
   bool isEditingAddress = false;
   bool isEditingTravel = false;
 
-  // ---------------------------------------------------------------
-  // DATE PICKER
-  // ---------------------------------------------------------------
   Future<String?> _pickDate(String current) async {
     DateTime initial;
     try {
@@ -57,9 +54,7 @@ class _AddressAndTravelInformationWidgetState
     return null;
   }
 
-  // ---------------------------------------------------------------
-  // SAVE ADDRESSES API CALL
-  // ---------------------------------------------------------------
+
   Future<void> _saveAddresses() async {
     try {
       final addressesPayload = widget.addresses.map((a) => a.toJson()).toList();
@@ -85,9 +80,6 @@ class _AddressAndTravelInformationWidgetState
     }
   }
 
-  // ---------------------------------------------------------------
-  // SAVE TRAVELS API CALL (optional)
-  // ---------------------------------------------------------------
   Future<void> _saveTravels() async {
     try {
       final travelsPayload = widget.travels.map((t) => t.toJson()).toList();
@@ -219,7 +211,6 @@ class _AddressAndTravelInformationWidgetState
             ),*/
           const SizedBox(height: 28),
 
-          /// TRAVEL INFORMATION
           _buildSectionTitle(
             "Travel Information",
             icon: Icons.flight_takeoff_rounded,
@@ -270,9 +261,6 @@ class _AddressAndTravelInformationWidgetState
     );
   }
 
-  // ---------------------------------------------------------------
-  // SECTION TITLE
-  // ---------------------------------------------------------------
   Widget _buildSectionTitle(
     String title, {
     required bool isEditing,
@@ -328,9 +316,6 @@ class _AddressAndTravelInformationWidgetState
     );
   }
 
-  // ---------------------------------------------------------------
-  // INFO CARD
-  // ---------------------------------------------------------------
   Widget _buildInfoCard(List<Widget> children) {
     return Container(
       width: double.infinity,
@@ -347,9 +332,6 @@ class _AddressAndTravelInformationWidgetState
     );
   }
 
-  // ---------------------------------------------------------------
-  // NORMAL EDITABLE ROW
-  // ---------------------------------------------------------------
   Widget _buildEditableRow(
     String label,
     String value,
@@ -386,9 +368,6 @@ class _AddressAndTravelInformationWidgetState
     );
   }
 
-  // ---------------------------------------------------------------
-  // COUNTRY DROPDOWN
-  // ---------------------------------------------------------------
   Widget _buildCountryDropdown({
     required String label,
     required String? selected,
@@ -436,9 +415,6 @@ class _AddressAndTravelInformationWidgetState
     );
   }
 
-  // ---------------------------------------------------------------
-  // DATE PICKER ROW
-  // ---------------------------------------------------------------
   Widget _buildDateRow(
     String label,
     String value,
