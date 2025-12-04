@@ -15,6 +15,8 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
   bool isEditing = false;
   bool isLoading = false;
 
+  Map<int, List<String>> occupationSuggestions = {};
+
   Future<void> _saveOccupations() async {
     setState(() {
       isLoading = true;
@@ -48,6 +50,23 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
     }
   }
 
+  Future<void> _searchOccupation(String query, int index) async {
+    if (query.isEmpty) {
+      setState(() => occupationSuggestions[index] = []);
+      return;
+    }
+
+    final response = await ApiService.searchOccupation(query);
+
+    if (response["success"] == true && response["data"] != null) {
+      List<String> titles = List<String>.from(
+          response["data"].map((item) => item["occupation_title"]));
+      setState(() {
+        occupationSuggestions[index] = titles;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -60,7 +79,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                 "Occupation & Skills",
                 icon: Icons.assessment_rounded,
                 isEditing: isEditing,
-                showAdd: false,
+                showAdd: true,
                 onEdit: () {
                   if (isEditing) {
                     _saveOccupations();
@@ -88,12 +107,16 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                 },
               ),
               const SizedBox(height: 18),
-              ...widget.occupations.map((occupation) => Column(
-                children: [
-                  _buildSkillCard(occupation),
-                  const SizedBox(height: 18),
-                ],
-              )),
+              ...widget.occupations.asMap().entries.map((entry) {
+                int index = entry.key;
+                Occupation occupation = entry.value;
+                return Column(
+                  children: [
+                    _buildSkillCard(occupation, index),
+                    const SizedBox(height: 18),
+                  ],
+                );
+              }),
             ],
           ),
         ),
@@ -156,7 +179,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
     );
   }
 
-  Widget _buildSkillCard(Occupation occupation) {
+  Widget _buildSkillCard(Occupation occupation, int index) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -184,8 +207,10 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
               _buildDateRow(
                   "Assessment Date", occupation.assessmentDate,
                       (val) => occupation.assessmentDate = val),
-              _buildEditableRow(
-                  "Nominated Occupation", occupation.nominatedOccupation,
+              _buildSearchableRow(
+                  "Nominated Occupation",
+                  occupation.nominatedOccupation,
+                  index,
                       (val) => occupation.nominatedOccupation = val),
               _buildEditableRow(
                   "Occupation Code", occupation.occupationCode,
@@ -247,6 +272,77 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
       ),
     );
   }
+
+  Widget _buildSearchableRow(String label, String value, int index, Function(String) onChanged) {
+    TextEditingController controller = TextEditingController(text: value);
+
+    return SizedBox(
+      child: Column(
+        children: [
+          TextFormField(
+            controller: controller,
+            enabled: isEditing,
+            onChanged: (val) {
+              onChanged(val);
+              _searchOccupation(val, index);
+            },
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+            decoration: InputDecoration(
+              labelText: label.toUpperCase(),
+              labelStyle: const TextStyle(
+                color: Colors.grey,
+                fontSize: 13,
+                letterSpacing: 0.2,
+              ),
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              suffixIcon: isEditing && controller.text.isNotEmpty
+                  ? IconButton(
+                icon: const Icon(Icons.clear, size: 18),
+                onPressed: () {
+                  setState(() {
+                    controller.clear();
+                    onChanged("");
+                    occupationSuggestions[index] = [];
+                  });
+                },
+              )
+                  : null,
+            ),
+          ),
+          if (occupationSuggestions[index] != null &&
+              occupationSuggestions[index]!.isNotEmpty)
+            Container(
+              constraints: const BoxConstraints(maxHeight: 150),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: ListView(
+                shrinkWrap: true,
+                children: occupationSuggestions[index]!
+                    .map((suggestion) => ListTile(
+                  title: Text(suggestion),
+                  onTap: () {
+                    setState(() {
+                      controller.text = suggestion;
+                      onChanged(suggestion);
+                      occupationSuggestions[index] = [];
+                    });
+                  },
+                ))
+                    .toList(),
+              ),
+            )
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildDateRow(String label, String value, Function(String) onChanged) {
     TextEditingController controller = TextEditingController(text: value);
