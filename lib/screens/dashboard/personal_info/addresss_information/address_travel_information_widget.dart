@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../../../../models/personal_information/address.dart';
@@ -27,6 +31,9 @@ class _AddressAndTravelInformationWidgetState
     extends State<AddressAndTravelInformationWidget> {
   bool isEditingAddress = false;
   bool isEditingTravel = false;
+  final Map<String, TextEditingController> _placeControllers = {};
+
+  final String googleApiKey = "AIzaSyATpl3gyx8FSoykbCx3otznCIWP_-8hk7c";
 
   Future<String?> _pickDate(String current) async {
     DateTime initial;
@@ -54,7 +61,6 @@ class _AddressAndTravelInformationWidgetState
     return null;
   }
 
-
   Future<void> _saveAddresses() async {
     try {
       final addressesPayload = widget.addresses.map((a) => a.toJson()).toList();
@@ -65,7 +71,7 @@ class _AddressAndTravelInformationWidgetState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Addresses updated successfully')),
         );
-        setState(() => isEditingAddress = false); // exit edit mode
+        setState(() => isEditingAddress = false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -105,6 +111,22 @@ class _AddressAndTravelInformationWidgetState
     }
   }
 
+  Future<List<String>> fetchPlaceSuggestions(String input) async {
+    if (input.isEmpty) return [];
+    final url =
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&key=$googleApiKey';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return (data['predictions'] as List)
+          .map((p) => p['description'] as String)
+          .toList();
+    } else {
+      throw Exception('Failed to fetch suggestions');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -126,14 +148,18 @@ class _AddressAndTravelInformationWidgetState
             showAdd: false,
           ),
           const SizedBox(height: 12),
-
           ...widget.addresses.map(
             (address) => _buildInfoCard([
-              _buildEditableRow(
+              _buildGooglePlaceField(
                 "Search Address",
                 address.searchAddress,
                 isEditingAddress,
-                (val) => address.searchAddress = val,
+                (val) {
+                  setState(() {
+                    address.searchAddress = val;
+                  });
+                },
+                fetchPlaceSuggestions,
               ),
               _buildEditableRow(
                 "Address Line 1",
@@ -198,18 +224,7 @@ class _AddressAndTravelInformationWidgetState
               ),
             ]),
           ),
-
-          /*if (isEditingAddress)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: ElevatedButton.icon(
-                onPressed: _saveAddresses,
-                icon: const Icon(Icons.save),
-                label: const Text("Save Addresses"),
-              ),
-            ),*/
           const SizedBox(height: 28),
-
           _buildSectionTitle(
             "Travel Information",
             icon: Icons.flight_takeoff_rounded,
@@ -225,7 +240,6 @@ class _AddressAndTravelInformationWidgetState
             showAdd: false,
           ),
           const SizedBox(height: 12),
-
           ...widget.travels.map(
             (travel) => _buildInfoCard([
               _buildCountryDropdown(
@@ -260,76 +274,74 @@ class _AddressAndTravelInformationWidgetState
     );
   }
 
-  Widget _buildSectionTitle(
-    String title, {
-    required bool isEditing,
-    required VoidCallback onEdit,
-    required VoidCallback onAdd,
-    required IconData icon,
-    bool showAdd = false,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
+  Widget _buildGooglePlaceField(
+      String label,
+      String value,
+      bool enabled,
+      ValueChanged<String> onChanged,
+      Future<List<String>> Function(String) fetchPlaceSuggestions,
+      ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: TypeAheadField<String>(
+        suggestionsCallback: (pattern) async {
+          if (pattern.isEmpty) return [];
+          return await fetchPlaceSuggestions(pattern);
+        },
+
+        itemBuilder: (context, suggestion) {
+          return ListTile(title: Text(suggestion));
+        },
+
+        onSelected: (suggestion) {
+          // ✅ onSelected now updates the controller from the builder
+          // This ensures the selected value shows
+          onChanged(suggestion);
+        },
+
+        builder: (context, textEditingController, focusNode) {
+          // ✅ Initialize the builder controller with initial value
+          if (textEditingController.text != value) {
+            textEditingController.text = value;
+            textEditingController.selection = TextSelection.fromPosition(
+              TextPosition(offset: textEditingController.text.length),
+            );
+          }
+
+          return TextField(
+            controller: textEditingController,
+            focusNode: focusNode,
+            enabled: enabled,
+            decoration: InputDecoration(
+              labelText: label.toUpperCase(),
+              border: const OutlineInputBorder(),
+              suffixIcon: enabled && textEditingController.text.isNotEmpty
+                  ? IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  textEditingController.clear();
+                  onChanged("");
+                },
+              )
+                  : null,
+            ),
+            onChanged: onChanged,
+          );
+        },
+
+        emptyBuilder: (context) => const Padding(
+          padding: EdgeInsets.all(8),
+          child: Text("No results found"),
         ),
-        const Spacer(),
-        InkWell(
-          onTap: onEdit,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: Icon(
-              isEditing ? Icons.check : Icons.edit,
-              color: Colors.blue,
-              size: 20,
-            ),
-          ),
+
+        loadingBuilder: (context) => const Padding(
+          padding: EdgeInsets.all(8),
+          child: CircularProgressIndicator(),
         ),
-        if (showAdd) const SizedBox(width: 8),
-        if (showAdd)
-          InkWell(
-            onTap: onAdd,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: const Icon(Icons.add, color: Colors.blue, size: 20),
-            ),
-          ),
-      ],
+      ),
     );
   }
 
-  Widget _buildInfoCard(List<Widget> children) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
-      ),
-    );
-  }
 
   Widget _buildEditableRow(
     String label,
@@ -338,7 +350,6 @@ class _AddressAndTravelInformationWidgetState
     ValueChanged<String> onChanged,
   ) {
     final controller = TextEditingController(text: value);
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
@@ -351,11 +362,6 @@ class _AddressAndTravelInformationWidgetState
         ),
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
-          labelStyle: const TextStyle(
-            color: Colors.grey,
-            fontSize: 13,
-            letterSpacing: 0.2,
-          ),
           border: const OutlineInputBorder(),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,
@@ -441,11 +447,6 @@ class _AddressAndTravelInformationWidgetState
             controller: controller,
             enabled: enabled,
             readOnly: true,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              fontWeight: FontWeight.w600,
-            ),
             decoration: InputDecoration(
               labelText: label.toUpperCase(),
               border: const OutlineInputBorder(),
@@ -454,8 +455,84 @@ class _AddressAndTravelInformationWidgetState
                 vertical: 10,
               ),
             ),
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(
+    String title, {
+    required bool isEditing,
+    required VoidCallback onEdit,
+    required VoidCallback onAdd,
+    required IconData icon,
+    bool showAdd = false,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.white),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+        const Spacer(),
+        InkWell(
+          onTap: onEdit,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Icon(
+              isEditing ? Icons.check : Icons.edit,
+              color: Colors.blue,
+              size: 20,
+            ),
+          ),
+        ),
+        if (showAdd) const SizedBox(width: 8),
+        if (showAdd)
+          InkWell(
+            onTap: onAdd,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: const Icon(Icons.add, color: Colors.blue, size: 20),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildInfoCard(List<Widget> children) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
       ),
     );
   }
