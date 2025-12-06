@@ -194,6 +194,7 @@ class MyAppWithTheme extends StatelessWidget {
       valueListenable: themeModeNotifier,
       builder: (context, mode, _) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'Client Portal',
           theme: lightTheme,
           darkTheme: darkTheme,
