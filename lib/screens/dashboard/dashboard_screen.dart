@@ -261,13 +261,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    "This feature will be available in a future update.",
-                  ),
-                ),
-              );
+              showSnack(context, "This feature will be available in a future update.");
             },
           ),
           IconButton(
@@ -318,19 +312,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           );
                         },
                         onBookAppointment: () {
-                          Navigator.of(context).push(
+                          /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const BookAppointmentScreen(),
                             ),
-                          );
+                          );*/
+                          showSnack(context, "This feature will be available in a future update.");
                         },
                         onSendMessage: () {
-                          Navigator.of(context).push(
+                          /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const SendMessageScreen(),
                             ),
-                          );
+                          );*/
                         },
                         onViewWorkflow: () {
                           Navigator.of(context).push(
@@ -340,11 +335,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           );
                         },
                         onBilling: () {
-                          Navigator.of(context).push(
+                          /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const BillingScreen(),
                             ),
-                          );
+                          );*/
+                          showSnack(context, "This feature will be available in a future update.");
                         },
                         onPersonalInformationUpload: () {
                           Navigator.of(context).push(
@@ -608,4 +604,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
+  void showSnack(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
 }

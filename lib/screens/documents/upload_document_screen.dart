@@ -53,6 +53,9 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
           _checklists =
               list.map((json) => AllowedChecklist.fromJson(json)).toList();
         });
+        if ( list.isEmpty) {
+          _showErrorSnackBar("No checklist available for this matter.");
+        }
       } else {
         _showErrorSnackBar("Failed to fetch allowed checklist");
       }

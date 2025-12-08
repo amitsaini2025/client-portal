@@ -54,14 +54,14 @@ class QuickActionsCard extends StatelessWidget {
             color: Colors.green,
           ),
           const SizedBox(height: 12),
-          _buildActionButton(
+          /*_buildActionButton(
             context: context,
             icon: Icons.message,
             label: 'Send Message',
             onTap: onSendMessage,
             color: Colors.orange,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 12),*/
           _buildActionButton(
             context: context,
             icon: Icons.timeline,
