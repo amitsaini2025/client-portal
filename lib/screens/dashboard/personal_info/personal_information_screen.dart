@@ -129,40 +129,56 @@ class _PersonalInformationScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BasicPersonalInformationWidget(
+            personalDetail!.basicInformation == null
+                ? const SizedBox.shrink()
+                : BasicPersonalInformationWidget(
               basicInfo: personalDetail!.basicInformation,
               phones: personalDetail!.phones,
               emails: personalDetail!.emails,
             ),
             const SizedBox(height: 20),
-            TravelDocumentsWidget(
+            (personalDetail!.passports.isEmpty && personalDetail!.visas.isEmpty)
+                ? const SizedBox.shrink()
+                : TravelDocumentsWidget(
               passports: personalDetail!.passports,
               visas: personalDetail!.visas,
               countries: countries,
               visaTypes: visaTypes,
             ),
             const SizedBox(height: 20),
-            AddressAndTravelInformationWidget(
+            (personalDetail!.addresses.isEmpty && personalDetail!.travels.isEmpty)
+                ? const SizedBox.shrink()
+                : AddressAndTravelInformationWidget(
               addresses: personalDetail!.addresses,
               travels: personalDetail!.travels,
               countries: countries,
             ),
             const SizedBox(height: 20),
-            EducationalQualificationsWidget(
+            personalDetail!.qualifications.isEmpty
+                ? const SizedBox.shrink()
+                : EducationalQualificationsWidget(
               qualifications: personalDetail!.qualifications,
               countries: countries,
             ),
             const SizedBox(height: 20),
-            WorkExperienceWidget(
+            personalDetail!.experiences.isEmpty
+                ? const SizedBox.shrink()
+                : WorkExperienceWidget(
               experiences: personalDetail!.experiences,
               countries: countries,
             ),
             const SizedBox(height: 20),
-            OccupationSkillsWidget(
+            personalDetail!.occupations.isEmpty
+                ? const SizedBox.shrink()
+                : OccupationSkillsWidget(
               occupations: personalDetail!.occupations,
             ),
             const SizedBox(height: 20),
-            TestScoresWidget(testScores: personalDetail!.testScores),
+            personalDetail!.testScores.isEmpty
+                ? const SizedBox.shrink()
+                : TestScoresWidget(
+              testScores: personalDetail!.testScores,
+            ),
             const SizedBox(height: 20)
             /*ExperienceWidget(
               experiences: personalDetail!.experiences,

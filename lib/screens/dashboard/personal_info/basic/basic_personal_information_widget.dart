@@ -50,7 +50,7 @@ class _BasicPersonalInformationWidgetState
     "De Facto",
     "Separated",
     "Divorced",
-    "Widowed"
+    "Widowed",
   ];
 
   @override
@@ -73,8 +73,11 @@ class _BasicPersonalInformationWidgetState
     if (widget.phones != null) {
       phoneList.addAll(widget.phones!);
       for (var p in phoneList) {
-        phoneControllers.add(TextEditingController(
-            text: "${p.countryCode ?? ''} ${p.phone ?? ''}".trim()));
+        phoneControllers.add(
+          TextEditingController(
+            text: "${p.countryCode ?? ''} ${p.phone ?? ''}".trim(),
+          ),
+        );
       }
     }
 
@@ -132,9 +135,9 @@ class _BasicPersonalInformationWidgetState
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
@@ -161,17 +164,25 @@ class _BasicPersonalInformationWidgetState
       });
     }
 
-    final res = await ApiService.updateClientPhoneDetail(payload);
+    if (payload.isNotEmpty) {
+      final res = await ApiService.updateClientPhoneDetail(payload);
 
-    if (res["success"] == true) {
+      if (res["success"] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Phones Updated Successfully!")),
+        );
+        setState(() => isEditingPhones = false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res["message"] ?? "Phone update failed")),
+        );
+        setState(() => isEditingPhones = false);
+      }
+    }else{
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Phones Updated Successfully!")),
+        SnackBar(content: Text("No data to update.")),
       );
       setState(() => isEditingPhones = false);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(res["message"] ?? "Phone update failed")),
-      );
     }
   }
 
@@ -188,24 +199,39 @@ class _BasicPersonalInformationWidgetState
       });
     }
 
-    final res = await ApiService.updateClientEmailDetail(payload);
+    if(payload.isNotEmpty){
+      final res = await ApiService.updateClientEmailDetail(payload);
 
-    if (res["success"] == true) {
+      if (res["success"] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Emails Updated Successfully!")),
+        );
+        setState(() => isEditingEmails = false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res["message"] ?? "Email update failed")),
+        );
+        setState(() => isEditingEmails = false);
+      }
+    }else{
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Emails Updated Successfully!")),
+        SnackBar(content: Text("No data to update")),
       );
       setState(() => isEditingEmails = false);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(res["message"] ?? "Email update failed")),
-      );
     }
   }
 
   void _addPhoneField() {
     setState(() {
       phoneList.add(
-          Phone(id: 0, phone: "", type: "Other", countryCode: "+", isPrimary: false));
+        Phone(
+          id: 0,
+          phone: "",
+          type: "Other",
+          countryCode: "+",
+          isPrimary: false,
+        ),
+      );
       phoneControllers.add(TextEditingController(text: "+ "));
     });
   }
@@ -227,50 +253,74 @@ class _BasicPersonalInformationWidgetState
         _buildInfoCard([
           _buildTextField('First Name', firstNameCtrl, isBasic: true),
           _buildTextField('Last Name', lastNameCtrl, isBasic: true),
-          _buildTextField('Client ID', clientIdCtrl, isBasic: false), // always non-editable
+          _buildTextField('Client ID', clientIdCtrl, isBasic: false),
+          // always non-editable
           _buildDOBField('Date of Birth', dobCtrl),
-          _buildDropdownField('Gender', genderValue, genderOptions,
-                  (value) => setState(() => genderValue = value)),
-          _buildDropdownField('Marital Status', maritalStatusValue, maritalStatusOptions,
-                  (value) => setState(() => maritalStatusValue = value)),
+          _buildDropdownField(
+            'Gender',
+            genderValue,
+            genderOptions,
+            (value) => setState(() => genderValue = value),
+          ),
+          _buildDropdownField(
+            'Marital Status',
+            maritalStatusValue,
+            maritalStatusOptions,
+            (value) => setState(() => maritalStatusValue = value),
+          ),
         ]),
 
         const SizedBox(height: 24),
 
-        _buildSectionTitle('Phone Numbers', showEdit: true, showAdd: true, isBasic: false),
+        _buildSectionTitle(
+          'Phone Numbers',
+          showEdit: true,
+          showAdd: true,
+          isBasic: false,
+        ),
         const SizedBox(height: 12),
         _buildInfoCard(
           phoneList.isEmpty
               ? [_buildStaticField('No Phone Records', '')]
               : List.generate(phoneList.length, (index) {
-            return _buildTextFieldPhone(
-              phoneList[index].type ?? 'Phone Number',
-              phoneControllers[index],
-              type: phoneList[index].type ?? 'Other',
-            );
-          }),
+                return _buildTextFieldPhone(
+                  phoneList[index].type ?? 'Phone Number',
+                  phoneControllers[index],
+                  type: phoneList[index].type ?? 'Other',
+                );
+              }),
         ),
 
         const SizedBox(height: 24),
 
-        _buildSectionTitle('Email Addresses', showEdit: true, showAdd: true, isBasic: false, isEmail: true),
+        _buildSectionTitle(
+          'Email Addresses',
+          showEdit: true,
+          showAdd: true,
+          isBasic: false,
+          isEmail: true,
+        ),
         const SizedBox(height: 12),
         _buildInfoCard(
           emailList.isEmpty
               ? [_buildStaticField('No Email Records', '')]
               : List.generate(emailList.length, (index) {
-            return _buildTextFieldEmail(
-              emailList[index].type ?? 'Email Address',
-              emailControllers[index],
-              type: emailList[index].type ?? 'Other',
-            );
-          }),
+                return _buildTextFieldEmail(
+                  emailList[index].type ?? 'Email Address',
+                  emailControllers[index],
+                  type: emailList[index].type ?? 'Other',
+                );
+              }),
         ),
       ],
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController ctrl, {required bool isBasic}) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController ctrl, {
+    required bool isBasic,
+  }) {
     bool editable = isBasic ? isEditingBasic : false;
     if (label == 'Client ID') editable = false;
 
@@ -288,13 +338,20 @@ class _BasicPersonalInformationWidgetState
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTextFieldPhone(String label, TextEditingController ctrl, {required String type}) {
+  Widget _buildTextFieldPhone(
+    String label,
+    TextEditingController ctrl, {
+    required String type,
+  }) {
     bool editable = type == "Personal" ? false : isEditingPhones;
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -310,13 +367,20 @@ class _BasicPersonalInformationWidgetState
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTextFieldEmail(String label, TextEditingController ctrl, {required String type}) {
+  Widget _buildTextFieldEmail(
+    String label,
+    TextEditingController ctrl, {
+    required String type,
+  }) {
     bool editable = type == "Personal" ? false : isEditingEmails;
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -332,37 +396,42 @@ class _BasicPersonalInformationWidgetState
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
         ),
       ),
     );
   }
 
   Widget _buildDropdownField(
-      String label,
-      String value,
-      List<String> options,
-      ValueChanged<String> onChangedNonNull,
-      ) {
+    String label,
+    String value,
+    List<String> options,
+    ValueChanged<String> onChangedNonNull,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: DropdownButtonFormField<String>(
         value: value.isNotEmpty ? value : null,
-        items: options
-            .map((e) => DropdownMenuItem<String>(
-          value: e,
-          child: Text(e),
-        ))
-            .toList(),
-        onChanged: isEditingBasic
-            ? (val) {
-          if (val != null) onChangedNonNull(val);
-        }
-            : null,
+        items:
+            options
+                .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+                .toList(),
+        onChanged:
+            isEditingBasic
+                ? (val) {
+                  if (val != null) onChangedNonNull(val);
+                }
+                : null,
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
         ),
       ),
     );
@@ -385,8 +454,13 @@ class _BasicPersonalInformationWidgetState
     );
   }
 
-  Widget _buildSectionTitle(String title,
-      {bool showEdit = false, bool showAdd = false, required bool isBasic, bool isEmail = false}) {
+  Widget _buildSectionTitle(
+    String title, {
+    bool showEdit = false,
+    bool showAdd = false,
+    required bool isBasic,
+    bool isEmail = false,
+  }) {
     return Row(
       children: [
         Icon(
@@ -411,14 +485,20 @@ class _BasicPersonalInformationWidgetState
           InkWell(
             onTap: () {
               if (isBasic) {
-                if (isEditingBasic) _saveBasicInfo();
-                else setState(() => isEditingBasic = true);
+                if (isEditingBasic)
+                  _saveBasicInfo();
+                else
+                  setState(() => isEditingBasic = true);
               } else if (isEmail) {
-                if (isEditingEmails) _saveEmails();
-                else setState(() => isEditingEmails = true);
+                if (isEditingEmails)
+                  _saveEmails();
+                else
+                  setState(() => isEditingEmails = true);
               } else {
-                if (isEditingPhones) _savePhones();
-                else setState(() => isEditingPhones = true);
+                if (isEditingPhones)
+                  _savePhones();
+                else
+                  setState(() => isEditingPhones = true);
               }
             },
             child: _editButton(isBasic: isBasic, isEmail: isEmail),
@@ -428,11 +508,12 @@ class _BasicPersonalInformationWidgetState
   }
 
   Widget _editButton({required bool isBasic, bool isEmail = false}) {
-    bool editing = isBasic
-        ? isEditingBasic
-        : isEmail
-        ? isEditingEmails
-        : isEditingPhones;
+    bool editing =
+        isBasic
+            ? isEditingBasic
+            : isEmail
+            ? isEditingEmails
+            : isEditingPhones;
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: _buttonDecoration(),
@@ -460,7 +541,10 @@ class _BasicPersonalInformationWidgetState
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
+      ),
     );
   }
 }
