@@ -1,10 +1,10 @@
 class Phone {
-  final int id;
-  final String phone;
-  final String type;
-  final bool isPrimary;
-  final String countryCode;
-  final String? extension;
+  int id;
+  String phone;
+  String type;
+  bool isPrimary;
+  String countryCode;
+  String? extension;
 
   Phone({
     required this.id,

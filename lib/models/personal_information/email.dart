@@ -1,8 +1,8 @@
 class Email {
-  final int? id;
-  final String email;
-  final String type;
-  final bool? isPrimary;
+  int? id;
+  String email;
+  String type;
+  bool? isPrimary;
 
   Email({
     this.id,

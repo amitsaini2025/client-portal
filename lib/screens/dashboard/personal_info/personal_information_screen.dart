@@ -10,7 +10,6 @@ import 'package:client/screens/dashboard/personal_info/addresss_information/addr
 import 'package:client/screens/dashboard/personal_info/education_qualitification/education_qualification_widget.dart';
 import 'package:client/screens/dashboard/personal_info/work_experience/work_experience_widget.dart';
 import 'package:client/screens/dashboard/personal_info/occupation_skills/occupation_skills_widget.dart';
-import 'package:client/screens/dashboard/personal_info/experience/experience_widget.dart';
 
 import '../../../models/personal_information/basic_information_post/visa_types/visa_type.dart';
 import '../../../models/personal_information/client_personal_detail_response.dart';
@@ -129,54 +128,40 @@ class _PersonalInformationScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            personalDetail!.basicInformation == null
-                ? const SizedBox.shrink()
-                : BasicPersonalInformationWidget(
+            BasicPersonalInformationWidget(
               basicInfo: personalDetail!.basicInformation,
               phones: personalDetail!.phones,
               emails: personalDetail!.emails,
             ),
             const SizedBox(height: 20),
-            (personalDetail!.passports.isEmpty && personalDetail!.visas.isEmpty)
-                ? const SizedBox.shrink()
-                : TravelDocumentsWidget(
+            TravelDocumentsWidget(
               passports: personalDetail!.passports,
               visas: personalDetail!.visas,
               countries: countries,
               visaTypes: visaTypes,
             ),
             const SizedBox(height: 20),
-            (personalDetail!.addresses.isEmpty && personalDetail!.travels.isEmpty)
-                ? const SizedBox.shrink()
-                : AddressAndTravelInformationWidget(
+            AddressAndTravelInformationWidget(
               addresses: personalDetail!.addresses,
               travels: personalDetail!.travels,
               countries: countries,
             ),
             const SizedBox(height: 20),
-            personalDetail!.qualifications.isEmpty
-                ? const SizedBox.shrink()
-                : EducationalQualificationsWidget(
+            EducationalQualificationsWidget(
               qualifications: personalDetail!.qualifications,
               countries: countries,
             ),
             const SizedBox(height: 20),
-            personalDetail!.experiences.isEmpty
-                ? const SizedBox.shrink()
-                : WorkExperienceWidget(
+            WorkExperienceWidget(
               experiences: personalDetail!.experiences,
               countries: countries,
             ),
             const SizedBox(height: 20),
-            personalDetail!.occupations.isEmpty
-                ? const SizedBox.shrink()
-                : OccupationSkillsWidget(
+            OccupationSkillsWidget(
               occupations: personalDetail!.occupations,
             ),
             const SizedBox(height: 20),
-            personalDetail!.testScores.isEmpty
-                ? const SizedBox.shrink()
-                : TestScoresWidget(
+            TestScoresWidget(
               testScores: personalDetail!.testScores,
             ),
             const SizedBox(height: 20)
