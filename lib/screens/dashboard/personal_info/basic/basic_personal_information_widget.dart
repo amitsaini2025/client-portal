@@ -233,15 +233,30 @@ class _BasicPersonalInformationWidgetState
         "phone": number,
         "type": phoneList[i].type ?? "Other",
         "country_code": countryCode,
+        "extension": phoneList[i].extension,
       });
     }
 
     if (payload.isNotEmpty) {
       final res = await ApiService.updateClientPhoneDetail(payload);
 
-      if (res["success"] == true) {
+      if (res["success"] == true && res["data"] != null && res["data"]["phones"] != null) {
+        final List<dynamic> updatedData = res["data"]["phones"];
+
+        // Update local phoneList objects from API response
+        for (int i = 0; i < updatedData.length; i++) {
+          final apiPhone = updatedData[i];
+          final localPhone = phoneList[i];
+
+          localPhone.id = apiPhone["id"];
+          localPhone.phone = apiPhone["phone"];
+          localPhone.type = apiPhone["type"];
+          localPhone.countryCode = apiPhone["country_code"];
+          localPhone.extension = apiPhone["extension"];
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Phones Updated Successfully!")),
+          const SnackBar(content: Text("Phones updated successfully!")),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -270,7 +285,21 @@ class _BasicPersonalInformationWidgetState
     if (payload.isNotEmpty) {
       final res = await ApiService.updateClientEmailDetail(payload);
 
-      if (res["success"] == true) {
+      if (res["success"] == true &&
+          res["data"] != null &&
+          res["data"]["emails"] != null) {
+
+        final List<dynamic> updatedEmails = res["data"]["emails"];
+
+        for (int i = 0; i < updatedEmails.length; i++) {
+          final apiEmail = updatedEmails[i];
+          final localEmail = emailList[i];
+
+          localEmail.id = apiEmail["id"];
+          localEmail.email = apiEmail["email"];
+          localEmail.type = apiEmail["type"];
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Emails Updated Successfully!")),
         );
@@ -283,6 +312,7 @@ class _BasicPersonalInformationWidgetState
 
     setState(() => isEditingEmails = false);
   }
+
 
   void _addPhoneField() {
     setState(() {
