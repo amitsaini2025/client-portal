@@ -33,6 +33,7 @@ class _AddressAndTravelInformationWidgetState
   bool isEditingTravel = false;
   final Map<String, TextEditingController> _placeControllers = {};
 
+  //final String googleApiKey = "AIzaSyATpl3gyx8FSoykbCx3otznCIWP_-8hk7c";
   final String googleApiKey = "AIzaSyATpl3gyx8FSoykbCx3otznCIWP_-8hk7c";
 
   Future<String?> _pickDate(String current) async {
@@ -61,13 +62,63 @@ class _AddressAndTravelInformationWidgetState
     return null;
   }
 
+  // -------------------------
+  // SAVE ADDRESSES (with ID mapping)
+  // -------------------------
   Future<void> _saveAddresses() async {
     try {
-      final addressesPayload = widget.addresses.map((a) => a.toJson()).toList();
+      // build payload according to backend expectation
+      final addressesPayload = widget.addresses.map((a) {
+        return {
+          "id": (a.id == null || a.id == 0) ? null : a.id,
+          "search_address": a.searchAddress ?? "",
+          "address_line_1": a.addressLine1 ?? "",
+          "address_line_2": a.addressLine2,
+          "suburb": a.suburb ?? "",
+          "state": a.state ?? "",
+          "postcode": a.postcode?.toString() ?? "",
+          "country": a.country ?? "",
+          "regional_code": a.regionalCode,
+          "start_date": a.startDate ?? "",
+          "end_date": a.endDate,
+          "is_current": a.isCurrent ?? false,
+        };
+      }).toList();
+
       final response = await ApiService.updateClientAddressDetail(
         addressesPayload,
       );
-      if (response['success'] == true || response['status'] == 200) {
+
+      if (response['success'] == true &&
+          response['data'] != null &&
+          response['data']['addresses'] != null) {
+        final List<dynamic> updated = response['data']['addresses'];
+
+        // update local models using returned data (assumes same ordering)
+        for (int i = 0; i < updated.length; i++) {
+          final api = updated[i];
+          if (i >= widget.addresses.length) break;
+          final local = widget.addresses[i];
+
+          local.id = api['id'];
+          local.searchAddress = api['search_address'];
+          local.addressLine1 = api['address_line_1'];
+          local.addressLine2 = api['address_line_2'];
+          local.suburb = api['suburb'];
+          local.state = api['state'];
+          // convert postcode to int if your model expects int; if it's String keep as is
+          try {
+            local.postcode = int.tryParse(api['postcode']?.toString() ?? '') ?? local.postcode;
+          } catch (_) {
+            // fallback: keep existing
+          }
+          local.country = api['country'];
+          local.regionalCode = api['regional_code'];
+          local.startDate = api['start_date'];
+          local.endDate = api['end_date'];
+          local.isCurrent = api['is_current'] ?? false;
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Addresses updated successfully')),
         );
@@ -86,13 +137,42 @@ class _AddressAndTravelInformationWidgetState
     }
   }
 
+  // -------------------------
+  // SAVE TRAVELS (with ID mapping)
+  // -------------------------
   Future<void> _saveTravels() async {
     try {
-      final travelsPayload = widget.travels.map((t) => t.toJson()).toList();
+      final travelsPayload = widget.travels.map((t) {
+        return {
+          "id": (t.id == null || t.id == 0) ? null : t.id,
+          "country_visited": t.countryVisited ?? "",
+          "arrival_date": t.arrivalDate ?? "",
+          "departure_date": t.departureDate ?? "",
+          "purpose": t.purpose ?? "",
+        };
+      }).toList();
+
       final response = await ApiService.updateClientTravelDetail(
         travelsPayload,
       );
-      if (response['success'] == true || response['status'] == 200) {
+
+      if (response['success'] == true &&
+          response['data'] != null &&
+          response['data']['travels'] != null) {
+        final List<dynamic> updatedTravels = response['data']['travels'];
+
+        for (int i = 0; i < updatedTravels.length; i++) {
+          final api = updatedTravels[i];
+          if (i >= widget.travels.length) break;
+          final local = widget.travels[i];
+
+          local.id = api['id'];
+          local.countryVisited = api['country_visited'];
+          local.arrivalDate = api['arrival_date'];
+          local.departureDate = api['departure_date'];
+          local.purpose = api['purpose'];
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Travels updated successfully')),
         );
@@ -127,6 +207,43 @@ class _AddressAndTravelInformationWidgetState
     }
   }
 
+  // -------------------------
+  // Add handlers (new items)
+  // -------------------------
+  void _onAddAddress() {
+    setState(() {
+      // create a new empty address (use 0 or null for id depending on your model)
+      widget.addresses.add(Address(
+        id: 0,
+        searchAddress: "",
+        addressLine1: "",
+        addressLine2: "",
+        suburb: "",
+        state: "",
+        postcode: 0,
+        country: "",
+        regionalCode: "",
+        startDate: "",
+        endDate: "",
+        isCurrent: false,
+      ));
+      isEditingAddress = true;
+    });
+  }
+
+  void _onAddTravel() {
+    setState(() {
+      widget.travels.add(Travel(
+        id: 0,
+        countryVisited: "",
+        arrivalDate: "",
+        departureDate: "",
+        purpose: "",
+      ));
+      isEditingTravel = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -144,17 +261,17 @@ class _AddressAndTravelInformationWidgetState
                 setState(() => isEditingAddress = !isEditingAddress);
               }
             },
-            onAdd: () {},
-            showAdd: false,
+            onAdd: _onAddAddress,
+            showAdd: true, // enabled add button
           ),
           const SizedBox(height: 12),
           ...widget.addresses.map(
-            (address) => _buildInfoCard([
+                (address) => _buildInfoCard([
               _buildGooglePlaceField(
                 "Search Address",
                 address.searchAddress,
                 isEditingAddress,
-                (val) {
+                    (val) {
                   setState(() {
                     address.searchAddress = val;
                   });
@@ -165,32 +282,32 @@ class _AddressAndTravelInformationWidgetState
                 "Address Line 1",
                 address.addressLine1 ?? "-",
                 isEditingAddress,
-                (val) => address.addressLine1 = val,
+                    (val) => address.addressLine1 = val,
               ),
               _buildEditableRow(
                 "Address Line 2",
                 address.addressLine2 ?? "-",
                 isEditingAddress,
-                (val) => address.addressLine2 = val,
+                    (val) => address.addressLine2 = val,
               ),
               _buildEditableRow(
                 "Suburb",
                 address.suburb,
                 isEditingAddress,
-                (val) => address.suburb = val,
+                    (val) => address.suburb = val,
               ),
               _buildEditableRow(
                 "State",
                 address.state,
                 isEditingAddress,
-                (val) => address.state = val,
+                    (val) => address.state = val,
               ),
               _buildEditableRow(
                 "Postcode",
                 address.postcode.toString(),
                 isEditingAddress,
-                (val) =>
-                    address.postcode = int.tryParse(val) ?? address.postcode,
+                    (val) =>
+                address.postcode = int.tryParse(val) ?? address.postcode,
               ),
               _buildCountryDropdown(
                 label: "Country",
@@ -202,25 +319,25 @@ class _AddressAndTravelInformationWidgetState
                 "Regional Code",
                 address.regionalCode ?? "-",
                 isEditingAddress,
-                (val) => address.regionalCode = val,
+                    (val) => address.regionalCode = val,
               ),
               _buildDateRow(
                 "Start Date",
                 address.startDate ?? "-",
                 isEditingAddress,
-                (val) => address.startDate = val,
+                    (val) => address.startDate = val,
               ),
               _buildDateRow(
                 "End Date",
                 address.endDate ?? "-",
                 isEditingAddress,
-                (val) => address.endDate = val,
+                    (val) => address.endDate = val,
               ),
               _buildEditableRow(
                 "Is Current",
                 address.isCurrent ? "Yes" : "No",
                 isEditingAddress,
-                (val) => address.isCurrent = val.toLowerCase() == "yes",
+                    (val) => address.isCurrent = val.toLowerCase() == "yes",
               ),
             ]),
           ),
@@ -236,12 +353,12 @@ class _AddressAndTravelInformationWidgetState
                 setState(() => isEditingTravel = !isEditingTravel);
               }
             },
-            onAdd: () {},
-            showAdd: false,
+            onAdd: _onAddTravel,
+            showAdd: true, // enabled add button
           ),
           const SizedBox(height: 12),
           ...widget.travels.map(
-            (travel) => _buildInfoCard([
+                (travel) => _buildInfoCard([
               _buildCountryDropdown(
                 label: "Country Visited",
                 editable: isEditingTravel,
@@ -253,19 +370,19 @@ class _AddressAndTravelInformationWidgetState
                 "Arrival Date",
                 travel.arrivalDate,
                 isEditingTravel,
-                (val) => travel.arrivalDate = val!,
+                    (val) => travel.arrivalDate = val!,
               ),
               _buildDateRow(
                 "Departure Date",
                 travel.departureDate,
                 isEditingTravel,
-                (val) => travel.departureDate = val!,
+                    (val) => travel.departureDate = val!,
               ),
               _buildEditableRow(
                 "Travel Purpose",
                 travel.purpose,
                 isEditingTravel,
-                (val) => travel.purpose = val,
+                    (val) => travel.purpose = val,
               ),
             ]),
           ),
@@ -344,11 +461,11 @@ class _AddressAndTravelInformationWidgetState
 
 
   Widget _buildEditableRow(
-    String label,
-    String value,
-    bool enabled,
-    ValueChanged<String> onChanged,
-  ) {
+      String label,
+      String value,
+      bool enabled,
+      ValueChanged<String> onChanged,
+      ) {
     final controller = TextEditingController(text: value);
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -391,55 +508,55 @@ class _AddressAndTravelInformationWidgetState
           ),
         ),
         child:
-            editable
-                ? DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: selected!.isEmpty ? null : selected,
-                    isExpanded: true,
-                    onChanged: onChanged,
-                    items:
-                        widget.countries
-                            .map(
-                              (c) => DropdownMenuItem(
-                                value: c.name,
-                                child: Text(c.name),
-                              ),
-                            )
-                            .toList(),
-                  ),
-                )
-                : Text(
-                  selected ?? "",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+        editable
+            ? DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: selected!.isEmpty ? null : selected,
+            isExpanded: true,
+            onChanged: onChanged,
+            items:
+            widget.countries
+                .map(
+                  (c) => DropdownMenuItem(
+                value: c.name,
+                child: Text(c.name),
+              ),
+            )
+                .toList(),
+          ),
+        )
+            : Text(
+          selected ?? "",
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.black87,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildDateRow(
-    String label,
-    String value,
-    bool enabled,
-    ValueChanged<String?> onChanged,
-  ) {
+      String label,
+      String value,
+      bool enabled,
+      ValueChanged<String?> onChanged,
+      ) {
     final controller = TextEditingController(text: value);
 
     return GestureDetector(
       onTap:
-          enabled
-              ? () async {
-                final newDate = await _pickDate(controller.text);
-                if (newDate != null) {
-                  controller.text = newDate;
-                  onChanged(newDate);
-                  setState(() {});
-                }
-              }
-              : null,
+      enabled
+          ? () async {
+        final newDate = await _pickDate(controller.text);
+        if (newDate != null) {
+          controller.text = newDate;
+          onChanged(newDate);
+          setState(() {});
+        }
+      }
+          : null,
       child: AbsorbPointer(
         child: Padding(
           padding: const EdgeInsets.only(bottom: 14),
@@ -467,13 +584,13 @@ class _AddressAndTravelInformationWidgetState
   }
 
   Widget _buildSectionTitle(
-    String title, {
-    required bool isEditing,
-    required VoidCallback onEdit,
-    required VoidCallback onAdd,
-    required IconData icon,
-    bool showAdd = false,
-  }) {
+      String title, {
+        required bool isEditing,
+        required VoidCallback onEdit,
+        required VoidCallback onAdd,
+        required IconData icon,
+        bool showAdd = false,
+      }) {
     return Row(
       children: [
         Icon(icon, color: Colors.white),
