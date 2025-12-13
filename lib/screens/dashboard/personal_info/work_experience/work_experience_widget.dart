@@ -69,14 +69,36 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
         widget.experiences.map((e) => e.toJson()).toList(),
       );
 
-      if (response["success"] == true) {
+      if (response["success"] == true &&
+          response["data"] != null &&
+          response["data"]["experiences"] != null) {
+        final List<dynamic> updatedData = response["data"]["experiences"];
+
+        // Update local experience objects from API response
+        for (int i = 0; i < updatedData.length; i++) {
+          final apiExp = updatedData[i];
+          final localExp = widget.experiences[i];
+
+          localExp.id = apiExp["id"];
+          localExp.jobTitle = apiExp["job_title"];
+          localExp.jobCode = apiExp["job_code"];
+          localExp.employerName = apiExp["employer_name"];
+          localExp.country = apiExp["country"];
+          localExp.state = apiExp["state"];
+          localExp.jobType = apiExp["job_type"];
+          localExp.startDate = apiExp["start_date"];
+          localExp.finishDate = apiExp["finish_date"];
+          localExp.relevantExperience = apiExp["relevant_experience"];
+          localExp.fteMultiplier = apiExp["fte_multiplier"];
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Experiences updated successfully")),
+          const SnackBar(content: Text("Experiences updated successfully!")),
         );
         setState(() => isEditing = false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response["message"] ?? "Update failed")),
+          SnackBar(content: Text(response["message"] ?? "Experience update failed")),
         );
       }
     } catch (e) {
@@ -94,7 +116,7 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     setState(() {
       widget.experiences.add(
         Experience(
-          id: DateTime.now().millisecondsSinceEpoch,
+          id: null,
           jobTitle: "",
           jobCode: "",
           country: "",

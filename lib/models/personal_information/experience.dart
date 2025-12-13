@@ -1,5 +1,5 @@
 class Experience {
-  final int id;
+  int? id;
   String jobTitle;
   String jobCode;
   String country;
@@ -9,7 +9,7 @@ class Experience {
   String employerName;
   String? state;
   String jobType;
-  final double fteMultiplier;
+  double fteMultiplier;
 
   Experience({
     required this.id,

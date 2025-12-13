@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../models/personal_information/occupation.dart';
 import '../../../../services/api_service.dart';
 
@@ -23,20 +24,40 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
     });
 
     try {
-      final response = await ApiService.updateClientOccupationDetail(
-        widget.occupations.map((e) => e.toJson()).toList(),
-      );
+      final payload = widget.occupations.map((e) => e.toJson()).toList();
+      final res = await ApiService.updateClientOccupationDetail(payload);
 
-      if (response["success"] == true) {
+      if (res["success"] == true &&
+          res["data"] != null &&
+          res["data"]["occupations"] != null) {
+        final List<dynamic> updatedData = res["data"]["occupations"];
+
+        for (int i = 0; i < updatedData.length; i++) {
+          final apiOcc = updatedData[i];
+          final localOcc = widget.occupations[i];
+
+          localOcc.id = apiOcc["id"];
+          localOcc.skillAssessment = apiOcc["skill_assessment"];
+          localOcc.nominatedOccupation = apiOcc["nominated_occupation"];
+          localOcc.occupationCode = apiOcc["occupation_code"];
+          localOcc.assessingAuthority = apiOcc["assessing_authority"];
+          localOcc.visaSubclass = apiOcc["visa_subclass"];
+          localOcc.assessmentDate = apiOcc["assessment_date"];
+          localOcc.expiryDate = apiOcc["expiry_date"];
+          localOcc.referenceNo = apiOcc["reference_no"];
+          localOcc.relevantOccupation = apiOcc["relevant_occupation"];
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Occupation details updated successfully")),
+          const SnackBar(content: Text("Occupations updated successfully!")),
         );
+
         setState(() {
           isEditing = false;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response["message"] ?? "Update failed")),
+          SnackBar(content: Text(res["message"] ?? "Occupation update failed")),
         );
       }
     } catch (e) {
@@ -60,11 +81,32 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
 
     if (response["success"] == true && response["data"] != null) {
       List<String> titles = List<String>.from(
-          response["data"].map((item) => item["occupation_title"]));
+        response["data"].map((item) => item["occupation_title"]),
+      );
       setState(() {
         occupationSuggestions[index] = titles;
       });
     }
+  }
+
+  void _addOccupation() {
+    setState(() {
+      widget.occupations.add(
+        Occupation(
+          id: null,
+          skillAssessment: "",
+          nominatedOccupation: "",
+          occupationCode: "",
+          assessingAuthority: "",
+          visaSubclass: "",
+          assessmentDate: "",
+          expiryDate: "",
+          referenceNo: "",
+          relevantOccupation: false,
+        ),
+      );
+      isEditing = true;
+    });
   }
 
   @override
@@ -79,7 +121,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                 "Occupation & Skills",
                 icon: Icons.assessment_rounded,
                 isEditing: isEditing,
-                showAdd: false,
+                showAdd: true,
                 onEdit: () {
                   if (isEditing) {
                     _saveOccupations();
@@ -87,24 +129,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                     setState(() => isEditing = true);
                   }
                 },
-                onAdd: () {
-                  setState(() {
-                    widget.occupations.add(
-                      Occupation(
-                        id: DateTime.now().millisecondsSinceEpoch,
-                        skillAssessment: "",
-                        nominatedOccupation: "",
-                        occupationCode: "",
-                        assessingAuthority: "",
-                        visaSubclass: "",
-                        assessmentDate: "",
-                        expiryDate: "",
-                        referenceNo: "",
-                        relevantOccupation: false,
-                      ),
-                    );
-                  });
-                },
+                onAdd: _addOccupation,
               ),
               const SizedBox(height: 18),
               ...widget.occupations.asMap().entries.map((entry) {
@@ -125,13 +150,13 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
   }
 
   Widget _buildSectionTitle(
-      String title, {
-        required bool isEditing,
-        required VoidCallback onEdit,
-        bool showAdd = false,
-        VoidCallback? onAdd,
-        required IconData icon,
-      }) {
+    String title, {
+    required bool isEditing,
+    required VoidCallback onEdit,
+    bool showAdd = false,
+    VoidCallback? onAdd,
+    required IconData icon,
+  }) {
     return Row(
       children: [
         Icon(icon, color: Colors.white),
@@ -202,19 +227,26 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             runSpacing: 14,
             children: [
               _buildEditableRow(
-                  "Skill Assessment", occupation.skillAssessment,
-                      (val) => occupation.skillAssessment = val),
+                "Skill Assessment",
+                occupation.skillAssessment,
+                (val) => occupation.skillAssessment = val,
+              ),
               _buildDateRow(
-                  "Assessment Date", occupation.assessmentDate,
-                      (val) => occupation.assessmentDate = val),
+                "Assessment Date",
+                occupation.assessmentDate,
+                (val) => occupation.assessmentDate = val,
+              ),
               _buildSearchableRow(
-                  "Nominated Occupation",
-                  occupation.nominatedOccupation,
-                  index,
-                      (val) => occupation.nominatedOccupation = val),
+                "Nominated Occupation",
+                occupation.nominatedOccupation,
+                index,
+                (val) => occupation.nominatedOccupation = val,
+              ),
               _buildEditableRow(
-                  "Occupation Code", occupation.occupationCode,
-                      (val) => occupation.occupationCode = val),
+                "Occupation Code",
+                occupation.occupationCode,
+                (val) => occupation.occupationCode = val,
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -223,24 +255,30 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             runSpacing: 14,
             children: [
               _buildDateRow(
-                  "Expiry Date", occupation.expiryDate,
-                      (val) => occupation.expiryDate = val),
+                "Expiry Date",
+                occupation.expiryDate,
+                (val) => occupation.expiryDate = val,
+              ),
               _buildEditableRow(
-                  "Reference No", occupation.referenceNo,
-                      (val) => occupation.referenceNo = val),
+                "Reference No",
+                occupation.referenceNo,
+                (val) => occupation.referenceNo = val,
+              ),
               _buildEditableRow(
-                  "Assessing Authority", occupation.assessingAuthority,
-                      (val) => occupation.assessingAuthority = val),
+                "Assessing Authority",
+                occupation.assessingAuthority,
+                (val) => occupation.assessingAuthority = val,
+              ),
               _buildEditableRow(
-                  "Visa Subclass", occupation.visaSubclass ?? "",
-                      (val) => occupation.visaSubclass = val),
+                "Visa Subclass",
+                occupation.visaSubclass ?? "",
+                (val) => occupation.visaSubclass = val,
+              ),
               _buildCheckboxRow(
-                  "Relevant", occupation.relevantOccupation,
-                      (val) {
-                    setState(() {
-                      occupation.relevantOccupation = val;
-                    });
-                  }),
+                "Relevant",
+                occupation.relevantOccupation,
+                (val) => occupation.relevantOccupation = val,
+              ),
             ],
           ),
         ],
@@ -248,7 +286,11 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
     );
   }
 
-  Widget _buildEditableRow(String label, String value, Function(String) onChanged) {
+  Widget _buildEditableRow(
+    String label,
+    String value,
+    Function(String) onChanged,
+  ) {
     return SizedBox(
       child: TextFormField(
         initialValue: value,
@@ -267,13 +309,21 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             letterSpacing: 0.2,
           ),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildSearchableRow(String label, String value, int index, Function(String) onChanged) {
+  Widget _buildSearchableRow(
+    String label,
+    String value,
+    int index,
+    Function(String) onChanged,
+  ) {
     TextEditingController controller = TextEditingController(text: value);
 
     return SizedBox(
@@ -299,19 +349,23 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                 letterSpacing: 0.2,
               ),
               border: const OutlineInputBorder(),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              suffixIcon: isEditing && controller.text.isNotEmpty
-                  ? IconButton(
-                icon: const Icon(Icons.clear, size: 18),
-                onPressed: () {
-                  setState(() {
-                    controller.clear();
-                    onChanged("");
-                    occupationSuggestions[index] = [];
-                  });
-                },
-              )
-                  : null,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+              suffixIcon:
+                  isEditing && controller.text.isNotEmpty
+                      ? IconButton(
+                        icon: const Icon(Icons.clear, size: 18),
+                        onPressed: () {
+                          setState(() {
+                            controller.clear();
+                            onChanged("");
+                            occupationSuggestions[index] = [];
+                          });
+                        },
+                      )
+                      : null,
             ),
           ),
           if (occupationSuggestions[index] != null &&
@@ -324,25 +378,27 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
               ),
               child: ListView(
                 shrinkWrap: true,
-                children: occupationSuggestions[index]!
-                    .map((suggestion) => ListTile(
-                  title: Text(suggestion),
-                  onTap: () {
-                    setState(() {
-                      controller.text = suggestion;
-                      onChanged(suggestion);
-                      occupationSuggestions[index] = [];
-                    });
-                  },
-                ))
-                    .toList(),
+                children:
+                    occupationSuggestions[index]!
+                        .map(
+                          (suggestion) => ListTile(
+                            title: Text(suggestion),
+                            onTap: () {
+                              setState(() {
+                                controller.text = suggestion;
+                                onChanged(suggestion);
+                                occupationSuggestions[index] = [];
+                              });
+                            },
+                          ),
+                        )
+                        .toList(),
               ),
-            )
+            ),
         ],
       ),
     );
   }
-
 
   Widget _buildDateRow(String label, String value, Function(String) onChanged) {
     TextEditingController controller = TextEditingController(text: value);
@@ -351,25 +407,37 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
         controller: controller,
         enabled: isEditing,
         readOnly: true,
-        onTap: isEditing
-            ? () async {
-          DateTime? pickedDate = await showDatePicker(
-            context: context,
-            initialDate: value.isNotEmpty
-                ? DateTime.tryParse(value) ?? DateTime.now()
-                : DateTime.now(),
-            firstDate: DateTime(1900),
-            lastDate: DateTime(2100),
-          );
-          if (pickedDate != null) {
-            String formattedDate = "${pickedDate.day.toString().padLeft(2,'0')}/${pickedDate.month.toString().padLeft(2,'0')}/${pickedDate.year}";
-            controller.text = formattedDate;
-            setState(() {
-              onChanged(formattedDate);
-            });
-          }
-        }
-            : null,
+        onTap:
+            isEditing
+                ? () async {
+                  DateTime initialDate;
+                  if (value.isNotEmpty) {
+                    final parts = value.split('/');
+                    initialDate = DateTime(
+                      int.parse(parts[2]),
+                      int.parse(parts[1]),
+                      int.parse(parts[0]),
+                    );
+                  } else {
+                    initialDate = DateTime.now();
+                  }
+
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: initialDate,
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    String formattedDate =
+                        "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
+                    controller.text = formattedDate;
+                    setState(() {
+                      onChanged(formattedDate);
+                    });
+                  }
+                }
+                : null,
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
@@ -383,8 +451,12 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             letterSpacing: 0.2,
           ),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          suffixIcon: isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
+          suffixIcon:
+              isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
         ),
       ),
     );
@@ -397,13 +469,14 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
         Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
         Checkbox(
           value: value,
-          onChanged: isEditing
-              ? (val) {
-            setState(() {
-              onChanged(val ?? false);
-            });
-          }
-              : null,
+          onChanged:
+              isEditing
+                  ? (val) {
+                    setState(() {
+                      onChanged(val ?? false);
+                    });
+                  }
+                  : null,
         ),
       ],
     );
