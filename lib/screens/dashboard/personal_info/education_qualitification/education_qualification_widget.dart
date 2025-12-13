@@ -24,10 +24,24 @@ class _EducationalQualificationsWidgetState
     extends State<EducationalQualificationsWidget> {
   bool isEditing = false;
 
-  List<Map<String, dynamic>> convertQualificationsToJson(
-      List<Qualification> list,
-      ) {
-    return list.map((q) {
+  final List<String> qualificationLevels = [
+    "Certificate I",
+    "Certificate II",
+    "Certificate III",
+    "Certificate IV",
+    "Diploma",
+    "Advanced Diploma",
+    "Bachelor Degree",
+    "Bachelor Honours Degree",
+    "Graduate Certificate",
+    "Graduate Diploma",
+    "Masters Degree",
+    "Doctoral Degree",
+    "Other",
+  ];
+
+  List<Map<String, dynamic>> convertQualificationsToJson() {
+    return widget.qualifications.map((q) {
       return {
         "id": q.id,
         "level": q.level,
@@ -46,57 +60,101 @@ class _EducationalQualificationsWidgetState
     }).toList();
   }
 
-  Future<void> _pickDate(
-      Function(String) onChanged,
-      String currentValue,
-      ) async {
-    DateTime initial;
+  void _addQualification() {
+    setState(() {
+      widget.qualifications.add(Qualification(
+        id: null,
+        level: "",
+        name: "",
+        collegeName: "",
+        campus: "",
+        country: "",
+        state: null,
+        startDate: "",
+        finishDate: "",
+        relevantQualification: false,
+        specialistEducation: false,
+        stemQualification: false,
+        regionalStudy: false,
+      ));
+      isEditing = true;
+    });
+  }
 
+  Future<void> _saveQualifications() async {
     try {
-      if (currentValue.isNotEmpty) {
-        final parts = currentValue.split('/');
-        initial = DateTime(
-          int.parse(parts[2]),
-          int.parse(parts[1]),
-          int.parse(parts[0]),
+      final payload = convertQualificationsToJson();
+      final response = await ApiService.updateClientQualificationDetail(payload);
+      if (response['success'] == true &&
+          response['data'] != null &&
+          response['data']['qualifications'] != null) {
+        final List<dynamic> updatedList = response['data']['qualifications'];
+        for (int i = 0; i < updatedList.length; i++) {
+          if (i >= widget.qualifications.length) break;
+
+          final api = updatedList[i];
+          final local = widget.qualifications[i];
+
+          local.id = api['id'];
+          local.level = api['level'] ?? "";
+          local.name = api['name'] ?? "";
+          local.collegeName = api['college_name'] ?? "";
+          local.campus = api['campus'] ?? "";
+          local.country = api['country'] ?? "";
+          local.state = api['state'] ?? "";
+          local.startDate = api['start_date'] ?? "";
+          local.finishDate = api['finish_date'] ?? "";
+          local.relevantQualification = api['relevant_qualification'] ?? false;
+          local.specialistEducation = api['specialist_education'] ?? false;
+          local.stemQualification = api['stem_qualification'] ?? false;
+          local.regionalStudy = api['regional_study'] ?? false;
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Qualifications updated successfully')),
         );
+
+        setState(() => isEditing = false);
       } else {
-        initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Failed to update qualifications'),
+          ),
+        );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating qualifications: $e')),
+      );
+    }
+  }
+
+
+  Future<String?> _pickDate(String current) async {
+    DateTime initial;
+    try {
+      final parts = current.split('/');
+      initial = DateTime(
+        int.parse(parts[2]),
+        int.parse(parts[1]),
+        int.parse(parts[0]),
+      );
     } catch (_) {
-      initial = DateTime.now().subtract(const Duration(days: 365 * 5));
+      initial = DateTime.now();
     }
 
     final picked = await showDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(1950),
-      lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+      lastDate: DateTime(2100),
     );
 
     if (picked != null) {
-      final formatted = DateFormat("dd/MM/yyyy").format(picked);
-      setState(() {
-        onChanged(formatted);
-      });
+      return DateFormat("dd/MM/yyyy").format(picked);
     }
+    return null;
   }
-
-  List<String> qualificationLevels = [
-    "Certificate I",
-    "Certificate II",
-    "Certificate III",
-    "Certificate IV",
-    "Diploma",
-    "Advanced Diploma",
-    "Bachelor Degree",
-    "Bachelor Honours Degree",
-    "Graduate Certificate",
-    "Graduate Diploma",
-    "Masters Degree",
-    "Doctoral Degree",
-    "Other",
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -106,47 +164,60 @@ class _EducationalQualificationsWidgetState
         children: [
           _buildSectionTitle(
             "Educational Qualifications",
-            showEdit: true,
-            showAdd: false,
+            icon: Icons.school_rounded,
             isEditing: isEditing,
-            onEdit: () async {
+            onEdit: () {
               if (isEditing) {
-                final json = convertQualificationsToJson(widget.qualifications);
-                final response =
-                await ApiService.updateClientQualificationDetail(json);
-
-                if (response['success'] == true || response['status'] == 200) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Qualifications updated successfully'),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        response['message'] ??
-                            'Failed to update qualifications',
-                      ),
-                    ),
-                  );
-                }
-                setState(() => isEditing = false);
+                _saveQualifications();
               } else {
                 setState(() => isEditing = true);
               }
             },
+            onAdd: _addQualification,
+            showAdd: true,
           ),
-
-          const SizedBox(height: 18),
-
+          const SizedBox(height: 12),
           ...widget.qualifications.map(
-                (qual) => Column(
-              children: [
-                _buildQualificationCard(qual),
-                const SizedBox(height: 18),
-              ],
-            ),
+                (qual) => _buildInfoCard([
+              _buildDropdown(
+                label: "Level",
+                value: qual.level,
+                items: qualificationLevels,
+                enabled: isEditing,
+                onChanged: (val) => setState(() => qual.level = val ?? ""),
+              ),
+              _buildEditableRow("Name", qual.name, isEditing,
+                      (val) => qual.name = val),
+              _buildEditableRow("Institution", qual.collegeName, isEditing,
+                      (val) => qual.collegeName = val),
+              _buildEditableRow("Campus", qual.campus, isEditing,
+                      (val) => qual.campus = val),
+              _buildDropdown(
+                label: "Country",
+                value: qual.country,
+                items: widget.countries.map((c) => c.name).toList(),
+                enabled: isEditing,
+                onChanged: (val) => setState(() => qual.country = val ?? ""),
+              ),
+              _buildEditableRow(
+                  "State", qual.state ?? "", isEditing, (val) => qual.state = val),
+              _buildDateRow("Start Date", qual.startDate, isEditing,
+                      (val) => qual.startDate = val!),
+              _buildDateRow("Finish Date", qual.finishDate, isEditing,
+                      (val) => qual.finishDate = val!),
+              _buildCheckbox(
+                  "Relevant", qual.relevantQualification, isEditing,
+                      (val) => qual.relevantQualification = val),
+              _buildCheckbox(
+                  "Specialist Education", qual.specialistEducation, isEditing,
+                      (val) => qual.specialistEducation = val),
+              _buildCheckbox(
+                  "STEM Qualification", qual.stemQualification, isEditing,
+                      (val) => qual.stemQualification = val),
+              _buildCheckbox(
+                  "Regional Study", qual.regionalStudy, isEditing,
+                      (val) => qual.regionalStudy = val),
+            ]),
           ),
         ],
       ),
@@ -155,15 +226,15 @@ class _EducationalQualificationsWidgetState
 
   Widget _buildSectionTitle(
       String title, {
-        required bool showEdit,
-        required bool showAdd,
+        required IconData icon,
         required bool isEditing,
         required VoidCallback onEdit,
-        VoidCallback? onAdd,
+        required VoidCallback onAdd,
+        bool showAdd = false,
       }) {
     return Row(
       children: [
-        const Icon(Icons.school_rounded, color: Colors.white),
+        Icon(icon, color: Colors.white),
         const SizedBox(width: 8),
         Text(
           title,
@@ -174,285 +245,155 @@ class _EducationalQualificationsWidgetState
           ),
         ),
         const Spacer(),
-        if (showEdit)
+        InkWell(
+          onTap: onEdit,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Icon(
+              isEditing ? Icons.check : Icons.edit,
+              color: Colors.blue,
+              size: 20,
+            ),
+          ),
+        ),
+        if (showAdd) const SizedBox(width: 8),
+        if (showAdd)
           InkWell(
-            onTap: onEdit,
+            onTap: onAdd,
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade300),
               ),
-              child: Icon(
-                isEditing ? Icons.check : Icons.edit,
-                color: Colors.blue,
-                size: 20,
-              ),
+              child: const Icon(Icons.add, color: Colors.blue, size: 20),
             ),
           ),
       ],
     );
   }
 
-  Widget _buildQualificationCard(Qualification qual) {
+  Widget _buildInfoCard(List<Widget> children) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade300),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLevelDropdown(qual),
-
-          _buildEditableRow("Name", qual.name, (val) => qual.name = val),
-          _buildEditableRow(
-            "Institution",
-            qual.collegeName,
-                (val) => qual.collegeName = val,
-          ),
-          _buildEditableRow("Campus", qual.campus, (val) => qual.campus = val),
-
-          _buildCountryDropdown(qual),
-
-          _buildEditableRow(
-            "State",
-            qual.state ?? "",
-                (val) => qual.state = val,
-          ),
-
-          _buildDateRow(
-            "Start Date",
-            qual.startDate,
-                (val) => qual.startDate = val,
-          ),
-
-          const SizedBox(height: 12),
-
-          _buildDateRow(
-            "Finish Date",
-            qual.finishDate,
-                (val) => qual.finishDate = val,
-          ),
-
-          _buildCheckboxRow(
-            "Relevant",
-            qual.relevantQualification,
-                (val) {
-              setState(() {
-                qual.relevantQualification = val;
-              });
-            },
-          ),
-          _buildCheckboxRow(
-            "Specialist Education",
-            qual.specialistEducation,
-                (val) {
-              setState(() {
-                qual.specialistEducation = val;
-              });
-            },
-          ),
-          _buildCheckboxRow(
-            "STEM Qualification",
-            qual.stemQualification,
-                (val) {
-              setState(() {
-                qual.stemQualification = val;
-              });
-            },
-          ),
-          _buildCheckboxRow(
-            "Regional Study",
-            qual.regionalStudy,
-                (val) {
-              setState(() {
-                qual.regionalStudy = val;
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLevelDropdown(Qualification qual) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: DropdownButtonFormField<String>(
-        value: qual.level.isEmpty ? null : qual.level,
-        isExpanded: true,
-        items: qualificationLevels
-            .map(
-              (level) => DropdownMenuItem(
-            value: level,
-            child: Text(level),
-          ),
-        )
-            .toList(),
-        onChanged: isEditing
-            ? (val) {
-          setState(() {
-            qual.level = val ?? "";
-          });
-        }
-            : null,
-        decoration: const InputDecoration(
-          labelText: "LEVEL",
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCountryDropdown(Qualification qual) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: DropdownButtonFormField<String>(
-        value: qual.country.isEmpty ? null : qual.country,
-        isExpanded: true,
-        items: widget.countries
-            .map((country) => DropdownMenuItem<String>(
-          value: country.name,
-          child: Text(country.name),
-        ))
-            .toList(),
-        onChanged: isEditing
-            ? (val) {
-          setState(() {
-            qual.country = val ?? "";
-          });
-        }
-            : null,
-        decoration: const InputDecoration(
-          labelText: "COUNTRY",
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        ),
+        children: children,
       ),
     );
   }
 
   Widget _buildEditableRow(
-      String label,
-      String value,
-      Function(String) onChanged,
-      ) {
+      String label, String value, bool enabled, ValueChanged<String> onChanged) {
+    final controller = TextEditingController(text: value);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
-        initialValue: value,
-        enabled: isEditing,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-        onChanged: (val) => onChanged(val),
+        controller: controller,
+        enabled: enabled,
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
-          labelStyle: const TextStyle(
-            color: Colors.grey,
-            fontSize: 13,
-            letterSpacing: 0.2,
-          ),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+        onChanged: onChanged,
+      ),
+    );
+  }
+
+  Widget _buildDropdown({
+    required String label,
+    required String value,
+    required List<String> items,
+    required bool enabled,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        ),
+        child: enabled
+            ? DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: value.isEmpty ? null : value,
+            isExpanded: true,
+            onChanged: onChanged,
+            items: items
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
+          ),
+        )
+            : Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDateRow(String label, String value, Function(String) onChanged) {
+  Widget _buildDateRow(
+      String label, String value, bool enabled, ValueChanged<String?> onChanged) {
     final controller = TextEditingController(text: value);
-
     return GestureDetector(
-      onTap:
-      isEditing
-          ? () async {
-        DateTime initial;
-        try {
-          if (controller.text.isNotEmpty) {
-            final parts = controller.text.split('/');
-            initial = DateTime(
-              int.parse(parts[2]),
-              int.parse(parts[1]),
-              int.parse(parts[0]),
-            );
-          } else {
-            initial = DateTime.now().subtract(
-              const Duration(days: 365 * 5),
-            );
-          }
-        } catch (_) {
-          initial = DateTime.now().subtract(
-            const Duration(days: 365 * 5),
-          );
-        }
-
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: initial,
-          firstDate: DateTime(1950),
-          lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
-        );
-
+      onTap: !enabled
+          ? null
+          : () async {
+        final picked = await _pickDate(controller.text);
         if (picked != null) {
-          final formatted = DateFormat("dd/MM/yyyy").format(picked);
-          setState(() {
-            controller.text = formatted;
-            onChanged(formatted);
-          });
+          controller.text = picked;
+          onChanged(picked);
+          setState(() {});
         }
-      }
-          : null,
+      },
       child: AbsorbPointer(
-        absorbing: true,
-        child: TextFormField(
-          controller: controller,
-          enabled: isEditing,
-          decoration: InputDecoration(
-            labelText: label.toUpperCase(),
-            border: const OutlineInputBorder(),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: TextFormField(
+            controller: controller,
+            enabled: enabled,
+            readOnly: true,
+            decoration: InputDecoration(
+              labelText: label.toUpperCase(),
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildCheckboxRow(String label, bool value, Function(bool) onChanged) {
+  Widget _buildCheckbox(
+      String label, bool value, bool enabled, ValueChanged<bool> onChanged) {
     return Row(
       children: [
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-        ),
+        Expanded(child: Text(label)),
         Checkbox(
           value: value,
-          onChanged: isEditing
-              ? (val) {
+          onChanged: enabled
+              ? (v) {
             setState(() {
-              onChanged(val ?? false);
+              onChanged(v ?? false);
             });
           }
               : null,

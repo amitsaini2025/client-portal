@@ -1,5 +1,5 @@
 class Qualification {
-  final int id;
+  int? id;
   String level;
   String name;
   String collegeName;
