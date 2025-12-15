@@ -41,17 +41,18 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                   setState(() {
                     widget.testScores.add(
                       TestScore(
-                        id: DateTime.now().millisecondsSinceEpoch,
+                        id: null,
                         testType: '',
                       ),
                     );
+                    isEditing = true; // automatically enable editing after add
                   });
                 },
-                showAdd: false,
+                showAdd: true, // show the Add button
               ),
               const SizedBox(height: 16),
               ...widget.testScores.map(
-                (score) => Column(
+                    (score) => Column(
                   children: [
                     _buildTestScoreCard(score),
                     const SizedBox(height: 16),
@@ -61,11 +62,11 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
             ],
           ),
         ),
-        /*if (isLoading)
+        if (isLoading)
           Container(
             color: Colors.black.withOpacity(0.3),
             child: const Center(child: CircularProgressIndicator()),
-          ),*/
+          ),
       ],
     );
   }
@@ -95,13 +96,13 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
   }
 
   Widget _buildSectionTitle(
-    String title, {
-    required bool isEditing,
-    required VoidCallback onEdit,
-    bool showAdd = false,
-    VoidCallback? onAdd,
-    required IconData icon,
-  }) {
+      String title, {
+        required bool isEditing,
+        required VoidCallback onEdit,
+        bool showAdd = false,
+        VoidCallback? onAdd,
+        required IconData icon,
+      }) {
     return Row(
       children: [
         Icon(icon, color: Colors.white),
@@ -163,21 +164,19 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
           Align(
             alignment: Alignment.topRight,
             child: InkWell(
-              onTap:
-                  isEditing
-                      ? () => setState(() => widget.testScores.remove(score))
-                      : null,
-              child:
-                  isEditing
-                      ? const Icon(Icons.remove_circle, color: Colors.red)
-                      : const SizedBox(),
+              onTap: isEditing
+                  ? () => setState(() => widget.testScores.remove(score))
+                  : null,
+              child: isEditing
+                  ? const Icon(Icons.remove_circle, color: Colors.red)
+                  : const SizedBox(),
             ),
           ),
           const SizedBox(height: 4),
           _buildEditableRow(
             "Test Type",
             score.testType,
-            (val) => score.testType = val,
+                (val) => score.testType = val,
           ),
           Row(
             children: [
@@ -185,7 +184,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                 child: _buildNumberField(
                   "Listening",
                   score.listening,
-                  (val) => score.listening = val,
+                      (val) => score.listening = val,
                 ),
               ),
               const SizedBox(width: 12),
@@ -193,7 +192,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                 child: _buildNumberField(
                   "Reading",
                   score.reading,
-                  (val) => score.reading = val,
+                      (val) => score.reading = val,
                 ),
               ),
             ],
@@ -205,7 +204,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                 child: _buildNumberField(
                   "Writing",
                   score.writing,
-                  (val) => score.writing = val,
+                      (val) => score.writing = val,
                 ),
               ),
               const SizedBox(width: 12),
@@ -213,7 +212,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                 child: _buildNumberField(
                   "Speaking",
                   score.speaking,
-                  (val) => score.speaking = val,
+                      (val) => score.speaking = val,
                 ),
               ),
             ],
@@ -222,19 +221,19 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
           _buildNumberField(
             "Overall Score",
             score.overallScore,
-            (val) => score.overallScore = val,
+                (val) => score.overallScore = val,
           ),
           const SizedBox(height: 12),
           _buildDateRow(
             "Test Date",
             score.testDate,
-            (val) => score.testDate = val,
+                (val) => score.testDate = val,
           ),
           const SizedBox(height: 12),
           _buildEditableRow(
             "Reference No",
             score.referenceNo,
-            (val) => score.referenceNo = val,
+                (val) => score.referenceNo = val,
           ),
           Row(
             children: [
@@ -244,11 +243,9 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
               ),
               Checkbox(
                 value: score.relevantTest,
-                onChanged:
-                    isEditing
-                        ? (val) =>
-                            setState(() => score.relevantTest = val ?? false)
-                        : null,
+                onChanged: isEditing
+                    ? (val) => setState(() => score.relevantTest = val ?? false)
+                    : null,
               ),
             ],
           ),
@@ -258,10 +255,10 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
   }
 
   Widget _buildEditableRow(
-    String label,
-    String value,
-    Function(String) onChanged,
-  ) {
+      String label,
+      String value,
+      Function(String) onChanged,
+      ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -271,10 +268,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
         ),
         style: const TextStyle(
@@ -287,9 +281,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
   }
 
   Widget _buildNumberField(String label, int value, Function(int) onChanged) {
-    TextEditingController controller = TextEditingController(
-      text: value.toString(),
-    );
+    TextEditingController controller = TextEditingController(text: value.toString());
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -303,10 +295,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
         ),
         style: const TextStyle(
@@ -326,34 +315,28 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
         controller: controller,
         enabled: isEditing,
         readOnly: true,
-        onTap:
-            isEditing
-                ? () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate:
-                        value.isNotEmpty ? _parseDate(value) : DateTime.now(),
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime(2100),
-                  );
-                  if (pickedDate != null) {
-                    final formatted =
-                        "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
-                    controller.text = formatted;
-                    onChanged(formatted);
-                  }
-                }
-                : null,
+        onTap: isEditing
+            ? () async {
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: value.isNotEmpty ? _parseDate(value) : DateTime.now(),
+            firstDate: DateTime(1900),
+            lastDate: DateTime(2100),
+          );
+          if (pickedDate != null) {
+            final formatted =
+                "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
+            controller.text = formatted;
+            onChanged(formatted);
+          }
+        }
+            : null,
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-          suffixIcon:
-              isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
+          suffixIcon: isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
         ),
         style: const TextStyle(
           fontSize: 14,
