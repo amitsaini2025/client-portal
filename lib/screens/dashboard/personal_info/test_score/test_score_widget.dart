@@ -45,10 +45,10 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                         testType: '',
                       ),
                     );
-                    isEditing = true; // automatically enable editing after add
+                    isEditing = true;
                   });
                 },
-                showAdd: true, // show the Add button
+                showAdd: true,
               ),
               const SizedBox(height: 16),
               ...widget.testScores.map(

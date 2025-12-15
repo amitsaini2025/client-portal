@@ -62,12 +62,8 @@ class _AddressAndTravelInformationWidgetState
     return null;
   }
 
-  // -------------------------
-  // SAVE ADDRESSES (with ID mapping)
-  // -------------------------
   Future<void> _saveAddresses() async {
     try {
-      // build payload according to backend expectation
       final addressesPayload = widget.addresses.map((a) {
         return {
           "id": (a.id == null || a.id == 0) ? null : a.id,
@@ -94,7 +90,6 @@ class _AddressAndTravelInformationWidgetState
           response['data']['addresses'] != null) {
         final List<dynamic> updated = response['data']['addresses'];
 
-        // update local models using returned data (assumes same ordering)
         for (int i = 0; i < updated.length; i++) {
           final api = updated[i];
           if (i >= widget.addresses.length) break;
@@ -106,7 +101,6 @@ class _AddressAndTravelInformationWidgetState
           local.addressLine2 = api['address_line_2'];
           local.suburb = api['suburb'];
           local.state = api['state'];
-          // convert postcode to int if your model expects int; if it's String keep as is
           try {
             local.postcode = int.tryParse(api['postcode']?.toString() ?? '') ?? local.postcode;
           } catch (_) {
@@ -137,9 +131,6 @@ class _AddressAndTravelInformationWidgetState
     }
   }
 
-  // -------------------------
-  // SAVE TRAVELS (with ID mapping)
-  // -------------------------
   Future<void> _saveTravels() async {
     try {
       final travelsPayload = widget.travels.map((t) {
@@ -207,12 +198,8 @@ class _AddressAndTravelInformationWidgetState
     }
   }
 
-  // -------------------------
-  // Add handlers (new items)
-  // -------------------------
   void _onAddAddress() {
     setState(() {
-      // create a new empty address (use 0 or null for id depending on your model)
       widget.addresses.add(Address(
         id: 0,
         searchAddress: "",
@@ -354,7 +341,7 @@ class _AddressAndTravelInformationWidgetState
               }
             },
             onAdd: _onAddTravel,
-            showAdd: true, // enabled add button
+            showAdd: true,
           ),
           const SizedBox(height: 12),
           ...widget.travels.map(
@@ -411,13 +398,10 @@ class _AddressAndTravelInformationWidgetState
         },
 
         onSelected: (suggestion) {
-          // ✅ onSelected now updates the controller from the builder
-          // This ensures the selected value shows
           onChanged(suggestion);
         },
 
         builder: (context, textEditingController, focusNode) {
-          // ✅ Initialize the builder controller with initial value
           if (textEditingController.text != value) {
             textEditingController.text = value;
             textEditingController.selection = TextSelection.fromPosition(

@@ -116,13 +116,11 @@ class _BasicPersonalInformationWidgetState
     }
   }
 
-  /// Format phone input to separate country code
   void _onPhoneChanged(int index, String value) {
     if (value.isEmpty) return;
 
-    String input = value.replaceAll(' ', ''); // Remove any spaces first
+    String input = value.replaceAll(' ', '');
 
-    // Ensure only one '+' at the start
     if (!input.startsWith('+')) {
       input = '+$input';
     } else {
@@ -132,7 +130,6 @@ class _BasicPersonalInformationWidgetState
     String matchedCode = '+';
     String remaining = input.substring(1);
 
-    // Sort country codes by length descending to match longest first
     for (var code in countryCodes..sort((a, b) => b.length.compareTo(a.length))) {
       if (input.startsWith(code)) {
         matchedCode = code;
@@ -141,10 +138,8 @@ class _BasicPersonalInformationWidgetState
       }
     }
 
-    // Add single space after country code
     String newText = remaining.isNotEmpty ? '$matchedCode $remaining' : matchedCode;
 
-    // Update TextField only if changed
     if (phoneControllers[index].text != newText) {
       phoneControllers[index].value = phoneControllers[index].value.copyWith(
         text: newText,
@@ -152,7 +147,6 @@ class _BasicPersonalInformationWidgetState
       );
     }
 
-    // Update corresponding Phone object
     if (index < phoneList.length) {
       phoneList[index].countryCode = matchedCode;
       phoneList[index].phone = remaining;
@@ -243,7 +237,6 @@ class _BasicPersonalInformationWidgetState
       if (res["success"] == true && res["data"] != null && res["data"]["phones"] != null) {
         final List<dynamic> updatedData = res["data"]["phones"];
 
-        // Update local phoneList objects from API response
         for (int i = 0; i < updatedData.length; i++) {
           final apiPhone = updatedData[i];
           final localPhone = phoneList[i];

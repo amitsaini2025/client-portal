@@ -29,12 +29,10 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
   bool isPassportEditing = false;
   bool isVisaEditing = false;
 
-  // Controllers for passports
   final Map<Passport, TextEditingController> _passportNumberControllers = {};
   final Map<Passport, TextEditingController> _passportIssueControllers = {};
   final Map<Passport, TextEditingController> _passportExpiryControllers = {};
 
-  // Controllers for visas
   final Map<Visa, TextEditingController> _visaDescriptionControllers = {};
   final Map<Visa, TextEditingController> _visaGrantControllers = {};
   final Map<Visa, TextEditingController> _visaExpiryControllers = {};

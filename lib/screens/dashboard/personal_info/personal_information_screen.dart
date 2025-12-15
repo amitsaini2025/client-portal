@@ -26,7 +26,7 @@ class _PersonalInformationScreenState
     extends State<PersonalInformationScreen> {
   ClientPersonalDetail? personalDetail;
   List<Country> countries = [];
-  List<VisaType> visaTypes = []; // 🔥 Added for visa types
+  List<VisaType> visaTypes = [];
 
   bool isLoading = true;
   String? errorMessage;
@@ -36,10 +36,9 @@ class _PersonalInformationScreenState
     super.initState();
     _loadPersonalDetails();
     _loadCountries();
-    _loadVisaTypes(); // 🔥 Fetch visa types
+    _loadVisaTypes();
   }
 
-  /// Load personal details
   Future<void> _loadPersonalDetails() async {
     try {
       final response = await ApiService.getClientPersonalDetail(tab: "all");
@@ -64,7 +63,6 @@ class _PersonalInformationScreenState
     }
   }
 
-  /// Load countries
   Future<void> _loadCountries() async {
     final response = await ApiService.getCountries();
     if (response["success"] == true) {
@@ -80,7 +78,6 @@ class _PersonalInformationScreenState
     }
   }
 
-  /// Load visa types
   Future<void> _loadVisaTypes() async {
     try {
       final response = await ApiService.getVisaTypes();
