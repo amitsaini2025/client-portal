@@ -5,7 +5,7 @@ class TestScore {
   int reading;
   int writing;
   int speaking;
-  int overallScore;
+  double overallScore;
   String testDate;
   String referenceNo;
   bool relevantTest;
@@ -30,7 +30,7 @@ class TestScore {
     reading: json['reading'] ?? 0,
     writing: json['writing'] ?? 0,
     speaking: json['speaking'] ?? 0,
-    overallScore: json['overall_score'] ?? 0,
+    overallScore: (json['overall_score'] as num?)?.toDouble() ?? 0.0,
     testDate: json['test_date'] ?? '',
     referenceNo: json['reference_no'] ?? '',
     relevantTest: json['relevant_test'] ?? false,

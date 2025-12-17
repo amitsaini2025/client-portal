@@ -5,7 +5,7 @@ class Address {
   String? addressLine2;
   String suburb;
   String state;
-  int postcode;
+  String? postcode;
   String country;
   String? regionalCode;
   String? startDate; // Format: "dd/MM/yyyy"
@@ -35,9 +35,7 @@ class Address {
       addressLine2: json['address_line_2'] as String?,
       suburb: json['suburb'] as String,
       state: json['state'] as String,
-      postcode: json['postcode'] is int
-          ? json['postcode'] as int
-          : int.tryParse(json['postcode'].toString()) ?? 0,
+      postcode: json['postcode']?.toString(),
       country: json['country'] as String,
       regionalCode: json['regional_code'] as String?,
       startDate: json['start_date'] as String?,

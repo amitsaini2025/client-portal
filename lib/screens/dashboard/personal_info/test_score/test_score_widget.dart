@@ -218,7 +218,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildNumberField(
+          _buildDoubleField(
             "Overall Score",
             score.overallScore,
                 (val) => score.overallScore = val,
@@ -279,6 +279,40 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
       ),
     );
   }
+
+  Widget _buildDoubleField(
+      String label,
+      double value,
+      ValueChanged<double> onChanged,
+      ) {
+    final controller = TextEditingController(text: value.toString());
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        enabled: isEditing,
+        onChanged: (val) {
+          final doubleVal = double.tryParse(val) ?? 0.0;
+          onChanged(doubleVal);
+        },
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          border: const OutlineInputBorder(),
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+        ),
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.black87,
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildNumberField(String label, int value, Function(int) onChanged) {
     TextEditingController controller = TextEditingController(text: value.toString());

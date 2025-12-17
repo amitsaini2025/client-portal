@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class QuickActionsCard extends StatelessWidget {
   final VoidCallback onUploadDocument;
   final VoidCallback onBookAppointment;
   final VoidCallback onSendMessage;
+
   final VoidCallback? onViewWorkflow;
   final VoidCallback? onBilling;
   final VoidCallback? onPersonalInformationUpload;
+
+  final VoidCallback? onCaseSummary;
+  final VoidCallback? onDocumentStatus;
+  final VoidCallback? onUpcomingDeadlines;
 
   const QuickActionsCard({
     super.key,
@@ -15,17 +21,21 @@ class QuickActionsCard extends StatelessWidget {
     required this.onSendMessage,
     this.onViewWorkflow,
     this.onBilling,
-    this.onPersonalInformationUpload
+    this.onPersonalInformationUpload,
+    this.onCaseSummary,
+    this.onDocumentStatus,
+    this.onUpcomingDeadlines,
   });
+
+  static const double _radius = 8;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor),
+        borderRadius: BorderRadius.circular(_radius),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,94 +44,230 @@ class QuickActionsCard extends StatelessWidget {
             'Quick Actions',
             style: Theme.of(context)
                 .textTheme
-                .titleLarge
+                .titleSmall
                 ?.copyWith(fontWeight: FontWeight.w600),
           ),
-          const SizedBox(height: 20),
-          _buildActionButton(
-            context: context,
-            icon: Icons.upload_file,
-            label: 'Upload Document',
-            onTap: onUploadDocument,
-            color: Colors.blue,
-          ),
           const SizedBox(height: 12),
-          _buildActionButton(
-            context: context,
-            icon: Icons.schedule,
-            label: 'Book Appointment',
-            onTap: onBookAppointment,
-            color: Colors.green,
-          ),
-          const SizedBox(height: 12),
-          /*_buildActionButton(
-            context: context,
-            icon: Icons.message,
-            label: 'Send Message',
-            onTap: onSendMessage,
-            color: Colors.orange,
-          ),
-          const SizedBox(height: 12),*/
-          _buildActionButton(
-            context: context,
-            icon: Icons.timeline,
-            label: 'View Workflow',
-            onTap: onViewWorkflow ?? () {},
-            color: Colors.purple,
-          ),
-          const SizedBox(height: 12),
-          _buildActionButton(
-            context: context,
-            icon: Icons.timeline,
-            label: 'Billing',
-            onTap: onBilling ?? () {},
-            color: Colors.red,
-          ),
-          const SizedBox(height: 12),
-          _buildActionButton(
-            context: context,
-            icon: Icons.timeline,
-            label: 'Personal Info',
-            onTap: onPersonalInformationUpload ?? () {},
-            color: Colors.brown,
+
+          MasonryGridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 20,
+            crossAxisSpacing: 20,
+            itemCount: 8,
+            itemBuilder: (context, index) {
+              switch (index) {
+                case 0:
+                  return _verticalTile(
+                    context,
+                    icon: Icons.upload_file,
+                    label: 'Upload\nDocument',
+                    helperText: 'Submit required files\nsecurely',
+                    color: Colors.blue,
+                    height: 140,
+                    onTap: onUploadDocument,
+                  );
+
+                case 1:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.schedule,
+                    label: 'Book\nAppointment',
+                    color: Colors.green,
+                    height: 60,
+                    onTap: onBookAppointment,
+                  );
+
+                case 2:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.timeline,
+                    label: 'View\nWorkflow',
+                    color: Colors.purple,
+                    height: 60,
+                    onTap: onViewWorkflow ?? () {},
+                  );
+
+                case 3:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.receipt_long,
+                    label: 'Billing',
+                    color: Colors.red,
+                    height: 60,
+                    onTap: onBilling ?? () {},
+                  );
+
+                case 4:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.person,
+                    label: 'Personal\nInfo',
+                    color: Colors.brown,
+                    height: 60,
+                    onTap: onPersonalInformationUpload ?? () {},
+                  );
+
+                case 5:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.assignment,
+                    label: 'Case\nSummary',
+                    color: Colors.indigo,
+                    height: 60,
+                    onTap: onCaseSummary ?? () {},
+                  );
+
+                case 6:
+                  return _verticalTile(
+                    context,
+                    icon: Icons.description,
+                    label: 'Document\nStatus',
+                    helperText: 'Submit required files\nsecurely',
+                    color: Colors.orange,
+                    height: 140,
+                    onTap: onDocumentStatus ?? () {},
+                  );
+
+                default:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.event,
+                    label: 'Upcoming\nDeadlines',
+                    color: Colors.teal,
+                    height: 60,
+                    onTap: onUpcomingDeadlines ?? () {},
+                  );
+              }
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildActionButton({
-    required BuildContext context,
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    required Color color,
-  }) {
+  /// =================== TILE HELPERS ===================
+
+  Widget _verticalTile(
+      BuildContext context, {
+        required IconData icon,
+        required String label,
+        required String helperText,
+        required Color color,
+        required double height,
+        required VoidCallback onTap,
+      }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(_radius),
       child: Container(
-        width: double.infinity, // match parent width
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16), // smaller height
+        height: height,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(_radius),
+          border: Border.all(color: color.withOpacity(0.25)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 24, color: color),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                height: 1.1,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              helperText,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: color.withOpacity(0.7),
+                height: 1.3,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _horizontalTile(
+      BuildContext context, {
+        required IconData icon,
+        required String label,
+        required Color color,
+        required double height,
+        required VoidCallback onTap,
+      }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(_radius),
+      child: Container(
+        height: height,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
+          borderRadius: BorderRadius.circular(_radius),
+          border: Border.all(color: color.withOpacity(0.25)),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 24), // smaller icon
-            const SizedBox(width: 12),
+            Icon(icon, size: 20, color: color),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
                 label,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: color,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                  color: color.withOpacity(0.9),
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _horizontalTileTextIcon(
+      BuildContext context, {
+        required IconData icon,
+        required String label,
+        required Color color,
+        required double height,
+        required VoidCallback onTap,
+      }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(_radius),
+      child: Container(
+        height: height,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(_radius),
+          border: Border.all(color: color.withOpacity(0.25)),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                  color: color.withOpacity(0.9),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Icon(icon, size: 20, color: color),
           ],
         ),
       ),

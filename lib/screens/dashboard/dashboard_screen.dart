@@ -294,14 +294,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     children: [
                       _buildWelcomeSection(),
                       const SizedBox(height: 24),
-                      WorkflowProgressCard(
-                        workflowResponse: _workflowResponse,
-                        isLoading: _isLoadingWorkflow,
-                        onTap: () {
-                          Navigator.pushNamed(context, '/workflow');
-                        },
-                      ),
-                      const SizedBox(height: 24),
                       QuickActionsCard(
                         onUploadDocument: () {
                           Navigator.of(context).push(
@@ -347,9 +339,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             MaterialPageRoute(
                               builder:
                                   (context) =>
-                                      const PersonalInformationScreen(),
+                              const PersonalInformationScreen(),
                             ),
                           );
+                        },
+                        onCaseSummary: (){
+                          Navigator.pushNamed(context, '/recent-cases');
+                        },
+                        onDocumentStatus: (){
+                          Navigator.pushNamed(context, '/documents');
+                        },
+                        onUpcomingDeadlines: (){
+                          Navigator.pushNamed(context, '/tasks');
+                        },
+                      ),
+                      /*const SizedBox(height: 24),
+                      WorkflowProgressCard(
+                        workflowResponse: _workflowResponse,
+                        isLoading: _isLoadingWorkflow,
+                        onTap: () {
+                          Navigator.pushNamed(context, '/workflow');
                         },
                       ),
                       const SizedBox(height: 24),
@@ -364,7 +373,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         upcomingDeadlineSummary: _upcomingDeadlineSummary,
                         tasks: _tasks,
                         deadlines: _deadlines,
-                      ),
+                      ),*/
                       const SizedBox(height: 24),
                       _buildRecentActivitySection(),
                     ],
@@ -378,7 +387,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (_dashboardSummary == null) return const SizedBox.shrink();
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -388,7 +397,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Theme.of(context).primaryColor.withOpacity(0.8),
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,31 +405,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Row(
             children: [
               Container(
-                width: 60,
-                height: 60,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(Icons.person, color: Colors.white, size: 30),
+                child: const Icon(
+                  Icons.person,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Welcome back!',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.headlineSmall?.copyWith(
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       'Here\'s what\'s happening with your cases',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(
                         color: Colors.white.withOpacity(0.9),
                       ),
                     ),
@@ -429,7 +447,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
           Row(
             children: [
               _buildStatItem(
@@ -437,24 +455,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 label: 'Total Matters',
                 value: _caseSummary!.totalMatters.toString(),
               ),
-              const SizedBox(width: 24),
+              const SizedBox(width: 12),
               _buildStatItem(
                 icon: Icons.folder_open,
                 label: 'Active Cases',
                 value: _dashboardSummary!.activeCases.toString(),
               ),
-              const SizedBox(width: 24),
+              const SizedBox(width: 12),
               _buildStatItem(
                 icon: Icons.description,
                 label: 'Documents',
                 value: _dashboardSummary!.totalDocuments.toString(),
               ),
-              /*const SizedBox(width: 24),
-              _buildStatItem(
-                icon: Icons.schedule,
-                label: 'Deadlines',
-                value: _dashboardSummary!.totalAppointments.toString(),
-              ),*/
             ],
           ),
         ],
@@ -469,28 +481,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           children: [
-            Icon(icon, color: Colors.white, size: 24),
-            const SizedBox(height: 8),
+            Icon(icon, color: Colors.white, size: 20),
+            const SizedBox(height: 6),
             Text(
               value,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
+            const SizedBox(height: 2),
             Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Colors.white.withOpacity(0.9),
               ),
               textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -499,51 +514,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildRecentActivitySection() {
-    const cardBackground = Color(0xFF2A1F70); // lighter navy
+    const cardBackground = Color(0xFF2A1F70);
     const goldenYellow = Color(0xFFF9B000);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: cardBackground,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: goldenYellow.withOpacity(0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Recent Activity',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
+                  fontSize: 14,
                 ),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/recent-activity');
                 },
-                child: const Text(
-                  'View All',
-                  style: TextStyle(color: goldenYellow),
-                ),
+                child: const Text('View All',
+                    style: TextStyle(color: goldenYellow, fontSize: 12)),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+
+          // Activity Items
           ..._recentActivity.map((activity) {
             return _buildActivityItem(
               icon: Icons.task,
               title: activity.title,
-              subtitle:
-                  activity.description
-                      .replaceAll('\n', ' ')
-                      .replaceAll('\t', ' ')
-                      .replaceAll(RegExp(r'\s+'), ' ')
-                      .trim(),
+              subtitle: activity.description
+                  .replaceAll('\n', ' ')
+                  .replaceAll('\t', ' ')
+                  .replaceAll(RegExp(r'\s+'), ' ')
+                  .trim(),
               time: activity.timeAgo,
               color: goldenYellow,
             );
@@ -561,44 +577,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required Color color,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(icon, color: color, size: 20),
+            child: Icon(icon, color: color, size: 16),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                  style: TextStyle(color: Colors.white70, fontSize: 10),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
           Text(
             time,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: Colors.white54),
+            style: const TextStyle(color: Colors.white54, fontSize: 10),
           ),
         ],
       ),

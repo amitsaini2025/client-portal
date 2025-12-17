@@ -1,6 +1,5 @@
 import 'package:client/models/case_summary.dart';
 import 'package:flutter/material.dart';
-
 import '../../models/case.dart';
 
 class CaseSummaryCard extends StatelessWidget {
@@ -15,125 +14,82 @@ class CaseSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /*final activeCases = cases.where((c) => c.status != 'completed').length;
-    final completedCases = cases.where((c) => c.status == 'completed').length;
-    final totalCases = cases.length;*/
-    final activeCases = caseSummary?.activeCases;
-    final completedCases = caseSummary?.completedCases;
-    final totalCases = caseSummary?.totalCases;
+    final activeCases = caseSummary?.activeCases ?? 0;
+    final completedCases = caseSummary?.completedCases ?? 0;
+    final totalCases = caseSummary?.totalCases ?? 0;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Case Summary',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/recent-cases');
-                  /*Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const CasesListScreen(),
-                    ),
-                  );*/
                 },
-                child: const Text('View All'),
+                child: const Text(
+                  'View All',
+                  style: TextStyle(fontSize: 12),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
 
-          // Case Statistics
+          // Case Stats
           Row(
             children: [
-              Expanded(
-                child: _buildStatItem(
-                  context: context,
-                  icon: Icons.folder_open,
-                  label: 'Active Cases',
-                  value: activeCases.toString(),
-                  color: Colors.blue,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildStatItem(
-                  context: context,
-                  icon: Icons.check_circle,
-                  label: 'Completed',
-                  value: completedCases.toString(),
-                  color: Colors.green,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildStatItem(
-                  context: context,
-                  icon: Icons.analytics,
-                  label: 'Total Cases',
-                  value: totalCases.toString(),
-                  color: Colors.purple,
-                ),
-              ),
+              _buildStatItem(context, icon: Icons.folder_open, label: 'Active', value: activeCases.toString(), color: Colors.blue),
+              const SizedBox(width: 6),
+              _buildStatItem(context, icon: Icons.check_circle, label: 'Completed', value: completedCases.toString(), color: Colors.green),
+              const SizedBox(width: 6),
+              _buildStatItem(context, icon: Icons.analytics, label: 'Total', value: totalCases.toString(), color: Colors.purple),
             ],
           ),
-
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
 
           // Recent Cases
           if (cases.isNotEmpty) ...[
             Text(
               'Recent Cases',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
             ),
-            const SizedBox(height: 16),
-            ...cases
-                .take(3)
-                .map((caseItem) => _buildCaseItem(context, caseItem)),
+            const SizedBox(height: 8),
+            ...cases.take(3).map((caseItem) => _buildCaseItem(context, caseItem)),
           ] else ...[
             Container(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  Icon(
-                    Icons.folder_open,
-                    size: 48,
-                    color: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
-                  ),
-                  const SizedBox(height: 16),
+                  Icon(Icons.folder_open, size: 40, color: Colors.grey.withOpacity(0.5)),
+                  const SizedBox(height: 12),
                   Text(
                     'No cases yet',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-                    ),
+                    style: TextStyle(color: Colors.grey.withOpacity(0.7), fontSize: 12, fontWeight: FontWeight.w600),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   Text(
                     'Your cases will appear here once they are created',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
-                    ),
+                    style: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 11),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -145,39 +101,24 @@ class CaseSummaryCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem({
-    required BuildContext context,
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: color.withValues(alpha: 0.8),
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+  Widget _buildStatItem(BuildContext context,
+      {required IconData icon, required String label, required String value, required Color color}) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: color.withOpacity(0.25)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 18),
+            const SizedBox(height: 4),
+            Text(value, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
+            Text(label, style: TextStyle(color: color.withOpacity(0.8), fontSize: 10), textAlign: TextAlign.center),
+          ],
+        ),
       ),
     );
   }
@@ -187,70 +128,52 @@ class CaseSummaryCard extends StatelessWidget {
     final statusText = _getStatusText(caseItem.status);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
+              color: statusColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(Icons.folder, color: statusColor, size: 20),
+            child: Icon(Icons.folder, color: statusColor, size: 16),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  caseItem.title
-                      .replaceAll('\n', ' ')
-                      .replaceAll('\t', ' ')
-                      .replaceAll(RegExp(r'\s+'), ' ')
-                      .trim(),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  caseItem.title.replaceAll(RegExp(r'\s+'), ' ').trim(),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
-                  caseItem.caseNumber
-                      .toString()
-                      .replaceAll('\n', ' ')
-                      .replaceAll('\t', ' ')
-                      .replaceAll(RegExp(r'\s+'), ' ')
-                      .trim(),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-                  ),
+                  caseItem.caseNumber.toString(),
+                  style: TextStyle(color: Colors.grey.withOpacity(0.7), fontSize: 10),
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
+              color: statusColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
               statusText,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: statusColor,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w600),
             ),
           ),
         ],

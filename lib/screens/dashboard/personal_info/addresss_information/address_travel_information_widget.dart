@@ -102,7 +102,7 @@ class _AddressAndTravelInformationWidgetState
           local.suburb = api['suburb'];
           local.state = api['state'];
           try {
-            local.postcode = int.tryParse(api['postcode']?.toString() ?? '') ?? local.postcode;
+            local.postcode = local.postcode;
           } catch (_) {
             // fallback: keep existing
           }
@@ -207,7 +207,7 @@ class _AddressAndTravelInformationWidgetState
         addressLine2: "",
         suburb: "",
         state: "",
-        postcode: 0,
+        postcode: "0",
         country: "",
         regionalCode: "",
         startDate: "",
@@ -294,7 +294,7 @@ class _AddressAndTravelInformationWidgetState
                 address.postcode.toString(),
                 isEditingAddress,
                     (val) =>
-                address.postcode = int.tryParse(val) ?? address.postcode,
+                address.postcode = address.postcode,
               ),
               _buildCountryDropdown(
                 label: "Country",

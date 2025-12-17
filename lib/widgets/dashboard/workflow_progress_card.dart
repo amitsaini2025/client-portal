@@ -15,13 +15,8 @@ class WorkflowProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return _buildLoadingCard(context);
-    }
-
-    if (workflowResponse == null) {
-      return const SizedBox.shrink();
-    }
+    if (isLoading) return _buildLoadingCard(context);
+    if (workflowResponse == null) return const SizedBox.shrink();
 
     final progress = workflowResponse!.progressPercentage;
     final currentStageName = workflowResponse!.activeStage?.stageName ?? 'Not Started';
@@ -30,88 +25,71 @@ class WorkflowProgressCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF1A237E), // Deep indigo
-              const Color(0xFF283593),
-            ],
+            colors: [Color(0xFF1A237E), Color(0xFF283593)],
           ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 6, offset: const Offset(0, 2))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
-                    Icons.timeline,
-                    color: Colors.white,
-                    size: 28,
-                  ),
+                  child: const Icon(Icons.timeline, color: Colors.white, size: 22),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Case Progress',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
+                          fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 4),
                       Text(
                         'Current Workflow Status',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withOpacity(0.8),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.white70,
+                          fontSize: 10,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.white.withOpacity(0.7),
-                  size: 20,
-                ),
+                Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
               ],
             ),
-            const SizedBox(height: 24),
-            
+            const SizedBox(height: 12),
+
             // Current Stage Info
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
+              margin: const EdgeInsets.only(top: 8),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.3),
-                  width: 1,
-                ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF9B000).withOpacity(0.9),
                       borderRadius: BorderRadius.circular(8),
@@ -119,29 +97,20 @@ class WorkflowProgressCard extends StatelessWidget {
                     child: Icon(
                       hasActiveStage ? Icons.pending_actions : Icons.help_outline,
                       color: Colors.white,
-                      size: 20,
+                      size: 16,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Current Stage',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.white.withOpacity(0.7),
-                            fontSize: 11,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
+                        Text('Current Stage', style: TextStyle(color: Colors.white70, fontSize: 9)),
+                        const SizedBox(height: 2),
                         Text(
                           currentStageName,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 2,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12),
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -150,9 +119,8 @@ class WorkflowProgressCard extends StatelessWidget {
                 ],
               ),
             ),
-            
-            const SizedBox(height: 20),
-            
+            const SizedBox(height: 12),
+
             // Progress Bar
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,51 +128,21 @@ class WorkflowProgressCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Overall Progress',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      '$progress%',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: const Color(0xFFF9B000),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text('Overall Progress', style: TextStyle(color: Colors.white70, fontSize: 10)),
+                    Text('$progress%', style: const TextStyle(color: Color(0xFFF9B000), fontWeight: FontWeight.bold, fontSize: 12)),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 6),
                 Stack(
                   children: [
-                    Container(
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
+                    Container(height: 6, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(3))),
                     FractionallySizedBox(
                       widthFactor: progress / 100,
                       child: Container(
-                        height: 10,
+                        height: 6,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFFF9B000), // Golden yellow
-                              Color(0xFFFFD54F), // Lighter yellow
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFF9B000).withOpacity(0.5),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                          gradient: const LinearGradient(colors: [Color(0xFFF9B000), Color(0xFFFFD54F)]),
+                          borderRadius: BorderRadius.circular(3),
                         ),
                       ),
                     ),
@@ -212,41 +150,16 @@ class WorkflowProgressCard extends StatelessWidget {
                 ),
               ],
             ),
-            
-            const SizedBox(height: 20),
-            
+            const SizedBox(height: 12),
+
             // Stats Row
             Row(
               children: [
-                Expanded(
-                  child: _buildStatChip(
-                    context,
-                    icon: Icons.check_circle,
-                    label: 'Completed',
-                    value: workflowResponse!.completedStages.toString(),
-                    color: Colors.green,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildStatChip(
-                    context,
-                    icon: Icons.hourglass_empty,
-                    label: 'Remaining',
-                    value: workflowResponse!.remainingStages.toString(),
-                    color: Colors.orange,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildStatChip(
-                    context,
-                    icon: Icons.list_alt,
-                    label: 'Total Stages',
-                    value: workflowResponse!.totalStages.toString(),
-                    color: Colors.blue,
-                  ),
-                ),
+                _buildStatChip(context, icon: Icons.check_circle, label: 'Completed', value: workflowResponse!.completedStages.toString(), color: Colors.green),
+                const SizedBox(width: 6),
+                _buildStatChip(context, icon: Icons.hourglass_empty, label: 'Remaining', value: workflowResponse!.remainingStages.toString(), color: Colors.orange),
+                const SizedBox(width: 6),
+                _buildStatChip(context, icon: Icons.list_alt, label: 'Total', value: workflowResponse!.totalStages.toString(), color: Colors.blue),
               ],
             ),
           ],
@@ -255,75 +168,41 @@ class WorkflowProgressCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatChip(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+  Widget _buildStatChip(BuildContext context,
+      {required IconData icon, required String label, required String value, required Color color}) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
         ),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 18),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.white.withOpacity(0.7),
-              fontSize: 10,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 16),
+            const SizedBox(height: 4),
+            Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+            Text(label, style: const TextStyle(color: Colors.white70, fontSize: 9), textAlign: TextAlign.center),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildLoadingCard(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF1A237E).withOpacity(0.7),
-            const Color(0xFF283593).withOpacity(0.7),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(colors: [Color(0xFF1A237E), Color(0xFF283593)]),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
-        children: [
-          const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF9B000)),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Loading workflow progress...',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withOpacity(0.8),
-            ),
-          ),
+        children: const [
+          SizedBox(height: 4),
+          CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF9B000)), strokeWidth: 2),
+          SizedBox(height: 8),
+          Text('Loading workflow progress...', style: TextStyle(color: Colors.white70, fontSize: 10)),
         ],
       ),
     );
