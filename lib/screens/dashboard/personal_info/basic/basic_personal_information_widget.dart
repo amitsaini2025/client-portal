@@ -57,27 +57,213 @@ class _BasicPersonalInformationWidgetState
 
   // Full international country codes
   final List<String> countryCodes = [
-    '+1', '+7', '+20', '+27', '+30', '+31', '+32', '+33', '+34', '+36', '+39',
-    '+40', '+41', '+43', '+44', '+45', '+46', '+47', '+48', '+49', '+51', '+52',
-    '+53', '+54', '+55', '+56', '+57', '+58', '+60', '+61', '+62', '+63', '+64',
-    '+65', '+66', '+81', '+82', '+84', '+86', '+90', '+91', '+92', '+93', '+94',
-    '+95', '+98', '+211', '+212', '+213', '+216', '+218', '+220', '+221', '+222',
-    '+223', '+224', '+225', '+226', '+227', '+228', '+229', '+230', '+231', '+232',
-    '+233', '+234', '+235', '+236', '+237', '+238', '+239', '+240', '+241', '+242',
-    '+243', '+244', '+245', '+246', '+248', '+249', '+250', '+251', '+252', '+253',
-    '+254', '+255', '+256', '+257', '+258', '+260', '+261', '+262', '+263', '+264',
-    '+265', '+266', '+267', '+268', '+269', '+290', '+291', '+297', '+298', '+299',
-    '+350', '+351', '+352', '+353', '+354', '+355', '+356', '+357', '+358', '+359',
-    '+370', '+371', '+372', '+373', '+374', '+375', '+376', '+377', '+378', '+379',
-    '+380', '+381', '+382', '+383', '+385', '+386', '+387', '+389', '+420', '+421',
-    '+423', '+500', '+501', '+502', '+503', '+504', '+505', '+506', '+507', '+508',
-    '+509', '+590', '+591', '+592', '+593', '+594', '+595', '+596', '+597', '+598',
-    '+599', '+670', '+672', '+673', '+674', '+675', '+676', '+677', '+678', '+679',
-    '+680', '+681', '+682', '+683', '+685', '+686', '+687', '+688', '+689', '+690',
-    '+691', '+692', '+850', '+852', '+853', '+855', '+856', '+870', '+880', '+886',
-    '+960', '+961', '+962', '+963', '+964', '+965', '+966', '+967', '+968', '+970',
-    '+971', '+972', '+973', '+974', '+975', '+976', '+977', '+992', '+993', '+994',
-    '+995', '+996', '+998'
+    '+1',
+    '+7',
+    '+20',
+    '+27',
+    '+30',
+    '+31',
+    '+32',
+    '+33',
+    '+34',
+    '+36',
+    '+39',
+    '+40',
+    '+41',
+    '+43',
+    '+44',
+    '+45',
+    '+46',
+    '+47',
+    '+48',
+    '+49',
+    '+51',
+    '+52',
+    '+53',
+    '+54',
+    '+55',
+    '+56',
+    '+57',
+    '+58',
+    '+60',
+    '+61',
+    '+62',
+    '+63',
+    '+64',
+    '+65',
+    '+66',
+    '+81',
+    '+82',
+    '+84',
+    '+86',
+    '+90',
+    '+91',
+    '+92',
+    '+93',
+    '+94',
+    '+95',
+    '+98',
+    '+211',
+    '+212',
+    '+213',
+    '+216',
+    '+218',
+    '+220',
+    '+221',
+    '+222',
+    '+223',
+    '+224',
+    '+225',
+    '+226',
+    '+227',
+    '+228',
+    '+229',
+    '+230',
+    '+231',
+    '+232',
+    '+233',
+    '+234',
+    '+235',
+    '+236',
+    '+237',
+    '+238',
+    '+239',
+    '+240',
+    '+241',
+    '+242',
+    '+243',
+    '+244',
+    '+245',
+    '+246',
+    '+248',
+    '+249',
+    '+250',
+    '+251',
+    '+252',
+    '+253',
+    '+254',
+    '+255',
+    '+256',
+    '+257',
+    '+258',
+    '+260',
+    '+261',
+    '+262',
+    '+263',
+    '+264',
+    '+265',
+    '+266',
+    '+267',
+    '+268',
+    '+269',
+    '+290',
+    '+291',
+    '+297',
+    '+298',
+    '+299',
+    '+350',
+    '+351',
+    '+352',
+    '+353',
+    '+354',
+    '+355',
+    '+356',
+    '+357',
+    '+358',
+    '+359',
+    '+370',
+    '+371',
+    '+372',
+    '+373',
+    '+374',
+    '+375',
+    '+376',
+    '+377',
+    '+378',
+    '+379',
+    '+380',
+    '+381',
+    '+382',
+    '+383',
+    '+385',
+    '+386',
+    '+387',
+    '+389',
+    '+420',
+    '+421',
+    '+423',
+    '+500',
+    '+501',
+    '+502',
+    '+503',
+    '+504',
+    '+505',
+    '+506',
+    '+507',
+    '+508',
+    '+509',
+    '+590',
+    '+591',
+    '+592',
+    '+593',
+    '+594',
+    '+595',
+    '+596',
+    '+597',
+    '+598',
+    '+599',
+    '+670',
+    '+672',
+    '+673',
+    '+674',
+    '+675',
+    '+676',
+    '+677',
+    '+678',
+    '+679',
+    '+680',
+    '+681',
+    '+682',
+    '+683',
+    '+685',
+    '+686',
+    '+687',
+    '+688',
+    '+689',
+    '+690',
+    '+691',
+    '+692',
+    '+850',
+    '+852',
+    '+853',
+    '+855',
+    '+856',
+    '+870',
+    '+880',
+    '+886',
+    '+960',
+    '+961',
+    '+962',
+    '+963',
+    '+964',
+    '+965',
+    '+966',
+    '+967',
+    '+968',
+    '+970',
+    '+971',
+    '+972',
+    '+973',
+    '+974',
+    '+975',
+    '+976',
+    '+977',
+    '+992',
+    '+993',
+    '+994',
+    '+995',
+    '+996',
+    '+998',
   ];
 
   @override
@@ -130,7 +316,8 @@ class _BasicPersonalInformationWidgetState
     String matchedCode = '+';
     String remaining = input.substring(1);
 
-    for (var code in countryCodes..sort((a, b) => b.length.compareTo(a.length))) {
+    for (var code
+        in countryCodes..sort((a, b) => b.length.compareTo(a.length))) {
       if (input.startsWith(code)) {
         matchedCode = code;
         remaining = input.substring(code.length);
@@ -138,7 +325,8 @@ class _BasicPersonalInformationWidgetState
       }
     }
 
-    String newText = remaining.isNotEmpty ? '$matchedCode $remaining' : matchedCode;
+    String newText =
+        remaining.isNotEmpty ? '$matchedCode $remaining' : matchedCode;
 
     if (phoneControllers[index].text != newText) {
       phoneControllers[index].value = phoneControllers[index].value.copyWith(
@@ -152,7 +340,6 @@ class _BasicPersonalInformationWidgetState
       phoneList[index].phone = remaining;
     }
   }
-
 
   Future<void> _pickDOB() async {
     DateTime initial;
@@ -234,7 +421,9 @@ class _BasicPersonalInformationWidgetState
     if (payload.isNotEmpty) {
       final res = await ApiService.updateClientPhoneDetail(payload);
 
-      if (res["success"] == true && res["data"] != null && res["data"]["phones"] != null) {
+      if (res["success"] == true &&
+          res["data"] != null &&
+          res["data"]["phones"] != null) {
         final List<dynamic> updatedData = res["data"]["phones"];
 
         for (int i = 0; i < updatedData.length; i++) {
@@ -281,7 +470,6 @@ class _BasicPersonalInformationWidgetState
       if (res["success"] == true &&
           res["data"] != null &&
           res["data"]["emails"] != null) {
-
         final List<dynamic> updatedEmails = res["data"]["emails"];
 
         for (int i = 0; i < updatedEmails.length; i++) {
@@ -306,7 +494,6 @@ class _BasicPersonalInformationWidgetState
     setState(() => isEditingEmails = false);
   }
 
-
   void _addPhoneField() {
     setState(() {
       phoneList.add(
@@ -325,12 +512,50 @@ class _BasicPersonalInformationWidgetState
 
   void _addEmailField() {
     setState(() {
-      emailList.add(
-        Email(id: 0, email: "", type: "Other", isPrimary: false),
-      );
+      emailList.add(Email(id: 0, email: "", type: "Other", isPrimary: false));
       emailControllers.add(TextEditingController());
       isEditingEmails = true;
     });
+  }
+
+  Future<void> _deletePhone(int index) async {
+    final phone = phoneList[index];
+
+    final res = await ApiService.deleteClientTabDetail(
+      id: phone.id,
+      type: "phone",
+    );
+
+    if (res["success"] == true) {
+      setState(() {
+        phoneList.removeAt(index);
+        phoneControllers.removeAt(index);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Phone Number Deleted Successfully!")),
+      );
+    }
+  }
+
+  Future<void> _deleteEmail(int index) async {
+    final email = emailList[index];
+
+    final res = await ApiService.deleteClientTabDetail(
+      id: email.id!,
+      type: "email",
+    );
+
+    if (res["success"] == true) {
+      setState(() {
+        emailList.removeAt(index);
+        emailControllers.removeAt(index);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Email Deleted Successfully!")),
+      );
+    }
   }
 
   @override
@@ -338,18 +563,30 @@ class _BasicPersonalInformationWidgetState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Basic Information', showEdit: true, showAdd: false, isBasic: true),
+        _buildSectionTitle(
+          'Basic Information',
+          showEdit: true,
+          showAdd: false,
+          isBasic: true,
+        ),
         const SizedBox(height: 12),
         _buildInfoCard([
           _buildTextField('First Name', firstNameCtrl, isBasic: true),
           _buildTextField('Last Name', lastNameCtrl, isBasic: true),
           _buildTextField('Client ID', clientIdCtrl, isBasic: false),
           _buildDOBField('Date of Birth', dobCtrl),
-          _buildDropdownField('Gender', genderValue, genderOptions,
-                  (value) => setState(() => genderValue = value!)),
-          _buildDropdownField('Marital Status', maritalStatusValue,
-              maritalStatusOptions,
-                  (value) => setState(() => maritalStatusValue = value!)),
+          _buildDropdownField(
+            'Gender',
+            genderValue,
+            genderOptions,
+            (value) => setState(() => genderValue = value!),
+          ),
+          _buildDropdownField(
+            'Marital Status',
+            maritalStatusValue,
+            maritalStatusOptions,
+            (value) => setState(() => maritalStatusValue = value!),
+          ),
         ]),
 
         const SizedBox(height: 24),
@@ -366,25 +603,61 @@ class _BasicPersonalInformationWidgetState
           phoneList.isEmpty
               ? [_buildStaticField('No Phone Records', '')]
               : List.generate(phoneList.length, (index) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTypeDropdown(
-                  phoneList[index].type ?? "Other",
-                  isEditingPhones,
-                      (value) {
-                    setState(() => phoneList[index].type = value!);
-                  },
-                ),
-                _buildTextFieldPhone(
-                  phoneList[index].type ?? 'Phone Number',
-                  phoneControllers[index],
-                  type: phoneList[index].type ?? 'Other',
-                ),
-                const SizedBox(height: 10),
-              ],
-            );
-          }),
+                final phone = phoneList[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildTypeDropdown(
+                            phone.type ?? "Other",
+                            isEditingPhones,
+                            (value) => setState(() => phone.type = value!),
+                          ),
+                        ),
+                        if (isEditingPhones)
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder:
+                                    (_) => AlertDialog(
+                                      title: const Text("Delete Phone"),
+                                      content: const Text(
+                                        "Are you sure you want to delete this phone number?",
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed:
+                                              () =>
+                                                  Navigator.pop(context, false),
+                                          child: const Text("Cancel"),
+                                        ),
+                                        TextButton(
+                                          onPressed:
+                                              () =>
+                                                  Navigator.pop(context, true),
+                                          child: const Text("Delete"),
+                                        ),
+                                      ],
+                                    ),
+                              );
+                              if (confirm == true) _deletePhone(index);
+                            },
+                          ),
+                      ],
+                    ),
+                    _buildTextFieldPhone(
+                      phone.type ?? 'Phone Number',
+                      phoneControllers[index],
+                      type: phone.type ?? 'Other',
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                );
+              }),
         ),
 
         const SizedBox(height: 24),
@@ -402,38 +675,79 @@ class _BasicPersonalInformationWidgetState
           emailList.isEmpty
               ? [_buildStaticField('No Email Records', '')]
               : List.generate(emailList.length, (index) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTypeDropdown(
-                  emailList[index].type ?? 'Other',
-                  isEditingEmails,
-                      (v) {
-                    setState(() => emailList[index].type = v!);
-                  },
-                ),
-                _buildTextFieldEmail(
-                  emailList[index].type ?? 'Email Address',
-                  emailControllers[index],
-                  type: emailList[index].type ?? 'Other',
-                ),
-                const SizedBox(height: 10),
-              ],
-            );
-          }),
+                final email = emailList[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildTypeDropdown(
+                            email.type ?? 'Other',
+                            isEditingEmails,
+                            (v) => setState(() => email.type = v!),
+                          ),
+                        ),
+                        if (isEditingEmails)
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder:
+                                    (_) => AlertDialog(
+                                      title: const Text("Delete Email"),
+                                      content: const Text(
+                                        "Are you sure you want to delete this email address?",
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed:
+                                              () =>
+                                                  Navigator.pop(context, false),
+                                          child: const Text("Cancel"),
+                                        ),
+                                        TextButton(
+                                          onPressed:
+                                              () =>
+                                                  Navigator.pop(context, true),
+                                          child: const Text("Delete"),
+                                        ),
+                                      ],
+                                    ),
+                              );
+                              if (confirm == true) _deleteEmail(index);
+                            },
+                          ),
+                      ],
+                    ),
+                    _buildTextFieldEmail(
+                      email.type ?? 'Email Address',
+                      emailControllers[index],
+                      type: email.type ?? 'Other',
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                );
+              }),
         ),
       ],
     );
   }
 
-  Widget _buildTypeDropdown(String value, bool editable, ValueChanged<String?> cb) {
+  Widget _buildTypeDropdown(
+    String value,
+    bool editable,
+    ValueChanged<String?> cb,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: DropdownButtonFormField<String>(
         value: value,
-        items: typeOptions
-            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-            .toList(),
+        items:
+            typeOptions
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                .toList(),
         onChanged: editable ? cb : null,
         decoration: const InputDecoration(
           labelText: "TYPE",
@@ -444,10 +758,10 @@ class _BasicPersonalInformationWidgetState
   }
 
   Widget _buildTextField(
-      String label,
-      TextEditingController ctrl, {
-        required bool isBasic,
-      }) {
+    String label,
+    TextEditingController ctrl, {
+    required bool isBasic,
+  }) {
     bool editable = isBasic ? isEditingBasic : false;
     if (label == 'Client ID') editable = false;
 
@@ -475,10 +789,10 @@ class _BasicPersonalInformationWidgetState
   }
 
   Widget _buildTextFieldPhone(
-      String label,
-      TextEditingController ctrl, {
-        required String type,
-      }) {
+    String label,
+    TextEditingController ctrl, {
+    required String type,
+  }) {
     bool editable = isEditingPhones;
 
     return Padding(
@@ -505,10 +819,10 @@ class _BasicPersonalInformationWidgetState
   }
 
   Widget _buildTextFieldEmail(
-      String label,
-      TextEditingController ctrl, {
-        required String type,
-      }) {
+    String label,
+    TextEditingController ctrl, {
+    required String type,
+  }) {
     bool editable = isEditingEmails;
 
     return Padding(
@@ -531,18 +845,19 @@ class _BasicPersonalInformationWidgetState
   }
 
   Widget _buildDropdownField(
-      String label,
-      String value,
-      List<String> options,
-      ValueChanged<String?> cb,
-      ) {
+    String label,
+    String value,
+    List<String> options,
+    ValueChanged<String?> cb,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: DropdownButtonFormField<String>(
         value: value.isNotEmpty ? value : null,
-        items: options
-            .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
-            .toList(),
+        items:
+            options
+                .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+                .toList(),
         onChanged: isEditingBasic ? cb : null,
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
@@ -570,12 +885,12 @@ class _BasicPersonalInformationWidgetState
   }
 
   Widget _buildSectionTitle(
-      String title, {
-        bool showEdit = false,
-        bool showAdd = true,
-        required bool isBasic,
-        bool isEmail = false,
-      }) {
+    String title, {
+    bool showEdit = false,
+    bool showAdd = true,
+    required bool isBasic,
+    bool isEmail = false,
+  }) {
     return Row(
       children: [
         Icon(
@@ -608,8 +923,7 @@ class _BasicPersonalInformationWidgetState
               child: const Icon(Icons.add, color: Colors.green, size: 20),
             ),
           ),
-        if (showEdit)
-          const SizedBox(width: 8),
+        if (showEdit) const SizedBox(width: 8),
         if (showEdit)
           InkWell(
             onTap: () {
@@ -639,7 +953,11 @@ class _BasicPersonalInformationWidgetState
 
   Widget _editButton({required bool isBasic, bool isEmail = false}) {
     bool editing =
-    isBasic ? isEditingBasic : isEmail ? isEditingEmails : isEditingPhones;
+        isBasic
+            ? isEditingBasic
+            : isEmail
+            ? isEditingEmails
+            : isEditingPhones;
 
     return Container(
       padding: const EdgeInsets.all(8),

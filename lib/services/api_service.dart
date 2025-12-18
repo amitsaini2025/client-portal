@@ -718,6 +718,24 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> deleteClientTabDetail({
+    required int id,
+    required String type,
+  }) async {
+    String endpoint = "${ApiConfig.baseUrl}/delete-client-tab-detail";
+    final params = {
+      "id": id,
+      "type": type,
+    };
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      params,
+      'POST',
+    );
+  }
+
+
   static Future<Map<String, dynamic>> updateClientBasicDetail({
     required String firstName,
     required String lastName,
