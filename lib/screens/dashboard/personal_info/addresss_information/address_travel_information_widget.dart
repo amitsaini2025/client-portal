@@ -64,22 +64,23 @@ class _AddressAndTravelInformationWidgetState
 
   Future<void> _saveAddresses() async {
     try {
-      final addressesPayload = widget.addresses.map((a) {
-        return {
-          "id": (a.id == null || a.id == 0) ? null : a.id,
-          "search_address": a.searchAddress ?? "",
-          "address_line_1": a.addressLine1 ?? "",
-          "address_line_2": a.addressLine2,
-          "suburb": a.suburb ?? "",
-          "state": a.state ?? "",
-          "postcode": a.postcode?.toString() ?? "",
-          "country": a.country ?? "",
-          "regional_code": a.regionalCode,
-          "start_date": a.startDate ?? "",
-          "end_date": a.endDate,
-          "is_current": a.isCurrent ?? false,
-        };
-      }).toList();
+      final addressesPayload =
+          widget.addresses.map((a) {
+            return {
+              "id": (a.id == null || a.id == 0) ? null : a.id,
+              "search_address": a.searchAddress ?? "",
+              "address_line_1": a.addressLine1 ?? "",
+              "address_line_2": a.addressLine2,
+              "suburb": a.suburb ?? "",
+              "state": a.state ?? "",
+              "postcode": a.postcode?.toString() ?? "",
+              "country": a.country ?? "",
+              "regional_code": a.regionalCode,
+              "start_date": a.startDate ?? "",
+              "end_date": a.endDate,
+              "is_current": a.isCurrent ?? false,
+            };
+          }).toList();
 
       final response = await ApiService.updateClientAddressDetail(
         addressesPayload,
@@ -133,15 +134,16 @@ class _AddressAndTravelInformationWidgetState
 
   Future<void> _saveTravels() async {
     try {
-      final travelsPayload = widget.travels.map((t) {
-        return {
-          "id": (t.id == null || t.id == 0) ? null : t.id,
-          "country_visited": t.countryVisited ?? "",
-          "arrival_date": t.arrivalDate ?? "",
-          "departure_date": t.departureDate ?? "",
-          "purpose": t.purpose ?? "",
-        };
-      }).toList();
+      final travelsPayload =
+          widget.travels.map((t) {
+            return {
+              "id": (t.id == null || t.id == 0) ? null : t.id,
+              "country_visited": t.countryVisited ?? "",
+              "arrival_date": t.arrivalDate ?? "",
+              "departure_date": t.departureDate ?? "",
+              "purpose": t.purpose ?? "",
+            };
+          }).toList();
 
       final response = await ApiService.updateClientTravelDetail(
         travelsPayload,
@@ -198,35 +200,77 @@ class _AddressAndTravelInformationWidgetState
     }
   }
 
+  Future<void> _deleteTravel(Travel t) async {
+    if (t.id == 0) {
+      setState(() => widget.travels.remove(t));
+      return;
+    }
+
+    final res = await ApiService.deleteClientTabDetail(
+      id: t.id!,
+      type: "travel",
+    );
+
+    if (res['success'] == true) {
+      setState(() => widget.travels.remove(t));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Travel Deleted Successfully!")),
+      );
+    }
+  }
+
+  Future<void> _deleteAddress(Address address) async {
+    if (address.id == 0) {
+      setState(() => widget.travels.remove(address));
+      return;
+    }
+
+    final res = await ApiService.deleteClientTabDetail(
+      id: address.id!,
+      type: "address",
+    );
+
+    if (res['success'] == true) {
+      setState(() => widget.addresses.remove(address));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Address Deleted Successfully!")),
+      );
+    }
+  }
+
   void _onAddAddress() {
     setState(() {
-      widget.addresses.add(Address(
-        id: 0,
-        searchAddress: "",
-        addressLine1: "",
-        addressLine2: "",
-        suburb: "",
-        state: "",
-        postcode: "0",
-        country: "",
-        regionalCode: "",
-        startDate: "",
-        endDate: "",
-        isCurrent: false,
-      ));
+      widget.addresses.add(
+        Address(
+          id: 0,
+          searchAddress: "",
+          addressLine1: "",
+          addressLine2: "",
+          suburb: "",
+          state: "",
+          postcode: "0",
+          country: "",
+          regionalCode: "",
+          startDate: "",
+          endDate: "",
+          isCurrent: false,
+        ),
+      );
       isEditingAddress = true;
     });
   }
 
   void _onAddTravel() {
     setState(() {
-      widget.travels.add(Travel(
-        id: 0,
-        countryVisited: "",
-        arrivalDate: "",
-        departureDate: "",
-        purpose: "",
-      ));
+      widget.travels.add(
+        Travel(
+          id: 0,
+          countryVisited: "",
+          arrivalDate: "",
+          departureDate: "",
+          purpose: "",
+        ),
+      );
       isEditingTravel = true;
     });
   }
@@ -253,12 +297,47 @@ class _AddressAndTravelInformationWidgetState
           ),
           const SizedBox(height: 12),
           ...widget.addresses.map(
-                (address) => _buildInfoCard([
+            (address) => _buildInfoCard([
+              if (isEditingAddress)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder:
+                            (_) => AlertDialog(
+                              title: const Text("Delete Address"),
+                              content: const Text(
+                                "Are you sure you want to delete this address?",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    _deleteAddress(address);
+                                  },
+                                  child: const Text(
+                                    "Delete",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                      );
+                    },
+                  ),
+                ),
               _buildGooglePlaceField(
                 "Search Address",
                 address.searchAddress,
                 isEditingAddress,
-                    (val) {
+                (val) {
                   setState(() {
                     address.searchAddress = val;
                   });
@@ -269,32 +348,31 @@ class _AddressAndTravelInformationWidgetState
                 "Address Line 1",
                 address.addressLine1 ?? "-",
                 isEditingAddress,
-                    (val) => address.addressLine1 = val,
+                (val) => address.addressLine1 = val,
               ),
               _buildEditableRow(
                 "Address Line 2",
                 address.addressLine2 ?? "-",
                 isEditingAddress,
-                    (val) => address.addressLine2 = val,
+                (val) => address.addressLine2 = val,
               ),
               _buildEditableRow(
                 "Suburb",
                 address.suburb,
                 isEditingAddress,
-                    (val) => address.suburb = val,
+                (val) => address.suburb = val,
               ),
               _buildEditableRow(
                 "State",
                 address.state,
                 isEditingAddress,
-                    (val) => address.state = val,
+                (val) => address.state = val,
               ),
               _buildEditableRow(
                 "Postcode",
                 address.postcode.toString(),
                 isEditingAddress,
-                    (val) =>
-                address.postcode = address.postcode,
+                (val) => address.postcode = address.postcode,
               ),
               _buildCountryDropdown(
                 label: "Country",
@@ -306,25 +384,25 @@ class _AddressAndTravelInformationWidgetState
                 "Regional Code",
                 address.regionalCode ?? "-",
                 isEditingAddress,
-                    (val) => address.regionalCode = val,
+                (val) => address.regionalCode = val,
               ),
               _buildDateRow(
                 "Start Date",
                 address.startDate ?? "-",
                 isEditingAddress,
-                    (val) => address.startDate = val,
+                (val) => address.startDate = val,
               ),
               _buildDateRow(
                 "End Date",
                 address.endDate ?? "-",
                 isEditingAddress,
-                    (val) => address.endDate = val,
+                (val) => address.endDate = val,
               ),
               _buildEditableRow(
                 "Is Current",
                 address.isCurrent ? "Yes" : "No",
                 isEditingAddress,
-                    (val) => address.isCurrent = val.toLowerCase() == "yes",
+                (val) => address.isCurrent = val.toLowerCase() == "yes",
               ),
             ]),
           ),
@@ -345,7 +423,42 @@ class _AddressAndTravelInformationWidgetState
           ),
           const SizedBox(height: 12),
           ...widget.travels.map(
-                (travel) => _buildInfoCard([
+            (travel) => _buildInfoCard([
+              if (isEditingTravel)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder:
+                            (_) => AlertDialog(
+                              title: const Text("Delete Travel"),
+                              content: const Text(
+                                "Are you sure you want to delete this travel record?",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    _deleteTravel(travel);
+                                  },
+                                  child: const Text(
+                                    "Delete",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                      );
+                    },
+                  ),
+                ),
               _buildCountryDropdown(
                 label: "Country Visited",
                 editable: isEditingTravel,
@@ -357,19 +470,19 @@ class _AddressAndTravelInformationWidgetState
                 "Arrival Date",
                 travel.arrivalDate,
                 isEditingTravel,
-                    (val) => travel.arrivalDate = val!,
+                (val) => travel.arrivalDate = val!,
               ),
               _buildDateRow(
                 "Departure Date",
                 travel.departureDate,
                 isEditingTravel,
-                    (val) => travel.departureDate = val!,
+                (val) => travel.departureDate = val!,
               ),
               _buildEditableRow(
                 "Travel Purpose",
                 travel.purpose,
                 isEditingTravel,
-                    (val) => travel.purpose = val,
+                (val) => travel.purpose = val,
               ),
             ]),
           ),
@@ -379,12 +492,12 @@ class _AddressAndTravelInformationWidgetState
   }
 
   Widget _buildGooglePlaceField(
-      String label,
-      String value,
-      bool enabled,
-      ValueChanged<String> onChanged,
-      Future<List<String>> Function(String) fetchPlaceSuggestions,
-      ) {
+    String label,
+    String value,
+    bool enabled,
+    ValueChanged<String> onChanged,
+    Future<List<String>> Function(String) fetchPlaceSuggestions,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TypeAheadField<String>(
@@ -416,40 +529,42 @@ class _AddressAndTravelInformationWidgetState
             decoration: InputDecoration(
               labelText: label.toUpperCase(),
               border: const OutlineInputBorder(),
-              suffixIcon: enabled && textEditingController.text.isNotEmpty
-                  ? IconButton(
-                icon: const Icon(Icons.clear),
-                onPressed: () {
-                  textEditingController.clear();
-                  onChanged("");
-                },
-              )
-                  : null,
+              suffixIcon:
+                  enabled && textEditingController.text.isNotEmpty
+                      ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          textEditingController.clear();
+                          onChanged("");
+                        },
+                      )
+                      : null,
             ),
             onChanged: onChanged,
           );
         },
 
-        emptyBuilder: (context) => const Padding(
-          padding: EdgeInsets.all(8),
-          child: Text("No results found"),
-        ),
+        emptyBuilder:
+            (context) => const Padding(
+              padding: EdgeInsets.all(8),
+              child: Text("No results found"),
+            ),
 
-        loadingBuilder: (context) => const Padding(
-          padding: EdgeInsets.all(8),
-          child: CircularProgressIndicator(),
-        ),
+        loadingBuilder:
+            (context) => const Padding(
+              padding: EdgeInsets.all(8),
+              child: CircularProgressIndicator(),
+            ),
       ),
     );
   }
 
-
   Widget _buildEditableRow(
-      String label,
-      String value,
-      bool enabled,
-      ValueChanged<String> onChanged,
-      ) {
+    String label,
+    String value,
+    bool enabled,
+    ValueChanged<String> onChanged,
+  ) {
     final controller = TextEditingController(text: value);
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -492,55 +607,55 @@ class _AddressAndTravelInformationWidgetState
           ),
         ),
         child:
-        editable
-            ? DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: selected!.isEmpty ? null : selected,
-            isExpanded: true,
-            onChanged: onChanged,
-            items:
-            widget.countries
-                .map(
-                  (c) => DropdownMenuItem(
-                value: c.name,
-                child: Text(c.name),
-              ),
-            )
-                .toList(),
-          ),
-        )
-            : Text(
-          selected ?? "",
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+            editable
+                ? DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: selected!.isEmpty ? null : selected,
+                    isExpanded: true,
+                    onChanged: onChanged,
+                    items:
+                        widget.countries
+                            .map(
+                              (c) => DropdownMenuItem(
+                                value: c.name,
+                                child: Text(c.name),
+                              ),
+                            )
+                            .toList(),
+                  ),
+                )
+                : Text(
+                  selected ?? "",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
       ),
     );
   }
 
   Widget _buildDateRow(
-      String label,
-      String value,
-      bool enabled,
-      ValueChanged<String?> onChanged,
-      ) {
+    String label,
+    String value,
+    bool enabled,
+    ValueChanged<String?> onChanged,
+  ) {
     final controller = TextEditingController(text: value);
 
     return GestureDetector(
       onTap:
-      enabled
-          ? () async {
-        final newDate = await _pickDate(controller.text);
-        if (newDate != null) {
-          controller.text = newDate;
-          onChanged(newDate);
-          setState(() {});
-        }
-      }
-          : null,
+          enabled
+              ? () async {
+                final newDate = await _pickDate(controller.text);
+                if (newDate != null) {
+                  controller.text = newDate;
+                  onChanged(newDate);
+                  setState(() {});
+                }
+              }
+              : null,
       child: AbsorbPointer(
         child: Padding(
           padding: const EdgeInsets.only(bottom: 14),
@@ -568,13 +683,13 @@ class _AddressAndTravelInformationWidgetState
   }
 
   Widget _buildSectionTitle(
-      String title, {
-        required bool isEditing,
-        required VoidCallback onEdit,
-        required VoidCallback onAdd,
-        required IconData icon,
-        bool showAdd = false,
-      }) {
+    String title, {
+    required bool isEditing,
+    required VoidCallback onEdit,
+    required VoidCallback onAdd,
+    required IconData icon,
+    bool showAdd = false,
+  }) {
     return Row(
       children: [
         Icon(icon, color: Colors.white),
