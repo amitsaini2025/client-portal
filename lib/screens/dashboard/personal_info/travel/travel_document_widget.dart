@@ -141,6 +141,67 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
     }
   }
 
+  Future<void> _deletePassport(Passport passport) async {
+    if (passport.id == 0) {
+      // If it is a new passport not yet saved to API
+      setState(() {
+        widget.passports.remove(passport);
+        _passportNumberControllers.remove(passport);
+        _passportIssueControllers.remove(passport);
+        _passportExpiryControllers.remove(passport);
+      });
+      return;
+    }
+
+    final res = await ApiService.deleteClientTabDetail(
+      id: passport.id!,
+      type: "passport",
+    );
+
+    if (res["success"] == true) {
+      setState(() {
+        widget.passports.remove(passport);
+        _passportNumberControllers.remove(passport);
+        _passportIssueControllers.remove(passport);
+        _passportExpiryControllers.remove(passport);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passport Deleted Successfully!")),
+      );
+    }
+  }
+
+  Future<void> _deleteVisa(Visa visa) async {
+    if (visa.id == 0) {
+      // If it is a new visa not yet saved to API
+      setState(() {
+        widget.visas.remove(visa);
+        _visaDescriptionControllers.remove(visa);
+        _visaGrantControllers.remove(visa);
+        _visaExpiryControllers.remove(visa);
+      });
+      return;
+    }
+
+    final res = await ApiService.deleteClientTabDetail(
+      id: visa.id,
+      type: "visa",
+    );
+
+    if (res["success"] == true) {
+      setState(() {
+        widget.visas.remove(visa);
+        _visaDescriptionControllers.remove(visa);
+        _visaGrantControllers.remove(visa);
+        _visaExpiryControllers.remove(visa);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Visa Deleted Successfully!")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -256,34 +317,121 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
   }
 
   Widget _buildPassportCard(Passport p) {
-    final numberController = _passportNumberControllers.putIfAbsent(p, () => TextEditingController(text: p.passportNumber));
-    final issueController = _passportIssueControllers.putIfAbsent(p, () => TextEditingController(text: p.issueDate));
-    final expiryController = _passportExpiryControllers.putIfAbsent(p, () => TextEditingController(text: p.expiryDate));
+    final numberController = _passportNumberControllers.putIfAbsent(
+        p, () => TextEditingController(text: p.passportNumber));
+    final issueController = _passportIssueControllers.putIfAbsent(
+        p, () => TextEditingController(text: p.issueDate));
+    final expiryController = _passportExpiryControllers.putIfAbsent(
+        p, () => TextEditingController(text: p.expiryDate));
 
     return _buildInfoCard([
-      _buildEditableRow("Passport Number", numberController, (val) => p.passportNumber = val, isPassportEditing),
+      Row(
+        children: [
+          Expanded(
+            child: _buildEditableRow(
+                "Passport Number", numberController, (val) => p.passportNumber = val, isPassportEditing),
+          ),
+          if (isPassportEditing)
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text("Delete Passport"),
+                    content: const Text("Are you sure you want to delete this passport?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false), // Cancel
+                        child: const Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true), // Confirm delete
+                        child: const Text("Delete"),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  await _deletePassport(p); // Call API to delete
+                  setState(() {
+                    widget.passports.remove(p);
+                    _passportNumberControllers.remove(p);
+                    _passportIssueControllers.remove(p);
+                    _passportExpiryControllers.remove(p);
+                  });
+                }
+              },
+            ),
+        ],
+      ),
       _buildCountryDropdown(
         label: "Country",
         selected: p.country,
         editable: isPassportEditing,
         onChanged: (val) => setState(() => p.country = val ?? ""),
       ),
-      _buildDateRow("Issued Date", issueController, (val) => p.issueDate = val ?? "", isPassportEditing),
-      _buildDateRow("Expiry Date", expiryController, (val) => p.expiryDate = val ?? "", isPassportEditing),
+      _buildDateRow(
+          "Issued Date", issueController, (val) => p.issueDate = val ?? "", isPassportEditing),
+      _buildDateRow(
+          "Expiry Date", expiryController, (val) => p.expiryDate = val ?? "", isPassportEditing),
     ]);
   }
 
   Widget _buildVisaCard(Visa v) {
-    final descriptionController = _visaDescriptionControllers.putIfAbsent(v, () => TextEditingController(text: v.visaDescription));
-    final grantController = _visaGrantControllers.putIfAbsent(v, () => TextEditingController(text: v.visaGrantDate));
-    final expiryController = _visaExpiryControllers.putIfAbsent(v, () => TextEditingController(text: v.visaExpiryDate));
+    final descriptionController = _visaDescriptionControllers.putIfAbsent(
+        v, () => TextEditingController(text: v.visaDescription));
+    final grantController = _visaGrantControllers.putIfAbsent(
+        v, () => TextEditingController(text: v.visaGrantDate));
+    final expiryController = _visaExpiryControllers.putIfAbsent(
+        v, () => TextEditingController(text: v.visaExpiryDate));
 
     return _buildInfoCard([
-      _buildCountryDropdown(
-        label: "Visa Country",
-        selected: v.visaCountry,
-        editable: isVisaEditing,
-        onChanged: (val) => setState(() => v.visaCountry = val ?? ""),
+      Row(
+        children: [
+          Expanded(
+            child: _buildCountryDropdown(
+              label: "Visa Country",
+              selected: v.visaCountry,
+              editable: isVisaEditing,
+              onChanged: (val) => setState(() => v.visaCountry = val ?? ""),
+            ),
+          ),
+          if (isVisaEditing)
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text("Delete Visa"),
+                    content: const Text("Are you sure you want to delete this visa?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false), // Cancel
+                        child: const Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true), // Confirm delete
+                        child: const Text("Delete"),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  await _deleteVisa(v); // Call API to delete
+                  setState(() {
+                    widget.visas.remove(v);
+                    _visaDescriptionControllers.remove(v);
+                    _visaGrantControllers.remove(v);
+                    _visaExpiryControllers.remove(v);
+                  });
+                }
+              },
+            ),
+        ],
       ),
       _buildVisaTypeDropdown(
         label: "Visa Type",
@@ -291,9 +439,12 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         editable: isVisaEditing,
         onChanged: (id) => setState(() => v.visaType = id?.toString() ?? ""),
       ),
-      _buildEditableRow("Description", descriptionController, (val) => v.visaDescription = val, isVisaEditing),
-      _buildDateRow("Grant Date", grantController, (val) => v.visaGrantDate = val ?? "", isVisaEditing),
-      _buildDateRow("Expiry Date", expiryController, (val) => v.visaExpiryDate = val ?? "", isVisaEditing),
+      _buildEditableRow(
+          "Description", descriptionController, (val) => v.visaDescription = val, isVisaEditing),
+      _buildDateRow(
+          "Grant Date", grantController, (val) => v.visaGrantDate = val ?? "", isVisaEditing),
+      _buildDateRow(
+          "Expiry Date", expiryController, (val) => v.visaExpiryDate = val ?? "", isVisaEditing),
     ]);
   }
 
