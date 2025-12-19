@@ -24,9 +24,9 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   bool isLoading = false;
 
   Future<void> _pickDate(
-      Function(String) onChanged,
-      String currentValue,
-      ) async {
+    Function(String) onChanged,
+    String currentValue,
+  ) async {
     DateTime initial;
 
     try {
@@ -98,7 +98,9 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
         setState(() => isEditing = false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response["message"] ?? "Experience update failed")),
+          SnackBar(
+            content: Text(response["message"] ?? "Experience update failed"),
+          ),
         );
       }
     } catch (e) {
@@ -133,6 +135,35 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     });
   }
 
+  Future<void> _deleteExperience(Experience exp) async {
+    // If not yet saved on server
+    if (exp.id == null || exp.id == 0) {
+      setState(() {
+        widget.experiences.remove(exp);
+      });
+      return;
+    }
+
+    final res = await ApiService.deleteClientTabDetail(
+      id: exp.id!,
+      type: "experience",
+    );
+
+    if (res["success"] == true) {
+      setState(() {
+        widget.experiences.remove(exp);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Experience deleted successfully")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res["message"] ?? "Delete failed")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -157,11 +188,8 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
               ),
               const SizedBox(height: 18),
               ...widget.experiences.map(
-                    (exp) => Column(
-                  children: [
-                    _buildWorkCard(exp),
-                    const SizedBox(height: 18),
-                  ],
+                (exp) => Column(
+                  children: [_buildWorkCard(exp), const SizedBox(height: 18)],
                 ),
               ),
             ],
@@ -172,13 +200,13 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   }
 
   Widget _buildSectionTitle(
-      String title, {
-        required IconData icon,
-        required bool isEditing,
-        required VoidCallback onEdit,
-        bool showAdd = false,
-        VoidCallback? onAdd,
-      }) {
+    String title, {
+    required IconData icon,
+    required bool isEditing,
+    required VoidCallback onEdit,
+    bool showAdd = false,
+    VoidCallback? onAdd,
+  }) {
     return Row(
       children: [
         Icon(icon, color: Colors.white),
@@ -244,16 +272,80 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildEditableRow("Job Title", exp.jobTitle, (val) => exp.jobTitle = val),
-          _buildEditableRow("ANZSCO Code", exp.jobCode, (val) => exp.jobCode = val),
-          _buildEditableRow("Employer Name", exp.employerName, (val) => exp.employerName = val),
+          Row(
+            children: [
+              Expanded(
+                child: _buildEditableRow(
+                  "Job Title",
+                  exp.jobTitle,
+                  (val) => exp.jobTitle = val,
+                ),
+              ),
+              if (isEditing)
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder:
+                          (_) => AlertDialog(
+                            title: const Text("Delete Experience"),
+                            content: const Text(
+                              "Are you sure you want to delete this work experience?",
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text("Cancel"),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text("Delete"),
+                              ),
+                            ],
+                          ),
+                    );
+
+                    if (confirm == true) {
+                      await _deleteExperience(exp);
+                    }
+                  },
+                ),
+            ],
+          ),
+          _buildEditableRow(
+            "ANZSCO Code",
+            exp.jobCode,
+            (val) => exp.jobCode = val,
+          ),
+          _buildEditableRow(
+            "Employer Name",
+            exp.employerName,
+            (val) => exp.employerName = val,
+          ),
           _buildCountryDropdown(exp),
           _buildEditableRow("State", exp.state ?? "", (val) => exp.state = val),
-          _buildEditableRow("Job Type", exp.jobType, (val) => exp.jobType = val),
-          _buildDateRow("Start Date", exp.startDate, (val) => exp.startDate = val),
+          _buildEditableRow(
+            "Job Type",
+            exp.jobType,
+            (val) => exp.jobType = val,
+          ),
+          _buildDateRow(
+            "Start Date",
+            exp.startDate,
+            (val) => exp.startDate = val,
+          ),
           const SizedBox(height: 12),
-          _buildDateRow("Finish Date", exp.finishDate, (val) => exp.finishDate = val),
-          _buildCheckboxRow("Relevant", exp.relevantExperience, (val) => exp.relevantExperience = val),
+          _buildDateRow(
+            "Finish Date",
+            exp.finishDate,
+            (val) => exp.finishDate = val,
+          ),
+          _buildCheckboxRow(
+            "Relevant",
+            exp.relevantExperience,
+            (val) => exp.relevantExperience = val,
+          ),
         ],
       ),
     );
@@ -265,21 +357,23 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
       child: DropdownButtonFormField<String>(
         value: exp.country.isEmpty ? null : exp.country,
         isExpanded: true,
-        items: widget.countries
-            .map(
-              (country) => DropdownMenuItem<String>(
-            value: country.name,
-            child: Text(country.name),
-          ),
-        )
-            .toList(),
-        onChanged: isEditing
-            ? (val) {
-          setState(() {
-            exp.country = val ?? "";
-          });
-        }
-            : null,
+        items:
+            widget.countries
+                .map(
+                  (country) => DropdownMenuItem<String>(
+                    value: country.name,
+                    child: Text(country.name),
+                  ),
+                )
+                .toList(),
+        onChanged:
+            isEditing
+                ? (val) {
+                  setState(() {
+                    exp.country = val ?? "";
+                  });
+                }
+                : null,
         decoration: const InputDecoration(
           labelText: "COUNTRY",
           border: OutlineInputBorder(),
@@ -289,19 +383,34 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     );
   }
 
-  Widget _buildEditableRow(String label, String value, Function(String) onChanged) {
+  Widget _buildEditableRow(
+    String label,
+    String value,
+    Function(String) onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         initialValue: value,
         enabled: isEditing,
         onChanged: (val) => onChanged(val),
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.black87,
+        ),
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
-          labelStyle: const TextStyle(color: Colors.grey, fontSize: 13, letterSpacing: 0.2),
+          labelStyle: const TextStyle(
+            color: Colors.grey,
+            fontSize: 13,
+            letterSpacing: 0.2,
+          ),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
         ),
       ),
     );
@@ -311,9 +420,7 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     final controller = TextEditingController(text: value);
 
     return GestureDetector(
-      onTap: isEditing
-          ? () => _pickDate(onChanged, controller.text)
-          : null,
+      onTap: isEditing ? () => _pickDate(onChanged, controller.text) : null,
       child: AbsorbPointer(
         absorbing: true,
         child: Padding(
@@ -325,7 +432,10 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
             decoration: InputDecoration(
               labelText: label.toUpperCase(),
               border: const OutlineInputBorder(),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
             ),
           ),
         ),
@@ -337,17 +447,21 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     return Row(
       children: [
         Expanded(
-          child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
         ),
         Checkbox(
           value: value,
-          onChanged: isEditing
-              ? (val) {
-            setState(() {
-              onChanged(val ?? false);
-            });
-          }
-              : null,
+          onChanged:
+              isEditing
+                  ? (val) {
+                    setState(() {
+                      onChanged(val ?? false);
+                    });
+                  }
+                  : null,
         ),
       ],
     );
