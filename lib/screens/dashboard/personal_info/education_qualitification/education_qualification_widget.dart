@@ -156,6 +156,36 @@ class _EducationalQualificationsWidgetState
     return null;
   }
 
+  Future<void> _deleteQualification(Qualification q) async {
+    // If not yet saved to API
+    if (q.id == null || q.id == 0) {
+      setState(() {
+        widget.qualifications.remove(q);
+      });
+      return;
+    }
+
+    final res = await ApiService.deleteClientTabDetail(
+      id: q.id!,
+      type: "qualification",
+    );
+
+    if (res["success"] == true) {
+      setState(() {
+        widget.qualifications.remove(q);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Qualification deleted successfully")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res["message"] ?? "Delete failed")),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -179,13 +209,48 @@ class _EducationalQualificationsWidgetState
           const SizedBox(height: 12),
           ...widget.qualifications.map(
                 (qual) => _buildInfoCard([
-              _buildDropdown(
-                label: "Level",
-                value: qual.level,
-                items: qualificationLevels,
-                enabled: isEditing,
-                onChanged: (val) => setState(() => qual.level = val ?? ""),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDropdown(
+                      label: "Level",
+                      value: qual.level,
+                      items: qualificationLevels,
+                      enabled: isEditing,
+                      onChanged: (val) => setState(() => qual.level = val ?? ""),
+                    ),
+                  ),
+                  if (isEditing)
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: const Text("Delete Qualification"),
+                            content: const Text(
+                                "Are you sure you want to delete this qualification?"),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text("Cancel"),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text("Delete"),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true) {
+                          await _deleteQualification(qual);
+                        }
+                      },
+                    ),
+                ],
               ),
+
               _buildEditableRow("Name", qual.name, isEditing,
                       (val) => qual.name = val),
               _buildEditableRow("Institution", qual.collegeName, isEditing,
