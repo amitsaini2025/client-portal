@@ -109,6 +109,34 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
     });
   }
 
+  Future<void> _deleteOccupation(Occupation occ) async {
+    if (occ.id == null || occ.id == 0) {
+      setState(() {
+        widget.occupations.remove(occ);
+      });
+      return;
+    }
+
+    final res = await ApiService.deleteClientTabDetail(
+      id: occ.id!,
+      type: "occupation",
+    );
+
+    if (res["success"] == true) {
+      setState(() {
+        widget.occupations.remove(occ);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Occupation deleted successfully")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res["message"] ?? "Delete failed")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -226,10 +254,46 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             spacing: 26,
             runSpacing: 14,
             children: [
-              _buildEditableRow(
-                "Skill Assessment",
-                occupation.skillAssessment,
-                (val) => occupation.skillAssessment = val,
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildEditableRow(
+                      "Skill Assessment",
+                      occupation.skillAssessment,
+                          (v) => occupation.skillAssessment = v,
+                    ),
+                  ),
+                  if (isEditing)
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: const Text("Delete Occupation"),
+                            content: const Text(
+                                "Are you sure you want to delete this occupation?"),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, false),
+                                child: const Text("Cancel"),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, true),
+                                child: const Text("Delete"),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true) {
+                          await _deleteOccupation(occupation);
+                        }
+                      },
+                    ),
+                ],
               ),
               _buildDateRow(
                 "Assessment Date",

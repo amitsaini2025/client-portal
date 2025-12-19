@@ -6,10 +6,7 @@ import '../../../../models/personal_information/test_score.dart';
 class TestScoresWidget extends StatefulWidget {
   final List<TestScore> testScores;
 
-  const TestScoresWidget({
-    super.key,
-    required this.testScores,
-  });
+  const TestScoresWidget({super.key, required this.testScores});
 
   @override
   State<TestScoresWidget> createState() => _TestScoresWidgetState();
@@ -39,12 +36,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                 },
                 onAdd: () {
                   setState(() {
-                    widget.testScores.add(
-                      TestScore(
-                        id: null,
-                        testType: '',
-                      ),
-                    );
+                    widget.testScores.add(TestScore(id: null, testType: ''));
                     isEditing = true;
                   });
                 },
@@ -52,7 +44,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
               ),
               const SizedBox(height: 16),
               ...widget.testScores.map(
-                    (score) => Column(
+                (score) => Column(
                   children: [
                     _buildTestScoreCard(score),
                     const SizedBox(height: 16),
@@ -95,14 +87,46 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
     setState(() => isLoading = false);
   }
 
+  Future<void> _deleteTestScore(TestScore score) async {
+    if (score.id == null) {
+      setState(() {
+        widget.testScores.remove(score);
+      });
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    final res = await ApiService.deleteClientTabDetail(
+      id: score.id!,
+      type: "testscore",
+    );
+
+    setState(() => isLoading = false);
+
+    if (res["success"] == true) {
+      setState(() {
+        widget.testScores.remove(score);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Test score deleted successfully")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res["message"] ?? "Delete failed")),
+      );
+    }
+  }
+
   Widget _buildSectionTitle(
-      String title, {
-        required bool isEditing,
-        required VoidCallback onEdit,
-        bool showAdd = false,
-        VoidCallback? onAdd,
-        required IconData icon,
-      }) {
+    String title, {
+    required bool isEditing,
+    required VoidCallback onEdit,
+    bool showAdd = false,
+    VoidCallback? onAdd,
+    required IconData icon,
+  }) {
     return Row(
       children: [
         Icon(icon, color: Colors.white),
@@ -163,20 +187,46 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
         children: [
           Align(
             alignment: Alignment.topRight,
-            child: InkWell(
-              onTap: isEditing
-                  ? () => setState(() => widget.testScores.remove(score))
-                  : null,
-              child: isEditing
-                  ? const Icon(Icons.remove_circle, color: Colors.red)
-                  : const SizedBox(),
-            ),
+            child:
+                isEditing
+                    ? IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder:
+                              (_) => AlertDialog(
+                                title: const Text("Delete Test Score"),
+                                content: const Text(
+                                  "Are you sure you want to delete this test score?",
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, false),
+                                    child: const Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, true),
+                                    child: const Text("Delete"),
+                                  ),
+                                ],
+                              ),
+                        );
+
+                        if (confirm == true) {
+                          await _deleteTestScore(score);
+                        }
+                      },
+                    )
+                    : const SizedBox(),
           ),
           const SizedBox(height: 4),
           _buildEditableRow(
             "Test Type",
             score.testType,
-                (val) => score.testType = val,
+            (val) => score.testType = val,
           ),
           Row(
             children: [
@@ -184,7 +234,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                 child: _buildNumberField(
                   "Listening",
                   score.listening,
-                      (val) => score.listening = val,
+                  (val) => score.listening = val,
                 ),
               ),
               const SizedBox(width: 12),
@@ -192,7 +242,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                 child: _buildNumberField(
                   "Reading",
                   score.reading,
-                      (val) => score.reading = val,
+                  (val) => score.reading = val,
                 ),
               ),
             ],
@@ -204,7 +254,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                 child: _buildNumberField(
                   "Writing",
                   score.writing,
-                      (val) => score.writing = val,
+                  (val) => score.writing = val,
                 ),
               ),
               const SizedBox(width: 12),
@@ -212,7 +262,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
                 child: _buildNumberField(
                   "Speaking",
                   score.speaking,
-                      (val) => score.speaking = val,
+                  (val) => score.speaking = val,
                 ),
               ),
             ],
@@ -221,19 +271,19 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
           _buildDoubleField(
             "Overall Score",
             score.overallScore,
-                (val) => score.overallScore = val,
+            (val) => score.overallScore = val,
           ),
           const SizedBox(height: 12),
           _buildDateRow(
             "Test Date",
             score.testDate,
-                (val) => score.testDate = val,
+            (val) => score.testDate = val,
           ),
           const SizedBox(height: 12),
           _buildEditableRow(
             "Reference No",
             score.referenceNo,
-                (val) => score.referenceNo = val,
+            (val) => score.referenceNo = val,
           ),
           Row(
             children: [
@@ -243,9 +293,11 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
               ),
               Checkbox(
                 value: score.relevantTest,
-                onChanged: isEditing
-                    ? (val) => setState(() => score.relevantTest = val ?? false)
-                    : null,
+                onChanged:
+                    isEditing
+                        ? (val) =>
+                            setState(() => score.relevantTest = val ?? false)
+                        : null,
               ),
             ],
           ),
@@ -255,10 +307,10 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
   }
 
   Widget _buildEditableRow(
-      String label,
-      String value,
-      Function(String) onChanged,
-      ) {
+    String label,
+    String value,
+    Function(String) onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -268,7 +320,10 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
         ),
         style: const TextStyle(
@@ -281,10 +336,10 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
   }
 
   Widget _buildDoubleField(
-      String label,
-      double value,
-      ValueChanged<double> onChanged,
-      ) {
+    String label,
+    double value,
+    ValueChanged<double> onChanged,
+  ) {
     final controller = TextEditingController(text: value.toString());
 
     return Padding(
@@ -300,8 +355,10 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
         ),
         style: const TextStyle(
@@ -313,9 +370,10 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
     );
   }
 
-
   Widget _buildNumberField(String label, int value, Function(int) onChanged) {
-    TextEditingController controller = TextEditingController(text: value.toString());
+    TextEditingController controller = TextEditingController(
+      text: value.toString(),
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -329,7 +387,10 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
         ),
         style: const TextStyle(
@@ -349,28 +410,34 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
         controller: controller,
         enabled: isEditing,
         readOnly: true,
-        onTap: isEditing
-            ? () async {
-          DateTime? pickedDate = await showDatePicker(
-            context: context,
-            initialDate: value.isNotEmpty ? _parseDate(value) : DateTime.now(),
-            firstDate: DateTime(1900),
-            lastDate: DateTime(2100),
-          );
-          if (pickedDate != null) {
-            final formatted =
-                "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
-            controller.text = formatted;
-            onChanged(formatted);
-          }
-        }
-            : null,
+        onTap:
+            isEditing
+                ? () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate:
+                        value.isNotEmpty ? _parseDate(value) : DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    final formatted =
+                        "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
+                    controller.text = formatted;
+                    onChanged(formatted);
+                  }
+                }
+                : null,
         decoration: InputDecoration(
           labelText: label.toUpperCase(),
           border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-          suffixIcon: isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
+          suffixIcon:
+              isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
         ),
         style: const TextStyle(
           fontSize: 14,
