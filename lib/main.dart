@@ -11,10 +11,12 @@ import 'package:client/screens/tasks/tasks_screen.dart';
 import 'package:client/screens/workflow/message/workflow_message_detail_screen.dart';
 import 'package:client/screens/workflow/workflow_documents_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
+import 'package:client/utils/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
@@ -29,6 +31,7 @@ import 'screens/auth/register_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'config/stripe_config.dart';
+import 'package:workmanager/workmanager.dart';
 
 final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(
   ThemeMode.light,
@@ -142,22 +145,83 @@ final ThemeData darkTheme = ThemeData(
   ),
 );
 
-// Firebase Messaging background handler
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  debugPrint('Handling a background message: ${message.messageId}');
 
-  // You can add custom logic here for background message handling
-  // For example, updating local storage, showing local notifications, etc.
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
+const AndroidNotificationChannel defaultChannel = AndroidNotificationChannel(
+  'default_channel',
+  'Default Channel',
+  description: 'General notifications',
+  importance: Importance.high,
+);
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  final FlutterLocalNotificationsPlugin plugin =
+  FlutterLocalNotificationsPlugin();
+
+  const AndroidInitializationSettings androidSettings =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  await plugin.initialize(
+    const InitializationSettings(android: androidSettings),
+  );
+
+  final String? title =
+      message.notification?.title ?? message.data['title'];
+  final String? body =
+      message.notification?.body ?? message.data['body'];
+
+  if (title == null || body == null) return;
+
+  await plugin.show(
+    DateTime.now().millisecondsSinceEpoch,
+    title,
+    body,
+    const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'default_channel',
+        'Default Channel',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+    ),
+  );
 }
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Stripe.publishableKey = StripeConfig.publishableKey;
   Stripe.merchantIdentifier = StripeConfig.merchantIdentifier;
   await Stripe.instance.applySettings();
-  Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Firebase
+  /// Firebase init
+  await initializeFirebaseSafely();
+  FirebaseMessaging.onBackgroundMessage(
+    firebaseMessagingBackgroundHandler,
+  );
+  const AndroidInitializationSettings androidSettings =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+  await flutterLocalNotificationsPlugin.initialize(
+    const InitializationSettings(android: androidSettings),
+  );
+  if (Platform.isAndroid) {
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(defaultChannel);
+  }
+  await FirebaseMessaging.instance.requestPermission();
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    _showForegroundNotification(message);
+  });
 
   // Initialize services
   await AuthService.initialize();
@@ -170,20 +234,59 @@ void main() async {
   }
   await ApiService.initializeAuthToken();
 
-  // Initialize FCM service
-  final fcmService = FCMService();
-  await fcmService.initialize();
-
-  // Handle notification taps when app is opened from notification
-  fcmService.getInitialMessage().then((RemoteMessage? message) {
-    if (message != null) {
-      debugPrint('App opened from notification: ${message.messageId}');
-      // You can add navigation logic here based on the notification data
-    }
-  });
-
   runApp(MyAppWithTheme());
 }
+
+Future<void> initializeFirebaseSafely() async {
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } on FirebaseException catch (e) {
+    if (e.code == 'duplicate-app') {
+      // Firebase already initialized — ignore
+      return;
+    }
+    rethrow;
+  }
+}
+
+/// 🔵 FOREGROUND NOTIFICATION
+Future<void> _showForegroundNotification(RemoteMessage message) async {
+  final String? title =
+      message.notification?.title ?? message.data['title'];
+  final String? body =
+      message.notification?.body ?? message.data['body'];
+
+  if (title == null || body == null) return;
+
+  await flutterLocalNotificationsPlugin.show(
+    message.hashCode,
+    title,
+    body,
+    const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'default_channel',
+        'Default Channel',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+    ),
+  );
+}
+
+/*Future<FirebaseApp> initializeFirebaseSafely() async {
+  try {
+    return await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } on FirebaseException catch (e) {
+    if (e.code == 'duplicate-app') {
+      return Firebase.apps.first;
+    }
+    rethrow;
+  }
+}*/
 
 class MyAppWithTheme extends StatelessWidget {
   const MyAppWithTheme({super.key});
