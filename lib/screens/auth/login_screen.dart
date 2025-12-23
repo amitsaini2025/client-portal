@@ -37,51 +37,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _checkBiometricAvailability();
     _checkBiometricStatus();
-    /*if (!Platform.isWindows) {
-      _setupNotifications();
-    }*/
-  }
-
-  Future<void> _setupNotifications() async {
-    final fcmService = FCMService();
-
-    // Set up message listeners
-    fcmService.setupMessageListeners(
-      onForegroundMessage: (RemoteMessage message) {
-        if (!mounted) return;
-        debugPrint('Got a message whilst in the foreground!');
-        if (message.notification != null) {
-          // Show in-app notification or update UI
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message.notification!.body ?? 'New notification'),
-              backgroundColor: Color(0xFF5E8B7E),
-              duration: Duration(seconds: 4),
-              action: SnackBarAction(
-                label: 'Dismiss',
-                textColor: Colors.white,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                },
-              ),
-            ),
-          );
-        }
-      },
-      onBackgroundMessageTap: (RemoteMessage message) {
-        debugPrint(
-          'Notification tapped while app in background: ${message.messageId}',
-        );
-        // You can add navigation logic here based on the notification data
-        // For example, navigate to a specific page based on the notification type
-      },
-    );
-
-    // Get the FCM token and register it
-    String? token = await fcmService.getToken();
-    if (token != null) {
-      await fcmService.registerToken(token);
-    }
   }
 
   @override

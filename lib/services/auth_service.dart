@@ -178,6 +178,7 @@ class AuthService {
         _currentToken = token;
         await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
         await AuthManager.saveAuthToken(token);
+        await AuthManager.saveUserID(userId.toString());
 
         // Store user data
         if (clientData != null) {

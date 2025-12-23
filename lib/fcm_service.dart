@@ -1,3 +1,4 @@
+import 'package:client/config/api_config.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -5,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'dart:convert';
 
 class FCMService {
-  static const String _apiBaseUrl = 'http://localhost:8000/api';
 
   // Singleton pattern
   static final FCMService _instance = FCMService._internal();
@@ -52,7 +52,7 @@ class FCMService {
   Future<bool> registerToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     final authToken = prefs.getString('auth_token');
-    final clientId = prefs.getString('client_id');
+    final clientId = prefs.getString('user_id');
 
     if (authToken == null || clientId == null) {
       debugPrint('FCM: Missing auth token or client ID');
@@ -63,8 +63,9 @@ class FCMService {
     await prefs.setString('fcm_token', token);
 
     try {
+      String baseUrl = ApiConfig.baseUrl;
       final response = await http.post(
-        Uri.parse('$_apiBaseUrl/register_token'),
+        Uri.parse('$baseUrl/fcm/register-token'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',

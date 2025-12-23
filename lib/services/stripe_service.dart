@@ -19,6 +19,16 @@ class AuthManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('auth_token');
   }
+
+  static Future<void> saveUserID(String userID) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_id', userID);
+  }
+
+  static Future<String?> getUserID() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
+  }
 }
 
 

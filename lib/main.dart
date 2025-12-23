@@ -168,9 +168,15 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   const AndroidInitializationSettings androidSettings =
   AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  await plugin.initialize(
-    const InitializationSettings(android: androidSettings),
+  const DarwinInitializationSettings iosSettings =
+  DarwinInitializationSettings();
+
+  const InitializationSettings initSettings = InitializationSettings(
+    android: androidSettings,
+    iOS: iosSettings,
   );
+
+  await plugin.initialize(initSettings);
 
   final String? title =
       message.notification?.title ?? message.data['title'];
@@ -202,26 +208,35 @@ void main() async {
   await Stripe.instance.applySettings();
 
   // Firebase
-  /// Firebase init
   await initializeFirebaseSafely();
   FirebaseMessaging.onBackgroundMessage(
     firebaseMessagingBackgroundHandler,
   );
   const AndroidInitializationSettings androidSettings =
   AndroidInitializationSettings('@mipmap/ic_launcher');
-  await flutterLocalNotificationsPlugin.initialize(
-    const InitializationSettings(android: androidSettings),
+  const DarwinInitializationSettings iosSettings =
+  DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
   );
+  const InitializationSettings initSettings = InitializationSettings(
+    android: androidSettings,
+    iOS: iosSettings,
+  );
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
   if (Platform.isAndroid) {
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(defaultChannel);
   }
-  await FirebaseMessaging.instance.requestPermission();
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    _showForegroundNotification(message);
-  });
+  await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+  FirebaseMessaging.onMessage.listen(_showForegroundNotification);
 
   // Initialize services
   await AuthService.initialize();
