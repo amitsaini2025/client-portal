@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../config/theme_config.dart';
 import '../../../../models/personal_information/occupation.dart';
 import '../../../../services/api_service.dart';
 
@@ -61,9 +63,9 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     } finally {
       setState(() {
         isLoading = false;
@@ -146,6 +148,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildSectionTitle(
+                context,
                 "Occupation & Skills",
                 icon: Icons.assessment_rounded,
                 isEditing: isEditing,
@@ -163,12 +166,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
               ...widget.occupations.asMap().entries.map((entry) {
                 int index = entry.key;
                 Occupation occupation = entry.value;
-                return Column(
-                  children: [
-                    _buildSkillCard(occupation, index),
-                    const SizedBox(height: 18),
-                  ],
-                );
+                return _buildSkillCard(context, occupation, index);
               }),
             ],
           ),
@@ -178,6 +176,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
   }
 
   Widget _buildSectionTitle(
+    BuildContext context,
     String title, {
     required bool isEditing,
     required VoidCallback onEdit,
@@ -185,65 +184,122 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
     VoidCallback? onAdd,
     required IconData icon,
   }) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final borderColor =
+        isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        ),
-        const Spacer(),
-        if (showAdd && onAdd != null)
-          InkWell(
-            onTap: onAdd,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.add, color: Colors.blue, size: 20),
-            ),
-          ),
-        if (showAdd) const SizedBox(width: 8),
-        InkWell(
-          onTap: onEdit,
-          child: Container(
-            padding: const EdgeInsets.all(8),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
+              color: ThemeConfig.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              isEditing ? Icons.check : Icons.edit,
-              color: Colors.blue,
-              size: 20,
+            child: Icon(icon, color: ThemeConfig.primaryColor, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
             ),
           ),
-        ),
-      ],
+          if (showAdd && onAdd != null)
+            InkWell(
+              onTap: onAdd,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: ThemeConfig.successColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: ThemeConfig.successColor.withOpacity(0.3),
+                  ),
+                ),
+                child: Icon(
+                  Icons.add_rounded,
+                  color: ThemeConfig.successColor,
+                  size: 20,
+                ),
+              ),
+            ),
+          if (showAdd) const SizedBox(width: 8),
+          InkWell(
+            onTap: onEdit,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color:
+                    isEditing
+                        ? ThemeConfig.successColor.withOpacity(0.1)
+                        : ThemeConfig.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color:
+                      isEditing
+                          ? ThemeConfig.successColor.withOpacity(0.3)
+                          : ThemeConfig.primaryColor.withOpacity(0.3),
+                ),
+              ),
+              child: Icon(
+                isEditing ? Icons.check_rounded : Icons.edit_rounded,
+                color:
+                    isEditing
+                        ? ThemeConfig.successColor
+                        : ThemeConfig.primaryColor,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildSkillCard(Occupation occupation, int index) {
+  Widget _buildSkillCard(
+    BuildContext context,
+    Occupation occupation,
+    int index,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final borderColor =
+        isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
+
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade300),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -258,34 +314,55 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                 children: [
                   Expanded(
                     child: _buildEditableRow(
+                      context,
                       "Skill Assessment",
                       occupation.skillAssessment,
-                          (v) => occupation.skillAssessment = v,
+                      (v) => occupation.skillAssessment = v,
                     ),
                   ),
                   if (isEditing)
                     IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
+                      icon: Icon(
+                        Icons.delete_outline_rounded,
+                        color: ThemeConfig.errorColor,
+                      ),
                       onPressed: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
-                          builder: (_) => AlertDialog(
-                            title: const Text("Delete Occupation"),
-                            content: const Text(
-                                "Are you sure you want to delete this occupation?"),
-                            actions: [
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, false),
-                                child: const Text("Cancel"),
+                          builder:
+                              (_) => AlertDialog(
+                                title: Text(
+                                  "Delete Occupation",
+                                  style: GoogleFonts.spaceGrotesk(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                content: Text(
+                                  "Are you sure you want to delete this occupation?",
+                                  style: GoogleFonts.inter(),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, false),
+                                    child: Text(
+                                      "Cancel",
+                                      style: GoogleFonts.inter(),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, true),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: ThemeConfig.errorColor,
+                                    ),
+                                    child: Text(
+                                      "Delete",
+                                      style: GoogleFonts.inter(),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(context, true),
-                                child: const Text("Delete"),
-                              ),
-                            ],
-                          ),
                         );
 
                         if (confirm == true) {
@@ -296,17 +373,20 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                 ],
               ),
               _buildDateRow(
+                context,
                 "Assessment Date",
                 occupation.assessmentDate,
                 (val) => occupation.assessmentDate = val,
               ),
               _buildSearchableRow(
+                context,
                 "Nominated Occupation",
                 occupation.nominatedOccupation,
                 index,
                 (val) => occupation.nominatedOccupation = val,
               ),
               _buildEditableRow(
+                context,
                 "Occupation Code",
                 occupation.occupationCode,
                 (val) => occupation.occupationCode = val,
@@ -319,26 +399,31 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
             runSpacing: 14,
             children: [
               _buildDateRow(
+                context,
                 "Expiry Date",
                 occupation.expiryDate,
                 (val) => occupation.expiryDate = val,
               ),
               _buildEditableRow(
+                context,
                 "Reference No",
                 occupation.referenceNo,
                 (val) => occupation.referenceNo = val,
               ),
               _buildEditableRow(
+                context,
                 "Assessing Authority",
                 occupation.assessingAuthority,
                 (val) => occupation.assessingAuthority = val,
               ),
               _buildEditableRow(
+                context,
                 "Visa Subclass",
                 occupation.visaSubclass ?? "",
                 (val) => occupation.visaSubclass = val,
               ),
               _buildCheckboxRow(
+                context,
                 "Relevant",
                 occupation.relevantOccupation,
                 (val) => occupation.relevantOccupation = val,
@@ -351,198 +436,419 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
   }
 
   Widget _buildEditableRow(
+    BuildContext context,
     String label,
     String value,
     Function(String) onChanged,
   ) {
-    return SizedBox(
-      child: TextFormField(
-        initialValue: value,
-        enabled: isEditing,
-        onChanged: onChanged,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          labelStyle: const TextStyle(
-            color: Colors.grey,
-            fontSize: 13,
-            letterSpacing: 0.2,
-          ),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchableRow(
-    String label,
-    String value,
-    int index,
-    Function(String) onChanged,
-  ) {
-    TextEditingController controller = TextEditingController(text: value);
-
-    return SizedBox(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextFormField(
-            controller: controller,
-            enabled: isEditing,
-            onChanged: (val) {
-              onChanged(val);
-              _searchOccupation(val, index);
-            },
-            style: const TextStyle(
+          Text(
+            label,
+            style: GoogleFonts.inter(
               fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              fontWeight: FontWeight.w500,
+              color:
+                  isDark
+                      ? ThemeConfig.textPrimaryDark
+                      : ThemeConfig.textPrimaryLight,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextFormField(
+            initialValue: value,
+            enabled: isEditing,
+            onChanged: onChanged,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color:
+                  isDark
+                      ? ThemeConfig.textPrimaryDark
+                      : ThemeConfig.textPrimaryLight,
             ),
             decoration: InputDecoration(
-              labelText: label.toUpperCase(),
-              labelStyle: const TextStyle(
-                color: Colors.grey,
-                fontSize: 13,
-                letterSpacing: 0.2,
+              hintText: label,
+              hintStyle: GoogleFonts.inter(
+                fontSize: 14,
+                color:
+                    isDark
+                        ? ThemeConfig.textSecondaryDark
+                        : ThemeConfig.textSecondaryLight,
               ),
-              border: const OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color:
+                      isDark ? ThemeConfig.borderDark : const Color(0xFFE5E7EB),
+                  width: 1,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color:
+                      isDark ? ThemeConfig.borderDark : const Color(0xFFE5E7EB),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: ThemeConfig.primaryColor,
+                  width: 1.5,
+                ),
+              ),
+              filled: true,
+              fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
+                horizontal: 16,
+                vertical: 16,
               ),
-              suffixIcon:
-                  isEditing && controller.text.isNotEmpty
-                      ? IconButton(
-                        icon: const Icon(Icons.clear, size: 18),
-                        onPressed: () {
-                          setState(() {
-                            controller.clear();
-                            onChanged("");
-                            occupationSuggestions[index] = [];
-                          });
-                        },
-                      )
-                      : null,
             ),
           ),
-          if (occupationSuggestions[index] != null &&
-              occupationSuggestions[index]!.isNotEmpty)
-            Container(
-              constraints: const BoxConstraints(maxHeight: 150),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: ListView(
-                shrinkWrap: true,
-                children:
-                    occupationSuggestions[index]!
-                        .map(
-                          (suggestion) => ListTile(
-                            title: Text(suggestion),
-                            onTap: () {
-                              setState(() {
-                                controller.text = suggestion;
-                                onChanged(suggestion);
-                                occupationSuggestions[index] = [];
-                              });
-                            },
-                          ),
-                        )
-                        .toList(),
-              ),
-            ),
         ],
       ),
     );
   }
 
-  Widget _buildDateRow(String label, String value, Function(String) onChanged) {
+  Widget _buildSearchableRow(
+    BuildContext context,
+    String label,
+    String value,
+    int index,
+    Function(String) onChanged,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     TextEditingController controller = TextEditingController(text: value);
-    return SizedBox(
-      child: TextFormField(
-        controller: controller,
-        enabled: isEditing,
-        readOnly: true,
-        onTap:
-            isEditing
-                ? () async {
-                  DateTime initialDate;
-                  if (value.isNotEmpty) {
-                    final parts = value.split('/');
-                    initialDate = DateTime(
-                      int.parse(parts[2]),
-                      int.parse(parts[1]),
-                      int.parse(parts[0]),
-                    );
-                  } else {
-                    initialDate = DateTime.now();
-                  }
 
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: initialDate,
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime(2100),
-                  );
-                  if (pickedDate != null) {
-                    String formattedDate =
-                        "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
-                    controller.text = formattedDate;
-                    setState(() {
-                      onChanged(formattedDate);
-                    });
-                  }
-                }
-                : null,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          labelStyle: const TextStyle(
-            color: Colors.grey,
-            fontSize: 13,
-            letterSpacing: 0.2,
-          ),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-          suffixIcon:
-              isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextFormField(
+                controller: controller,
+                enabled: isEditing,
+                onChanged: (val) {
+                  onChanged(val);
+                  _searchOccupation(val, index);
+                },
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color:
+                      isDark
+                          ? ThemeConfig.textPrimaryDark
+                          : ThemeConfig.textPrimaryLight,
+                ),
+                decoration: InputDecoration(
+                  hintText: label,
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    color:
+                        isDark
+                            ? ThemeConfig.textSecondaryDark
+                            : ThemeConfig.textSecondaryLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: ThemeConfig.primaryColor,
+                      width: 1.5,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  suffixIcon:
+                      isEditing && controller.text.isNotEmpty
+                          ? IconButton(
+                            icon: Icon(
+                              Icons.clear_rounded,
+                              size: 18,
+                              color:
+                                  isDark
+                                      ? ThemeConfig.textSecondaryDark
+                                      : ThemeConfig.textSecondaryLight,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                controller.clear();
+                                onChanged("");
+                                occupationSuggestions[index] = [];
+                              });
+                            },
+                          )
+                          : null,
+                ),
+              ),
+            ),
+            if (occupationSuggestions[index] != null &&
+                occupationSuggestions[index]!.isNotEmpty)
+              Container(
+                constraints: const BoxConstraints(maxHeight: 150),
+                margin: const EdgeInsets.only(top: 4),
+                decoration: BoxDecoration(
+                  color: isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight,
+                  border: Border.all(
+                    color:
+                        isDark
+                            ? ThemeConfig.borderDark
+                            : ThemeConfig.borderLight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ListView(
+                  shrinkWrap: true,
+                  children:
+                      occupationSuggestions[index]!
+                          .map(
+                            (suggestion) => ListTile(
+                              title: Text(
+                                suggestion,
+                                style: GoogleFonts.inter(),
+                              ),
+                              onTap: () {
+                                setState(() {
+                                  controller.text = suggestion;
+                                  onChanged(suggestion);
+                                  occupationSuggestions[index] = [];
+                                });
+                              },
+                            ),
+                          )
+                          .toList(),
+                ),
+              ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCheckboxRow(String label, bool value, Function(bool) onChanged) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-        Checkbox(
-          value: value,
-          onChanged:
-              isEditing
-                  ? (val) {
-                    setState(() {
-                      onChanged(val ?? false);
-                    });
-                  }
-                  : null,
+  Widget _buildDateRow(
+    BuildContext context,
+    String label,
+    String value,
+    Function(String) onChanged,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    TextEditingController controller = TextEditingController(text: value);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: GestureDetector(
+                onTap:
+                    isEditing
+                        ? () async {
+                          DateTime initialDate;
+                          if (value.isNotEmpty) {
+                            final parts = value.split('/');
+                            initialDate = DateTime(
+                              int.parse(parts[2]),
+                              int.parse(parts[1]),
+                              int.parse(parts[0]),
+                            );
+                          } else {
+                            initialDate = DateTime.now();
+                          }
+
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: initialDate,
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime(2100),
+                          );
+                          if (pickedDate != null) {
+                            String formattedDate =
+                                "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
+                            controller.text = formattedDate;
+                            setState(() {
+                              onChanged(formattedDate);
+                            });
+                          }
+                        }
+                        : null,
+                child: AbsorbPointer(
+                  absorbing: true,
+                  child: TextFormField(
+                    controller: controller,
+                    enabled: isEditing,
+                    readOnly: true,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color:
+                          isDark
+                              ? ThemeConfig.textPrimaryDark
+                              : ThemeConfig.textPrimaryLight,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: label,
+                      hintStyle: GoogleFonts.inter(
+                        fontSize: 14,
+                        color:
+                            isDark
+                                ? ThemeConfig.textSecondaryDark
+                                : ThemeConfig.textSecondaryLight,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color:
+                              isDark
+                                  ? ThemeConfig.borderDark
+                                  : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color:
+                              isDark
+                                  ? ThemeConfig.borderDark
+                                  : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: ThemeConfig.primaryColor,
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      suffixIcon: Icon(
+                        Icons.calendar_today_rounded,
+                        size: 20,
+                        color:
+                            isDark
+                                ? ThemeConfig.textSecondaryDark
+                                : ThemeConfig.textSecondaryLight,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildCheckboxRow(
+    BuildContext context,
+    String label,
+    bool value,
+    Function(bool) onChanged,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+              color: textColor,
+            ),
+          ),
+          Checkbox(
+            value: value,
+            activeColor: ThemeConfig.primaryColor,
+            onChanged:
+                isEditing
+                    ? (val) {
+                      setState(() {
+                        onChanged(val ?? false);
+                      });
+                    }
+                    : null,
+          ),
+        ],
+      ),
     );
   }
 }

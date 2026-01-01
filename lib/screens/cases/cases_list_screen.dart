@@ -21,6 +21,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
   final int perPage = 10;
   bool hasMore = true;
   bool isFetchingMore = false;
+
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -55,27 +56,24 @@ class _CasesListScreenState extends State<CasesListScreen> {
       );
 
       if (result['success'] == true) {
-        final data = result['data'];
-
-        final List<dynamic> caseList = data['cases'] ?? data;
-        final fetchedCases =
-        caseList.map((json) => Case.fromJson(json)).toList();
+        final List<dynamic> caseList = result['data']['cases'] ?? result['data'];
+        final fetched = caseList.map((e) => Case.fromJson(e)).toList();
 
         setState(() {
           if (page == 1) {
-            cases = fetchedCases;
+            cases = fetched;
           } else {
-            cases.addAll(fetchedCases);
+            cases.addAll(fetched);
           }
 
           currentPage = page;
-          hasMore = fetchedCases.length == perPage;
+          hasMore = fetched.length == perPage;
           isLoading = false;
           isFetchingMore = false;
         });
       } else {
         setState(() {
-          error = result['message'] ?? 'Failed to fetch cases';
+          error = result['message'];
           isLoading = false;
           isFetchingMore = false;
         });
@@ -145,92 +143,13 @@ class _CasesListScreenState extends State<CasesListScreen> {
         child: SingleChildScrollView(
           controller: _scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'My Cases',
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      // TODO: Navigate to case creation screen
-                    },
-                    icon: const Icon(Icons.add, size: 18),
-                    label: const Text('New Case'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ThemeConfig.goldenYellow,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
+              _header(),
               const SizedBox(height: 16),
-
-              // Case statistics
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: ThemeConfig.navyBlue.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                      color: ThemeConfig.goldenYellow.withOpacity(0.5)),
-                ),
-                child: Column(
-                  children: [
-                    _buildStatCard(
-                      'Total Cases',
-                      cases.length.toString(),
-                      Icons.folder,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildStatCard(
-                      'Active Cases',
-                      cases
-                          .where((c) => c.status != 'completed')
-                          .length
-                          .toString(),
-                      Icons.work,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildStatCard(
-                      'Pending Documents',
-                      cases
-                          .where((c) => c.status == 'pending_documents')
-                          .length
-                          .toString(),
-                      Icons.pending,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildStatCard(
-                      'Completed',
-                      cases
-                          .where((c) => c.status == 'completed')
-                          .length
-                          .toString(),
-                      Icons.check_circle,
-                    ),
-                  ],
-                ),
-              ),
-
+              _statsCard(),
               const SizedBox(height: 24),
 
               if (isLoading)
@@ -243,66 +162,18 @@ class _CasesListScreenState extends State<CasesListScreen> {
                   ),
                 )
               else if (error != null)
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 40),
-                    child: Column(
-                      children: [
-                        const Icon(Icons.error_outline,
-                            size: 64, color: Colors.red),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Error: ',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () => _fetchCases(page: 1),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ThemeConfig.goldenYellow,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
+                _errorView()
               else if (cases.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 60),
-                    child: Center(
-                      child: Column(
-                        children: const [
-                          Icon(Icons.folder_open,
-                              size: 64, color: Colors.white54),
-                          SizedBox(height: 16),
-                          Text(
-                            'No cases found',
-                            style:
-                            TextStyle(fontSize: 18, color: Colors.white70),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Your cases will appear here once they are created',
-                            style:
-                            TextStyle(fontSize: 14, color: Colors.white54),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
+                  _emptyView()
                 else
                   Column(
                     children: [
-                      for (final caseItem in cases) _buildCaseCard(caseItem),
+                      for (final item in cases) _buildCaseCard(item),
                       if (isFetchingMore)
                         const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: ThemeConfig.goldenYellow,
-                            ),
+                          padding: EdgeInsets.all(16),
+                          child: CircularProgressIndicator(
+                            color: ThemeConfig.goldenYellow,
                           ),
                         ),
                     ],
@@ -314,171 +185,211 @@ class _CasesListScreenState extends State<CasesListScreen> {
     );
   }
 
+  Widget _header() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'My Cases',
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {},
+          icon: const Icon(Icons.add, size: 18),
+          label: const Text('New Case'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: ThemeConfig.goldenYellow,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _statsCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: ThemeConfig.navyBlue.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
+      ),
+      child: Column(
+        children: [
+          _buildStatCard('Total Cases', cases.length.toString(), Icons.folder),
+          const SizedBox(height: 12),
+          _buildStatCard(
+            'Active Cases',
+            cases.where((c) => c.status != 'completed').length.toString(),
+            Icons.work,
+          ),
+          const SizedBox(height: 12),
+          _buildStatCard(
+            'Pending Documents',
+            cases.where((c) => c.status == 'pending_documents').length.toString(),
+            Icons.pending,
+          ),
+          const SizedBox(height: 12),
+          _buildStatCard(
+            'Completed',
+            cases.where((c) => c.status == 'completed').length.toString(),
+            Icons.check_circle,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCaseCard(Case caseItem) {
     return Card(
       color: ThemeConfig.navyBlue.withOpacity(0.8),
+      margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: ThemeConfig.goldenYellow.withOpacity(0.4)),
       ),
-      margin: const EdgeInsets.only(bottom: 16),
-      child: InkWell(
-        onTap: () {
-          // TODO: Navigate to case detail screen
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title + chips
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          caseItem.title,
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          caseItem.stageName ?? 'No description available',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: ThemeConfig.goldenYellow,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(caseItem.status).withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      _getStatusText(caseItem.status),
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w600,
-                        color: _getStatusColor(caseItem.status),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // Progress
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// TITLE + STATUS
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Progress',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                        caseItem.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
+                      const SizedBox(height: 4),
                       Text(
-                        caseItem.progressDisplay ?? '',
+                        caseItem.stageName ?? 'No description available',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
                           color: ThemeConfig.goldenYellow,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: (caseItem.progressPercentage ?? 0) / 100,
-                    backgroundColor: Colors.white12,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      ThemeConfig.goldenYellow,
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color:
+                      _getStatusColor(caseItem.status).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // Details row
-              ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  ...caseItem.agentsMap.entries.map((entry) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: _buildDetailItem(
-                        Icons.person,
-                        '${entry.key}: ${entry.value.name}',
-                        ThemeConfig.goldenYellow,
-                      ),
-                    );
-                  }),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // Actions
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      // TODO: Navigate to case timeline
-                    },
-                    icon: const Icon(Icons.timeline, size: 18),
-                    label: const Text('Timeline'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: ThemeConfig.goldenYellow,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      // TODO: Navigate to case detail
-                    },
-                    icon: const Icon(Icons.visibility, size: 18),
-                    label: const Text('View Details'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ThemeConfig.goldenYellow,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                    child: Text(
+                      _getStatusText(caseItem.status),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: _getStatusColor(caseItem.status),
                       ),
                     ),
                   ),
-                ],
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            /// PROGRESS
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Progress',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  caseItem.progressDisplay ?? '',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: ThemeConfig.goldenYellow,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: (caseItem.progressPercentage ?? 0) / 100,
+              backgroundColor: Colors.white12,
+              valueColor:
+              AlwaysStoppedAnimation<Color>(ThemeConfig.goldenYellow),
+            ),
+
+            const SizedBox(height: 16),
+
+            /// AGENTS
+            ...caseItem.agentsMap.entries.map(
+                  (entry) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _buildDetailItem(
+                  Icons.person,
+                  '${entry.key}: ${entry.value.name}',
+                  ThemeConfig.goldenYellow,
+                ),
               ),
-            ],
-          ),
+            ),
+
+            const SizedBox(height: 12),
+
+            /// ACTION BUTTONS
+            Wrap(
+              alignment: WrapAlignment.end,
+              spacing: 12,
+              runSpacing: 8,
+              children: [
+                TextButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.timeline, size: 18),
+                  label: const Text('Timeline'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: ThemeConfig.goldenYellow,
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.visibility, size: 18),
+                  label: const Text('View Details'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ThemeConfig.goldenYellow,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -500,7 +411,6 @@ class _CasesListScreenState extends State<CasesListScreen> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   title,
@@ -527,15 +437,65 @@ class _CasesListScreenState extends State<CasesListScreen> {
 
   Widget _buildDetailItem(IconData icon, String text, Color color) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 16, color: color),
         const SizedBox(width: 6),
-        Text(
-          text,
-          style: GoogleFonts.inter(fontSize: 13, color: color),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.inter(fontSize: 13, color: color),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _errorView() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Column(
+          children: [
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            const Text('Something went wrong',
+                style: TextStyle(color: Colors.white)),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => _fetchCases(page: 1),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThemeConfig.goldenYellow,
+              ),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _emptyView() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 60),
+      child: Center(
+        child: Column(
+          children: const [
+            Icon(Icons.folder_open, size: 64, color: Colors.white54),
+            SizedBox(height: 16),
+            Text(
+              'No cases found',
+              style: TextStyle(fontSize: 18, color: Colors.white70),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Your cases will appear here once they are created',
+              style: TextStyle(fontSize: 14, color: Colors.white54),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

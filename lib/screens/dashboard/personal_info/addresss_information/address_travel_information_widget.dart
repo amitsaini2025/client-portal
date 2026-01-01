@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
+import '../../../../config/theme_config.dart';
 import '../../../../models/personal_information/address.dart';
 import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
 import '../../../../models/personal_information/travel.dart';
@@ -282,6 +284,7 @@ class _AddressAndTravelInformationWidgetState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionTitle(
+            context,
             "Address Information",
             icon: Icons.home_rounded,
             isEditing: isEditingAddress,
@@ -297,34 +300,49 @@ class _AddressAndTravelInformationWidgetState
           ),
           const SizedBox(height: 12),
           ...widget.addresses.map(
-            (address) => _buildInfoCard([
+            (address) => _buildInfoCard(context, [
               if (isEditingAddress)
                 Align(
                   alignment: Alignment.centerRight,
                   child: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    icon: Icon(
+                      Icons.delete_outline_rounded,
+                      color: ThemeConfig.errorColor,
+                    ),
                     onPressed: () {
                       showDialog(
                         context: context,
                         builder:
                             (_) => AlertDialog(
-                              title: const Text("Delete Address"),
-                              content: const Text(
+                              title: Text(
+                                "Delete Address",
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              content: Text(
                                 "Are you sure you want to delete this address?",
+                                style: GoogleFonts.inter(),
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: const Text("Cancel"),
+                                  child: Text(
+                                    "Cancel",
+                                    style: GoogleFonts.inter(),
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pop(context);
                                     _deleteAddress(address);
                                   },
-                                  child: const Text(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: ThemeConfig.errorColor,
+                                  ),
+                                  child: Text(
                                     "Delete",
-                                    style: TextStyle(color: Colors.red),
+                                    style: GoogleFonts.inter(),
                                   ),
                                 ),
                               ],
@@ -334,6 +352,7 @@ class _AddressAndTravelInformationWidgetState
                   ),
                 ),
               _buildGooglePlaceField(
+                context,
                 "Search Address",
                 address.searchAddress,
                 isEditingAddress,
@@ -345,60 +364,70 @@ class _AddressAndTravelInformationWidgetState
                 fetchPlaceSuggestions,
               ),
               _buildEditableRow(
+                context,
                 "Address Line 1",
                 address.addressLine1 ?? "-",
                 isEditingAddress,
                 (val) => address.addressLine1 = val,
               ),
               _buildEditableRow(
+                context,
                 "Address Line 2",
                 address.addressLine2 ?? "-",
                 isEditingAddress,
                 (val) => address.addressLine2 = val,
               ),
               _buildEditableRow(
+                context,
                 "Suburb",
                 address.suburb,
                 isEditingAddress,
                 (val) => address.suburb = val,
               ),
               _buildEditableRow(
+                context,
                 "State",
                 address.state,
                 isEditingAddress,
                 (val) => address.state = val,
               ),
               _buildEditableRow(
+                context,
                 "Postcode",
                 address.postcode.toString(),
                 isEditingAddress,
                 (val) => address.postcode = address.postcode,
               ),
               _buildCountryDropdown(
+                context,
                 label: "Country",
                 editable: isEditingAddress,
                 selected: address.country,
                 onChanged: (val) => setState(() => address.country = val ?? ""),
               ),
               _buildEditableRow(
+                context,
                 "Regional Code",
                 address.regionalCode ?? "-",
                 isEditingAddress,
                 (val) => address.regionalCode = val,
               ),
               _buildDateRow(
+                context,
                 "Start Date",
                 address.startDate ?? "-",
                 isEditingAddress,
                 (val) => address.startDate = val,
               ),
               _buildDateRow(
+                context,
                 "End Date",
                 address.endDate ?? "-",
                 isEditingAddress,
                 (val) => address.endDate = val,
               ),
               _buildEditableRow(
+                context,
                 "Is Current",
                 address.isCurrent ? "Yes" : "No",
                 isEditingAddress,
@@ -408,6 +437,7 @@ class _AddressAndTravelInformationWidgetState
           ),
           const SizedBox(height: 28),
           _buildSectionTitle(
+            context,
             "Travel Information",
             icon: Icons.flight_takeoff_rounded,
             isEditing: isEditingTravel,
@@ -423,34 +453,49 @@ class _AddressAndTravelInformationWidgetState
           ),
           const SizedBox(height: 12),
           ...widget.travels.map(
-            (travel) => _buildInfoCard([
+            (travel) => _buildInfoCard(context, [
               if (isEditingTravel)
                 Align(
                   alignment: Alignment.centerRight,
                   child: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    icon: Icon(
+                      Icons.delete_outline_rounded,
+                      color: ThemeConfig.errorColor,
+                    ),
                     onPressed: () {
                       showDialog(
                         context: context,
                         builder:
                             (_) => AlertDialog(
-                              title: const Text("Delete Travel"),
-                              content: const Text(
+                              title: Text(
+                                "Delete Travel",
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              content: Text(
                                 "Are you sure you want to delete this travel record?",
+                                style: GoogleFonts.inter(),
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: const Text("Cancel"),
+                                  child: Text(
+                                    "Cancel",
+                                    style: GoogleFonts.inter(),
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pop(context);
                                     _deleteTravel(travel);
                                   },
-                                  child: const Text(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: ThemeConfig.errorColor,
+                                  ),
+                                  child: Text(
                                     "Delete",
-                                    style: TextStyle(color: Colors.red),
+                                    style: GoogleFonts.inter(),
                                   ),
                                 ),
                               ],
@@ -460,6 +505,7 @@ class _AddressAndTravelInformationWidgetState
                   ),
                 ),
               _buildCountryDropdown(
+                context,
                 label: "Country Visited",
                 editable: isEditingTravel,
                 selected: travel.countryVisited,
@@ -467,18 +513,21 @@ class _AddressAndTravelInformationWidgetState
                     (val) => setState(() => travel.countryVisited = val ?? ""),
               ),
               _buildDateRow(
+                context,
                 "Arrival Date",
                 travel.arrivalDate,
                 isEditingTravel,
                 (val) => travel.arrivalDate = val!,
               ),
               _buildDateRow(
+                context,
                 "Departure Date",
                 travel.departureDate,
                 isEditingTravel,
                 (val) => travel.departureDate = val!,
               ),
               _buildEditableRow(
+                context,
                 "Travel Purpose",
                 travel.purpose,
                 isEditingTravel,
@@ -492,197 +541,507 @@ class _AddressAndTravelInformationWidgetState
   }
 
   Widget _buildGooglePlaceField(
+    BuildContext context,
     String label,
     String value,
     bool enabled,
     ValueChanged<String> onChanged,
     Future<List<String>> Function(String) fetchPlaceSuggestions,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: TypeAheadField<String>(
-        suggestionsCallback: (pattern) async {
-          if (pattern.isEmpty) return [];
-          return await fetchPlaceSuggestions(pattern);
-        },
-
-        itemBuilder: (context, suggestion) {
-          return ListTile(title: Text(suggestion));
-        },
-
-        onSelected: (suggestion) {
-          onChanged(suggestion);
-        },
-
-        builder: (context, textEditingController, focusNode) {
-          if (textEditingController.text != value) {
-            textEditingController.text = value;
-            textEditingController.selection = TextSelection.fromPosition(
-              TextPosition(offset: textEditingController.text.length),
-            );
-          }
-
-          return TextField(
-            controller: textEditingController,
-            focusNode: focusNode,
-            enabled: enabled,
-            decoration: InputDecoration(
-              labelText: label.toUpperCase(),
-              border: const OutlineInputBorder(),
-              suffixIcon:
-                  enabled && textEditingController.text.isNotEmpty
-                      ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          textEditingController.clear();
-                          onChanged("");
-                        },
-                      )
-                      : null,
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
             ),
-            onChanged: onChanged,
-          );
-        },
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TypeAheadField<String>(
+                suggestionsCallback: (pattern) async {
+                  if (pattern.isEmpty) return [];
+                  return await fetchPlaceSuggestions(pattern);
+                },
+                itemBuilder: (context, suggestion) {
+                  return ListTile(
+                    title: Text(suggestion, style: GoogleFonts.inter()),
+                  );
+                },
+                onSelected: (suggestion) {
+                  onChanged(suggestion);
+                },
+                builder: (context, textEditingController, focusNode) {
+                  if (textEditingController.text != value) {
+                    textEditingController.text = value;
+                    textEditingController
+                        .selection = TextSelection.fromPosition(
+                      TextPosition(offset: textEditingController.text.length),
+                    );
+                  }
 
-        emptyBuilder:
-            (context) => const Padding(
-              padding: EdgeInsets.all(8),
-              child: Text("No results found"),
+                  return TextField(
+                    controller: textEditingController,
+                    focusNode: focusNode,
+                    enabled: enabled,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color:
+                          isDark
+                              ? ThemeConfig.textPrimaryDark
+                              : ThemeConfig.textPrimaryLight,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: label,
+                      hintStyle: GoogleFonts.inter(
+                        fontSize: 14,
+                        color:
+                            isDark
+                                ? ThemeConfig.textSecondaryDark
+                                : ThemeConfig.textSecondaryLight,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color:
+                              isDark
+                                  ? ThemeConfig.borderDark
+                                  : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color:
+                              isDark
+                                  ? ThemeConfig.borderDark
+                                  : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: ThemeConfig.primaryColor,
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      suffixIcon:
+                          enabled && textEditingController.text.isNotEmpty
+                              ? IconButton(
+                                icon: Icon(
+                                  Icons.clear_rounded,
+                                  color:
+                                      isDark
+                                          ? ThemeConfig.textSecondaryDark
+                                          : ThemeConfig.textSecondaryLight,
+                                ),
+                                onPressed: () {
+                                  textEditingController.clear();
+                                  onChanged("");
+                                },
+                              )
+                              : null,
+                    ),
+                    onChanged: onChanged,
+                  );
+                },
+                emptyBuilder:
+                    (context) => Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(
+                        "No results found",
+                        style: GoogleFonts.inter(),
+                      ),
+                    ),
+                loadingBuilder:
+                    (context) => const Padding(
+                      padding: EdgeInsets.all(8),
+                      child: CircularProgressIndicator(),
+                    ),
+              ),
             ),
-
-        loadingBuilder:
-            (context) => const Padding(
-              padding: EdgeInsets.all(8),
-              child: CircularProgressIndicator(),
-            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildEditableRow(
+    BuildContext context,
     String label,
     String value,
     bool enabled,
     ValueChanged<String> onChanged,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final controller = TextEditingController(text: value);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: TextFormField(
-        controller: controller,
-        enabled: enabled,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextFormField(
+                controller: controller,
+                enabled: enabled,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color:
+                      isDark
+                          ? ThemeConfig.textPrimaryDark
+                          : ThemeConfig.textPrimaryLight,
+                ),
+                decoration: InputDecoration(
+                  hintText: label,
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    color:
+                        isDark
+                            ? ThemeConfig.textSecondaryDark
+                            : ThemeConfig.textSecondaryLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: ThemeConfig.primaryColor,
+                      width: 1.5,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                onChanged: onChanged,
+              ),
+            ),
+          ],
         ),
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-        ),
-        onChanged: onChanged,
       ),
     );
   }
 
-  Widget _buildCountryDropdown({
+  Widget _buildCountryDropdown(
+    BuildContext context, {
     required String label,
     required String? selected,
     required bool editable,
     required ValueChanged<String?> onChanged,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child:
+                  editable
+                      ? DropdownButtonFormField<String>(
+                        value: selected!.isEmpty ? null : selected,
+                        isExpanded: true,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color:
+                              isDark
+                                  ? ThemeConfig.textPrimaryDark
+                                  : ThemeConfig.textPrimaryLight,
+                        ),
+                        onChanged: onChanged,
+                        items:
+                            widget.countries
+                                .map(
+                                  (c) => DropdownMenuItem(
+                                    value: c.name,
+                                    child: Text(
+                                      c.name,
+                                      style: GoogleFonts.inter(fontSize: 14),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                        decoration: InputDecoration(
+                          hintText: 'Choose $label',
+                          hintStyle: GoogleFonts.inter(
+                            fontSize: 14,
+                            color:
+                                isDark
+                                    ? ThemeConfig.textSecondaryDark
+                                    : ThemeConfig.textSecondaryLight,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color:
+                                  isDark
+                                      ? ThemeConfig.borderDark
+                                      : const Color(0xFFE5E7EB),
+                              width: 1,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color:
+                                  isDark
+                                      ? ThemeConfig.borderDark
+                                      : const Color(0xFFE5E7EB),
+                              width: 1,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: ThemeConfig.primaryColor,
+                              width: 1.5,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor:
+                              isDark ? ThemeConfig.cardDark : Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                          suffixIcon: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color:
+                                isDark
+                                    ? ThemeConfig.textSecondaryDark
+                                    : ThemeConfig.textSecondaryLight,
+                          ),
+                        ),
+                        icon: const SizedBox.shrink(),
+                      )
+                      : Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark ? ThemeConfig.cardDark : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color:
+                                isDark
+                                    ? ThemeConfig.borderDark
+                                    : const Color(0xFFE5E7EB),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          selected ?? "",
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color:
+                                isDark
+                                    ? ThemeConfig.textPrimaryDark
+                                    : ThemeConfig.textPrimaryLight,
+                          ),
+                        ),
+                      ),
+            ),
+          ],
         ),
-        child:
-            editable
-                ? DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: selected!.isEmpty ? null : selected,
-                    isExpanded: true,
-                    onChanged: onChanged,
-                    items:
-                        widget.countries
-                            .map(
-                              (c) => DropdownMenuItem(
-                                value: c.name,
-                                child: Text(c.name),
-                              ),
-                            )
-                            .toList(),
-                  ),
-                )
-                : Text(
-                  selected ?? "",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
       ),
     );
   }
 
   Widget _buildDateRow(
+    BuildContext context,
     String label,
     String value,
     bool enabled,
     ValueChanged<String?> onChanged,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final controller = TextEditingController(text: value);
 
-    return GestureDetector(
-      onTap:
-          enabled
-              ? () async {
-                final newDate = await _pickDate(controller.text);
-                if (newDate != null) {
-                  controller.text = newDate;
-                  onChanged(newDate);
-                  setState(() {});
-                }
-              }
-              : null,
-      child: AbsorbPointer(
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 14),
-          child: TextFormField(
-            controller: controller,
-            enabled: enabled,
-            readOnly: true,
-            decoration: InputDecoration(
-              labelText: label.toUpperCase(),
-              border: const OutlineInputBorder(),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
               ),
             ),
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              fontWeight: FontWeight.w600,
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: GestureDetector(
+                onTap:
+                    enabled
+                        ? () async {
+                          final newDate = await _pickDate(controller.text);
+                          if (newDate != null) {
+                            controller.text = newDate;
+                            onChanged(newDate);
+                            setState(() {});
+                          }
+                        }
+                        : null,
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: controller,
+                    enabled: enabled,
+                    readOnly: true,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color:
+                          isDark
+                              ? ThemeConfig.textPrimaryDark
+                              : ThemeConfig.textPrimaryLight,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: label,
+                      hintStyle: GoogleFonts.inter(
+                        fontSize: 14,
+                        color:
+                            isDark
+                                ? ThemeConfig.textSecondaryDark
+                                : ThemeConfig.textSecondaryLight,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color:
+                              isDark
+                                  ? ThemeConfig.borderDark
+                                  : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color:
+                              isDark
+                                  ? ThemeConfig.borderDark
+                                  : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: ThemeConfig.primaryColor,
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      suffixIcon: Icon(
+                        Icons.calendar_today_rounded,
+                        size: 20,
+                        color:
+                            isDark
+                                ? ThemeConfig.textSecondaryDark
+                                : ThemeConfig.textSecondaryLight,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildSectionTitle(
+    BuildContext context,
     String title, {
     required bool isEditing,
     required VoidCallback onEdit,
@@ -690,61 +1049,121 @@ class _AddressAndTravelInformationWidgetState
     required IconData icon,
     bool showAdd = false,
   }) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final borderColor =
+        isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        ),
-        const Spacer(),
-        InkWell(
-          onTap: onEdit,
-          child: Container(
-            padding: const EdgeInsets.all(8),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
+              color: ThemeConfig.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              isEditing ? Icons.check : Icons.edit,
-              color: Colors.blue,
-              size: 20,
-            ),
+            child: Icon(icon, color: ThemeConfig.primaryColor, size: 24),
           ),
-        ),
-        if (showAdd) const SizedBox(width: 8),
-        if (showAdd)
-          InkWell(
-            onTap: onAdd,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textColor,
               ),
-              child: const Icon(Icons.add, color: Colors.blue, size: 20),
             ),
           ),
-      ],
+          InkWell(
+            onTap: onEdit,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color:
+                    isEditing
+                        ? ThemeConfig.successColor.withOpacity(0.1)
+                        : ThemeConfig.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color:
+                      isEditing
+                          ? ThemeConfig.successColor.withOpacity(0.3)
+                          : ThemeConfig.primaryColor.withOpacity(0.3),
+                ),
+              ),
+              child: Icon(
+                isEditing ? Icons.check_rounded : Icons.edit_rounded,
+                color:
+                    isEditing
+                        ? ThemeConfig.successColor
+                        : ThemeConfig.primaryColor,
+                size: 20,
+              ),
+            ),
+          ),
+          if (showAdd) const SizedBox(width: 8),
+          if (showAdd)
+            InkWell(
+              onTap: onAdd,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: ThemeConfig.successColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: ThemeConfig.successColor.withOpacity(0.3),
+                  ),
+                ),
+                child: Icon(
+                  Icons.add_rounded,
+                  color: ThemeConfig.successColor,
+                  size: 20,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
-  Widget _buildInfoCard(List<Widget> children) {
+  Widget _buildInfoCard(BuildContext context, List<Widget> children) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final borderColor =
+        isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

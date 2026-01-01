@@ -1,6 +1,8 @@
 import 'package:client/services/api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../config/theme_config.dart';
 import '../../../../models/personal_information/test_score.dart';
 
 class TestScoresWidget extends StatefulWidget {
@@ -25,6 +27,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildSectionTitle(
+                context,
                 "Test Scores",
                 icon: Icons.assignment_rounded,
                 isEditing: isEditing,
@@ -44,12 +47,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
               ),
               const SizedBox(height: 16),
               ...widget.testScores.map(
-                (score) => Column(
-                  children: [
-                    _buildTestScoreCard(score),
-                    const SizedBox(height: 16),
-                  ],
-                ),
+                (score) => _buildTestScoreCard(context, score),
               ),
             ],
           ),
@@ -120,6 +118,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
   }
 
   Widget _buildSectionTitle(
+    BuildContext context,
     String title, {
     required bool isEditing,
     required VoidCallback onEdit,
@@ -127,60 +126,120 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
     VoidCallback? onAdd,
     required IconData icon,
   }) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final borderColor =
+        isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        ),
-        const Spacer(),
-        if (showAdd && onAdd != null)
-          InkWell(
-            onTap: onAdd,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.add, color: Colors.blue, size: 20),
-            ),
-          ),
-        if (showAdd) const SizedBox(width: 8),
-        InkWell(
-          onTap: onEdit,
-          child: Container(
-            padding: const EdgeInsets.all(8),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
+              color: ThemeConfig.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              isEditing ? Icons.check : Icons.edit,
-              color: Colors.blue,
-              size: 20,
+            child: Icon(icon, color: ThemeConfig.primaryColor, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
             ),
           ),
-        ),
-      ],
+          if (showAdd && onAdd != null)
+            InkWell(
+              onTap: onAdd,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: ThemeConfig.successColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: ThemeConfig.successColor.withOpacity(0.3),
+                  ),
+                ),
+                child: Icon(
+                  Icons.add_rounded,
+                  color: ThemeConfig.successColor,
+                  size: 20,
+                ),
+              ),
+            ),
+          if (showAdd) const SizedBox(width: 8),
+          InkWell(
+            onTap: onEdit,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color:
+                    isEditing
+                        ? ThemeConfig.successColor.withOpacity(0.1)
+                        : ThemeConfig.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color:
+                      isEditing
+                          ? ThemeConfig.successColor.withOpacity(0.3)
+                          : ThemeConfig.primaryColor.withOpacity(0.3),
+                ),
+              ),
+              child: Icon(
+                isEditing ? Icons.check_rounded : Icons.edit_rounded,
+                color:
+                    isEditing
+                        ? ThemeConfig.successColor
+                        : ThemeConfig.primaryColor,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildTestScoreCard(TestScore score) {
+  Widget _buildTestScoreCard(BuildContext context, TestScore score) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final borderColor =
+        isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade300),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,26 +249,44 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
             child:
                 isEditing
                     ? IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
+                      icon: Icon(
+                        Icons.delete_outline_rounded,
+                        color: ThemeConfig.errorColor,
+                      ),
                       onPressed: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder:
                               (_) => AlertDialog(
-                                title: const Text("Delete Test Score"),
-                                content: const Text(
+                                title: Text(
+                                  "Delete Test Score",
+                                  style: GoogleFonts.spaceGrotesk(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                content: Text(
                                   "Are you sure you want to delete this test score?",
+                                  style: GoogleFonts.inter(),
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed:
                                         () => Navigator.pop(context, false),
-                                    child: const Text("Cancel"),
+                                    child: Text(
+                                      "Cancel",
+                                      style: GoogleFonts.inter(),
+                                    ),
                                   ),
                                   TextButton(
                                     onPressed:
                                         () => Navigator.pop(context, true),
-                                    child: const Text("Delete"),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: ThemeConfig.errorColor,
+                                    ),
+                                    child: Text(
+                                      "Delete",
+                                      style: GoogleFonts.inter(),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -224,6 +301,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
           ),
           const SizedBox(height: 4),
           _buildEditableRow(
+            context,
             "Test Type",
             score.testType,
             (val) => score.testType = val,
@@ -232,6 +310,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
             children: [
               Expanded(
                 child: _buildNumberField(
+                  context,
                   "Listening",
                   score.listening,
                   (val) => score.listening = val,
@@ -240,6 +319,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildNumberField(
+                  context,
                   "Reading",
                   score.reading,
                   (val) => score.reading = val,
@@ -252,6 +332,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
             children: [
               Expanded(
                 child: _buildNumberField(
+                  context,
                   "Writing",
                   score.writing,
                   (val) => score.writing = val,
@@ -260,6 +341,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildNumberField(
+                  context,
                   "Speaking",
                   score.speaking,
                   (val) => score.speaking = val,
@@ -269,37 +351,55 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
           ),
           const SizedBox(height: 12),
           _buildDoubleField(
+            context,
             "Overall Score",
             score.overallScore,
             (val) => score.overallScore = val,
           ),
-          const SizedBox(height: 12),
           _buildDateRow(
+            context,
             "Test Date",
             score.testDate,
             (val) => score.testDate = val,
           ),
-          const SizedBox(height: 12),
           _buildEditableRow(
+            context,
             "Reference No",
             score.referenceNo,
             (val) => score.referenceNo = val,
           ),
-          Row(
-            children: [
-              const Text(
-                "Relevant?",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              Checkbox(
-                value: score.relevantTest,
-                onChanged:
-                    isEditing
-                        ? (val) =>
-                            setState(() => score.relevantTest = val ?? false)
-                        : null,
-              ),
-            ],
+          Builder(
+            builder: (context) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              return Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  children: [
+                    Text(
+                      "Relevant?",
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color:
+                            isDark
+                                ? ThemeConfig.textPrimaryDark
+                                : ThemeConfig.textPrimaryLight,
+                      ),
+                    ),
+                    Checkbox(
+                      value: score.relevantTest,
+                      activeColor: ThemeConfig.primaryColor,
+                      onChanged:
+                          isEditing
+                              ? (val) => setState(
+                                () => score.relevantTest = val ?? false,
+                              )
+                              : null,
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -307,142 +407,403 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
   }
 
   Widget _buildEditableRow(
+    BuildContext context,
     String label,
     String value,
     Function(String) onChanged,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        enabled: isEditing,
-        initialValue: value,
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color:
+                  isDark
+                      ? ThemeConfig.textPrimaryDark
+                      : ThemeConfig.textPrimaryLight,
+            ),
           ),
-          labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-        ),
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
+          const SizedBox(height: 8),
+          TextFormField(
+            enabled: isEditing,
+            initialValue: value,
+            onChanged: onChanged,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color:
+                  isDark
+                      ? ThemeConfig.textPrimaryDark
+                      : ThemeConfig.textPrimaryLight,
+            ),
+            decoration: InputDecoration(
+              hintText: label,
+              hintStyle: GoogleFonts.inter(
+                fontSize: 14,
+                color:
+                    isDark
+                        ? ThemeConfig.textSecondaryDark
+                        : ThemeConfig.textSecondaryLight,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color:
+                      isDark ? ThemeConfig.borderDark : const Color(0xFFE5E7EB),
+                  width: 1,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color:
+                      isDark ? ThemeConfig.borderDark : const Color(0xFFE5E7EB),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: ThemeConfig.primaryColor,
+                  width: 1.5,
+                ),
+              ),
+              filled: true,
+              fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildDoubleField(
+    BuildContext context,
     String label,
     double value,
     ValueChanged<double> onChanged,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final controller = TextEditingController(text: value.toString());
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        enabled: isEditing,
-        onChanged: (val) {
-          final doubleVal = double.tryParse(val) ?? 0.0;
-          onChanged(doubleVal);
-        },
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-          labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-        ),
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextFormField(
+                controller: controller,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                enabled: isEditing,
+                onChanged: (val) {
+                  final doubleVal = double.tryParse(val) ?? 0.0;
+                  onChanged(doubleVal);
+                },
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color:
+                      isDark
+                          ? ThemeConfig.textPrimaryDark
+                          : ThemeConfig.textPrimaryLight,
+                ),
+                decoration: InputDecoration(
+                  hintText: label,
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    color:
+                        isDark
+                            ? ThemeConfig.textSecondaryDark
+                            : ThemeConfig.textSecondaryLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: ThemeConfig.primaryColor,
+                      width: 1.5,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildNumberField(String label, int value, Function(int) onChanged) {
+  Widget _buildNumberField(
+    BuildContext context,
+    String label,
+    int value,
+    Function(int) onChanged,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     TextEditingController controller = TextEditingController(
       text: value.toString(),
     );
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: TextInputType.number,
-        enabled: isEditing,
-        onChanged: (val) {
-          final intVal = int.tryParse(val) ?? 0;
-          onChanged(intVal);
-        },
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-          labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-        ),
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextFormField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                enabled: isEditing,
+                onChanged: (val) {
+                  final intVal = int.tryParse(val) ?? 0;
+                  onChanged(intVal);
+                },
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color:
+                      isDark
+                          ? ThemeConfig.textPrimaryDark
+                          : ThemeConfig.textPrimaryLight,
+                ),
+                decoration: InputDecoration(
+                  hintText: label,
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    color:
+                        isDark
+                            ? ThemeConfig.textSecondaryDark
+                            : ThemeConfig.textSecondaryLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: ThemeConfig.primaryColor,
+                      width: 1.5,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDateRow(String label, String value, Function(String) onChanged) {
+  Widget _buildDateRow(
+    BuildContext context,
+    String label,
+    String value,
+    Function(String) onChanged,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     TextEditingController controller = TextEditingController(text: value);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: controller,
-        enabled: isEditing,
-        readOnly: true,
-        onTap:
-            isEditing
-                ? () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate:
-                        value.isNotEmpty ? _parseDate(value) : DateTime.now(),
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime(2100),
-                  );
-                  if (pickedDate != null) {
-                    final formatted =
-                        "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
-                    controller.text = formatted;
-                    onChanged(formatted);
-                  }
-                }
-                : null,
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-          labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-          suffixIcon:
-              isEditing ? const Icon(Icons.calendar_today, size: 18) : null,
-        ),
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: GestureDetector(
+                onTap:
+                    isEditing
+                        ? () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate:
+                                value.isNotEmpty
+                                    ? _parseDate(value)
+                                    : DateTime.now(),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime(2100),
+                          );
+                          if (pickedDate != null) {
+                            final formatted =
+                                "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
+                            controller.text = formatted;
+                            onChanged(formatted);
+                          }
+                        }
+                        : null,
+                child: AbsorbPointer(
+                  absorbing: true,
+                  child: TextFormField(
+                    controller: controller,
+                    enabled: isEditing,
+                    readOnly: true,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color:
+                          isDark
+                              ? ThemeConfig.textPrimaryDark
+                              : ThemeConfig.textPrimaryLight,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: label,
+                      hintStyle: GoogleFonts.inter(
+                        fontSize: 14,
+                        color:
+                            isDark
+                                ? ThemeConfig.textSecondaryDark
+                                : ThemeConfig.textSecondaryLight,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color:
+                              isDark
+                                  ? ThemeConfig.borderDark
+                                  : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color:
+                              isDark
+                                  ? ThemeConfig.borderDark
+                                  : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: ThemeConfig.primaryColor,
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      suffixIcon: Icon(
+                        Icons.calendar_today_rounded,
+                        size: 20,
+                        color:
+                            isDark
+                                ? ThemeConfig.textSecondaryDark
+                                : ThemeConfig.textSecondaryLight,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

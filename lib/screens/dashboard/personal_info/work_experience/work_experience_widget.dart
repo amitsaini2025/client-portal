@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../config/theme_config.dart';
 import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
 import '../../../../models/personal_information/experience.dart';
 import '../../../../services/api_service.dart';
@@ -173,6 +175,7 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildSectionTitle(
+                context,
                 "Work Experience",
                 icon: Icons.work_rounded,
                 isEditing: isEditing,
@@ -188,9 +191,7 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
               ),
               const SizedBox(height: 18),
               ...widget.experiences.map(
-                (exp) => Column(
-                  children: [_buildWorkCard(exp), const SizedBox(height: 18)],
-                ),
+                (exp) => _buildWorkCard(context, exp),
               ),
             ],
           ),
@@ -200,6 +201,7 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
   }
 
   Widget _buildSectionTitle(
+    BuildContext context,
     String title, {
     required IconData icon,
     required bool isEditing,
@@ -207,65 +209,113 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     bool showAdd = false,
     VoidCallback? onAdd,
   }) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final borderColor = isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: borderColor,
+          width: 1,
         ),
-        const Spacer(),
-        if (showAdd && onAdd != null)
-          InkWell(
-            onTap: onAdd,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.add, color: Colors.blue, size: 20),
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        if (showAdd) const SizedBox(width: 8),
-        InkWell(
-          onTap: onEdit,
-          child: Container(
-            padding: const EdgeInsets.all(8),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
+              color: ThemeConfig.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              isEditing ? Icons.check : Icons.edit,
-              color: Colors.blue,
-              size: 20,
+            child: Icon(icon, color: ThemeConfig.primaryColor, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
             ),
           ),
-        ),
-      ],
+          if (showAdd && onAdd != null)
+            InkWell(
+              onTap: onAdd,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: ThemeConfig.successColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: ThemeConfig.successColor.withOpacity(0.3),
+                  ),
+                ),
+                child: Icon(Icons.add_rounded,
+                    color: ThemeConfig.successColor, size: 20),
+              ),
+            ),
+          if (showAdd) const SizedBox(width: 8),
+          InkWell(
+            onTap: onEdit,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isEditing
+                    ? ThemeConfig.successColor.withOpacity(0.1)
+                    : ThemeConfig.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isEditing
+                      ? ThemeConfig.successColor.withOpacity(0.3)
+                      : ThemeConfig.primaryColor.withOpacity(0.3),
+                ),
+              ),
+              child: Icon(
+                isEditing ? Icons.check_rounded : Icons.edit_rounded,
+                color: isEditing ? ThemeConfig.successColor : ThemeConfig.primaryColor,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildWorkCard(Experience exp) {
+  Widget _buildWorkCard(BuildContext context, Experience exp) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final borderColor = isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
+
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade300),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: borderColor,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -276,6 +326,7 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
             children: [
               Expanded(
                 child: _buildEditableRow(
+                  context,
                   "Job Title",
                   exp.jobTitle,
                   (val) => exp.jobTitle = val,
@@ -283,24 +334,31 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
               ),
               if (isEditing)
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  icon: Icon(Icons.delete_outline_rounded, color: ThemeConfig.errorColor),
                   onPressed: () async {
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder:
                           (_) => AlertDialog(
-                            title: const Text("Delete Experience"),
-                            content: const Text(
+                            title: Text(
+                              "Delete Experience",
+                              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w600),
+                            ),
+                            content: Text(
                               "Are you sure you want to delete this work experience?",
+                              style: GoogleFonts.inter(),
                             ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
-                                child: const Text("Cancel"),
+                                child: Text("Cancel", style: GoogleFonts.inter()),
                               ),
                               TextButton(
                                 onPressed: () => Navigator.pop(context, true),
-                                child: const Text("Delete"),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: ThemeConfig.errorColor,
+                                ),
+                                child: Text("Delete", style: GoogleFonts.inter()),
                               ),
                             ],
                           ),
@@ -314,34 +372,39 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
             ],
           ),
           _buildEditableRow(
+            context,
             "ANZSCO Code",
             exp.jobCode,
             (val) => exp.jobCode = val,
           ),
           _buildEditableRow(
+            context,
             "Employer Name",
             exp.employerName,
             (val) => exp.employerName = val,
           ),
-          _buildCountryDropdown(exp),
-          _buildEditableRow("State", exp.state ?? "", (val) => exp.state = val),
+          _buildCountryDropdown(context, exp),
+          _buildEditableRow(context, "State", exp.state ?? "", (val) => exp.state = val),
           _buildEditableRow(
+            context,
             "Job Type",
             exp.jobType,
             (val) => exp.jobType = val,
           ),
           _buildDateRow(
+            context,
             "Start Date",
             exp.startDate,
             (val) => exp.startDate = val,
           ),
-          const SizedBox(height: 12),
           _buildDateRow(
+            context,
             "Finish Date",
             exp.finishDate,
             (val) => exp.finishDate = val,
           ),
           _buildCheckboxRow(
+            context,
             "Relevant",
             exp.relevantExperience,
             (val) => exp.relevantExperience = val,
@@ -351,119 +414,279 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
     );
   }
 
-  Widget _buildCountryDropdown(Experience exp) {
+  Widget _buildCountryDropdown(BuildContext context, Experience exp) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: DropdownButtonFormField<String>(
-        value: exp.country.isEmpty ? null : exp.country,
-        isExpanded: true,
-        items:
-            widget.countries
-                .map(
-                  (country) => DropdownMenuItem<String>(
-                    value: country.name,
-                    child: Text(country.name),
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Country",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: DropdownButtonFormField<String>(
+                value: exp.country.isEmpty ? null : exp.country,
+                isExpanded: true,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight,
+                ),
+                items: widget.countries
+                    .map(
+                      (country) => DropdownMenuItem<String>(
+                        value: country.name,
+                        child: Text(country.name, style: GoogleFonts.inter(fontSize: 14)),
+                      ),
+                    )
+                    .toList(),
+                onChanged:
+                    isEditing
+                        ? (val) {
+                          setState(() {
+                            exp.country = val ?? "";
+                          });
+                        }
+                        : null,
+                decoration: InputDecoration(
+                  hintText: "Choose Country",
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: isDark ? ThemeConfig.textSecondaryDark : ThemeConfig.textSecondaryLight,
                   ),
-                )
-                .toList(),
-        onChanged:
-            isEditing
-                ? (val) {
-                  setState(() {
-                    exp.country = val ?? "";
-                  });
-                }
-                : null,
-        decoration: const InputDecoration(
-          labelText: "COUNTRY",
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark ? ThemeConfig.borderDark : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark ? ThemeConfig.borderDark : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: ThemeConfig.primaryColor,
+                      width: 1.5,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  suffixIcon: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: isDark ? ThemeConfig.textSecondaryDark : ThemeConfig.textSecondaryLight,
+                  ),
+                ),
+                icon: const SizedBox.shrink(),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildEditableRow(
+    BuildContext context,
     String label,
     String value,
     Function(String) onChanged,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        initialValue: value,
-        enabled: isEditing,
-        onChanged: (val) => onChanged(val),
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          labelStyle: const TextStyle(
-            color: Colors.grey,
-            fontSize: 13,
-            letterSpacing: 0.2,
-          ),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextFormField(
+                initialValue: value,
+                enabled: isEditing,
+                onChanged: (val) => onChanged(val),
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight,
+                ),
+                decoration: InputDecoration(
+                  hintText: label,
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: isDark ? ThemeConfig.textSecondaryDark : ThemeConfig.textSecondaryLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark ? ThemeConfig.borderDark : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark ? ThemeConfig.borderDark : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: ThemeConfig.primaryColor,
+                      width: 1.5,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDateRow(String label, String value, Function(String) onChanged) {
+  Widget _buildDateRow(BuildContext context, String label, String value, Function(String) onChanged) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final controller = TextEditingController(text: value);
 
-    return GestureDetector(
-      onTap: isEditing ? () => _pickDate(onChanged, controller.text) : null,
-      child: AbsorbPointer(
-        absorbing: true,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: TextFormField(
-            controller: controller,
-            enabled: isEditing,
-            readOnly: true,
-            decoration: InputDecoration(
-              labelText: label.toUpperCase(),
-              border: const OutlineInputBorder(),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: GestureDetector(
+                onTap: isEditing ? () => _pickDate(onChanged, controller.text) : null,
+                child: AbsorbPointer(
+                  absorbing: true,
+                  child: TextFormField(
+                    controller: controller,
+                    enabled: isEditing,
+                    readOnly: true,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: label,
+                      hintStyle: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: isDark ? ThemeConfig.textSecondaryDark : ThemeConfig.textSecondaryLight,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: isDark ? ThemeConfig.borderDark : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: isDark ? ThemeConfig.borderDark : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: ThemeConfig.primaryColor,
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      suffixIcon: Icon(
+                        Icons.calendar_today_rounded,
+                        size: 20,
+                        color: isDark ? ThemeConfig.textSecondaryDark : ThemeConfig.textSecondaryLight,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckboxRow(BuildContext context, String label, bool value, Function(bool) onChanged) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: textColor,
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCheckboxRow(String label, bool value, Function(bool) onChanged) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w600),
+          Checkbox(
+            value: value,
+            activeColor: ThemeConfig.primaryColor,
+            onChanged:
+                isEditing
+                    ? (val) {
+                      setState(() {
+                        onChanged(val ?? false);
+                      });
+                    }
+                    : null,
           ),
-        ),
-        Checkbox(
-          value: value,
-          onChanged:
-              isEditing
-                  ? (val) {
-                    setState(() {
-                      onChanged(val ?? false);
-                    });
-                  }
-                  : null,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

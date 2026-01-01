@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../config/theme_config.dart';
 import '../../../../models/personal_information/basic_information.dart';
 import '../../../../models/personal_information/email.dart';
 import '../../../../models/personal_information/phone.dart';
@@ -560,28 +562,41 @@ class _BasicPersonalInformationWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final textColor =
+        isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight;
+    final secondaryTextColor =
+        isDark ? ThemeConfig.textSecondaryDark : ThemeConfig.textSecondaryLight;
+    final borderColor =
+        isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle(
+          context,
           'Basic Information',
+          Icons.person_outline_rounded,
           showEdit: true,
           showAdd: false,
           isBasic: true,
         ),
-        const SizedBox(height: 12),
-        _buildInfoCard([
-          _buildTextField('First Name', firstNameCtrl, isBasic: true),
-          _buildTextField('Last Name', lastNameCtrl, isBasic: true),
-          _buildTextField('Client ID', clientIdCtrl, isBasic: false),
-          _buildDOBField('Date of Birth', dobCtrl),
+        const SizedBox(height: 16),
+        _buildInfoCard(context, [
+          _buildTextField(context, 'First Name', firstNameCtrl, isBasic: true),
+          _buildTextField(context, 'Last Name', lastNameCtrl, isBasic: true),
+          _buildTextField(context, 'Client ID', clientIdCtrl, isBasic: false),
+          _buildDOBField(context, 'Date of Birth', dobCtrl),
           _buildDropdownField(
+            context,
             'Gender',
             genderValue,
             genderOptions,
             (value) => setState(() => genderValue = value!),
           ),
           _buildDropdownField(
+            context,
             'Marital Status',
             maritalStatusValue,
             maritalStatusOptions,
@@ -589,28 +604,44 @@ class _BasicPersonalInformationWidgetState
           ),
         ]),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
 
         _buildSectionTitle(
+          context,
           'Phone Numbers',
+          Icons.phone_iphone_rounded,
           showEdit: true,
           showAdd: true,
           isBasic: false,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
 
-        _buildInfoCard(
-          phoneList.isEmpty
-              ? [_buildStaticField('No Phone Records', '')]
-              : List.generate(phoneList.length, (index) {
+        phoneList.isEmpty
+            ? _buildInfoCard(context, [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: Text(
+                    'No phone numbers added',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: secondaryTextColor,
+                    ),
+                  ),
+                ),
+              ),
+            ])
+            : Column(
+              children: List.generate(phoneList.length, (index) {
                 final phone = phoneList[index];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: _buildInfoCard(context, [
                     Row(
                       children: [
                         Expanded(
                           child: _buildTypeDropdown(
+                            context,
                             phone.type ?? "Other",
                             isEditingPhones,
                             (value) => setState(() => phone.type = value!),
@@ -618,28 +649,47 @@ class _BasicPersonalInformationWidgetState
                         ),
                         if (isEditingPhones)
                           IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
+                            icon: Icon(
+                              Icons.delete_outline_rounded,
+                              color: ThemeConfig.errorColor,
+                            ),
                             onPressed: () async {
                               final confirm = await showDialog<bool>(
                                 context: context,
                                 builder:
                                     (_) => AlertDialog(
-                                      title: const Text("Delete Phone"),
-                                      content: const Text(
+                                      title: Text(
+                                        "Delete Phone",
+                                        style: GoogleFonts.spaceGrotesk(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      content: Text(
                                         "Are you sure you want to delete this phone number?",
+                                        style: GoogleFonts.inter(),
                                       ),
                                       actions: [
                                         TextButton(
                                           onPressed:
                                               () =>
                                                   Navigator.pop(context, false),
-                                          child: const Text("Cancel"),
+                                          child: Text(
+                                            "Cancel",
+                                            style: GoogleFonts.inter(),
+                                          ),
                                         ),
                                         TextButton(
                                           onPressed:
                                               () =>
                                                   Navigator.pop(context, true),
-                                          child: const Text("Delete"),
+                                          style: TextButton.styleFrom(
+                                            foregroundColor:
+                                                ThemeConfig.errorColor,
+                                          ),
+                                          child: Text(
+                                            "Delete",
+                                            style: GoogleFonts.inter(),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -649,40 +699,57 @@ class _BasicPersonalInformationWidgetState
                           ),
                       ],
                     ),
+                    const SizedBox(height: 8),
                     _buildTextFieldPhone(
+                      context,
                       phone.type ?? 'Phone Number',
                       phoneControllers[index],
                       type: phone.type ?? 'Other',
                     ),
-                    const SizedBox(height: 10),
-                  ],
+                  ]),
                 );
               }),
-        ),
+            ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
 
         _buildSectionTitle(
+          context,
           'Email Addresses',
+          Icons.email_outlined,
           showEdit: true,
           showAdd: true,
           isBasic: false,
           isEmail: true,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
 
-        _buildInfoCard(
-          emailList.isEmpty
-              ? [_buildStaticField('No Email Records', '')]
-              : List.generate(emailList.length, (index) {
+        emailList.isEmpty
+            ? _buildInfoCard(context, [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: Text(
+                    'No email addresses added',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: secondaryTextColor,
+                    ),
+                  ),
+                ),
+              ),
+            ])
+            : Column(
+              children: List.generate(emailList.length, (index) {
                 final email = emailList[index];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: _buildInfoCard(context, [
                     Row(
                       children: [
                         Expanded(
                           child: _buildTypeDropdown(
+                            context,
                             email.type ?? 'Other',
                             isEditingEmails,
                             (v) => setState(() => email.type = v!),
@@ -690,28 +757,47 @@ class _BasicPersonalInformationWidgetState
                         ),
                         if (isEditingEmails)
                           IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
+                            icon: Icon(
+                              Icons.delete_outline_rounded,
+                              color: ThemeConfig.errorColor,
+                            ),
                             onPressed: () async {
                               final confirm = await showDialog<bool>(
                                 context: context,
                                 builder:
                                     (_) => AlertDialog(
-                                      title: const Text("Delete Email"),
-                                      content: const Text(
+                                      title: Text(
+                                        "Delete Email",
+                                        style: GoogleFonts.spaceGrotesk(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      content: Text(
                                         "Are you sure you want to delete this email address?",
+                                        style: GoogleFonts.inter(),
                                       ),
                                       actions: [
                                         TextButton(
                                           onPressed:
                                               () =>
                                                   Navigator.pop(context, false),
-                                          child: const Text("Cancel"),
+                                          child: Text(
+                                            "Cancel",
+                                            style: GoogleFonts.inter(),
+                                          ),
                                         ),
                                         TextButton(
                                           onPressed:
                                               () =>
                                                   Navigator.pop(context, true),
-                                          child: const Text("Delete"),
+                                          style: TextButton.styleFrom(
+                                            foregroundColor:
+                                                ThemeConfig.errorColor,
+                                          ),
+                                          child: Text(
+                                            "Delete",
+                                            style: GoogleFonts.inter(),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -721,237 +807,641 @@ class _BasicPersonalInformationWidgetState
                           ),
                       ],
                     ),
+                    const SizedBox(height: 8),
                     _buildTextFieldEmail(
+                      context,
                       email.type ?? 'Email Address',
                       emailControllers[index],
                       type: email.type ?? 'Other',
                     ),
-                    const SizedBox(height: 10),
-                  ],
+                  ]),
                 );
               }),
-        ),
+            ),
       ],
     );
   }
 
   Widget _buildTypeDropdown(
+    BuildContext context,
     String value,
     bool editable,
     ValueChanged<String?> cb,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: DropdownButtonFormField<String>(
-        value: value,
-        items:
-            typeOptions
-                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                .toList(),
-        onChanged: editable ? cb : null,
-        decoration: const InputDecoration(
-          labelText: "TYPE",
-          border: OutlineInputBorder(),
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Type",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: DropdownButtonFormField<String>(
+                value: value,
+                items:
+                    typeOptions
+                        .map(
+                          (e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(
+                              e,
+                              style: GoogleFonts.inter(fontSize: 14),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                onChanged: editable ? cb : null,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color:
+                      isDark
+                          ? ThemeConfig.textPrimaryDark
+                          : ThemeConfig.textPrimaryLight,
+                ),
+                decoration: InputDecoration(
+                  hintText: "Choose Type",
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    color:
+                        isDark
+                            ? ThemeConfig.textSecondaryDark
+                            : ThemeConfig.textSecondaryLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: ThemeConfig.primaryColor,
+                      width: 1.5,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  suffixIcon: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color:
+                        isDark
+                            ? ThemeConfig.textSecondaryDark
+                            : ThemeConfig.textSecondaryLight,
+                  ),
+                ),
+                icon: const SizedBox.shrink(),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildTextField(
+    BuildContext context,
     String label,
     TextEditingController ctrl, {
     required bool isBasic,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     bool editable = isBasic ? isEditingBasic : false;
     if (label == 'Client ID') editable = false;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: TextFormField(
-        controller: ctrl,
-        readOnly: !editable,
-        enabled: editable,
-        style: const TextStyle(
-          fontSize: 14,
-          color: Colors.black87,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextFormField(
+                controller: ctrl,
+                readOnly: !editable,
+                enabled: editable,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color:
+                      isDark
+                          ? ThemeConfig.textPrimaryDark
+                          : ThemeConfig.textPrimaryLight,
+                ),
+                decoration: InputDecoration(
+                  hintText: label,
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    color:
+                        isDark
+                            ? ThemeConfig.textSecondaryDark
+                            : ThemeConfig.textSecondaryLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: ThemeConfig.primaryColor,
+                      width: 1.5,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildTextFieldPhone(
+    BuildContext context,
     String label,
     TextEditingController ctrl, {
     required String type,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     bool editable = isEditingPhones;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: TextFormField(
-        controller: ctrl,
-        readOnly: !editable,
-        enabled: editable,
-        keyboardType: TextInputType.phone,
-        style: const TextStyle(
-          fontSize: 14,
-          color: Colors.black87,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          border: const OutlineInputBorder(),
-        ),
-        onChanged: (val) {
-          _onPhoneChanged(phoneControllers.indexOf(ctrl), val);
-        },
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color:
+                  isDark
+                      ? ThemeConfig.textPrimaryDark
+                      : ThemeConfig.textPrimaryLight,
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: TextFormField(
+              controller: ctrl,
+              readOnly: !editable,
+              enabled: editable,
+              keyboardType: TextInputType.phone,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+              decoration: InputDecoration(
+                hintText: label,
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  color:
+                      isDark
+                          ? ThemeConfig.textSecondaryDark
+                          : ThemeConfig.textSecondaryLight,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color:
+                        isDark
+                            ? ThemeConfig.borderDark
+                            : const Color(0xFFE5E7EB),
+                    width: 1,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color:
+                        isDark
+                            ? ThemeConfig.borderDark
+                            : const Color(0xFFE5E7EB),
+                    width: 1,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: ThemeConfig.primaryColor,
+                    width: 1.5,
+                  ),
+                ),
+                filled: true,
+                fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+              onChanged: (val) {
+                _onPhoneChanged(phoneControllers.indexOf(ctrl), val);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildTextFieldEmail(
+    BuildContext context,
     String label,
     TextEditingController ctrl, {
     required String type,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     bool editable = isEditingEmails;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: TextFormField(
-        controller: ctrl,
-        readOnly: !editable,
-        enabled: editable,
-        style: const TextStyle(
-          fontSize: 14,
-          color: Colors.black87,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          border: const OutlineInputBorder(),
-        ),
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color:
+                  isDark
+                      ? ThemeConfig.textPrimaryDark
+                      : ThemeConfig.textPrimaryLight,
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: TextFormField(
+              controller: ctrl,
+              readOnly: !editable,
+              enabled: editable,
+              keyboardType: TextInputType.emailAddress,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+              decoration: InputDecoration(
+                hintText: label,
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  color:
+                      isDark
+                          ? ThemeConfig.textSecondaryDark
+                          : ThemeConfig.textSecondaryLight,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color:
+                        isDark
+                            ? ThemeConfig.borderDark
+                            : const Color(0xFFE5E7EB),
+                    width: 1,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color:
+                        isDark
+                            ? ThemeConfig.borderDark
+                            : const Color(0xFFE5E7EB),
+                    width: 1,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: ThemeConfig.primaryColor,
+                    width: 1.5,
+                  ),
+                ),
+                filled: true,
+                fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildDropdownField(
+    BuildContext context,
     String label,
     String value,
     List<String> options,
     ValueChanged<String?> cb,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: DropdownButtonFormField<String>(
-        value: value.isNotEmpty ? value : null,
-        items:
-            options
-                .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
-                .toList(),
-        onChanged: isEditingBasic ? cb : null,
-        decoration: InputDecoration(
-          labelText: label.toUpperCase(),
-          border: const OutlineInputBorder(),
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: DropdownButtonFormField<String>(
+                value: value.isNotEmpty ? value : null,
+                items:
+                    options
+                        .map(
+                          (e) => DropdownMenuItem<String>(
+                            value: e,
+                            child: Text(
+                              e,
+                              style: GoogleFonts.inter(fontSize: 14),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                onChanged: isEditingBasic ? cb : null,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color:
+                      isDark
+                          ? ThemeConfig.textPrimaryDark
+                          : ThemeConfig.textPrimaryLight,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Choose $label',
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 14,
+                    color:
+                        isDark
+                            ? ThemeConfig.textSecondaryDark
+                            : ThemeConfig.textSecondaryLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color:
+                          isDark
+                              ? ThemeConfig.borderDark
+                              : const Color(0xFFE5E7EB),
+                      width: 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: ThemeConfig.primaryColor,
+                      width: 1.5,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  suffixIcon: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color:
+                        isDark
+                            ? ThemeConfig.textSecondaryDark
+                            : ThemeConfig.textSecondaryLight,
+                  ),
+                ),
+                icon: const SizedBox.shrink(),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDOBField(String label, TextEditingController ctrl) {
-    return GestureDetector(
-      onTap: isEditingBasic ? _pickDOB : null,
-      child: AbsorbPointer(
-        absorbing: true,
-        child: _buildTextField(label, ctrl, isBasic: true),
+  Widget _buildDOBField(
+    BuildContext context,
+    String label,
+    TextEditingController ctrl,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color:
+                    isDark
+                        ? ThemeConfig.textPrimaryDark
+                        : ThemeConfig.textPrimaryLight,
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: GestureDetector(
+                onTap: isEditingBasic ? _pickDOB : null,
+                child: AbsorbPointer(
+                  absorbing: true,
+                  child: TextFormField(
+                    controller: ctrl,
+                    readOnly: true,
+                    enabled: isEditingBasic,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color:
+                          isDark
+                              ? ThemeConfig.textPrimaryDark
+                              : ThemeConfig.textPrimaryLight,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: label,
+                      hintStyle: GoogleFonts.inter(
+                        fontSize: 14,
+                        color:
+                            isDark
+                                ? ThemeConfig.textSecondaryDark
+                                : ThemeConfig.textSecondaryLight,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color:
+                              isDark
+                                  ? ThemeConfig.borderDark
+                                  : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color:
+                              isDark
+                                  ? ThemeConfig.borderDark
+                                  : const Color(0xFFE5E7EB),
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: ThemeConfig.primaryColor,
+                          width: 1.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: isDark ? ThemeConfig.cardDark : Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      suffixIcon: Icon(
+                        Icons.calendar_today_rounded,
+                        size: 20,
+                        color:
+                            isDark
+                                ? ThemeConfig.textSecondaryDark
+                                : ThemeConfig.textSecondaryLight,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildStaticField(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Text("$label: $value"),
-    );
-  }
-
   Widget _buildSectionTitle(
-    String title, {
+    BuildContext context,
+    String title,
+    IconData icon, {
     bool showEdit = false,
     bool showAdd = true,
     required bool isBasic,
     bool isEmail = false,
   }) {
-    return Row(
-      children: [
-        Icon(
-          title.contains('Phone')
-              ? Icons.phone_iphone
-              : title.contains('Email')
-              ? Icons.email
-              : Icons.person,
-          color: Colors.white,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-        ),
-        const Spacer(),
-        if (showAdd)
-          InkWell(
-            onTap: () {
-              if (title.contains('Phone')) _addPhoneField();
-              if (title.contains('Email')) _addEmailField();
-            },
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: _buttonDecoration(),
-              child: const Icon(Icons.add, color: Colors.green, size: 20),
-            ),
-          ),
-        if (showEdit) const SizedBox(width: 8),
-        if (showEdit)
-          InkWell(
-            onTap: () {
-              if (isBasic) {
-                if (isEditingBasic) {
-                  _saveBasicInfo();
-                } else {
-                  setState(() => isEditingBasic = true);
-                }
-              } else if (isEmail) {
-                if (isEditingEmails)
-                  _saveEmails();
-                else
-                  setState(() => isEditingEmails = true);
-              } else {
-                if (isEditingPhones)
-                  _savePhones();
-                else
-                  setState(() => isEditingPhones = true);
-              }
-            },
-            child: _editButton(isBasic: isBasic, isEmail: isEmail),
-          ),
-      ],
-    );
-  }
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final borderColor =
+        isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
 
-  Widget _editButton({required bool isBasic, bool isEmail = false}) {
     bool editing =
         isBasic
             ? isEditingBasic
@@ -960,31 +1450,139 @@ class _BasicPersonalInformationWidgetState
             : isEditingPhones;
 
     return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: _buttonDecoration(),
-      child: Icon(
-        editing ? Icons.check : Icons.edit,
-        color: Colors.blue,
-        size: 20,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: ThemeConfig.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: ThemeConfig.primaryColor, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (showAdd)
+            InkWell(
+              onTap: () {
+                if (title.contains('Phone')) _addPhoneField();
+                if (title.contains('Email')) _addEmailField();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: ThemeConfig.successColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: ThemeConfig.successColor.withOpacity(0.3),
+                  ),
+                ),
+                child: Icon(
+                  Icons.add_rounded,
+                  color: ThemeConfig.successColor,
+                  size: 20,
+                ),
+              ),
+            ),
+          if (showEdit && showAdd) const SizedBox(width: 8),
+          if (showEdit)
+            InkWell(
+              onTap: () {
+                if (isBasic) {
+                  if (isEditingBasic) {
+                    _saveBasicInfo();
+                  } else {
+                    setState(() => isEditingBasic = true);
+                  }
+                } else if (isEmail) {
+                  if (isEditingEmails)
+                    _saveEmails();
+                  else
+                    setState(() => isEditingEmails = true);
+                } else {
+                  if (isEditingPhones)
+                    _savePhones();
+                  else
+                    setState(() => isEditingPhones = true);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color:
+                      editing
+                          ? ThemeConfig.successColor.withOpacity(0.1)
+                          : ThemeConfig.primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color:
+                        editing
+                            ? ThemeConfig.successColor.withOpacity(0.3)
+                            : ThemeConfig.primaryColor.withOpacity(0.3),
+                  ),
+                ),
+                child: Icon(
+                  editing ? Icons.check_rounded : Icons.edit_rounded,
+                  color:
+                      editing
+                          ? ThemeConfig.successColor
+                          : ThemeConfig.primaryColor,
+                  size: 20,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
 
-  BoxDecoration _buttonDecoration() {
-    return BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: Colors.grey.shade300),
-    );
-  }
+  Widget _buildInfoCard(BuildContext context, List<Widget> children) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
+    final borderColor =
+        isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
 
-  Widget _buildInfoCard(List<Widget> children) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
