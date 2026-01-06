@@ -271,12 +271,12 @@ class AuthService {
       // Call API logout if token exists
       if (_currentToken != null) {
         try {
-          await ApiService.logout();
           final fcmService = FCMService();
           String? fcmToken = await fcmService.getToken();
           if (fcmToken != null) {
             await ApiService.unregisterFcmToken(fcmToken);
           }
+          await ApiService.logout();
         } catch (e) {
           print('Logout API call failed: $e');
         }
