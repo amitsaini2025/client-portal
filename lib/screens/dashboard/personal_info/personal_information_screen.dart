@@ -110,66 +110,95 @@ class _PersonalInformationScreenState
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isLoading
-          ? const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      )
-          : errorMessage != null
           ? Center(
-        child: Text(
-          errorMessage!,
-          style: const TextStyle(color: Colors.white),
-        ),
-      )
-          : SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BasicPersonalInformationWidget(
-              basicInfo: personalDetail!.basicInformation,
-              phones: personalDetail!.phones,
-              emails: personalDetail!.emails,
-            ),
-            const SizedBox(height: 20),
-            TravelDocumentsWidget(
-              passports: personalDetail!.passports,
-              visas: personalDetail!.visas,
-              countries: countries,
-              visaTypes: visaTypes,
-            ),
-            const SizedBox(height: 20),
-            AddressAndTravelInformationWidget(
-              addresses: personalDetail!.addresses,
-              travels: personalDetail!.travels,
-              countries: countries,
-            ),
-            const SizedBox(height: 20),
-            EducationalQualificationsWidget(
-              qualifications: personalDetail!.qualifications,
-              countries: countries,
-            ),
-            const SizedBox(height: 20),
-            WorkExperienceWidget(
-              experiences: personalDetail!.experiences,
-              countries: countries,
-            ),
-            const SizedBox(height: 20),
-            OccupationSkillsWidget(
-              occupations: personalDetail!.occupations,
-            ),
-            const SizedBox(height: 20),
-            TestScoresWidget(
-              testScores: personalDetail!.testScores,
-            ),
-            const SizedBox(height: 20)
-            /*ExperienceWidget(
-              experiences: personalDetail!.experiences,
-              countries: countries,
-            ),
-            const SizedBox(height: 20),*/
-          ],
-        ),
-      ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: ThemeConfig.goldenYellow,
+                    strokeWidth: 3,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading personal information...',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : errorMessage != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline_rounded,
+                          color: ThemeConfig.errorColor,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          errorMessage!,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BasicPersonalInformationWidget(
+                        basicInfo: personalDetail!.basicInformation,
+                        phones: personalDetail!.phones,
+                        emails: personalDetail!.emails,
+                      ),
+                      const SizedBox(height: 24),
+                      TravelDocumentsWidget(
+                        passports: personalDetail!.passports,
+                        visas: personalDetail!.visas,
+                        countries: countries,
+                        visaTypes: visaTypes,
+                      ),
+                      const SizedBox(height: 24),
+                      AddressAndTravelInformationWidget(
+                        addresses: personalDetail!.addresses,
+                        travels: personalDetail!.travels,
+                        countries: countries,
+                      ),
+                      const SizedBox(height: 24),
+                      EducationalQualificationsWidget(
+                        qualifications: personalDetail!.qualifications,
+                        countries: countries,
+                      ),
+                      const SizedBox(height: 24),
+                      WorkExperienceWidget(
+                        experiences: personalDetail!.experiences,
+                        countries: countries,
+                      ),
+                      const SizedBox(height: 24),
+                      OccupationSkillsWidget(
+                        occupations: personalDetail!.occupations,
+                      ),
+                      const SizedBox(height: 24),
+                      TestScoresWidget(
+                        testScores: personalDetail!.testScores,
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
     );
   }
 }

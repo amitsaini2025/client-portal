@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../fcm_service.dart';
 import '../models/admin.dart';
 import '../models/client.dart';
 import 'api_service.dart';
@@ -69,8 +70,9 @@ class AuthService {
       }
 
       // Load selected matter name
-      final storedMatterName =
-      await _secureStorage.read(key: _selectedMatterNameKey);
+      final storedMatterName = await _secureStorage.read(
+        key: _selectedMatterNameKey,
+      );
       if (storedMatterName != null) {
         _selectedMatterName = storedMatterName;
       }
@@ -186,7 +188,10 @@ class AuthService {
           _currentUserId = userId;
           await _saveUserData();
           if (_currentUserId != null) {
-            await _secureStorage.write(key: _userIdKey, value: _currentUserId.toString());
+            await _secureStorage.write(
+              key: _userIdKey,
+              value: _currentUserId.toString(),
+            );
           }
         }
 
@@ -247,7 +252,7 @@ class AuthService {
         return {
           'success': true,
           'message':
-          'Registration successful. Please check your email for verification.',
+              'Registration successful. Please check your email for verification.',
         };
       } else {
         return {
@@ -267,6 +272,11 @@ class AuthService {
       if (_currentToken != null) {
         try {
           await ApiService.logout();
+          final fcmService = FCMService();
+          String? fcmToken = await fcmService.getToken();
+          if (fcmToken != null) {
+            await ApiService.unregisterFcmToken(fcmToken);
+          }
         } catch (e) {
           print('Logout API call failed: $e');
         }

@@ -64,8 +64,9 @@ class FCMService {
 
     try {
       String baseUrl = ApiConfig.baseUrl;
+      String registerToken = ApiConfig.registerFCMToken;
       final response = await http.post(
-        Uri.parse('$baseUrl/fcm/register-token'),
+        Uri.parse('$baseUrl$registerToken'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',

@@ -9,7 +9,7 @@ class ApiConfig {
   static const String logoutEndpoint = '/logout';
   static const String forgotPasswordEndpoint = '/forgot-password';
   static const String resetPasswordEndpoint = '/reset-password';
-  static const String refreshTokenEndpoint = '/auth/refresh';
+  static const String refreshTokenEndpoint = '/refresh';
 
   // Matters
   static const String mattersEndpoint = '/matters';
@@ -53,6 +53,9 @@ class ApiConfig {
   static const String updateClientOccupationDetail = "/update-client-occupation-detail";
   static const String updateClientTestScoreDetail = "/update-client-testscore-detail";
   static const String searchOccupation = "/search-occupation";
+
+  static const String registerFCMToken = "/fcm/register-token";
+  static const String unregisterFCMToken = "/fcm/unregister-token";
 
 
   // API settings

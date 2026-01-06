@@ -53,6 +53,17 @@ class ApiService {
       final streamedResponse = await request.send().timeout(_timeout);
       final response = await http.Response.fromStream(streamedResponse);
 
+      if (response.statusCode == 401) {
+        final refreshed = await _handleTokenRefresh();
+
+        if (refreshed) {
+          final newHeaders = _buildHeaders();
+          return _makeRequest(endpoint, newHeaders, body, method);
+        } else {
+          await clearAuth();
+          throw Exception('Session expired. Please login again.');
+        }
+      }
       return _handleResponse(response);
     } catch (e) {
       if (e is http.ClientException) {
@@ -100,6 +111,23 @@ class ApiService {
     }
 
     return ApiConfig.getErrorMessage(statusCode);
+  }
+
+  static bool _isRefreshing = false;
+  static Future<bool>? _refreshFuture;
+
+  static Future<bool> _handleTokenRefresh() async {
+    if (_isRefreshing) {
+      return await _refreshFuture!;
+    }
+
+    _isRefreshing = true;
+    _refreshFuture = AuthService.refreshToken();
+
+    final success = await _refreshFuture!;
+    _isRefreshing = false;
+
+    return success;
   }
 
   // Build headers for requests
@@ -176,6 +204,17 @@ class ApiService {
     }
 
     return {'success': true, 'message': 'Logged out successfully'};
+  }
+
+  static Future<void> unregisterFcmToken(String fcmToken) async {
+    if (_authToken == null || fcmToken.isEmpty) return;
+    try {
+      await _makeRequest(ApiConfig.unregisterFCMToken, _buildHeaders(), {
+        "token": fcmToken,
+      }, 'POST');
+    } catch (e) {
+      print('FCM unregister failed: $e');
+    }
   }
 
   static Future<Map<String, dynamic>> forgotPassword(String email) async {
@@ -320,7 +359,6 @@ class ApiService {
     return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
-
   static Future<Map<String, dynamic>> uploadWorkflowChecklistDocument({
     required String filePath,
     required int allowedChecklistId,
@@ -412,11 +450,13 @@ class ApiService {
   static Future<Map<String, dynamic>> uploadDocument(
     String filePath,
     String title,
-    String description,
-    {int? caseId}
-  ) async {
+    String description, {
+    int? caseId,
+  }) async {
     final headers = _buildHeaders();
-    headers.remove('Content-Type'); // Let http package set multipart content type
+    headers.remove(
+      'Content-Type',
+    ); // Let http package set multipart content type
 
     final request = http.MultipartRequest(
       'POST',
@@ -597,7 +637,6 @@ class ApiService {
     );
   }
 
-
   static Future<Map<String, dynamic>> getWorkflowMessages({
     required int clientMatterId,
     required int clientMatterStageId,
@@ -622,7 +661,6 @@ class ApiService {
       'GET',
     );
   }
-
 
   static Future<Map<String, dynamic>> getMessageDetail(int messageId) async {
     return await _makeRequest(
@@ -650,27 +688,19 @@ class ApiService {
     );
   }
 
-
   static Future<Map<String, dynamic>> markMessageAsRead({
     required int messageId,
   }) async {
     final url = '${ApiConfig.messageRead}/$messageId/read';
     final headers = _buildHeaders();
     final body = {};
-    return await _makeRequest(
-      url,
-      headers,
-      body,
-      'POST',
-    );
+    return await _makeRequest(url, headers, body, 'POST');
   }
 
   static Future<Map<String, dynamic>> getUnreadMessageCount({
     required int clientMatterId,
   }) async {
-    final params = {
-      'client_matter_id': clientMatterId.toString(),
-    };
+    final params = {'client_matter_id': clientMatterId.toString()};
 
     return await _makeRequest(
       ApiConfig.messageUnreadCount,
@@ -680,42 +710,24 @@ class ApiService {
     );
   }
 
-
   static Future<Map<String, dynamic>> getClientPersonalDetail({
     String tab = 'all',
   }) async {
-    String endpoint =
-        '${ApiConfig.getClientPersonalDetailEndpoint}?tab=$tab';
+    String endpoint = '${ApiConfig.getClientPersonalDetailEndpoint}?tab=$tab';
 
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
-
 
   static Future<Map<String, dynamic>> getCountries() async {
     String endpoint = '${ApiConfig.baseUrl}/countries';
 
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
   static Future<Map<String, dynamic>> getVisaTypes() async {
     String endpoint = "${ApiConfig.baseUrl}/visa-types";
 
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      "GET",
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, "GET");
   }
 
   static Future<Map<String, dynamic>> deleteClientTabDetail({
@@ -723,18 +735,9 @@ class ApiService {
     required String type,
   }) async {
     String endpoint = "${ApiConfig.baseUrl}/delete-client-tab-detail";
-    final params = {
-      "id": id,
-      "type": type,
-    };
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      params,
-      'POST',
-    );
+    final params = {"id": id, "type": type};
+    return await _makeRequest(endpoint, _buildHeaders(), params, 'POST');
   }
-
 
   static Future<Map<String, dynamic>> updateClientBasicDetail({
     required String firstName,
@@ -745,91 +748,68 @@ class ApiService {
   }) async {
     const endpoint = ApiConfig.updateClientBasicDetail;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "first_name": firstName,
-        "last_name": lastName,
-        "date_of_birth": dob,
-        "gender": gender,
-        "marital_status": maritalStatus,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "first_name": firstName,
+      "last_name": lastName,
+      "date_of_birth": dob,
+      "gender": gender,
+      "marital_status": maritalStatus,
+    }, "POST");
     print("UPDATE RESPONSE: $response");
     return response;
   }
 
   static Future<Map<String, dynamic>> updateClientPhoneDetail(
-      List<Map<String, dynamic>> phones) async {
+    List<Map<String, dynamic>> phones,
+  ) async {
     const endpoint = ApiConfig.updateClientPhoneDetail;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "phones": phones,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "phones": phones,
+    }, "POST");
 
     print("UPDATE PHONE RESPONSE: $response");
     return response;
   }
 
-
   static Future<Map<String, dynamic>> updateClientEmailDetail(
-      List<Map<String, dynamic>> emails) async {
+    List<Map<String, dynamic>> emails,
+  ) async {
     const endpoint = ApiConfig.updateClientEmailDetail;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "emails": emails,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "emails": emails,
+    }, "POST");
     return response;
   }
 
   static Future<Map<String, dynamic>> updateClientPassportDetail(
-      List<Map<String, dynamic>> passports,
-      ) async {
+    List<Map<String, dynamic>> passports,
+  ) async {
     const endpoint = ApiConfig.updateClientPassportDetail;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "passports": passports,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "passports": passports,
+    }, "POST");
 
     return response;
   }
 
   static Future<Map<String, dynamic>> updateClientVisaDetail(
-      List<Map<String, dynamic>> visas,
-      ) async {
+    List<Map<String, dynamic>> visas,
+  ) async {
     const endpoint = ApiConfig.updateClientVisaDetail;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "visas": visas,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "visas": visas,
+    }, "POST");
 
     return response;
   }
 
   static Future<Map<String, dynamic>> updateClientAddressDetail(
-      List<Map<String, dynamic>> addresses) async {
+    List<Map<String, dynamic>> addresses,
+  ) async {
     final response = await _makeRequest(
       ApiConfig.updateClientAddressDetail,
       _buildHeaders(),
@@ -841,98 +821,71 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> updateClientTravelDetail(
-      List<Map<String, dynamic>> travels,
-      ) async {
+    List<Map<String, dynamic>> travels,
+  ) async {
     const endpoint = ApiConfig.updateClientTravelDetail;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "travels": travels,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "travels": travels,
+    }, "POST");
 
     return response;
   }
 
   static Future<Map<String, dynamic>> updateClientQualificationDetail(
-      List<Map<String, dynamic>> qualifications,
-      ) async {
+    List<Map<String, dynamic>> qualifications,
+  ) async {
     const endpoint = ApiConfig.updateClientQualificationDetail;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "qualifications": qualifications,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "qualifications": qualifications,
+    }, "POST");
 
     return response;
   }
 
-
   static Future<Map<String, dynamic>> updateClientExperienceDetail(
-      List<Map<String, dynamic>> experiences,
-      ) async {
+    List<Map<String, dynamic>> experiences,
+  ) async {
     const endpoint = ApiConfig.updateClientExperienceDetail;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "experiences": experiences,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "experiences": experiences,
+    }, "POST");
 
     return response;
   }
 
   static Future<Map<String, dynamic>> updateClientOccupationDetail(
-      List<Map<String, dynamic>> occupations) async {
+    List<Map<String, dynamic>> occupations,
+  ) async {
     const endpoint = ApiConfig.updateClientOccupationDetail;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {"occupations": occupations},
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "occupations": occupations,
+    }, "POST");
 
     return response;
   }
 
   static Future<Map<String, dynamic>> updateClientTestScoreDetail(
-      List<Map<String, dynamic>> testScores) async {
+    List<Map<String, dynamic>> testScores,
+  ) async {
     const endpoint = ApiConfig.updateClientTestScoreDetail;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {"test_scores": testScores},
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "test_scores": testScores,
+    }, "POST");
 
     return response;
   }
-
 
   static Future<Map<String, dynamic>> searchOccupation(String query) async {
     String endpoint = "${ApiConfig.searchOccupation}/?q=$query";
 
-    final response =  await _makeRequest(
-        endpoint,
-        _buildHeaders(),
-        null,
-        "GET"
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
     return response;
   }
-
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(

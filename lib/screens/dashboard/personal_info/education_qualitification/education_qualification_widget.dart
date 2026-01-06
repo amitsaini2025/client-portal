@@ -380,28 +380,39 @@ class _EducationalQualificationsWidgetState
         isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 16,
             offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+            spreadRadius: 0,
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: ThemeConfig.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
+              color: ThemeConfig.primaryColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: ThemeConfig.primaryColor.withOpacity(0.2),
+                width: 1,
+              ),
             ),
-            child: Icon(icon, color: ThemeConfig.primaryColor, size: 24),
+            child: Icon(icon, color: ThemeConfig.primaryColor, size: 22),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -414,50 +425,60 @@ class _EducationalQualificationsWidgetState
               ),
             ),
           ),
-          InkWell(
-            onTap: onEdit,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color:
-                    isEditing
-                        ? ThemeConfig.successColor.withOpacity(0.1)
-                        : ThemeConfig.primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onEdit,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
                   color:
                       isEditing
-                          ? ThemeConfig.successColor.withOpacity(0.3)
-                          : ThemeConfig.primaryColor.withOpacity(0.3),
+                          ? ThemeConfig.successColor.withOpacity(0.12)
+                          : ThemeConfig.primaryColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color:
+                        isEditing
+                            ? ThemeConfig.successColor.withOpacity(0.25)
+                            : ThemeConfig.primaryColor.withOpacity(0.25),
+                    width: 1,
+                  ),
                 ),
-              ),
-              child: Icon(
-                isEditing ? Icons.check_rounded : Icons.edit_rounded,
-                color:
-                    isEditing
-                        ? ThemeConfig.successColor
-                        : ThemeConfig.primaryColor,
-                size: 20,
+                child: Icon(
+                  isEditing ? Icons.check_rounded : Icons.edit_rounded,
+                  color:
+                      isEditing
+                          ? ThemeConfig.successColor
+                          : ThemeConfig.primaryColor,
+                  size: 20,
+                ),
               ),
             ),
           ),
           if (showAdd) const SizedBox(width: 8),
           if (showAdd)
-            InkWell(
-              onTap: onAdd,
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: ThemeConfig.successColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: ThemeConfig.successColor.withOpacity(0.3),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onAdd,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: ThemeConfig.successColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: ThemeConfig.successColor.withOpacity(0.25),
+                      width: 1,
+                    ),
                   ),
-                ),
-                child: Icon(
-                  Icons.add_rounded,
-                  color: ThemeConfig.successColor,
-                  size: 20,
+                  child: Icon(
+                    Icons.add_rounded,
+                    color: ThemeConfig.successColor,
+                    size: 20,
+                  ),
                 ),
               ),
             ),
@@ -474,17 +495,24 @@ class _EducationalQualificationsWidgetState
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 16,
             offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -505,7 +533,7 @@ class _EducationalQualificationsWidgetState
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final controller = TextEditingController(text: value);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 22),
       child: SizedBox(
         width: double.infinity,
         child: Column(
@@ -598,7 +626,7 @@ class _EducationalQualificationsWidgetState
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 22),
       child: SizedBox(
         width: double.infinity,
         child: Column(
@@ -742,7 +770,7 @@ class _EducationalQualificationsWidgetState
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final controller = TextEditingController(text: value);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 22),
       child: SizedBox(
         width: double.infinity,
         child: Column(
@@ -854,21 +882,41 @@ class _EducationalQualificationsWidgetState
     bool enabled,
     ValueChanged<bool> onChanged,
   ) {
-    return Row(
-      children: [
-        Expanded(child: Text(label)),
-        Checkbox(
-          value: value,
-          onChanged:
-              enabled
-                  ? (v) {
-                    setState(() {
-                      onChanged(v ?? false);
-                    });
-                  }
-                  : null,
-        ),
-      ],
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: textColor,
+              ),
+            ),
+          ),
+          Checkbox(
+            value: value,
+            activeColor: ThemeConfig.primaryColor,
+            checkColor: Colors.white,
+            onChanged:
+                enabled
+                    ? (v) {
+                      setState(() {
+                        onChanged(v ?? false);
+                      });
+                    }
+                    : null,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
