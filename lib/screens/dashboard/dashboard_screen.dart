@@ -105,7 +105,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Get the FCM token and register it
     String? token = await fcmService.getToken();
     if (token != null) {
-      await fcmService.registerToken(token);
+      await ApiService.registerFCMToken(token);
     }
   }
 

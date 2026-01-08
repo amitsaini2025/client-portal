@@ -458,26 +458,36 @@ class AuthService {
   /// Refresh authentication token
   static Future<bool> refreshToken() async {
     try {
-      final refreshToken = await _secureStorage.read(key: _refreshTokenKey);
-      if (refreshToken == null) return false;
+      final refreshToken =
+      await _secureStorage.read(key: _refreshTokenKey);
 
-      final response = await ApiService.refreshToken();
+      if (refreshToken == null || refreshToken.isEmpty) {
+        return false;
+      }
 
-      if (response['success'] == true) {
+      final response = await ApiService.refreshTokenApi(refreshToken);
+
+      if (response['success'] == true &&
+          response['data'] != null &&
+          response['data']['token'] != null) {
+
         final newToken = response['data']['token'];
+
         await _secureStorage.write(key: _tokenKey, value: newToken);
         _currentToken = newToken;
-        await AuthManager.saveAuthToken(newToken);
 
-        // Update API service with new token
+        await AuthManager.saveAuthToken(newToken);
         ApiService.setAuthToken(newToken);
+
         return true;
       }
+
       return false;
     } catch (e) {
       return false;
     }
   }
+
 
   /// Check if token is expired
   static bool isTokenExpired(String token) {

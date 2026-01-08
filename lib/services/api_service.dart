@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:client/config/app_config.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/api_config.dart';
+import '../utils/navigation_service.dart';
 import 'auth_service.dart';
 
 class ApiService {
@@ -60,8 +63,13 @@ class ApiService {
           final newHeaders = _buildHeaders();
           return _makeRequest(endpoint, newHeaders, body, method);
         } else {
-          await clearAuth();
-          throw Exception('Session expired. Please login again.');
+          await AuthService.logout();
+          if (navigatorKey.currentState?.canPop() ?? false) {
+            navigatorKey.currentState?.pushNamedAndRemoveUntil(
+              '/login',
+                  (route) => false,
+            );
+          }
         }
       }
       return _handleResponse(response);
@@ -245,8 +253,7 @@ class ApiService {
     );
   }
 
-  static Future<Map<String, dynamic>> refreshToken() async {
-    final refreshToken = await _getRefreshToken();
+  /*static Future<Map<String, dynamic>> refreshToken(String refreshToken) async {
     if (refreshToken == null) {
       throw Exception('No refresh token available');
     }
@@ -264,7 +271,93 @@ class ApiService {
     }
 
     return response;
+  }*/
+
+  /*static Future<Map<String, dynamic>> refreshTokenApi(String refreshToken) async {
+    if (refreshToken.isEmpty) {
+      throw Exception('No refresh token available');
+    }
+
+    final response = await _makeRequest(
+      ApiConfig.refreshTokenEndpoint,
+      _buildHeaders(requiresAuth: false),
+      {
+        'refresh_token': refreshToken,
+      },
+      'POST',
+    );
+
+    return response;
+  }*/
+
+  static Future<Map<String, dynamic>> refreshTokenApi(String refreshToken) async {
+    final url = ApiConfig.baseUrl + ApiConfig.refreshTokenEndpoint;
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    final body = jsonEncode({'refresh_token': refreshToken.trim()});
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      throw Exception(
+          'Failed to refresh token: ${response.statusCode} ${response.body}');
+    }
   }
+
+  /// Register FCM token with the server
+  static Future<bool> registerFCMToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    final clientId = prefs.getString('user_id');
+
+    if (clientId == null) {
+      debugPrint('FCM: Missing client ID');
+      return false;
+    }
+
+    // Store token locally for retry
+    await prefs.setString('fcm_token', token);
+
+    try {
+      final response = await _makeRequest(
+        ApiConfig.registerFCMToken,
+        _buildHeaders(requiresAuth: true),
+        {
+          'token': token,
+          'client_id': clientId,
+        },
+        'POST',
+      );
+
+      final success = response['success'] == true;
+
+      await prefs.setBool('fcm_token_registered', success);
+
+      if (success) {
+        debugPrint('FCM: Token registered successfully');
+      } else {
+        debugPrint(
+          'FCM: Failed to register token: ${response['message'] ?? 'Unknown error'}',
+        );
+      }
+
+      return success;
+    } catch (e) {
+      await prefs.setBool('fcm_token_registered', false);
+      debugPrint('FCM: Error registering token: $e');
+      return false;
+    }
+  }
+
 
   // Client Portal Methods
   static Future<Map<String, dynamic>> getClientProfile() async {
@@ -915,12 +1008,6 @@ class ApiService {
     // This would typically get the FCM token
     // For now, return a placeholder
     return 'flutter-device-token';
-  }
-
-  static Future<String?> _getRefreshToken() async {
-    // Get refresh token from secure storage
-    // This would be implemented in AuthService
-    return null;
   }
 
   // Check if user is authenticated

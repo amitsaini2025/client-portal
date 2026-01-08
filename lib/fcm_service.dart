@@ -1,4 +1,5 @@
 import 'package:client/config/api_config.dart';
+import 'package:client/services/api_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,53 +49,6 @@ class FCMService {
     }
   }
 
-  /// Register FCM token with the server
-  Future<bool> registerToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    final authToken = prefs.getString('auth_token');
-    final clientId = prefs.getString('user_id');
-
-    if (authToken == null || clientId == null) {
-      debugPrint('FCM: Missing auth token or client ID');
-      return false;
-    }
-
-    // Store the token locally for retry attempts
-    await prefs.setString('fcm_token', token);
-
-    try {
-      String baseUrl = ApiConfig.baseUrl;
-      String registerToken = ApiConfig.registerFCMToken;
-      final response = await http.post(
-        Uri.parse('$baseUrl$registerToken'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $authToken',
-        },
-        body: jsonEncode({'token': token, 'client_id': clientId}),
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        await prefs.setBool('fcm_token_registered', true);
-        debugPrint(
-          'FCM: Token registered successfully: ${responseData['message']}',
-        );
-        return true;
-      } else {
-        final errorData = jsonDecode(response.body);
-        await prefs.setBool('fcm_token_registered', false);
-        debugPrint(
-          'FCM: Failed to register token: ${errorData['message'] ?? 'Unknown error'}',
-        );
-        return false;
-      }
-    } catch (e) {
-      await prefs.setBool('fcm_token_registered', false);
-      debugPrint('FCM: Error registering token: $e');
-      return false;
-    }
-  }
 
   /// Retry failed token registration
   Future<bool> retryFailedRegistration() async {
@@ -105,7 +59,7 @@ class FCMService {
       final storedToken = prefs.getString('fcm_token');
       if (storedToken != null) {
         debugPrint('FCM: Retrying token registration...');
-        return await registerToken(storedToken);
+        return await ApiService.registerFCMToken(storedToken);
       }
     }
     return false;
@@ -125,7 +79,7 @@ class FCMService {
     // Listen for token refresh
     _messaging.onTokenRefresh.listen((newToken) async {
       debugPrint('FCM: Token refreshed: $newToken');
-      await registerToken(newToken);
+      await ApiService.registerFCMToken(newToken);
     });
   }
 

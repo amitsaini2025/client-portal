@@ -11,6 +11,7 @@ import 'package:client/screens/tasks/tasks_screen.dart';
 import 'package:client/screens/workflow/message/workflow_message_detail_screen.dart';
 import 'package:client/screens/workflow/workflow_documents_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
+import 'package:client/utils/navigation_service.dart';
 import 'package:client/utils/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -312,6 +313,7 @@ class MyAppWithTheme extends StatelessWidget {
       valueListenable: themeModeNotifier,
       builder: (context, mode, _) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'Client Portal',
           theme: lightTheme,
@@ -462,7 +464,7 @@ class LoginPageState extends State<LoginPage> {
     // Get the FCM token and register it
     String? token = await fcmService.getToken();
     if (token != null) {
-      await fcmService.registerToken(token);
+      await ApiService.registerFCMToken(token);
     }
   }
 
@@ -539,7 +541,7 @@ class LoginPageState extends State<LoginPage> {
         final fcmService = FCMService();
         String? fcmToken = await fcmService.getToken();
         if (fcmToken != null) {
-          await fcmService.registerToken(fcmToken);
+          await ApiService.registerFCMToken(fcmToken);
         }
       }
 
