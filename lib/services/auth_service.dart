@@ -472,10 +472,13 @@ class AuthService {
           response['data']['token'] != null) {
 
         final newToken = response['data']['token'];
+        final newRefreshToken = response['data']['refresh_token'];
 
+        // Store token securely
         await _secureStorage.write(key: _tokenKey, value: newToken);
         _currentToken = newToken;
-
+        await _secureStorage.write(key: _refreshTokenKey, value: newRefreshToken);
+        await AuthManager.saveAuthToken(newToken);
         await AuthManager.saveAuthToken(newToken);
         ApiService.setAuthToken(newToken);
 
