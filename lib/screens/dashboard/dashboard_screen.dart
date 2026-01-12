@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:client/config/theme_config.dart';
-import 'package:client/screens/billing/billing_screen.dart';
 import 'package:client/screens/dashboard/personal_info/personal_information_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import '../../fcm_service.dart';
+import '../../models/blog.dart';
 import '../../models/case.dart';
 import '../../models/case_summary.dart';
 import '../../models/dashboard_summary.dart';
@@ -17,19 +17,12 @@ import '../../models/document_status_summary.dart';
 import '../../models/recent_activity.dart';
 import '../../models/task.dart';
 import '../../models/upcoming_deadline_summary.dart';
-import '../../models/workflow_stage.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
-import '../../widgets/dashboard/case_summary_card.dart';
-import '../../widgets/dashboard/document_status_card.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
-import '../../widgets/dashboard/upcoming_deadlines_card.dart';
-import '../../widgets/dashboard/workflow_progress_card.dart';
-import '../appointments/book_appointment_screen.dart';
 import '../documents/upload_document_screen.dart';
-import '../messages/send_message_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String matterId;
@@ -54,14 +47,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Task> _tasks = [];
   List<RecentActivity> _recentActivity = [];
 
-  WorkflowStagesResponse? _workflowResponse;
-  bool _isLoadingWorkflow = false;
+  List<Blog> _blogs = [];
+  bool _isLoadingBlogs = false;
 
   @override
   void initState() {
     super.initState();
     _loadDashboardData();
-    _loadWorkflowData();
+    _loadRecentBlogs();
     if (!Platform.isWindows) {
       _setupNotifications();
     }
@@ -109,31 +102,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> _loadWorkflowData() async {
-    setState(() {
-      _isLoadingWorkflow = true;
-    });
+  Future<void> _loadRecentBlogs() async {
+    setState(() => _isLoadingBlogs = true);
 
     try {
-      final response = await ApiService.getWorkflowStages(
-        clientMatterId: int.tryParse(widget.matterId),
-      );
-
-      if (response['success'] == true && response['data'] != null) {
-        setState(() {
-          _workflowResponse = WorkflowStagesResponse.fromJson(response['data']);
-          _isLoadingWorkflow = false;
-        });
-      } else {
-        setState(() {
-          _isLoadingWorkflow = false;
-        });
+      final response = await ApiService.getFeaturedBlogs(page: 1, perPage: 5);
+      if (response['success'] == true) {
+        final List list = response['data'];
+        _blogs = list.map((e) => Blog.fromJson(e)).toList();
       }
-    } catch (e) {
-      setState(() {
-        _isLoadingWorkflow = false;
-      });
-    }
+    } catch (_) {}
+
+    setState(() => _isLoadingBlogs = false);
   }
 
   Future<void> _loadDashboardData() async {
@@ -310,7 +290,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              showSnack(context, "This feature will be available in a future update.");
+              showSnack(
+                context,
+                "This feature will be available in a future update.",
+              );
             },
           ),
           IconButton(
@@ -331,107 +314,219 @@ class _DashboardScreenState extends State<DashboardScreen> {
               )
               : RefreshIndicator(
                 onRefresh: () async {
-                  await Future.wait([
-                    _loadDashboardData(),
-                    _loadWorkflowData(),
-                  ]);
+                  await Future.wait([_loadDashboardData(), _loadRecentBlogs()]);
                 },
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _buildWelcomeSection(),
+                      _buildRecentUpdatesSection(),
+                      //_buildWelcomeSection(),
                       const SizedBox(height: 24),
-                      QuickActionsCard(
-                        onUploadDocument: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => const UploadDocumentScreen(),
-                            ),
-                          );
-                        },
-                        onBookAppointment: () {
-                          /*Navigator.of(context).push(
+
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            QuickActionsCard(
+                              onUploadDocument: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            const UploadDocumentScreen(),
+                                  ),
+                                );
+                              },
+                              onBookAppointment: () {
+                                /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const BookAppointmentScreen(),
                             ),
                           );*/
-                          showSnack(context, "This feature will be available in a future update.");
-                        },
-                        onSendMessage: () {
-                          /*Navigator.of(context).push(
+                                showSnack(
+                                  context,
+                                  "This feature will be available in a future update.",
+                                );
+                              },
+                              onSendMessage: () {
+                                /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const SendMessageScreen(),
                             ),
                           );*/
-                        },
-                        onViewWorkflow: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const WorkflowScreen(),
-                            ),
-                          );
-                        },
-                        onBilling: () {
-                          /*Navigator.of(context).push(
+                              },
+                              onViewWorkflow: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const WorkflowScreen(),
+                                  ),
+                                );
+                              },
+                              onBilling: () {
+                                /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const BillingScreen(),
                             ),
                           );*/
-                          showSnack(context, "This feature will be available in a future update.");
-                        },
-                        onPersonalInformationUpload: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                              const PersonalInformationScreen(),
+                                showSnack(
+                                  context,
+                                  "This feature will be available in a future update.",
+                                );
+                              },
+                              onPersonalInformationUpload: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            const PersonalInformationScreen(),
+                                  ),
+                                );
+                              },
+                              onCaseSummary: () {
+                                Navigator.pushNamed(context, '/recent-cases');
+                              },
+                              onDocumentStatus: () {
+                                Navigator.pushNamed(context, '/documents');
+                              },
+                              onUpcomingDeadlines: () {
+                                Navigator.pushNamed(context, '/tasks');
+                              },
+                              onBlog: () {
+                                Navigator.pushNamed(context, '/blogs');
+                              },
                             ),
-                          );
-                        },
-                        onCaseSummary: (){
-                          Navigator.pushNamed(context, '/recent-cases');
-                        },
-                        onDocumentStatus: (){
-                          Navigator.pushNamed(context, '/documents');
-                        },
-                        onUpcomingDeadlines: (){
-                          Navigator.pushNamed(context, '/tasks');
-                        },
-                        onBlog: (){
-                          Navigator.pushNamed(context, '/blogs');
-                        },
+                            const SizedBox(height: 24),
+                            /*WorkflowProgressCard(
+                              workflowResponse: _workflowResponse,
+                              isLoading: _isLoadingWorkflow,
+                              onTap: () {
+                                Navigator.pushNamed(context, '/workflow');
+                              },
+                            ),
+                            const SizedBox(height: 24),
+                            CaseSummaryCard(
+                              caseSummary: _caseSummary,
+                              cases: _cases,
+                            ),
+                            const SizedBox(height: 24),
+                            DocumentStatusCard(
+                              documentStatusSummary: _documentStatusSummary,
+                              documents: _documents,
+                            ),
+                            const SizedBox(height: 24),
+                            UpcomingDeadlinesCard(
+                              upcomingDeadlineSummary: _upcomingDeadlineSummary,
+                              tasks: _tasks,
+                              deadlines: _deadlines,
+                            ),
+                            const SizedBox(height: 24),*/
+                            _buildRecentActivitySection(),
+                          ],
+                        ),
                       ),
-                      /*const SizedBox(height: 24),
-                      WorkflowProgressCard(
-                        workflowResponse: _workflowResponse,
-                        isLoading: _isLoadingWorkflow,
-                        onTap: () {
-                          Navigator.pushNamed(context, '/workflow');
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      CaseSummaryCard(caseSummary: _caseSummary, cases: _cases),
-                      const SizedBox(height: 24),
-                      DocumentStatusCard(
-                        documentStatusSummary: _documentStatusSummary,
-                        documents: _documents,
-                      ),
-                      const SizedBox(height: 24),
-                      UpcomingDeadlinesCard(
-                        upcomingDeadlineSummary: _upcomingDeadlineSummary,
-                        tasks: _tasks,
-                        deadlines: _deadlines,
-                      ),*/
-                      const SizedBox(height: 24),
-                      _buildRecentActivitySection(),
                     ],
                   ),
                 ),
               ),
+    );
+  }
+
+  Widget _buildRecentUpdatesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
+          child: Row(
+            children: [
+              const Text(
+                "Recent updates",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () => Navigator.pushNamed(context, '/blogs'),
+                child: const Text("View all"),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 140,
+          child: _isLoadingBlogs
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _blogs.length,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemBuilder: (context, index) {
+              final blog = _blogs[index];
+              return Container(
+                width: 260,
+                margin: EdgeInsets.only(
+                  right: index == _blogs.length - 1 ? 0 : 16,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  image: DecorationImage(
+                    image: NetworkImage(blog.image),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Container(
+                    // Dark overlay for text readability
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.2),
+                          Colors.black.withOpacity(0.7),
+                        ],
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          blog.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          blog.date,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -463,11 +558,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(
-                  Icons.person,
-                  color: Colors.white,
-                  size: 24,
-                ),
+                child: const Icon(Icons.person, color: Colors.white, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -476,10 +567,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   children: [
                     Text(
                       'Welcome back!',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
@@ -487,10 +575,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 2),
                     Text(
                       'Here\'s what\'s happening with your cases',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.white.withOpacity(0.9),
                       ),
                     ),
@@ -595,8 +680,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onPressed: () {
                   Navigator.pushNamed(context, '/recent-activity');
                 },
-                child: const Text('View All',
-                    style: TextStyle(color: goldenYellow, fontSize: 12)),
+                child: const Text(
+                  'View All',
+                  style: TextStyle(color: goldenYellow, fontSize: 12),
+                ),
               ),
             ],
           ),
@@ -607,11 +694,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return _buildActivityItem(
               icon: Icons.task,
               title: activity.title,
-              subtitle: activity.description
-                  .replaceAll('\n', ' ')
-                  .replaceAll('\t', ' ')
-                  .replaceAll(RegExp(r'\s+'), ' ')
-                  .trim(),
+              subtitle:
+                  activity.description
+                      .replaceAll('\n', ' ')
+                      .replaceAll('\t', ' ')
+                      .replaceAll(RegExp(r'\s+'), ' ')
+                      .trim(),
               time: activity.timeAgo,
               color: goldenYellow,
             );
@@ -649,7 +737,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(
                   title,
                   style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -674,11 +765,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void showSnack(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-      ),
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
     );
   }
-
 }
