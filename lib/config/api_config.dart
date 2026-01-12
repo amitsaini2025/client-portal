@@ -57,6 +57,8 @@ class ApiConfig {
   static const String registerFCMToken = "/fcm/register-token";
   static const String unregisterFCMToken = "/fcm/unregister-token";
 
+  static const String blogListEndpoint = "/blogs/list";
+
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

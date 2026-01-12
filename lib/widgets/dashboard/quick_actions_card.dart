@@ -14,6 +14,8 @@ class QuickActionsCard extends StatelessWidget {
   final VoidCallback? onDocumentStatus;
   final VoidCallback? onUpcomingDeadlines;
 
+  final VoidCallback? onBlog;
+
   const QuickActionsCard({
     super.key,
     required this.onUploadDocument,
@@ -25,6 +27,7 @@ class QuickActionsCard extends StatelessWidget {
     this.onCaseSummary,
     this.onDocumentStatus,
     this.onUpcomingDeadlines,
+    this.onBlog
   });
 
   static const double _radius = 8;
@@ -128,6 +131,16 @@ class QuickActionsCard extends StatelessWidget {
                     color: Colors.orange,
                     height: 140,
                     onTap: onDocumentStatus ?? () {},
+                  );
+
+                case 7:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.assignment,
+                    label: 'Blog',
+                    color: Colors.purple,
+                    height: 60,
+                    onTap: onBlog ?? () {},
                   );
 
                 default:

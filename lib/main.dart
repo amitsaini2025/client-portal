@@ -1,5 +1,9 @@
+import 'dart:io' show Platform;
+
 import 'package:client/screens/auth/reset_password_screen.dart';
 import 'package:client/screens/cases/cases_list_screen.dart';
+import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
+import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
 import 'package:client/screens/document_management/document_management.dart';
 import 'package:client/screens/documents/documents_screen.dart';
 import 'package:client/screens/matters/matters_screen.dart';
@@ -12,27 +16,25 @@ import 'package:client/screens/workflow/message/workflow_message_detail_screen.d
 import 'package:client/screens/workflow/workflow_documents_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:client/utils/navigation_service.dart';
-import 'package:client/utils/notification_service.dart';
-import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'firebase_options.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
-import 'widgets/user_nav.dart';
-import 'dart:io' show Platform;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'config/stripe_config.dart';
 import 'fcm_service.dart';
-import 'services/api_service.dart';
-import 'services/auth_service.dart';
+import 'firebase_options.dart';
+import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
-import 'screens/auth/forgot_password_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
-import 'config/stripe_config.dart';
-import 'package:workmanager/workmanager.dart';
+import 'services/api_service.dart';
+import 'services/auth_service.dart';
+import 'widgets/user_nav.dart';
 
 final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(
   ThemeMode.light,
@@ -146,9 +148,8 @@ final ThemeData darkTheme = ThemeData(
   ),
 );
 
-
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
+    FlutterLocalNotificationsPlugin();
 
 const AndroidNotificationChannel defaultChannel = AndroidNotificationChannel(
   'default_channel',
@@ -159,18 +160,16 @@ const AndroidNotificationChannel defaultChannel = AndroidNotificationChannel(
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final FlutterLocalNotificationsPlugin plugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   const AndroidInitializationSettings androidSettings =
-  AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
   const DarwinInitializationSettings iosSettings =
-  DarwinInitializationSettings();
+      DarwinInitializationSettings();
 
   const InitializationSettings initSettings = InitializationSettings(
     android: androidSettings,
@@ -179,10 +178,8 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   await plugin.initialize(initSettings);
 
-  final String? title =
-      message.notification?.title ?? message.data['title'];
-  final String? body =
-      message.notification?.body ?? message.data['body'];
+  final String? title = message.notification?.title ?? message.data['title'];
+  final String? body = message.notification?.body ?? message.data['body'];
 
   if (title == null || body == null) return;
 
@@ -201,7 +198,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   );
 }
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Stripe.publishableKey = StripeConfig.publishableKey;
@@ -210,13 +206,10 @@ void main() async {
 
   // Firebase
   await initializeFirebaseSafely();
-  FirebaseMessaging.onBackgroundMessage(
-    firebaseMessagingBackgroundHandler,
-  );
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   const AndroidInitializationSettings androidSettings =
-  AndroidInitializationSettings('@mipmap/ic_launcher');
-  const DarwinInitializationSettings iosSettings =
-  DarwinInitializationSettings(
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
     requestAlertPermission: true,
     requestBadgePermission: true,
     requestSoundPermission: true,
@@ -229,7 +222,8 @@ void main() async {
   if (Platform.isAndroid) {
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(defaultChannel);
   }
   await FirebaseMessaging.instance.requestPermission(
@@ -269,10 +263,8 @@ Future<void> initializeFirebaseSafely() async {
 
 /// 🔵 FOREGROUND NOTIFICATION
 Future<void> _showForegroundNotification(RemoteMessage message) async {
-  final String? title =
-      message.notification?.title ?? message.data['title'];
-  final String? body =
-      message.notification?.body ?? message.data['body'];
+  final String? title = message.notification?.title ?? message.data['title'];
+  final String? body = message.notification?.body ?? message.data['body'];
 
   if (title == null || body == null) return;
 
@@ -360,7 +352,17 @@ class MyAppWithTheme extends StatelessWidget {
               final args =
                   ModalRoute.of(context)!.settings.arguments
                       as Map<String, dynamic>;
-              return WorkflowDocumentsScreen(stageId: args['stageId'], stageName: args['stageName'],);
+              return WorkflowDocumentsScreen(
+                stageId: args['stageId'],
+                stageName: args['stageName'],
+              );
+            },
+            '/blogs': (context) => const BlogListScreen(),
+            '/blogs/detail': (context) {
+              final args =
+                  ModalRoute.of(context)!.settings.arguments
+                      as Map<String, dynamic>;
+              return BlogDetailScreen(blogId: args['blogId']);
             },
           },
         );

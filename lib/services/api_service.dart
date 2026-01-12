@@ -980,6 +980,21 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> getFeaturedBlogs({
+    int page = 1,
+    int perPage = 10,
+  }) async {
+    final endpoint =
+        "${ApiConfig.blogListEndpoint}?page=$page&per_page=$perPage&featured=1";
+
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
     String endpoint,

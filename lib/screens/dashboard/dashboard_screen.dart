@@ -401,6 +401,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onUpcomingDeadlines: (){
                           Navigator.pushNamed(context, '/tasks');
                         },
+                        onBlog: (){
+                          Navigator.pushNamed(context, '/blogs');
+                        },
                       ),
                       /*const SizedBox(height: 24),
                       WorkflowProgressCard(
