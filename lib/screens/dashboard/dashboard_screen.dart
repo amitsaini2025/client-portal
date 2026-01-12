@@ -331,45 +331,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             QuickActionsCard(
                               onUploadDocument: () {
-                                Navigator.of(context).push(
+                                /*Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder:
                                         (context) =>
                                             const UploadDocumentScreen(),
                                   ),
-                                );
+                                );*/
+                                Navigator.pushNamed(context, '/my-files');
                               },
                               onBookAppointment: () {
                                 /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder:
                                   (context) => const BookAppointmentScreen(),
-                            ),
-                          );*/
-                                showSnack(
-                                  context,
-                                  "This feature will be available in a future update.",
-                                );
-                              },
-                              onSendMessage: () {
-                                /*Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const SendMessageScreen(),
-                            ),
-                          );*/
-                              },
-                              onViewWorkflow: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => const WorkflowScreen(),
-                                  ),
-                                );
-                              },
-                              onBilling: () {
-                                /*Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const BillingScreen(),
                             ),
                           );*/
                                 showSnack(
@@ -386,17 +361,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                 );
                               },
-                              onCaseSummary: () {
-                                Navigator.pushNamed(context, '/recent-cases');
-                              },
-                              onDocumentStatus: () {
-                                Navigator.pushNamed(context, '/documents');
-                              },
                               onUpcomingDeadlines: () {
                                 Navigator.pushNamed(context, '/tasks');
-                              },
-                              onBlog: () {
-                                Navigator.pushNamed(context, '/blogs');
                               },
                             ),
                             const SizedBox(height: 24),

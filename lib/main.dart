@@ -4,6 +4,7 @@ import 'package:client/screens/auth/reset_password_screen.dart';
 import 'package:client/screens/cases/cases_list_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
+import 'package:client/screens/dashboard/my_files/my_files_screen.dart';
 import 'package:client/screens/document_management/document_management.dart';
 import 'package:client/screens/documents/documents_screen.dart';
 import 'package:client/screens/matters/matters_screen.dart';
@@ -364,6 +365,7 @@ class MyAppWithTheme extends StatelessWidget {
                       as Map<String, dynamic>;
               return BlogDetailScreen(blogId: args['blogId']);
             },
+            '/my-files': (context) => MyFilesScreen(),
           },
         );
       },

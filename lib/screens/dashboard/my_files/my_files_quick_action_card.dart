@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-class QuickActionsCard extends StatelessWidget {
+class MyFilesQuickActionsCard extends StatelessWidget {
   final VoidCallback onUploadDocument;
-  final VoidCallback onBookAppointment;
-  final VoidCallback? onPersonalInformationUpload;
+  final VoidCallback onSendMessage;
+
+  final VoidCallback? onViewWorkflow;
+  final VoidCallback? onBilling;
+
+  final VoidCallback? onCaseSummary;
+  final VoidCallback? onDocumentStatus;
   final VoidCallback? onUpcomingDeadlines;
 
-  const QuickActionsCard({
+  final VoidCallback? onBlog;
+
+  const MyFilesQuickActionsCard({
     super.key,
     required this.onUploadDocument,
-    required this.onBookAppointment,
-    this.onPersonalInformationUpload,
+    required this.onSendMessage,
+    this.onViewWorkflow,
+    this.onBilling,
+    this.onCaseSummary,
+    this.onDocumentStatus,
     this.onUpcomingDeadlines,
+    this.onBlog
   });
 
   static const double _radius = 8;
@@ -30,9 +41,10 @@ class QuickActionsCard extends StatelessWidget {
         children: [
           Text(
             'Quick Actions',
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall
+                ?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 12),
 
@@ -42,14 +54,14 @@ class QuickActionsCard extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 20,
             crossAxisSpacing: 20,
-            itemCount: 3,
+            itemCount: 5,
             itemBuilder: (context, index) {
               switch (index) {
                 case 0:
                   return _verticalTile(
                     context,
                     icon: Icons.upload_file,
-                    label: 'My Files',
+                    label: 'Upload\nDocument',
                     helperText: 'Submit required files\nsecurely',
                     color: Colors.blue,
                     height: 140,
@@ -59,21 +71,52 @@ class QuickActionsCard extends StatelessWidget {
                 case 1:
                   return _horizontalTile(
                     context,
-                    icon: Icons.schedule,
-                    label: 'Book\nAppointment',
-                    color: Colors.green,
+                    icon: Icons.timeline,
+                    label: 'View\nWorkflow',
+                    color: Colors.purple,
                     height: 60,
-                    onTap: onBookAppointment,
+                    onTap: onViewWorkflow ?? () {},
                   );
 
                 case 2:
                   return _horizontalTile(
                     context,
-                    icon: Icons.person,
-                    label: 'Personal\nInfo',
-                    color: Colors.brown,
+                    icon: Icons.receipt_long,
+                    label: 'Billing',
+                    color: Colors.red,
                     height: 60,
-                    onTap: onPersonalInformationUpload ?? () {},
+                    onTap: onBilling ?? () {},
+                  );
+
+                case 3:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.assignment,
+                    label: 'Case\nSummary',
+                    color: Colors.indigo,
+                    height: 60,
+                    onTap: onCaseSummary ?? () {},
+                  );
+
+                case 4:
+                  return _verticalTile(
+                    context,
+                    icon: Icons.description,
+                    label: 'Document\nStatus',
+                    helperText: 'Submit required files\nsecurely',
+                    color: Colors.orange,
+                    height: 140,
+                    onTap: onDocumentStatus ?? () {},
+                  );
+
+                case 5:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.assignment,
+                    label: 'Blog',
+                    color: Colors.purple,
+                    height: 60,
+                    onTap: onBlog ?? () {},
                   );
 
                 default:
