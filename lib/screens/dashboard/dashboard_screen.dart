@@ -23,6 +23,7 @@ import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
 import '../documents/upload_document_screen.dart';
+import 'my_files/my_files_quick_action_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String matterId;
@@ -330,16 +331,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             QuickActionsCard(
-                              onUploadDocument: () {
-                                /*Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) =>
-                                            const UploadDocumentScreen(),
-                                  ),
-                                );*/
-                                Navigator.pushNamed(context, '/my-files');
-                              },
                               onBookAppointment: () {
                                 /*Navigator.of(context).push(
                             MaterialPageRoute(
@@ -364,33 +355,61 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               onUpcomingDeadlines: () {
                                 Navigator.pushNamed(context, '/tasks');
                               },
-                            ),
-                            const SizedBox(height: 24),
-                            /*WorkflowProgressCard(
-                              workflowResponse: _workflowResponse,
-                              isLoading: _isLoadingWorkflow,
-                              onTap: () {
-                                Navigator.pushNamed(context, '/workflow');
+                              onPRCalculator: (){
+                                Navigator.pushNamed(context, '/pr-calculator');
+                              },
+                              onStudentFundCalculator: (){
+                                Navigator.pushNamed(context, '/student-fund-calculator');
                               },
                             ),
                             const SizedBox(height: 24),
-                            CaseSummaryCard(
-                              caseSummary: _caseSummary,
-                              cases: _cases,
+                            MyFilesQuickActionsCard(
+                              onUploadDocument: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => const UploadDocumentScreen(),
+                                  ),
+                                );
+                              },
+                              onSendMessage: () {
+                                /*Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const SendMessageScreen(),
+                            ),
+                          );*/
+                              },
+                              onViewWorkflow: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => const WorkflowScreen(),
+                                  ),
+                                );
+                              },
+                              onBilling: () {
+                                /*Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const BillingScreen(),
+                            ),
+                          );*/
+                                showSnack(
+                                  context,
+                                  "This feature will be available in a future update.",
+                                );
+                              },
+                              onCaseSummary: () {
+                                Navigator.pushNamed(context, '/recent-cases');
+                              },
+                              onDocumentStatus: () {
+                                Navigator.pushNamed(context, '/documents');
+                              },
+                              onUpcomingDeadlines: () {
+                                Navigator.pushNamed(context, '/tasks');
+                              },
+                              onRecentActivity: (){
+                                Navigator.pushNamed(context, '/recent-activity');
+                              },
                             ),
                             const SizedBox(height: 24),
-                            DocumentStatusCard(
-                              documentStatusSummary: _documentStatusSummary,
-                              documents: _documents,
-                            ),
-                            const SizedBox(height: 24),
-                            UpcomingDeadlinesCard(
-                              upcomingDeadlineSummary: _upcomingDeadlineSummary,
-                              tasks: _tasks,
-                              deadlines: _deadlines,
-                            ),
-                            const SizedBox(height: 24),*/
-                            _buildRecentActivitySection(),
                           ],
                         ),
                       ),

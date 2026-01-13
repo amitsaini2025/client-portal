@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class QuickActionsCard extends StatelessWidget {
-  final VoidCallback onUploadDocument;
   final VoidCallback onBookAppointment;
   final VoidCallback? onPersonalInformationUpload;
   final VoidCallback? onUpcomingDeadlines;
+  final VoidCallback? onPRCalculator;
+  final VoidCallback? onStudentFundCalculator;
 
   const QuickActionsCard({
     super.key,
-    required this.onUploadDocument,
     required this.onBookAppointment,
     this.onPersonalInformationUpload,
     this.onUpcomingDeadlines,
+    this.onPRCalculator,
+    this.onStudentFundCalculator
   });
 
   static const double _radius = 8;
@@ -42,21 +44,11 @@ class QuickActionsCard extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 20,
             crossAxisSpacing: 20,
-            itemCount: 3,
+            itemCount: 4,
             itemBuilder: (context, index) {
               switch (index) {
-                case 0:
-                  return _verticalTile(
-                    context,
-                    icon: Icons.upload_file,
-                    label: 'My Files',
-                    helperText: 'Submit required files\nsecurely',
-                    color: Colors.blue,
-                    height: 140,
-                    onTap: onUploadDocument,
-                  );
 
-                case 1:
+                case 0:
                   return _horizontalTile(
                     context,
                     icon: Icons.schedule,
@@ -66,7 +58,7 @@ class QuickActionsCard extends StatelessWidget {
                     onTap: onBookAppointment,
                   );
 
-                case 2:
+                case 1:
                   return _horizontalTile(
                     context,
                     icon: Icons.person,
@@ -74,6 +66,26 @@ class QuickActionsCard extends StatelessWidget {
                     color: Colors.brown,
                     height: 60,
                     onTap: onPersonalInformationUpload ?? () {},
+                  );
+
+                case 2:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.calculate,
+                    label: 'PR\nCalculator',
+                    color: Colors.red,
+                    height: 60,
+                    onTap: onPRCalculator ?? () {},
+                  );
+
+                case 3:
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.calculate,
+                    label: 'Student\nFund Calculator',
+                    color: Colors.purple,
+                    height: 60,
+                    onTap: onStudentFundCalculator ?? () {},
                   );
 
                 default:

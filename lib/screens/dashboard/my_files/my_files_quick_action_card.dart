@@ -12,7 +12,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
   final VoidCallback? onDocumentStatus;
   final VoidCallback? onUpcomingDeadlines;
 
-  final VoidCallback? onBlog;
+  final VoidCallback? onRecentActivity;
 
   const MyFilesQuickActionsCard({
     super.key,
@@ -23,7 +23,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     this.onCaseSummary,
     this.onDocumentStatus,
     this.onUpcomingDeadlines,
-    this.onBlog
+    this.onRecentActivity
   });
 
   static const double _radius = 8;
@@ -40,7 +40,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Quick Actions',
+            'My Files',
             style: Theme.of(context)
                 .textTheme
                 .titleSmall
@@ -54,17 +54,26 @@ class MyFilesQuickActionsCard extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 20,
             crossAxisSpacing: 20,
-            itemCount: 5,
+            itemCount: 6,
             itemBuilder: (context, index) {
               switch (index) {
                 case 0:
-                  return _verticalTile(
+                  /*return _verticalTile(
                     context,
                     icon: Icons.upload_file,
                     label: 'Upload\nDocument',
                     helperText: 'Submit required files\nsecurely',
                     color: Colors.blue,
                     height: 140,
+                    onTap: onUploadDocument,
+                  );*/
+
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.upload_file,
+                    label: 'Upload\nDocument',
+                    color: Colors.blue,
+                    height: 60,
                     onTap: onUploadDocument,
                   );
 
@@ -99,7 +108,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                   );
 
                 case 4:
-                  return _verticalTile(
+                  /*return _verticalTile(
                     context,
                     icon: Icons.description,
                     label: 'Document\nStatus',
@@ -107,16 +116,25 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     color: Colors.orange,
                     height: 140,
                     onTap: onDocumentStatus ?? () {},
+                  );*/
+
+                  return _horizontalTile(
+                    context,
+                    icon: Icons.description,
+                    label: 'Document\nStatus',
+                    color: Colors.orange,
+                    height: 60,
+                    onTap: onDocumentStatus ?? () {},
                   );
 
                 case 5:
                   return _horizontalTile(
                     context,
-                    icon: Icons.assignment,
-                    label: 'Blog',
-                    color: Colors.purple,
+                    icon: Icons.local_activity,
+                    label: 'Recent\nActivity',
+                    color: Colors.brown,
                     height: 60,
-                    onTap: onBlog ?? () {},
+                    onTap: onRecentActivity ?? () {},
                   );
 
                 default:
