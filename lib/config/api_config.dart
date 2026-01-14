@@ -59,6 +59,8 @@ class ApiConfig {
 
   static const String blogListEndpoint = "/blogs/list";
 
+  static const String prPointsCalcList = "/pr-point-calc-lists";
+
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
+import '../../../services/api_service.dart';
+import 'package:client/models/pr_points_response.dart';
 
 class PRCalculatorScreen extends StatefulWidget {
   const PRCalculatorScreen({super.key});
@@ -9,18 +11,46 @@ class PRCalculatorScreen extends StatefulWidget {
 }
 
 class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
-  String? age;
-  String? english;
-  String? education;
-  String? overseasExp;
-  String? ausExp;
-  String? partner;
+  PRData? data;
+  bool loading = true;
 
-  bool australianStudy = false;
-  bool specialistEducation = false;
-  bool communityLanguage = false;
-  bool professionalYear = false;
-  bool regionalStudy = false;
+  PointItem? age;
+  PointItem? english;
+  PointItem? education;
+  PointItem? overseasExp;
+  PointItem? ausExp;
+  PointItem? partner;
+
+  Map<AdditionalPointItem, bool> additionalPoints = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPRPoints();
+  }
+
+  Future<void> _fetchPRPoints() async {
+    try {
+      final response = await ApiService.getPRPoints();
+      final parsed = PRPointsResponse.fromJson(response);
+
+      if (parsed.success) {
+        final map = <AdditionalPointItem, bool>{};
+        for (var i in parsed.data.additionalPoints) {
+          map[i] = false;
+        }
+
+        setState(() {
+          data = parsed.data;
+          additionalPoints = map;
+          loading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      setState(() => loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +58,14 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
       appBar: AppBar(
         title: const Text(
           'PR Calculator',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontSize: 18),
         ),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
+      body: loading || data == null
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Center(
           child: ConstrainedBox(
@@ -48,11 +80,12 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "Calculate Your Points",
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: Colors.grey[850],
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -60,133 +93,100 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
                     _infoBox(),
                     const SizedBox(height: 24),
 
-                    _dropdown(
-                      label: "Age (at time of invitation)",
-                      value: age,
-                      items: ["18–24", "25–32", "33–39", "40–44", "45+"],
-                      onChanged: (v) => setState(() => age = v),
+                    _buildDropdown<PointItem>(
+                      "Age (at time of invitation)",
+                      data!.age,
+                      age,
+                          (v) => setState(() => age = v),
                     ),
 
-                    _dropdown(
-                      label: "English Language Proficiency",
-                      value: english,
+                    _buildDropdown<PointItem>(
+                      "English Language Proficiency",
+                      data!.englishLanguage,
+                      english,
+                          (v) => setState(() => english = v),
                       helper:
                       "IELTS 6/PTE 50 = Competent, IELTS 7/PTE 65 = Proficient, IELTS 8/PTE 79 = Superior",
-                      items: [
-                        "Competent English",
-                        "Proficient English",
-                        "Superior English",
-                      ],
-                      onChanged: (v) => setState(() => english = v),
                     ),
 
-                    _dropdown(
-                      label: "Educational Qualifications",
-                      value: education,
+                    _buildDropdown<PointItem>(
+                      "Educational Qualifications",
+                      data!.education,
+                      education,
+                          (v) => setState(() => education = v),
                       helper:
                       "Qualification must be recognized by the relevant assessing authority",
-                      items: [
-                        "Diploma or Trade Qualification",
-                        "Bachelor Degree",
-                        "Master Degree",
-                        "PhD",
-                      ],
-                      onChanged: (v) => setState(() => education = v),
                     ),
 
-                    _dropdown(
-                      label: "Skilled Employment Experience (Overseas)",
-                      value: overseasExp,
-                      items: [
-                        "Less than 3 years",
-                        "3–4 years",
-                        "5–7 years",
-                        "8+ years",
-                      ],
-                      onChanged: (v) => setState(() => overseasExp = v),
+                    _buildDropdown<PointItem>(
+                      "Skilled Employment Experience (Overseas)",
+                      data!.overseasExp,
+                      overseasExp,
+                          (v) => setState(() => overseasExp = v),
                     ),
 
-                    _dropdown(
-                      label: "Skilled Employment Experience (Australia)",
-                      value: ausExp,
-                      items: [
-                        "Less than 1 year",
-                        "1–2 years",
-                        "3–4 years",
-                        "5–7 years",
-                        "8+ years",
-                      ],
-                      onChanged: (v) => setState(() => ausExp = v),
+                    _buildDropdown<PointItem>(
+                      "Skilled Employment Experience (Australia)",
+                      data!.australiaExp,
+                      ausExp,
+                          (v) => setState(() => ausExp = v),
                     ),
 
                     const SizedBox(height: 24),
-                    const Text(
+                    Text(
                       "Additional Points",
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Colors.grey[850],
                       ),
                     ),
 
-                    _checkbox(
-                      "Australian study requirement (5 points)",
-                      australianStudy,
-                          (v) => setState(() => australianStudy = v),
-                    ),
-                    _checkbox(
-                      "Specialist Education Qualification (10 points)",
-                      specialistEducation,
-                          (v) => setState(() => specialistEducation = v),
-                      subtitle:
-                      "Master's by research or PhD from Australian institution in STEMM field",
-                    ),
-                    _checkbox(
-                      "Credentialed Community Language (5 points)",
-                      communityLanguage,
-                          (v) => setState(() => communityLanguage = v),
-                    ),
-                    _checkbox(
-                      "Professional Year in Australia (5 points)",
-                      professionalYear,
-                          (v) => setState(() => professionalYear = v),
-                    ),
-                    _checkbox(
-                      "Regional study (5 points)",
-                      regionalStudy,
-                          (v) => setState(() => regionalStudy = v),
-                    ),
+                    ...additionalPoints.entries.map((e) {
+                      return _checkbox(
+                        e.key.label,
+                        e.value,
+                            (v) =>
+                            setState(() => additionalPoints[e.key] = v),
+                        subtitle: e.key.description ?? e.key.note,
+                      );
+                    }),
 
                     const SizedBox(height: 24),
-                    _dropdown(
-                      label: "Partner / Spouse Status",
-                      value: partner,
-                      helper:
-                      "Partner skills require positive skills assessment and competent English",
-                      items: [
-                        "No partner included in application (0 points)",
-                        "Partner with competent English (5 points)",
-                        "Partner with skills assessment (10 points)",
-                      ],
-                      onChanged: (v) => setState(() => partner = v),
+
+                    _buildDropdown<PointItem>(
+                      "Partner / Spouse Status",
+                      data!.partnerStatus,
+                      partner,
+                          (v) => setState(() => partner = v),
                     ),
 
                     const SizedBox(height: 32),
+
                     SizedBox(
                       width: double.infinity,
-                      height: 52,
+                      height: 48,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: _calculatePoints,
                         style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         child: const Text(
                           "Calculate My Points",
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(
+                              fontSize: 14, color: Colors.white),
                         ),
                       ),
                     ),
+
+                    const SizedBox(height: 32),
+                    _visaOptionsCard(data!.visaOptions),
+
+                    const SizedBox(height: 24),
+                    _importantNotes(data!.importantNotes),
                   ],
                 ),
               ),
@@ -197,53 +197,59 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
     );
   }
 
-  // ---------- UI HELPERS ----------
+  /// ================= UI HELPERS =================
 
   Widget _infoBox() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFFEFF5FF),
         borderRadius: BorderRadius.circular(8),
         border: Border(
-          left: BorderSide(color: Colors.blue.shade700, width: 4),
+          left: BorderSide(color: Colors.blue, width: 4),
         ),
       ),
       child: const Text(
         "Note: This calculator shows your base points. Additional points "
             "(5 for State/Territory nomination or 15 for regional nomination) "
             "may apply when you receive an invitation.",
-        style: TextStyle(color: Colors.blue),
+        style: TextStyle(color: Colors.blueGrey, fontSize: 12),
       ),
     );
   }
 
-  Widget _dropdown({
-    required String label,
-    String? helper,
-    String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
+  Widget _buildDropdown<T extends PointItem>(
+      String label,
+      List<T> items,
+      T? value,
+      ValueChanged<T?> onChanged, {
+        String? helper,
+      }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 6),
-          DropdownButtonFormField<String>(
+          Text(label,
+              style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Colors.grey[850])),
+          const SizedBox(height: 4),
+          DropdownButtonFormField<T>(
             value: value,
-            isExpanded: true, // ⭐ prevents overflow
-            hint: const Text("Select"),
+            isExpanded: true,
+            hint: const Text("Select", style: TextStyle(fontSize: 12)),
             items: items
                 .map(
                   (e) => DropdownMenuItem(
                 value: e,
-                child: Text(e, overflow: TextOverflow.ellipsis),
+                child: Text(
+                  e.label,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontSize: 13, color: Colors.grey[850]),
+                ),
               ),
             )
                 .toList(),
@@ -251,35 +257,149 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               isDense: true,
+              contentPadding:
+              EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             ),
           ),
           if (helper != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              helper,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
+            const SizedBox(height: 2),
+            Text(helper,
+                style:
+                const TextStyle(fontSize: 11, color: Colors.grey)),
           ],
         ],
       ),
     );
   }
 
-  Widget _checkbox(
-      String title,
-      bool value,
-      ValueChanged<bool> onChanged, {
-        String? subtitle,
-      }) {
+  Widget _checkbox(String title, bool value, ValueChanged<bool> onChanged,
+      {String? subtitle}) {
     return CheckboxListTile(
       contentPadding: EdgeInsets.zero,
       value: value,
       onChanged: (v) => onChanged(v ?? false),
-      title: Text(title),
+      title: Text(title,
+          style: TextStyle(fontSize: 13, color: Colors.grey[850])),
       subtitle: subtitle != null
-          ? Text(subtitle, style: const TextStyle(fontSize: 12))
+          ? Text(subtitle,
+          style:
+          const TextStyle(fontSize: 11, color: Colors.grey))
           : null,
       controlAffinity: ListTileControlAffinity.leading,
+    );
+  }
+
+  /// ================= VISA OPTIONS =================
+
+  Widget _visaOptionsCard(List<VisaOption> visas) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text("Visa Options",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          ...visas.map(_visaItem),
+        ]),
+      ),
+    );
+  }
+
+  Widget _visaItem(VisaOption v) {
+    final color = v.code == "189"
+        ? Colors.blue
+        : v.code == "190"
+        ? Colors.green
+        : Colors.purple;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          width: 4,
+          height: 44,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child:
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(v.name,
+                style: const TextStyle(
+                    fontWeight: FontWeight.w600, fontSize: 14)),
+            const SizedBox(height: 2),
+            Text(v.description,
+                style: const TextStyle(
+                    fontSize: 12, color: Colors.black54)),
+            if (v.additionalPointsNote != null)
+              Text(v.additionalPointsNote!,
+                  style: const TextStyle(
+                      fontSize: 11, color: Colors.black45)),
+          ]),
+        ),
+      ]),
+    );
+  }
+
+  /// ================= IMPORTANT NOTES =================
+
+  Widget _importantNotes(List<String> notes) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child:
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text("Important Notes",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          ...notes.map(
+                (e) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child:
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text("• "),
+                Expanded(child: Text(e)),
+              ]),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  /// ================= CALCULATION =================
+
+  void _calculatePoints() {
+    int total = 0;
+
+    if (age != null) total += age!.value;
+    if (english != null) total += english!.value;
+    if (education != null) total += education!.value;
+    if (overseasExp != null) total += overseasExp!.value;
+    if (ausExp != null) total += ausExp!.value;
+    if (partner != null) total += partner!.value;
+
+    additionalPoints.forEach((k, v) {
+      if (v) total += k.value;
+    });
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Total Points"),
+        content: Text("You have $total points."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          )
+        ],
+      ),
     );
   }
 }

@@ -995,6 +995,17 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> getPRPoints() async {
+    final endpoint = ApiConfig.prPointsCalcList;
+
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
     String endpoint,

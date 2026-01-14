@@ -4,14 +4,11 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 class MyFilesQuickActionsCard extends StatelessWidget {
   final VoidCallback onUploadDocument;
   final VoidCallback onSendMessage;
-
   final VoidCallback? onViewWorkflow;
   final VoidCallback? onBilling;
-
   final VoidCallback? onCaseSummary;
   final VoidCallback? onDocumentStatus;
   final VoidCallback? onUpcomingDeadlines;
-
   final VoidCallback? onRecentActivity;
 
   const MyFilesQuickActionsCard({
@@ -23,129 +20,87 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     this.onCaseSummary,
     this.onDocumentStatus,
     this.onUpcomingDeadlines,
-    this.onRecentActivity
+    this.onRecentActivity,
   });
-
-  static const double _radius = 8;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(_radius),
+        color: const Color(0xFF2A2F57),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'My Files',
-            style: Theme.of(context)
-                .textTheme
-                .titleSmall
-                ?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              fontSize: 15,
+            ),
           ),
           const SizedBox(height: 12),
-
           MasonryGridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 20,
-            crossAxisSpacing: 20,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
             itemCount: 6,
             itemBuilder: (context, index) {
               switch (index) {
                 case 0:
-                  /*return _verticalTile(
-                    context,
-                    icon: Icons.upload_file,
-                    label: 'Upload\nDocument',
-                    helperText: 'Submit required files\nsecurely',
-                    color: Colors.blue,
-                    height: 140,
-                    onTap: onUploadDocument,
-                  );*/
-
-                  return _horizontalTile(
-                    context,
-                    icon: Icons.upload_file,
-                    label: 'Upload\nDocument',
-                    color: Colors.blue,
-                    height: 60,
-                    onTap: onUploadDocument,
-                  );
-
+                  return _buildTile(
+                      context,
+                      icon: Icons.upload_file,
+                      label: 'Upload\nDocument',
+                      color: Colors.blueAccent.shade100,
+                      onTap: onUploadDocument);
                 case 1:
-                  return _horizontalTile(
-                    context,
-                    icon: Icons.timeline,
-                    label: 'View\nWorkflow',
-                    color: Colors.purple,
-                    height: 60,
-                    onTap: onViewWorkflow ?? () {},
-                  );
-
+                  return _buildTile(
+                      context,
+                      icon: Icons.timeline,
+                      label: 'View\nWorkflow',
+                      color: Colors.purpleAccent.shade100,
+                      onTap: onViewWorkflow ?? () {});
                 case 2:
-                  return _horizontalTile(
-                    context,
-                    icon: Icons.receipt_long,
-                    label: 'Billing',
-                    color: Colors.red,
-                    height: 60,
-                    onTap: onBilling ?? () {},
-                  );
-
+                  return _buildTile(
+                      context,
+                      icon: Icons.receipt_long,
+                      label: 'Billing',
+                      color: Colors.redAccent.shade100,
+                      onTap: onBilling ?? () {});
                 case 3:
-                  return _horizontalTile(
-                    context,
-                    icon: Icons.assignment,
-                    label: 'Case\nSummary',
-                    color: Colors.indigo,
-                    height: 60,
-                    onTap: onCaseSummary ?? () {},
-                  );
-
+                  return _buildTile(
+                      context,
+                      icon: Icons.assignment,
+                      label: 'Case\nSummary',
+                      color: Colors.indigoAccent.shade100,
+                      onTap: onCaseSummary ?? () {});
                 case 4:
-                  /*return _verticalTile(
-                    context,
-                    icon: Icons.description,
-                    label: 'Document\nStatus',
-                    helperText: 'Submit required files\nsecurely',
-                    color: Colors.orange,
-                    height: 140,
-                    onTap: onDocumentStatus ?? () {},
-                  );*/
-
-                  return _horizontalTile(
-                    context,
-                    icon: Icons.description,
-                    label: 'Document\nStatus',
-                    color: Colors.orange,
-                    height: 60,
-                    onTap: onDocumentStatus ?? () {},
-                  );
-
+                  return _buildTile(
+                      context,
+                      icon: Icons.description,
+                      label: 'Document\nStatus',
+                      color: Colors.orangeAccent.shade100,
+                      onTap: onDocumentStatus ?? () {});
                 case 5:
-                  return _horizontalTile(
-                    context,
-                    icon: Icons.local_activity,
-                    label: 'Recent\nActivity',
-                    color: Colors.brown,
-                    height: 60,
-                    onTap: onRecentActivity ?? () {},
-                  );
-
+                  return _buildTile(
+                      context,
+                      icon: Icons.local_activity,
+                      label: 'Recent\nActivity',
+                      color: Colors.amber.shade300,
+                      onTap: onRecentActivity ?? () {});
                 default:
-                  return _horizontalTile(
-                    context,
-                    icon: Icons.event,
-                    label: 'Upcoming\nDeadlines',
-                    color: Colors.teal,
-                    height: 60,
-                    onTap: onUpcomingDeadlines ?? () {},
-                  );
+                  return _buildTile(
+                      context,
+                      icon: Icons.event,
+                      label: 'Upcoming\nDeadlines',
+                      color: Colors.tealAccent.shade100,
+                      onTap: onUpcomingDeadlines ?? () {});
               }
             },
           ),
@@ -154,127 +109,47 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     );
   }
 
-  /// =================== TILE HELPERS ===================
 
-  Widget _verticalTile(
-      BuildContext context, {
-        required IconData icon,
-        required String label,
-        required String helperText,
-        required Color color,
-        required double height,
-        required VoidCallback onTap,
-      }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(_radius),
-      child: Container(
-        height: height,
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(_radius),
-          border: Border.all(color: color.withOpacity(0.25)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, size: 24, color: color),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                height: 1.1,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              helperText,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: color.withOpacity(0.7),
-                height: 1.3,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _horizontalTile(
+  Widget _buildTile(
       BuildContext context, {
         required IconData icon,
         required String label,
         required Color color,
-        required double height,
         required VoidCallback onTap,
       }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(_radius),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        height: height,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(_radius),
-          border: Border.all(color: color.withOpacity(0.25)),
+          color: const Color(0xFF262D50),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.3), width: 1),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: color),
-            const SizedBox(width: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.all(6),
+              child: Icon(icon, size: 18, color: color), // smaller icon
+            ),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: const TextStyle(
+                  color: Colors.white,
                   fontWeight: FontWeight.w500,
+                  fontSize: 12,
                   height: 1.2,
-                  color: color.withOpacity(0.9),
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _horizontalTileTextIcon(
-      BuildContext context, {
-        required IconData icon,
-        required String label,
-        required Color color,
-        required double height,
-        required VoidCallback onTap,
-      }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(_radius),
-      child: Container(
-        height: height,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(_radius),
-          border: Border.all(color: color.withOpacity(0.25)),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  height: 1.2,
-                  color: color.withOpacity(0.9),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Icon(icon, size: 20, color: color),
+            const Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white38),
           ],
         ),
       ),
