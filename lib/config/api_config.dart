@@ -60,6 +60,7 @@ class ApiConfig {
   static const String blogListEndpoint = "/blogs/list";
 
   static const String prPointsCalcList = "/pr-point-calc-lists";
+  static const String prPointCalcResult = "/pr-point-calc-result";
 
 
   // API settings

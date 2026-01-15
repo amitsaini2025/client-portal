@@ -289,8 +289,6 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
     );
   }
 
-  /// ================= VISA OPTIONS =================
-
   Widget _visaOptionsCard(List<VisaOption> visas) {
     return Card(
       elevation: 3,
@@ -346,8 +344,6 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
     );
   }
 
-  /// ================= IMPORTANT NOTES =================
-
   Widget _importantNotes(List<String> notes) {
     return Card(
       child: Padding(
@@ -372,34 +368,178 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
     );
   }
 
-  /// ================= CALCULATION =================
+  void _calculatePoints() async {
+    if (age == null ||
+        english == null ||
+        education == null ||
+        overseasExp == null ||
+        ausExp == null ||
+        partner == null) {
 
-  void _calculatePoints() {
-    int total = 0;
+      int total = 0;
 
-    if (age != null) total += age!.value;
-    if (english != null) total += english!.value;
-    if (education != null) total += education!.value;
-    if (overseasExp != null) total += overseasExp!.value;
-    if (ausExp != null) total += ausExp!.value;
-    if (partner != null) total += partner!.value;
+      if (age != null) total += age!.value;
+      if (english != null) total += english!.value;
+      if (education != null) total += education!.value;
+      if (overseasExp != null) total += overseasExp!.value;
+      if (ausExp != null) total += ausExp!.value;
+      if (partner != null) total += partner!.value;
 
-    additionalPoints.forEach((k, v) {
-      if (v) total += k.value;
-    });
+      additionalPoints.forEach((k, v) {
+        if (v) total += k.value;
+      });
+
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Total Points"),
+          content: Text("You have $total points."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            )
+          ],
+        ),
+      );
+      return;
+    }
+
+    final selectedAdditionalPoints = additionalPoints.entries
+        .where((e) => e.value)
+        .map((e) => e.key.value)
+        .toList();
+
+    final payload = {
+      "age": age!.value,
+      "english_language_proficiency": english!.value,
+      "educational_qualifications": education!.value,
+      "skilled_employment_overseas": overseasExp!.value,
+      "skilled_employment_australia": ausExp!.value,
+      "additional_points": selectedAdditionalPoints,
+      "partner_spouse_status": partner!.value,
+    };
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Total Points"),
-        content: Text("You have $total points."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("OK"),
-          )
-        ],
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final response =
+      await ApiService.calculatePRPoints(payload: payload);
+
+      Navigator.pop(context);
+
+      if (response['success'] == true) {
+        _showResultDialog(response['data']);
+      } else {
+        _showError("Failed to calculate points");
+      }
+    } catch (e) {
+      Navigator.pop(context);
+      _showError(e.toString());
+    }
+  }
+
+  void _showResultDialog(Map<String, dynamic> data) {
+    final totalPoints = data['total_points'];
+    final basePoints = data['base_points'];
+    final additionalPoints = data['additional_points'];
+    final message = data['message'];
+    final breakdown = data['points_breakdown'] as Map<String, dynamic>;
+
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: SingleChildScrollView( // makes dialog scrollable if content is long
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Your Points",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+
+                Text(
+                  "$totalPoints",
+                  style: const TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+                Text("Base: $basePoints  |  Additional: $additionalPoints"),
+
+                const SizedBox(height: 16),
+
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        color: Colors.green, fontWeight: FontWeight.w600),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Breakdown list
+                ...breakdown.values.map((e) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            e['label'],
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text("${e['points']} pts"),
+                      ],
+                    ),
+                  );
+                }).toList(),
+
+                const SizedBox(height: 20),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Close"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
+    );
+  }
+
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 }
