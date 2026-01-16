@@ -63,13 +63,11 @@ class ApiService {
           final newHeaders = _buildHeaders();
           return _makeRequest(endpoint, newHeaders, body, method);
         } else {
-          await AuthService.logout();
-          if (navigatorKey.currentState?.canPop() ?? false) {
-            navigatorKey.currentState?.pushNamedAndRemoveUntil(
-              '/login',
-                  (route) => false,
-            );
-          }
+          await AuthService.logout(false);
+          navigatorKey.currentState?.pushNamedAndRemoveUntil(
+            '/login',
+                (route) => false,
+          );
         }
       }
       return _handleResponse(response);

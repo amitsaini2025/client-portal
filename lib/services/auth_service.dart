@@ -266,21 +266,24 @@ class AuthService {
   }
 
   /// Logout user
-  static Future<void> logout() async {
+  static Future<void> logout(bool callAPI) async {
     try {
       // Call API logout if token exists
-      if (_currentToken != null) {
-        try {
-          final fcmService = FCMService();
-          String? fcmToken = await fcmService.getToken();
-          if (fcmToken != null) {
-            await ApiService.unregisterFcmToken(fcmToken);
+      if (callAPI){
+        if (_currentToken != null) {
+          try {
+            final fcmService = FCMService();
+            String? fcmToken = await fcmService.getToken();
+            if (fcmToken != null) {
+              await ApiService.unregisterFcmToken(fcmToken);
+            }
+            await ApiService.logout();
+          } catch (e) {
+            print('Logout API call failed: $e');
           }
-          await ApiService.logout();
-        } catch (e) {
-          print('Logout API call failed: $e');
         }
       }
+
 
       // Clear local storage
       await _secureStorage.delete(key: _tokenKey);
