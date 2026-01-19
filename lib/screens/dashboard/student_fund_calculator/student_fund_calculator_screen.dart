@@ -292,7 +292,8 @@ class _StudentFundCalculatorScreenState
       Navigator.pop(context);
 
       if (res['success'] == true) {
-        _showResult(res['data']);
+        //_showResult(res['data']);
+        _showFinancialResultDialog(context, res['data']);
       } else {
         _showError("Calculation failed");
       }
@@ -301,6 +302,226 @@ class _StudentFundCalculatorScreenState
       _showError(e.toString());
     }
   }
+
+  void _showFinancialResultDialog(
+      BuildContext context, Map<String, dynamic> d) {
+    final breakdown = d['breakdown'];
+    final living = breakdown['living_expenses']['breakdown'];
+
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        insetPadding: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Financial Requirements",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+
+                _rowItem(
+                  "Total Tuition Fees",
+                  breakdown['tuition_fees']['amount'],
+                  Colors.blue,
+                ),
+                _divider(),
+
+                _rowItem(
+                  "Living Expenses",
+                  breakdown['living_expenses']['amount'],
+                  Colors.green,
+                ),
+                _divider(),
+
+                _rowItem(
+                  "School Fees",
+                  breakdown['school_fees']['amount'],
+                  Colors.purple,
+                ),
+                _divider(),
+
+                _rowItem(
+                  "Travel Expenses",
+                  breakdown['travel_expenses']['amount'],
+                  Colors.deepOrange,
+                ),
+
+                const SizedBox(height: 24),
+
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blue.shade50,
+                        Colors.purple.shade50,
+                      ],
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Total Financial Capacity Required",
+                        style:
+                        TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "AUD \$${d['total_financial_capacity_required']}",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade50,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.amber, width: 2),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: const [
+                          Icon(Icons.warning_amber_rounded,
+                              color: Colors.orange),
+                          SizedBox(width: 8),
+                          Text(
+                            "Additional Requirement: OSHC",
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Overseas Student Health Cover is mandatory but separate from financial capacity",
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        "Estimated cost: AUD \$${d['oshc']['total_cost']}",
+                        style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepOrange),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        "Must cover entire visa duration",
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                const Text(
+                  "Living Costs Breakdown (12 months):",
+                  style:
+                  TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                _bullet("Student", living['primary_student']),
+                _bullet("Partner", living['partner']),
+                _bullet("Children", living['children']),
+                _bullet(
+                    "Extra Accommodation", living['additional_accommodation']),
+
+                const SizedBox(height: 16),
+
+                const Text(
+                  "School Fees (12 months):",
+                  style:
+                  TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                _bullet(
+                    "1 Child", breakdown['school_fees']['amount']),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  "Note: Calculations show 12 months maximum as per visa requirements, "
+                      "even though your course duration is ${d['course_duration_years']} years.",
+                  style: TextStyle(
+                      color: Colors.orange.shade800, fontSize: 13),
+                ),
+
+                const SizedBox(height: 24),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Close"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _rowItem(String title, int amount, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title,
+            style: const TextStyle(fontSize: 15, color: Colors.black54)),
+        const SizedBox(height: 4),
+        Text(
+          "AUD \$${amount.toString()}",
+          style: TextStyle(
+              fontSize: 15, fontWeight: FontWeight.bold, color: color),
+        ),
+      ],
+    );
+  }
+
+  Widget _divider() => const Padding(
+    padding: EdgeInsets.symmetric(vertical: 10),
+    child: Divider(),
+  );
+
+  Widget _bullet(String label, int amount) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          const Text("• "),
+          Expanded(child: Text(label)),
+          Text("AUD \$${amount.toString()}"),
+        ],
+      ),
+    );
+  }
+
 
   void _showResult(Map<String, dynamic> d) {
     final breakdown = d['breakdown'];
