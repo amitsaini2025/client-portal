@@ -62,6 +62,9 @@ class ApiConfig {
   static const String prPointsCalcList = "/pr-point-calc-lists";
   static const String prPointCalcResult = "/pr-point-calc-result";
 
+  static const String studentCalcList = "/student-calc-lists";
+  static const String studentCalcResult = "/student-calc-result";
+
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

@@ -1017,6 +1017,29 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> getStudentCalcLists() async {
+    final endpoint = ApiConfig.studentCalcList;
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+  static Future<Map<String, dynamic>> calculateStudentFund(
+      {required Map<String, dynamic> payload}) async {
+    final endpoint = ApiConfig.studentCalcResult;
+
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      payload,
+      'POST',
+    );
+  }
+
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
     String endpoint,
