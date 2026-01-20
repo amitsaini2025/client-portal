@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:client/config/theme_config.dart';
 import 'package:client/screens/dashboard/personal_info/personal_information_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
+import 'package:client/services/api_service_bansal_immigration.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
@@ -107,7 +108,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() => _isLoadingBlogs = true);
 
     try {
-      final response = await ApiService.getFeaturedBlogs(page: 1, perPage: 5);
+      final response = await ApiServiceBansalImmigration.getFeaturedBlogs(page: 1, perPage: 5);
       if (response['success'] == true) {
         final List list = response['data'];
         _blogs = list.map((e) => Blog.fromJson(e)).toList();

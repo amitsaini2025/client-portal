@@ -1,3 +1,4 @@
+import 'package:client/services/api_service_bansal_immigration.dart';
 import 'package:flutter/material.dart';
 
 import '../../../config/theme_config.dart';
@@ -37,7 +38,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await ApiService.getFeaturedBlogs(
+      final response = await ApiServiceBansalImmigration.getFeaturedBlogs(
         page: _currentPage,
         perPage: 10,
       );
