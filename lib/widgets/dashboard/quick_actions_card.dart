@@ -7,6 +7,7 @@ class QuickActionsCard extends StatelessWidget {
   final VoidCallback? onUpcomingDeadlines;
   final VoidCallback? onPRCalculator;
   final VoidCallback? onStudentFundCalculator;
+  final VoidCallback? onOccupationSearch;
 
   const QuickActionsCard({
     super.key,
@@ -15,6 +16,7 @@ class QuickActionsCard extends StatelessWidget {
     this.onUpcomingDeadlines,
     this.onPRCalculator,
     this.onStudentFundCalculator,
+    this.onOccupationSearch
   });
 
   static const double _radius = 12;
@@ -27,11 +29,7 @@ class QuickActionsCard extends StatelessWidget {
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(_radius),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -52,7 +50,7 @@ class QuickActionsCard extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
-            itemCount: 4,
+            itemCount: 5,
             itemBuilder: (context, index) {
               switch (index) {
                 case 0:
@@ -82,6 +80,13 @@ class QuickActionsCard extends StatelessWidget {
                     label: 'Student\nFund Calculator',
                     color: Colors.purple,
                     onTap: onStudentFundCalculator ?? () {},
+                  );
+                case 4:
+                  return _tile(
+                    icon: Icons.search,
+                    label: 'Occupation\nSearch',
+                    color: Colors.blue,
+                    onTap: onOccupationSearch ?? () {},
                   );
                 default:
                   return _tile(

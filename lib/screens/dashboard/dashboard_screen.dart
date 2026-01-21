@@ -362,6 +362,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               onStudentFundCalculator: (){
                                 Navigator.pushNamed(context, '/student-fund-calculator');
                               },
+                              onOccupationSearch: (){
+                                Navigator.pushNamed(context, '/occupation-search');
+                              },
                             ),
                             const SizedBox(height: 24),
                             MyFilesQuickActionsCard(

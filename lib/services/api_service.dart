@@ -1039,6 +1039,13 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> occupationFinder(String query) async {
+    String endpoint = "${ApiConfig.occupationFinder}/?q=$query";
+
+    final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
+    return response;
+  }
+
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(

@@ -65,6 +65,8 @@ class ApiConfig {
   static const String studentCalcList = "/student-calc-lists";
   static const String studentCalcResult = "/student-calc-result";
 
+  static const String occupationFinder = "/occupation-finder";
+
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

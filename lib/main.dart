@@ -5,6 +5,7 @@ import 'package:client/screens/cases/cases_list_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
 import 'package:client/screens/dashboard/my_files/my_files_screen.dart';
+import 'package:client/screens/dashboard/occupation_search/occupation_search_screen.dart';
 import 'package:client/screens/dashboard/pr_calculator/pr_calculator_screen.dart';
 import 'package:client/screens/dashboard/student_fund_calculator/student_fund_calculator_screen.dart';
 import 'package:client/screens/document_management/document_management.dart';
@@ -370,6 +371,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/my-files': (context) => MyFilesScreen(),
             '/pr-calculator': (context) => PRCalculatorScreen(),
             '/student-fund-calculator': (context) => StudentFundCalculatorScreen(),
+            '/occupation-search': (context) => OccupationSearchScreen(),
           },
         );
       },
