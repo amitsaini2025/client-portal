@@ -365,6 +365,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               onOccupationSearch: (){
                                 Navigator.pushNamed(context, '/occupation-search');
                               },
+                              onPostCodeChecker: (){
+                                Navigator.pushNamed(context, '/post-code-checker');
+                              },
                             ),
                             const SizedBox(height: 24),
                             MyFilesQuickActionsCard(

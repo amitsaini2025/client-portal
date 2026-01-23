@@ -67,6 +67,9 @@ class ApiConfig {
 
   static const String occupationFinder = "/occupation-finder";
 
+  static const String postCodeSearch = "/postcode-search";
+  static const String postCodeResult = "/postcode-result";
+
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

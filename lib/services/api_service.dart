@@ -1046,6 +1046,22 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> postcodeSearch(String query) async {
+    String endpoint =
+        "${ApiConfig.postCodeSearch}?q=$query";
+
+    final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
+    return response;
+  }
+
+  static Future<Map<String, dynamic>> postcodeResult(String postcode) async {
+    String endpoint =
+        "${ApiConfig.postCodeResult}?postcode=$postcode";
+
+    final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
+    return response;
+  }
+
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
