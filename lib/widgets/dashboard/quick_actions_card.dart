@@ -18,7 +18,7 @@ class QuickActionsCard extends StatelessWidget {
     this.onPRCalculator,
     this.onStudentFundCalculator,
     this.onOccupationSearch,
-    this.onPostCodeChecker
+    this.onPostCodeChecker,
   });
 
   static const double _radius = 12;

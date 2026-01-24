@@ -24,6 +24,7 @@ import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
 import '../documents/upload_document_screen.dart';
+import 'book_appointment/book_appointment_location_screen.dart';
 import 'my_files/my_files_quick_action_card.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -108,7 +109,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() => _isLoadingBlogs = true);
 
     try {
-      final response = await ApiServiceBansalImmigration.getFeaturedBlogs(page: 1, perPage: 5);
+      final response = await ApiServiceBansalImmigration.getFeaturedBlogs(
+        page: 1,
+        perPage: 5,
+      );
       if (response['success'] == true) {
         final List list = response['data'];
         _blogs = list.map((e) => Blog.fromJson(e)).toList();
@@ -333,16 +337,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             QuickActionsCard(
                               onBookAppointment: () {
-                                /*Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => const BookAppointmentScreen(),
-                            ),
-                          );*/
-                                showSnack(
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            const BookAppointmentLocationScreen(),
+                                  ),
+                                );
+                                /*showSnack(
                                   context,
                                   "This feature will be available in a future update.",
-                                );
+                                );*/
                               },
                               onPersonalInformationUpload: () {
                                 Navigator.of(context).push(
@@ -356,17 +361,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               onUpcomingDeadlines: () {
                                 Navigator.pushNamed(context, '/tasks');
                               },
-                              onPRCalculator: (){
+                              onPRCalculator: () {
                                 Navigator.pushNamed(context, '/pr-calculator');
                               },
-                              onStudentFundCalculator: (){
-                                Navigator.pushNamed(context, '/student-fund-calculator');
+                              onStudentFundCalculator: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/student-fund-calculator',
+                                );
                               },
-                              onOccupationSearch: (){
-                                Navigator.pushNamed(context, '/occupation-search');
+                              onOccupationSearch: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/occupation-search',
+                                );
                               },
-                              onPostCodeChecker: (){
-                                Navigator.pushNamed(context, '/post-code-checker');
+                              onPostCodeChecker: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/post-code-checker',
+                                );
                               },
                             ),
                             const SizedBox(height: 24),
@@ -374,7 +388,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               onUploadDocument: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) => const UploadDocumentScreen(),
+                                    builder:
+                                        (context) =>
+                                            const UploadDocumentScreen(),
                                   ),
                                 );
                               },
@@ -388,7 +404,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               onViewWorkflow: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) => const WorkflowScreen(),
+                                    builder:
+                                        (context) => const WorkflowScreen(),
                                   ),
                                 );
                               },
@@ -412,8 +429,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               onUpcomingDeadlines: () {
                                 Navigator.pushNamed(context, '/tasks');
                               },
-                              onRecentActivity: (){
-                                Navigator.pushNamed(context, '/recent-activity');
+                              onRecentActivity: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/recent-activity',
+                                );
                               },
                             ),
                             const SizedBox(height: 24),
@@ -454,69 +474,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(height: 12),
         SizedBox(
           height: 140,
-          child: _isLoadingBlogs
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _blogs.length,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemBuilder: (context, index) {
-              final blog = _blogs[index];
-              return Container(
-                width: 260,
-                margin: EdgeInsets.only(
-                  right: index == _blogs.length - 1 ? 0 : 16,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  image: DecorationImage(
-                    image: NetworkImage(blog.image),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    // Dark overlay for text readability
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.2),
-                          Colors.black.withOpacity(0.7),
-                        ],
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          blog.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
+          child:
+              _isLoadingBlogs
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _blogs.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemBuilder: (context, index) {
+                      final blog = _blogs[index];
+                      return Container(
+                        width: 260,
+                        margin: EdgeInsets.only(
+                          right: index == _blogs.length - 1 ? 0 : 16,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          image: DecorationImage(
+                            image: NetworkImage(blog.image),
+                            fit: BoxFit.cover,
                           ),
                         ),
-                        const Spacer(),
-                        Text(
-                          blog.date,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            // Dark overlay for text readability
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.black.withOpacity(0.2),
+                                  Colors.black.withOpacity(0.7),
+                                ],
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  blog.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  blog.date,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                ),
-              );
-            },
-          ),
         ),
       ],
     );
