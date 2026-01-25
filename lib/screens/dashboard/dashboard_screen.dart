@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:client/config/theme_config.dart';
+import 'package:client/screens/appointments/book_appointment_screen.dart';
 import 'package:client/screens/dashboard/personal_info/personal_information_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:client/services/api_service_bansal_immigration.dart';
@@ -341,7 +342,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   MaterialPageRoute(
                                     builder:
                                         (context) =>
-                                            const BookAppointmentLocationScreen(),
+                                            const BookAppointmentScreen(),
                                   ),
                                 );
                                 /*showSnack(

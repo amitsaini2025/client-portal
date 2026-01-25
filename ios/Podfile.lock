@@ -37,32 +37,32 @@ PODS:
   - file_picker (0.0.1):
     - DKImagePickerController/PhotoGallery
     - Flutter
-  - Firebase/CoreOnly (12.4.0):
-    - FirebaseCore (~> 12.4.0)
-  - Firebase/Messaging (12.4.0):
+  - Firebase/CoreOnly (12.8.0):
+    - FirebaseCore (~> 12.8.0)
+  - Firebase/Messaging (12.8.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 12.4.0)
-  - firebase_core (4.2.0):
-    - Firebase/CoreOnly (= 12.4.0)
+    - FirebaseMessaging (~> 12.8.0)
+  - firebase_core (4.4.0):
+    - Firebase/CoreOnly (= 12.8.0)
     - Flutter
-  - firebase_messaging (16.0.3):
-    - Firebase/Messaging (= 12.4.0)
+  - firebase_messaging (16.1.1):
+    - Firebase/Messaging (= 12.8.0)
     - firebase_core
     - Flutter
-  - FirebaseCore (12.4.0):
-    - FirebaseCoreInternal (~> 12.4.0)
+  - FirebaseCore (12.8.0):
+    - FirebaseCoreInternal (~> 12.8.0)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/Logger (~> 8.1)
-  - FirebaseCoreInternal (12.4.0):
+  - FirebaseCoreInternal (12.8.0):
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
-  - FirebaseInstallations (12.4.0):
-    - FirebaseCore (~> 12.4.0)
+  - FirebaseInstallations (12.8.0):
+    - FirebaseCore (~> 12.8.0)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/UserDefaults (~> 8.1)
     - PromisesObjC (~> 2.4)
-  - FirebaseMessaging (12.4.0):
-    - FirebaseCore (~> 12.4.0)
-    - FirebaseInstallations (~> 12.4.0)
+  - FirebaseMessaging (12.8.0):
+    - FirebaseCore (~> 12.8.0)
+    - FirebaseInstallations (~> 12.8.0)
     - GoogleDataTransport (~> 10.1)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
     - GoogleUtilities/Environment (~> 8.1)
@@ -113,7 +113,7 @@ PODS:
     - nanopb/encode (= 3.30910.0)
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
-  - NWWebSocket (0.5.7)
+  - NWWebSocket (0.5.9)
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -123,9 +123,10 @@ PODS:
   - pusher_channels_flutter (0.0.1):
     - Flutter
     - PusherSwift (~> 10.1.5)
-  - PusherSwift (10.1.6):
-    - NWWebSocket (~> 0.5.7)
-    - TweetNacl (~> 1.0.0)
+  - PusherSwift (10.1.9):
+    - NWWebSocket (~> 0.5.9)
+    - PusherTweetNacl (~> 1.2.0)
+  - PusherTweetNacl (1.2.0)
   - SDWebImage (5.21.5):
     - SDWebImage/Core (= 5.21.5)
   - SDWebImage/Core (5.21.5)
@@ -135,65 +136,64 @@ PODS:
   - sqflite_darwin (0.0.4):
     - Flutter
     - FlutterMacOS
-  - Stripe (24.23.3):
-    - StripeApplePay (= 24.23.3)
-    - StripeCore (= 24.23.3)
-    - StripePayments (= 24.23.3)
-    - StripePaymentsUI (= 24.23.3)
-    - StripeUICore (= 24.23.3)
+  - Stripe (25.0.1):
+    - StripeApplePay (= 25.0.1)
+    - StripeCore (= 25.0.1)
+    - StripePayments (= 25.0.1)
+    - StripePaymentsUI (= 25.0.1)
+    - StripeUICore (= 25.0.1)
   - stripe_ios (0.0.1):
     - Flutter
-    - Stripe (~> 24.23.0)
+    - Stripe (~> 25.0.1)
     - stripe_ios/stripe_ios (= 0.0.1)
     - stripe_ios/stripe_objc (= 0.0.1)
-    - StripeApplePay (~> 24.23.0)
-    - StripeFinancialConnections (~> 24.23.0)
-    - StripePayments (~> 24.23.0)
-    - StripePaymentSheet (~> 24.23.0)
-    - StripePaymentsUI (~> 24.23.0)
+    - StripeApplePay (~> 25.0.1)
+    - StripeFinancialConnections (~> 25.0.1)
+    - StripePayments (~> 25.0.1)
+    - StripePaymentSheet (~> 25.0.1)
+    - StripePaymentsUI (~> 25.0.1)
   - stripe_ios/stripe_ios (0.0.1):
     - Flutter
-    - Stripe (~> 24.23.0)
+    - Stripe (~> 25.0.1)
     - stripe_ios/stripe_objc
-    - StripeApplePay (~> 24.23.0)
-    - StripeFinancialConnections (~> 24.23.0)
-    - StripePayments (~> 24.23.0)
-    - StripePaymentSheet (~> 24.23.0)
-    - StripePaymentsUI (~> 24.23.0)
+    - StripeApplePay (~> 25.0.1)
+    - StripeFinancialConnections (~> 25.0.1)
+    - StripePayments (~> 25.0.1)
+    - StripePaymentSheet (~> 25.0.1)
+    - StripePaymentsUI (~> 25.0.1)
   - stripe_ios/stripe_objc (0.0.1):
     - Flutter
-    - Stripe (~> 24.23.0)
-    - StripeApplePay (~> 24.23.0)
-    - StripeFinancialConnections (~> 24.23.0)
-    - StripePayments (~> 24.23.0)
-    - StripePaymentSheet (~> 24.23.0)
-    - StripePaymentsUI (~> 24.23.0)
-  - StripeApplePay (24.23.3):
-    - StripeCore (= 24.23.3)
-  - StripeCore (24.23.3)
-  - StripeFinancialConnections (24.23.3):
-    - StripeCore (= 24.23.3)
-    - StripeUICore (= 24.23.3)
-  - StripePayments (24.23.3):
-    - StripeCore (= 24.23.3)
-    - StripePayments/Stripe3DS2 (= 24.23.3)
-  - StripePayments/Stripe3DS2 (24.23.3):
-    - StripeCore (= 24.23.3)
-  - StripePaymentSheet (24.23.3):
-    - StripeApplePay (= 24.23.3)
-    - StripeCore (= 24.23.3)
-    - StripePayments (= 24.23.3)
-    - StripePaymentsUI (= 24.23.3)
-  - StripePaymentsUI (24.23.3):
-    - StripeCore (= 24.23.3)
-    - StripePayments (= 24.23.3)
-    - StripeUICore (= 24.23.3)
-  - StripeUICore (24.23.3):
-    - StripeCore (= 24.23.3)
+    - Stripe (~> 25.0.1)
+    - StripeApplePay (~> 25.0.1)
+    - StripeFinancialConnections (~> 25.0.1)
+    - StripePayments (~> 25.0.1)
+    - StripePaymentSheet (~> 25.0.1)
+    - StripePaymentsUI (~> 25.0.1)
+  - StripeApplePay (25.0.1):
+    - StripeCore (= 25.0.1)
+  - StripeCore (25.0.1)
+  - StripeFinancialConnections (25.0.1):
+    - StripeCore (= 25.0.1)
+    - StripeUICore (= 25.0.1)
+  - StripePayments (25.0.1):
+    - StripeCore (= 25.0.1)
+    - StripePayments/Stripe3DS2 (= 25.0.1)
+  - StripePayments/Stripe3DS2 (25.0.1):
+    - StripeCore (= 25.0.1)
+  - StripePaymentSheet (25.0.1):
+    - StripeApplePay (= 25.0.1)
+    - StripeCore (= 25.0.1)
+    - StripePayments (= 25.0.1)
+    - StripePaymentsUI (= 25.0.1)
+  - StripePaymentsUI (25.0.1):
+    - StripeCore (= 25.0.1)
+    - StripePayments (= 25.0.1)
+    - StripeUICore (= 25.0.1)
+  - StripeUICore (25.0.1):
+    - StripeCore (= 25.0.1)
   - SwiftyGif (5.4.5)
   - syncfusion_flutter_pdfviewer (0.0.1):
     - Flutter
-  - TweetNacl (1.0.2)
   - url_launcher_ios (0.0.1):
     - Flutter
   - workmanager_apple (0.0.1):
@@ -218,7 +218,6 @@ DEPENDENCIES:
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
   - stripe_ios (from `.symlinks/plugins/stripe_ios/ios`)
   - syncfusion_flutter_pdfviewer (from `.symlinks/plugins/syncfusion_flutter_pdfviewer/ios`)
-  - TweetNacl (~> 1.0)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - workmanager_apple (from `.symlinks/plugins/workmanager_apple/ios`)
 
@@ -237,6 +236,7 @@ SPEC REPOS:
     - NWWebSocket
     - PromisesObjC
     - PusherSwift
+    - PusherTweetNacl
     - SDWebImage
     - Stripe
     - StripeApplePay
@@ -247,7 +247,6 @@ SPEC REPOS:
     - StripePaymentsUI
     - StripeUICore
     - SwiftyGif
-    - TweetNacl
 
 EXTERNAL SOURCES:
   connectivity_plus:
@@ -297,13 +296,13 @@ SPEC CHECKSUMS:
   DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
   DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
   file_picker: a0560bc09d61de87f12d246fc47d2119e6ef37be
-  Firebase: f07b15ae5a6ec0f93713e30b923d9970d144af3e
-  firebase_core: 744984dbbed8b3036abf34f0b98d80f130a7e464
-  firebase_messaging: 82c70650c426a0a14873e1acdb9ec2b443c4e8b4
-  FirebaseCore: bb595f3114953664e3c1dc032f008a244147cfd3
-  FirebaseCoreInternal: d7f5a043c2cd01a08103ab586587c1468047bca6
-  FirebaseInstallations: ae9f4902cb5bf1d0c5eaa31ec1f4e5495a0714e2
-  FirebaseMessaging: d33971b7bb252745ea6cd31ab190d1a1df4b8ed5
+  Firebase: 9a58fdbc9d8655ed7b79a19cf9690bb007d3d46d
+  firebase_core: ee30637e6744af8e0c12a6a1e8a9718506ec2398
+  firebase_messaging: 343de01a8d3e18b60df0c6d37f7174c44ae38e02
+  FirebaseCore: 0dbad74bda10b8fb9ca34ad8f375fb9dd3ebef7c
+  FirebaseCoreInternal: fe5fa466aeb314787093a7dce9f0beeaad5a2a21
+  FirebaseInstallations: 6a14ab3d694ebd9f839c48d330da5547e9ca9dc0
+  FirebaseMessaging: 7f42cfd10ec64181db4e01b305a613791c8e782c
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_keyboard_visibility: 4625131e43015dbbe759d9b20daaf77e0e3f6619
   flutter_local_notifications: a5a732f069baa862e728d839dd2ebb904737effb
@@ -313,30 +312,30 @@ SPEC CHECKSUMS:
   image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
   local_auth_darwin: d2e8c53ef0c4f43c646462e3415432c4dab3ae19
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
-  NWWebSocket: b4741420f1976e1dff4da3edad00c401e4f1d769
+  NWWebSocket: 01dead025db38f26693d4fa0b4d5869c8013eae0
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   pointer_interceptor_ios: ec847ef8b0915778bed2b2cef636f4d177fa8eed
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   pusher_channels_flutter: 19ee24691d26965e9efca571f1620f536b9882bf
-  PusherSwift: fa3d5f6587c20ad5790de87a5c9b150367b5f0f5
+  PusherSwift: 84a45a6b62c137c52ca948626817989d3127c022
+  PusherTweetNacl: 015f56f2cf010e718703f2bd9bca66fdcc91b208
   SDWebImage: e9c98383c7572d713c1a0d7dd2783b10599b9838
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
-  Stripe: a4b6584549bac3698733ed564e55b0b067cfda8a
-  stripe_ios: b720131bae6025a497bf7bb030e238a1a2781f18
-  StripeApplePay: c8b005f1b5a242c455f76b42eda08660e9e33102
-  StripeCore: 9a87da02c7fefc9b965218210a0902acd71157ab
-  StripeFinancialConnections: 331ece5b6446dbf6eac62b94f8e365d0af9e000a
-  StripePayments: 95ca9bc60eca45f02cd35b125a67a969c9d62ce7
-  StripePaymentSheet: 7bc20a0ab10d91acc06dc449ab61bb2cf221b0f4
-  StripePaymentsUI: 1590647b3f635a58fb0e7058d86d3e9ff89250d4
-  StripeUICore: a63d95d604e70a5895f9d6b09c49a46757e86353
+  Stripe: 4728e3e0dd8df134e4a420ab504e929a93a815f0
+  stripe_ios: b6b8ef64e89a5409da466b4e6a2a6a26178892a6
+  StripeApplePay: 43997281ace138a1c75a8f2d7be11925ea28644c
+  StripeCore: 457c30e2fd3a7c4b274a5ad53d1ff03661eef2a0
+  StripeFinancialConnections: 8c2e326f767fb014b53174b3a5f8592c0a45fa56
+  StripePayments: 6955de4298a5265e66f02cffcc7954475ac7f6c8
+  StripePaymentSheet: 3f93ce6ea84afde770d3c7e18a9b8f99aed63896
+  StripePaymentsUI: 626726a01255a6458c35436f7f6431dacee82684
+  StripeUICore: 30f8352fd7a5cf1541b7777a57b3ad1133bf6763
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   syncfusion_flutter_pdfviewer: 90dc48305d2e33d4aa20681d1e98ddeda891bc14
-  TweetNacl: 3abf4d1d2082b0114e7a67410e300892448951e6
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
   workmanager_apple: 904529ae31e97fc5be632cf628507652294a0778
 
-PODFILE CHECKSUM: 7e4fe5602f0942e8fb5e8b9efb0b1607392f828a
+PODFILE CHECKSUM: 79547f0ebd8c9c38d71d1cb7d7b68b0daca455a3
 
 COCOAPODS: 1.16.2

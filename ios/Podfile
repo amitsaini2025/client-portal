@@ -1,65 +1,49 @@
-# Uncomment this line to define a global platform for your project
 platform :ios, '15.0'
 
-# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
-# Define flutter_root before requiring podhelper
 def flutter_root
-  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  generated_xcode_build_settings_path = File.expand_path(
+    File.join('..', 'Flutter', 'Generated.xcconfig'),
+    __FILE__
+  )
   unless File.exist?(generated_xcode_build_settings_path)
     raise "#{generated_xcode_build_settings_path} must exist. Run 'flutter pub get' first"
   end
+
   File.foreach(generated_xcode_build_settings_path) do |line|
     matches = line.match(/FLUTTER_ROOT\=(.*)/)
     return matches[1].strip if matches
   end
+
   raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}"
 end
 
-# Flutter integration
-require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+require File.expand_path(
+  File.join('packages', 'flutter_tools', 'bin', 'podhelper'),
+  flutter_root
+)
 
-use_frameworks!
+use_frameworks! :linkage => :static
 use_modular_headers!
 
 # ---------- MAIN TARGET ----------
-# ---------------------------------
-
-# Explicitly add TweetNacl
 target 'Runner' do
-  use_frameworks!  # Needed for Swift pods sometimes
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-
-  pod 'TweetNacl', '~> 1.0'
 
   target 'RunnerTests' do
     inherit! :search_paths
   end
 end
 
-# Post install tweaks for Swift and simulator
+# SINGLE post_install for Flutter settings
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-
-
-      # Fix for CTweetNacl module error with Pusher on Xcode 26.0
-      # Disable explicit module builds for Pusher and TweetNacl pods
-      if ['PusherSwift', 'PusherSwiftWithEncryption', 'TweetNacl'].include?(target.name)
-        config.build_settings['SWIFT_ENABLE_EXPLICIT_MODULES'] = 'NO'
-        # Additional settings to resolve module dependencies
-        config.build_settings['SWIFT_ENABLE_INCREMENTAL_COMPILATION'] = 'NO'
-        config.build_settings['SWIFT_COMPILATION_MODE'] = 'wholemodule'
-      end
-
-
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
     end
-  end
-  # Additional project-level settings for all targets
-  installer.pods_project.build_configurations.each do |config|
-    config.build_settings['SWIFT_ENABLE_EXPLICIT_MODULES'] = 'NO'
   end
 end
