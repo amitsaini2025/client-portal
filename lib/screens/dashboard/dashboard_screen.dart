@@ -26,6 +26,7 @@ import '../../widgets/common/loading_widget.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
 import '../documents/upload_document_screen.dart';
 import 'book_appointment/book_appointment_location_screen.dart';
+import 'book_appointment/book_location_screen.dart';
 import 'my_files/my_files_quick_action_card.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -342,7 +343,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   MaterialPageRoute(
                                     builder:
                                         (context) =>
-                                            const BookAppointmentScreen(),
+                                            const BookLocationScreen(),
                                   ),
                                 );
                                 /*showSnack(
