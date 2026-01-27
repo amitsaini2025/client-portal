@@ -4,4 +4,5 @@ class ApiConfigBansalImmigration {
   static const String clientPortalEndpoint = '/client-portal';
 
   static const String blogListEndpoint = "/blogs/list";
+  static const String blogDetailEndpoint = "/blogs/detail";
 }

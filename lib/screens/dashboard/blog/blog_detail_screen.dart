@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:client/services/api_service_bansal_immigration.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:http/http.dart' as http;
@@ -27,31 +28,24 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
 
   Future<void> _fetchBlogDetail() async {
     setState(() => isLoading = true);
+
     try {
-      final response = await http.get(
-        Uri.parse(
-          'https://migrationmanager.bansalcrm.com/api/blogs/detail/${widget.blogId}',
-        ),
-        headers: {
-          'Authorization':
-              'Bearer 350|WmNai2jZealDRjVkg2VX4bDip4IC95N3hGi3enzK4f42e5cf',
-          'Accept': 'application/json',
-        },
+      final response = await ApiServiceBansalImmigration.getBlogDetail(
+        blogId: widget.blogId,
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true) {
-          setState(() => blog = data['data']);
-        }
+      if (response['success'] == true) {
+        setState(() => blog = response['data']);
       } else {
-        debugPrint("Failed to load blog: ${response.statusCode}");
+        debugPrint("Failed to load blog");
       }
     } catch (e) {
       debugPrint("Error fetching blog: $e");
     }
+
     setState(() => isLoading = false);
   }
+
 
   @override
   Widget build(BuildContext context) {

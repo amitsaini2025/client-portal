@@ -211,4 +211,19 @@ class ApiServiceBansalImmigration{
     );
   }
 
+  static Future<Map<String, dynamic>> getBlogDetail({
+    required int blogId,
+  }) async {
+    final endpoint =
+        "${ApiConfigBansalImmigration.blogDetailEndpoint}/$blogId";
+
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+
 }
