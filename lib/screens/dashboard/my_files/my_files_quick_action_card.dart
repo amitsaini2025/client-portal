@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+import '../../../services/auth_service.dart';
+
 class MyFilesQuickActionsCard extends StatelessWidget {
   final VoidCallback onUploadDocument;
   final VoidCallback onSendMessage;
@@ -34,13 +36,67 @@ class MyFilesQuickActionsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'My Files',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              fontSize: 15,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'My Files',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder:
+                        (context) => AlertDialog(
+                          title: const Text("Change Matter"),
+                          content: const Text(
+                            "Do you want to change the selected matter?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("No"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/matters');
+                              },
+                              child: const Text("Yes"),
+                            ),
+                          ],
+                        ),
+                  );
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      AuthService.selectedMatterName ?? '',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      "ID: ${AuthService.selectedMatterId ?? ''}",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           MasonryGridView.count(
@@ -54,53 +110,60 @@ class MyFilesQuickActionsCard extends StatelessWidget {
               switch (index) {
                 case 0:
                   return _buildTile(
-                      context,
-                      icon: Icons.upload_file,
-                      label: 'Upload\nDocument',
-                      color: Colors.blueAccent.shade100,
-                      onTap: onUploadDocument);
+                    context,
+                    icon: Icons.upload_file,
+                    label: 'Upload\nDocument',
+                    color: Colors.blueAccent.shade100,
+                    onTap: onUploadDocument,
+                  );
                 case 1:
                   return _buildTile(
-                      context,
-                      icon: Icons.timeline,
-                      label: 'View\nWorkflow',
-                      color: Colors.purpleAccent.shade100,
-                      onTap: onViewWorkflow ?? () {});
+                    context,
+                    icon: Icons.timeline,
+                    label: 'View\nWorkflow',
+                    color: Colors.purpleAccent.shade100,
+                    onTap: onViewWorkflow ?? () {},
+                  );
                 case 2:
                   return _buildTile(
-                      context,
-                      icon: Icons.receipt_long,
-                      label: 'Billing',
-                      color: Colors.redAccent.shade100,
-                      onTap: onBilling ?? () {});
+                    context,
+                    icon: Icons.receipt_long,
+                    label: 'Billing',
+                    color: Colors.redAccent.shade100,
+                    onTap: onBilling ?? () {},
+                  );
                 case 3:
                   return _buildTile(
-                      context,
-                      icon: Icons.assignment,
-                      label: 'Case\nSummary',
-                      color: Colors.indigoAccent.shade100,
-                      onTap: onCaseSummary ?? () {});
+                    context,
+                    icon: Icons.assignment,
+                    label: 'Case\nSummary',
+                    color: Colors.indigoAccent.shade100,
+                    onTap: onCaseSummary ?? () {},
+                  );
                 case 4:
                   return _buildTile(
-                      context,
-                      icon: Icons.description,
-                      label: 'Document\nStatus',
-                      color: Colors.orangeAccent.shade100,
-                      onTap: onDocumentStatus ?? () {});
+                    context,
+                    icon: Icons.description,
+                    label: 'Document\nStatus',
+                    color: Colors.orangeAccent.shade100,
+                    onTap: onDocumentStatus ?? () {},
+                  );
                 case 5:
                   return _buildTile(
-                      context,
-                      icon: Icons.local_activity,
-                      label: 'Recent\nActivity',
-                      color: Colors.amber.shade300,
-                      onTap: onRecentActivity ?? () {});
+                    context,
+                    icon: Icons.local_activity,
+                    label: 'Recent\nActivity',
+                    color: Colors.amber.shade300,
+                    onTap: onRecentActivity ?? () {},
+                  );
                 default:
                   return _buildTile(
-                      context,
-                      icon: Icons.event,
-                      label: 'Upcoming\nDeadlines',
-                      color: Colors.tealAccent.shade100,
-                      onTap: onUpcomingDeadlines ?? () {});
+                    context,
+                    icon: Icons.event,
+                    label: 'Upcoming\nDeadlines',
+                    color: Colors.tealAccent.shade100,
+                    onTap: onUpcomingDeadlines ?? () {},
+                  );
               }
             },
           ),
@@ -109,14 +172,13 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     );
   }
 
-
   Widget _buildTile(
-      BuildContext context, {
-        required IconData icon,
-        required String label,
-        required Color color,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -149,7 +211,11 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white38),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 12,
+              color: Colors.white38,
+            ),
           ],
         ),
       ),

@@ -247,50 +247,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
-        title: GestureDetector(
-          onTap: () {
-            showDialog(
-              context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: const Text("Change Matter"),
-                    content: const Text(
-                      "Do you want to change the selected matter?",
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("No"),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          Navigator.pushNamed(context, '/matters');
-                        },
-                        child: const Text("Yes"),
-                      ),
-                    ],
-                  ),
-            );
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AuthService.selectedMatterName ?? '',
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                "ID: ${AuthService.selectedMatterId ?? ''}",
-                style: const TextStyle(fontSize: 12, color: Colors.white70),
-              ),
-            ],
-          ),
-        ),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
         elevation: 0,
