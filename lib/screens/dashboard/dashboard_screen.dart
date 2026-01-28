@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:client/config/theme_config.dart';
-import 'package:client/screens/appointments/book_appointment_screen.dart';
 import 'package:client/screens/dashboard/personal_info/personal_information_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:client/services/api_service_bansal_immigration.dart';
@@ -20,12 +19,10 @@ import '../../models/recent_activity.dart';
 import '../../models/task.dart';
 import '../../models/upcoming_deadline_summary.dart';
 import '../../services/api_service.dart';
-import '../../services/auth_service.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
 import '../documents/upload_document_screen.dart';
-import 'book_appointment/book_appointment_location_screen.dart';
 import 'book_appointment/book_location_screen.dart';
 import 'my_files/my_files_quick_action_card.dart';
 
@@ -261,6 +258,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
           ),
           IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) =>
+                  const PersonalInformationScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.person_outline),
             onPressed: () {
               Navigator.pushNamed(context, '/profile');
@@ -307,13 +316,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   "This feature will be available in a future update.",
                                 );*/
                               },
-                              onPersonalInformationUpload: () {
-                                Navigator.of(context).push(
+                              onHealthInsurance: () {
+                                /*Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder:
                                         (context) =>
                                             const PersonalInformationScreen(),
                                   ),
+                                );*/
+                                showSnack(
+                                  context,
+                                  "This feature will be available in a future update.",
                                 );
                               },
                               onUpcomingDeadlines: () {

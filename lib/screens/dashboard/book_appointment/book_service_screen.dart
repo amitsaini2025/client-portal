@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
 
+import '../../../models/appointment/appointment_variable_list.dart';
 import 'book_details_screen.dart';
 import 'booking_widget.dart';
 
 class BookServiceScreen extends StatefulWidget {
-  const BookServiceScreen({super.key});
+  final List<ServiceTypeModel> services;
+  final List<SimpleServiceModel> serviceCategories;
+
+  const BookServiceScreen({
+    super.key,
+    required this.services,
+    required this.serviceCategories,
+  });
 
   @override
   State<BookServiceScreen> createState() => _BookServiceScreenState();
 }
 
 class _BookServiceScreenState extends State<BookServiceScreen> {
-  int selected = 0;
+  SimpleServiceModel? selectedService;
 
-  final services = [
-    'Permanent Residency Appointment',
-    'Temporary Residency Appointment',
-    'JRP/Skill Assessment',
-    'Tourist Visa',
-    'Education / Student Visa',
-    'Complex Matters',
-    'Visa Cancellation / Refusals',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    if (widget.serviceCategories.isNotEmpty) {
+      selectedService = widget.serviceCategories.first;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,24 +35,31 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
       activeStep: 2,
       title: 'Select Your Service',
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...List.generate(services.length, (i) {
+          ...widget.serviceCategories.map((service) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: SelectionCard(
-                title: services[i],
-                isSelected: selected == i,
-                onTap: () => setState(() => selected = i),
+                title: service.name,
+                subtitle: service.name,
+                isSelected: selectedService?.id == service.id,
+                onTap: () => setState(() => selectedService = service),
               ),
             );
-          }),
+          }).toList(),
           const SizedBox(height: 30),
           NextButton(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const BookDetailsScreen()),
-              );
+              if (selectedService != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) => BookDetailsScreen(services: widget.services),
+                  ),
+                );
+              }
             },
           ),
         ],

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:client/config/app_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,7 +65,7 @@ class ApiService {
           await AuthService.logout(false);
           navigatorKey.currentState?.pushNamedAndRemoveUntil(
             '/login',
-                (route) => false,
+            (route) => false,
           );
         }
       }
@@ -288,7 +287,9 @@ class ApiService {
     return response;
   }*/
 
-  static Future<Map<String, dynamic>> refreshTokenApi(String refreshToken) async {
+  static Future<Map<String, dynamic>> refreshTokenApi(
+    String refreshToken,
+  ) async {
     final url = ApiConfig.baseUrl + ApiConfig.refreshTokenEndpoint;
 
     final headers = {
@@ -308,7 +309,8 @@ class ApiService {
       return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
       throw Exception(
-          'Failed to refresh token: ${response.statusCode} ${response.body}');
+        'Failed to refresh token: ${response.statusCode} ${response.body}',
+      );
     }
   }
 
@@ -329,10 +331,7 @@ class ApiService {
       final response = await _makeRequest(
         ApiConfig.registerFCMToken,
         _buildHeaders(requiresAuth: true),
-        {
-          'token': token,
-          'client_id': clientId,
-        },
+        {'token': token, 'client_id': clientId},
         'POST',
       );
 
@@ -355,7 +354,6 @@ class ApiService {
       return false;
     }
   }
-
 
   // Client Portal Methods
   static Future<Map<String, dynamic>> getClientProfile() async {
@@ -985,23 +983,13 @@ class ApiService {
     final endpoint =
         "${ApiConfig.blogListEndpoint}?page=$page&per_page=$perPage&featured=1";
 
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
   static Future<Map<String, dynamic>> getPRPoints() async {
     final endpoint = ApiConfig.prPointsCalcList;
 
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
   static Future<Map<String, dynamic>> calculatePRPoints({
@@ -1009,34 +997,20 @@ class ApiService {
   }) async {
     final endpoint = ApiConfig.prPointCalcResult;
 
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      payload,
-      'POST',
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), payload, 'POST');
   }
 
   static Future<Map<String, dynamic>> getStudentCalcLists() async {
     final endpoint = ApiConfig.studentCalcList;
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
-  static Future<Map<String, dynamic>> calculateStudentFund(
-      {required Map<String, dynamic> payload}) async {
+  static Future<Map<String, dynamic>> calculateStudentFund({
+    required Map<String, dynamic> payload,
+  }) async {
     final endpoint = ApiConfig.studentCalcResult;
 
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      payload,
-      'POST',
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), payload, 'POST');
   }
 
   static Future<Map<String, dynamic>> occupationFinder(String query) async {
@@ -1047,21 +1021,47 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> postcodeSearch(String query) async {
-    String endpoint =
-        "${ApiConfig.postCodeSearch}?q=$query";
+    String endpoint = "${ApiConfig.postCodeSearch}?q=$query";
 
     final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
     return response;
   }
 
   static Future<Map<String, dynamic>> postcodeResult(String postcode) async {
-    String endpoint =
-        "${ApiConfig.postCodeResult}?postcode=$postcode";
+    String endpoint = "${ApiConfig.postCodeResult}?postcode=$postcode";
 
     final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
     return response;
   }
 
+  static Future<Map<String, dynamic>> getAppointmentVariableLists() async {
+    const endpoint = ApiConfig.appointmentVariableLists;
+
+    final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
+
+    return response;
+  }
+
+  static Future<Map<String, dynamic>> getAppointments({
+    int page = 1,
+    int perPage = 50,
+  }) async {
+    final endpoint = "${ApiConfig.appointments}?per_page=$perPage&page=$page";
+
+    final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
+    return response;
+  }
+
+  static Future<Map<String, dynamic>> getAppointmentById(int id) async {
+    final endpoint = "${ApiConfig.appointments}/$id";
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      "GET",
+    );
+    return response;
+  }
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(

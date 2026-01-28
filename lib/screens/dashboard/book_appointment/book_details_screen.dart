@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../../../models/appointment/appointment_variable_list.dart';
 import 'book_confirm_screen.dart';
 import 'booking_widget.dart';
 
 class BookDetailsScreen extends StatefulWidget {
-  const BookDetailsScreen({super.key});
+  final List<ServiceTypeModel> services;
+
+  const BookDetailsScreen({super.key, required this.services});
 
   @override
-  State<BookDetailsScreen> createState() => _ServiceDetailsScreenState();
+  State<BookDetailsScreen> createState() => _BookDetailsScreenState();
 }
 
-class _ServiceDetailsScreenState extends State<BookDetailsScreen> {
+class _BookDetailsScreenState extends State<BookDetailsScreen> {
   int selectedIndex = 0;
 
   @override
@@ -20,58 +23,38 @@ class _ServiceDetailsScreenState extends State<BookDetailsScreen> {
       title: 'Select Service',
       child: Column(
         children: [
-          ServiceCard(
-            tagText: 'FREE',
-            tagColor: Colors.green,
-            title: 'Free Consultation',
-            priceText: 'FREE',
-            duration: '15 minutes • 10:45 AM - 4:00 PM',
-            description:
-                'Perfect for initial inquiries: Quick assessment of your immigration situation, '
-                'basic visa pathway guidance, and preliminary advice. '
-                'Available for clients currently within Australia only. '
-                'Includes initial case evaluation and next steps recommendation.',
-            availability:
-                'Available: Monday to Friday, 10:45 AM - 4:00 PM • 15-minute time slots',
-            selected: selectedIndex == 0,
-            onTap: () => setState(() => selectedIndex = 0),
-          ),
-          const SizedBox(height: 20),
+          ...List.generate(widget.services.length, (index) {
+            final service = widget.services[index];
 
-          ServiceCard(
-            tagText: '\$150',
-            tagColor: Colors.orange,
-            title: 'Comprehensive Migration Advice',
-            priceText: '\$150',
-            duration: '30 minutes • 9:00 AM - 5:00 PM',
-            description:
-                'In-depth professional consultation: Comprehensive case analysis, '
-                'detailed migration strategy, complex visa applications, ART appeals, '
-                'visa cancellations, protection visas, and personalized action plans. '
-                'Suitable for overseas applicants and complex cases.',
-            availability:
-                'Available: Monday to Friday, 9:00 AM - 5:00 PM • 30-minute time slots • Includes video call option',
-            selected: selectedIndex == 1,
-            onTap: () => setState(() => selectedIndex = 1),
-          ),
-          const SizedBox(height: 20),
+            final tagText = service.price == 0
+                ? 'FREE'
+                : service.availableForOverseas
+                ? 'OVERSEAS'
+                : service.priceDisplay;
 
-          ServiceCard(
-            tagText: 'OVERSEAS',
-            tagColor: const Color(0xFF1E3A8A),
-            title: 'Overseas Applicant Enquiry',
-            priceText: '\$150',
-            duration: '30 minutes • 9:00 AM - 5:00 PM',
-            description:
-                'Specialized consultation for overseas applicants: For applicants currently '
-                'outside Australia or inquiring on behalf of someone overseas. '
-                'Includes detailed assessment and personalized migration strategy.',
-            availability:
-                'Available: Monday to Friday, 9:00 AM - 5:00 PM • 30-minute time slots • Includes video call option',
-            selected: selectedIndex == 2,
-            onTap: () => setState(() => selectedIndex = 2),
-          ),
+            final tagColor = service.price == 0
+                ? Colors.green
+                : service.availableForOverseas
+                ? const Color(0xFF1E3A8A)
+                : Colors.orange;
 
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: ServiceCard(
+                tagText: tagText,
+                tagColor: tagColor,
+                title: service.name,
+                priceText: service.priceDisplay,
+                duration:
+                '${service.duration} ${service.durationUnit} • ${service.startTime} - ${service.endTime} ${service.timeFormat}',
+                description: service.description,
+                availability:
+                'Available: ${service.availableDays.join(', ')} • ${service.timeSlotDescription}',
+                selected: selectedIndex == index,
+                onTap: () => setState(() => selectedIndex = index),
+              ),
+            );
+          }),
           const SizedBox(height: 32),
           NextButton(
             onTap: () {
@@ -152,13 +135,10 @@ class ServiceCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-
             Text(duration, style: TextStyle(color: Colors.grey.shade600)),
             const SizedBox(height: 12),
-
             Text(description, style: const TextStyle(height: 1.5)),
             const SizedBox(height: 12),
-
             Text(
               availability,
               style: TextStyle(

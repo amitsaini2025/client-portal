@@ -70,6 +70,8 @@ class ApiConfig {
   static const String postCodeSearch = "/postcode-search";
   static const String postCodeResult = "/postcode-result";
 
+  static const String appointmentVariableLists = "/appointment-variable-lists";
+  static const String appointments = "/appointments";
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

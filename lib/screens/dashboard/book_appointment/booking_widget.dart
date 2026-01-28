@@ -6,12 +6,14 @@ class ScaffoldWrapper extends StatelessWidget {
   final int activeStep;
   final String title;
   final Widget child;
+  final List<Widget>? actions; // <-- Add this
 
   const ScaffoldWrapper({
     super.key,
     required this.activeStep,
     required this.title,
     required this.child,
+    this.actions, // <-- Add this
   });
 
   @override
@@ -26,39 +28,39 @@ class ScaffoldWrapper extends StatelessWidget {
         backgroundColor: ThemeConfig.goldenYellow,
         elevation: 0,
         foregroundColor: Colors.white,
+        actions: actions, // <-- Pass actions here
       ),
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 1100),
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                StepHeader(activeStep: activeStep),
-                const SizedBox(height: 30),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+      body: Container(
+        constraints: const BoxConstraints(maxWidth: 1100),
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StepHeader(activeStep: activeStep),
+              const SizedBox(height: 30),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 24),
-                child,
-              ],
-            ),
+              ),
+              const SizedBox(height: 24),
+              child,
+            ],
           ),
         ),
       ),
     );
   }
 }
+
 
 class StepHeader extends StatelessWidget {
   final int activeStep;

@@ -3,7 +3,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class QuickActionsCard extends StatelessWidget {
   final VoidCallback onBookAppointment;
-  final VoidCallback? onPersonalInformationUpload;
+  final VoidCallback? onHealthInsurance;
   final VoidCallback? onUpcomingDeadlines;
   final VoidCallback? onPRCalculator;
   final VoidCallback? onStudentFundCalculator;
@@ -13,7 +13,7 @@ class QuickActionsCard extends StatelessWidget {
   const QuickActionsCard({
     super.key,
     required this.onBookAppointment,
-    this.onPersonalInformationUpload,
+    this.onHealthInsurance,
     this.onUpcomingDeadlines,
     this.onPRCalculator,
     this.onStudentFundCalculator,
@@ -64,10 +64,10 @@ class QuickActionsCard extends StatelessWidget {
                   );
                 case 1:
                   return _tile(
-                    icon: Icons.person,
-                    label: 'Personal\nInfo',
+                    icon: Icons.health_and_safety,
+                    label: 'Health\nInsurance',
                     color: Colors.brown,
-                    onTap: onPersonalInformationUpload ?? () {},
+                    onTap: onHealthInsurance ?? () {},
                   );
                 case 2:
                   return _tile(
