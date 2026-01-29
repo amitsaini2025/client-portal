@@ -70,6 +70,7 @@ dependencies:
   connectivity_plus: ^6.1.5
   
   # Date & Time
+  table_calendar: ^3.0.9
   intl: ^0.20.2
   
   # Charts & Analytics

@@ -1063,6 +1063,52 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> getDisabledDates({
+    required int id,
+    required int enquiryItem,
+    required int inPersonAddress,
+  }) async {
+    const endpoint = ApiConfig.appointmentsGetDisabledDates;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "id": id,
+        "enquiry_item": enquiryItem,
+        "inperson_address": inPersonAddress,
+      },
+      "POST",
+    );
+
+    return response;
+  }
+
+  static Future<Map<String, dynamic>> getDisabledSlots({
+    required int serviceId,
+    required int enquiryItem,
+    required int inPersonAddress,
+    required String selectedDate,
+  }) async {
+    const endpoint = ApiConfig.appointmentsGetDisabledSlots;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "service_id": serviceId,
+        "enquiry_item": enquiryItem,
+        "inperson_address": inPersonAddress,
+        "sel_date": selectedDate,
+      },
+      "POST",
+    );
+
+    return response;
+  }
+
+
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
     String endpoint,
