@@ -191,6 +191,12 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
                   const SizedBox(height: 40),
                   NextButton(
                     onTap: () {
+                      Map<String, dynamic> selectedOptions = {
+                        'inperson_address': selectedLocation?.id,
+                        'appointment_details': selectedMeeting?.name,
+                        'preferred_language': selectedLanguage?.name,
+                      };
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -198,6 +204,7 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
                               (_) => BookServiceScreen(
                                 services: services,
                                 serviceCategories: serviceCategories,
+                                selectedOptions: selectedOptions,
                               ),
                         ),
                       );

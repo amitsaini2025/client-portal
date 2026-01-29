@@ -1108,6 +1108,35 @@ class ApiService {
   }
 
 
+  static Future<Map<String, dynamic>> createAppointmentNew({
+    required int noeId,
+    required int serviceId,
+    required String appointDate,
+    required String appointTime,
+    required String description,
+    required String appointmentDetails,
+    required String preferredLanguage,
+    required int inPersonAddress,
+  }) async {
+    const endpoint = ApiConfig.appointments;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        "noe_id": noeId,
+        "service_id": serviceId,
+        "appoint_date": appointDate,
+        "appoint_time": appointTime,
+        "description": description,
+        "appointment_details": appointmentDetails,
+        "preferred_language": preferredLanguage,
+        "inperson_address": inPersonAddress,
+      },
+      "POST",
+    );
+    return response;
+  }
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(

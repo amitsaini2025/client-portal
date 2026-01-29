@@ -7,11 +7,13 @@ import 'booking_widget.dart';
 class BookServiceScreen extends StatefulWidget {
   final List<ServiceTypeModel> services;
   final List<SimpleServiceModel> serviceCategories;
+  final Map<String, dynamic> selectedOptions;
 
   const BookServiceScreen({
     super.key,
     required this.services,
     required this.serviceCategories,
+    required this.selectedOptions,
   });
 
   @override
@@ -52,11 +54,15 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
           NextButton(
             onTap: () {
               if (selectedService != null) {
+                widget.selectedOptions['noe_id'] = selectedService?.id;
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder:
-                        (_) => BookDetailsScreen(services: widget.services),
+                        (_) => BookDetailsScreen(
+                          services: widget.services,
+                          selectedOptions: widget.selectedOptions,
+                        ),
                   ),
                 );
               }

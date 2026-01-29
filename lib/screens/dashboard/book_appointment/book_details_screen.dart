@@ -6,8 +6,13 @@ import 'booking_widget.dart';
 
 class BookDetailsScreen extends StatefulWidget {
   final List<ServiceTypeModel> services;
+  final Map<String, dynamic> selectedOptions;
 
-  const BookDetailsScreen({super.key, required this.services});
+  const BookDetailsScreen({
+    super.key,
+    required this.services,
+    required this.selectedOptions,
+  });
 
   @override
   State<BookDetailsScreen> createState() => _BookDetailsScreenState();
@@ -26,17 +31,19 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           ...List.generate(widget.services.length, (index) {
             final service = widget.services[index];
 
-            final tagText = service.price == 0
-                ? 'FREE'
-                : service.availableForOverseas
-                ? 'OVERSEAS'
-                : service.priceDisplay;
+            final tagText =
+                service.price == 0
+                    ? 'FREE'
+                    : service.availableForOverseas
+                    ? 'OVERSEAS'
+                    : service.priceDisplay;
 
-            final tagColor = service.price == 0
-                ? Colors.green
-                : service.availableForOverseas
-                ? const Color(0xFF1E3A8A)
-                : Colors.orange;
+            final tagColor =
+                service.price == 0
+                    ? Colors.green
+                    : service.availableForOverseas
+                    ? const Color(0xFF1E3A8A)
+                    : Colors.orange;
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 20),
@@ -46,10 +53,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 title: service.name,
                 priceText: service.priceDisplay,
                 duration:
-                '${service.duration} ${service.durationUnit} • ${service.startTime} - ${service.endTime} ${service.timeFormat}',
+                    '${service.duration} ${service.durationUnit} • ${service.startTime} - ${service.endTime} ${service.timeFormat}',
                 description: service.description,
                 availability:
-                'Available: ${service.availableDays.join(', ')} • ${service.timeSlotDescription}',
+                    'Available: ${service.availableDays.join(', ')} • ${service.timeSlotDescription}',
                 selected: selectedIndex == index,
                 onTap: () => setState(() => selectedIndex = index),
               ),
@@ -58,9 +65,16 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           const SizedBox(height: 32),
           NextButton(
             onTap: () {
+              widget.selectedOptions['service_id'] =
+                  widget.services[selectedIndex];
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const BookConfirmScreen()),
+                MaterialPageRoute(
+                  builder:
+                      (_) => BookConfirmScreen(
+                        selectedOptions: widget.selectedOptions,
+                      ),
+                ),
               );
             },
           ),
