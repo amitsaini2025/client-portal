@@ -69,6 +69,7 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
 
   Future<void> _createAppointment() async {
     final description = enquiryController.text.trim();
+
     if (description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Details of Enquiry are required')),
@@ -89,18 +90,30 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
       final formatter = DateFormat('yyyy-MM-dd');
       final appointDate = formatter.format(selectedDay!);
 
-      final serviceId = widget.selectedOptions['service_id'];
-      final int serviceIdValue = serviceId is int ? serviceId : serviceId.id;
+      final serviceIdRaw = widget.selectedOptions['service_id'];
+      final int serviceIdValue = serviceIdRaw is int
+          ? serviceIdRaw
+          : int.tryParse(serviceIdRaw.toString()) ?? 0;
+
+      final noeIdRaw = widget.selectedOptions['noe_id'];
+      final int noeIdValue = noeIdRaw is int
+          ? noeIdRaw
+          : int.tryParse(noeIdRaw.toString()) ?? 0;
+
+      final inPersonAddressRaw = widget.selectedOptions['inperson_address'];
+      final int inPersonAddressValue = inPersonAddressRaw is int
+          ? inPersonAddressRaw
+          : int.tryParse(inPersonAddressRaw.toString()) ?? 0;
 
       final response = await ApiService.createAppointmentNew(
-        noeId: widget.selectedOptions['noe_id'],
+        noeId: noeIdValue,
         serviceId: serviceIdValue,
         appointDate: appointDate,
         appointTime: selectedTime!,
         description: description,
-        appointmentDetails: widget.selectedOptions['appointment_details'],
-        preferredLanguage: widget.selectedOptions['preferred_language'],
-        inPersonAddress: widget.selectedOptions['inperson_address'],
+        appointmentDetails: widget.selectedOptions['appointment_details']?.toString() ?? '',
+        preferredLanguage: widget.selectedOptions['preferred_language']?.toString() ?? '',
+        inPersonAddress: inPersonAddressValue,
       );
 
       setState(() => isLoading = false);
@@ -122,6 +135,7 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

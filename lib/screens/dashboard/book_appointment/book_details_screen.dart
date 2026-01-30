@@ -66,7 +66,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           NextButton(
             onTap: () {
               widget.selectedOptions['service_id'] =
-                  widget.services[selectedIndex];
+                  widget.services[selectedIndex].id;
               Navigator.push(
                 context,
                 MaterialPageRoute(
