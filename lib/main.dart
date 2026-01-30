@@ -10,7 +10,6 @@ import 'package:client/screens/dashboard/post_code_checker/postcode_checker_scre
 import 'package:client/screens/dashboard/pr_calculator/pr_calculator_screen.dart';
 import 'package:client/screens/dashboard/student_fund_calculator/student_fund_calculator_screen.dart';
 import 'package:client/screens/document_management/document_management.dart';
-import 'package:client/screens/documents/documents_screen.dart';
 import 'package:client/screens/matters/matters_screen.dart';
 import 'package:client/screens/pdf/pdf_viewer_screen.dart';
 import 'package:client/screens/profile/edit_profile_screen.dart';
@@ -18,8 +17,10 @@ import 'package:client/screens/profile/profile_screen.dart';
 import 'package:client/screens/recent_activity/recent_activity.dart';
 import 'package:client/screens/tasks/tasks_screen.dart';
 import 'package:client/screens/workflow/message/workflow_message_detail_screen.dart';
+import 'package:client/screens/workflow/message/workflow_messages_screen.dart';
 import 'package:client/screens/workflow/workflow_documents_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
+import 'package:client/screens/workflow/workflow_stages_screen.dart';
 import 'package:client/utils/navigation_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -332,7 +333,8 @@ class MyAppWithTheme extends StatelessWidget {
             '/profile': (context) => const ProfileScreen(),
             '/profile/edit': (context) => const EditProfileScreen(),
             '/recent-cases': (context) => const CasesListScreen(),
-            '/documents': (context) => const DocumentsScreen(),
+            //'/documents': (context) => const DocumentsScreen(),
+            '/documents': (context) => const WorkflowDocumentsScreen(),
             '/tasks': (context) => const TasksScreen(),
             '/recent-activity': (context) => const RecentActivityScreen(),
             '/document-management':
@@ -347,6 +349,8 @@ class MyAppWithTheme extends StatelessWidget {
               );
             },
             '/workflow': (context) => const WorkflowScreen(),
+            '/workflow-stages': (context) => const WorkflowStagesScreen(),
+            '/workflow-message': (context) => const WorkflowMessagesScreen(),
             '/workflow-message-detail': (context) {
               final args =
                   ModalRoute.of(context)!.settings.arguments
@@ -371,7 +375,8 @@ class MyAppWithTheme extends StatelessWidget {
             },
             '/my-files': (context) => MyFilesScreen(),
             '/pr-calculator': (context) => PRCalculatorScreen(),
-            '/student-fund-calculator': (context) => StudentFundCalculatorScreen(),
+            '/student-fund-calculator':
+                (context) => StudentFundCalculatorScreen(),
             '/occupation-search': (context) => OccupationSearchScreen(),
             '/post-code-checker': (context) => PostcodeCheckerScreen(),
           },

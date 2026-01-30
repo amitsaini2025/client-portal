@@ -241,6 +241,15 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Messages',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: ThemeConfig.goldenYellow,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+      ),
       backgroundColor: const Color(0xFFF5F5F5),
       body: _isLoading
           ? Center(

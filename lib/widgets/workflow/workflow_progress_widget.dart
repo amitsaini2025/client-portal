@@ -13,12 +13,8 @@ class WorkflowProgressWidget extends StatelessWidget {
 
   Color _getStageColor(WorkflowStage stage, BuildContext context) {
     if (stage.isCurrentStage || stage.isActive) {
-      return Theme
-          .of(context)
-          .colorScheme
-          .primary;
+      return Theme.of(context).colorScheme.primary;
     }
-    // Check if stage is before current stage
     final currentIndex = workflowResponse.currentStageIndex;
     final stageIndex = workflowResponse.workflowStages.indexOf(stage);
     if (currentIndex >= 0 && stageIndex < currentIndex) {
@@ -31,7 +27,6 @@ class WorkflowProgressWidget extends StatelessWidget {
     if (stage.isCurrentStage || stage.isActive) {
       return Icons.radio_button_checked;
     }
-    // Check if stage is before current stage (completed)
     final currentIndex = workflowResponse.currentStageIndex;
     final stageIndex = workflowResponse.workflowStages.indexOf(stage);
     if (currentIndex >= 0 && stageIndex < currentIndex) {
@@ -45,15 +40,10 @@ class WorkflowProgressWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Progress Summary Card
         _buildProgressSummaryCard(context),
         const SizedBox(height: 24),
-
-        // Progress Bar
         _buildProgressBar(context),
         const SizedBox(height: 24),
-
-        // Workflow Stages List
         _buildStagesList(context),
       ],
     );
@@ -70,10 +60,7 @@ class WorkflowProgressWidget extends StatelessWidget {
           children: [
             const Text(
               'Workflow Progress',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Row(
@@ -108,11 +95,13 @@ class WorkflowProgressWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStat(BuildContext context,
+  Widget _buildStat(
+      BuildContext context,
       String label,
       String value,
       Color color,
-      IconData icon,) {
+      IconData icon,
+      ) {
     return Column(
       children: [
         Icon(icon, color: color, size: 32),
@@ -127,10 +116,7 @@ class WorkflowProgressWidget extends StatelessWidget {
         ),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
-          ),
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
         ),
       ],
     );
@@ -147,20 +133,14 @@ class WorkflowProgressWidget extends StatelessWidget {
           children: [
             const Text(
               'Overall Progress',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             ),
             Text(
               '$progress%',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
-                color: Theme
-                    .of(context)
-                    .colorScheme
-                    .primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ],
@@ -173,10 +153,7 @@ class WorkflowProgressWidget extends StatelessWidget {
             minHeight: 12,
             backgroundColor: Colors.grey.shade200,
             valueColor: AlwaysStoppedAnimation<Color>(
-              Theme
-                  .of(context)
-                  .colorScheme
-                  .primary,
+              Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
@@ -203,35 +180,32 @@ class WorkflowProgressWidget extends StatelessWidget {
       children: [
         const Text(
           'All Stages',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
-        ...workflowResponse.workflowStages
-            .asMap()
-            .entries
-            .map((entry) {
-          final index = entry.key;
+        ...workflowResponse.workflowStages.asMap().entries.map((entry) {
           final stage = entry.value;
-          final isLast = index == workflowResponse.workflowStages.length - 1;
+          final isLast =
+              entry.key == workflowResponse.workflowStages.length - 1;
           return _buildStageItem(context, stage, isLast);
-        }).toList(),
+        }),
       ],
     );
   }
 
-  Widget _buildStageItem(BuildContext context, WorkflowStage stage,
-      bool isLast) {
+  Widget _buildStageItem(
+      BuildContext context,
+      WorkflowStage stage,
+      bool isLast,
+      ) {
     final color = _getStageColor(stage, context);
     final icon = _getStageIcon(stage);
     final isCurrent = stage.isCurrentStage || stage.isActive;
+    final primary = Theme.of(context).colorScheme.primary;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Timeline column
         Column(
           children: [
             Container(
@@ -262,14 +236,12 @@ class WorkflowProgressWidget extends StatelessWidget {
               Container(
                 width: 2,
                 height: 60,
-                color: color == Colors.grey.shade300
-                    ? Colors.grey.shade300
-                    : color,
+                color:
+                color == Colors.grey.shade300 ? Colors.grey.shade300 : color,
               ),
           ],
         ),
         const SizedBox(width: 16),
-        // Stage info
         Expanded(
           child: GestureDetector(
             onTap: () => onStageTap?.call(stage),
@@ -277,21 +249,10 @@ class WorkflowProgressWidget extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: isCurrent
-                    ? Theme
-                    .of(context)
-                    .colorScheme
-                    .primary
-                    .withOpacity(0.1)
-                    : Colors.grey.shade50,
+                color: isCurrent ? primary.withOpacity(0.1) : Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isCurrent
-                      ? Theme
-                      .of(context)
-                      .colorScheme
-                      .primary
-                      : Colors.grey.shade300,
+                  color: isCurrent ? primary : Colors.grey.shade300,
                   width: isCurrent ? 2 : 1,
                 ),
               ),
@@ -304,9 +265,7 @@ class WorkflowProgressWidget extends StatelessWidget {
                       fontWeight:
                       isCurrent ? FontWeight.bold : FontWeight.w500,
                       fontSize: 14,
-                      color: isCurrent
-                          ? Colors.white
-                          : Colors.black87,
+                      color: isCurrent ? primary : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -314,13 +273,10 @@ class WorkflowProgressWidget extends StatelessWidget {
                     stage.statusText,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isCurrent
-                          ? Colors.white
-                          : Colors.black87,
+                      color: isCurrent ? primary : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Allowed Checklist Items
                   if (stage.allowedChecklist.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,37 +286,35 @@ class WorkflowProgressWidget extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: isCurrent
-                                ? Colors.white
-                                : Colors.black87,
+                            color: isCurrent ? primary : Colors.black87,
                           ),
                         ),
                         const SizedBox(height: 4),
                         ...stage.allowedChecklist.map(
-                              (item) =>
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 2),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.check,
-                                      size: 14,
-                                      color: Colors.green,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(
-                                        item.name,
-                                        style: TextStyle(fontSize: 12,
-                                            color: isCurrent
-                                                ? Colors.white
-                                                : Colors.black87),
-                                      ),
-                                    ),
-                                  ],
+                              (item) => Padding(
+                            padding:
+                            const EdgeInsets.symmetric(vertical: 2),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.check,
+                                  size: 14,
+                                  color: Colors.green,
                                 ),
-                              ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    item.name,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color:
+                                      isCurrent ? primary : Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -372,7 +326,6 @@ class WorkflowProgressWidget extends StatelessWidget {
       ],
     );
   }
-
 }
 
 // Compact version for dashboard
@@ -387,8 +340,8 @@ class CompactWorkflowProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = workflowResponse.progressPercentage;
-    final currentStageName = workflowResponse.activeStage?.stageName ??
-        'Not Started';
+    final currentStageName =
+        workflowResponse.activeStage?.stageName ?? 'Not Started';
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -405,10 +358,7 @@ class CompactWorkflowProgress extends StatelessWidget {
               Icon(
                 Icons.timeline,
                 size: 16,
-                color: Theme
-                    .of(context)
-                    .colorScheme
-                    .primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -427,10 +377,7 @@ class CompactWorkflowProgress extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Theme
-                      .of(context)
-                      .colorScheme
-                      .primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
@@ -443,10 +390,7 @@ class CompactWorkflowProgress extends StatelessWidget {
               minHeight: 4,
               backgroundColor: Colors.grey.shade300,
               valueColor: AlwaysStoppedAnimation<Color>(
-                Theme
-                    .of(context)
-                    .colorScheme
-                    .primary,
+                Theme.of(context).colorScheme.primary,
               ),
             ),
           ),

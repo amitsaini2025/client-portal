@@ -12,6 +12,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
   final VoidCallback? onDocumentStatus;
   final VoidCallback? onUpcomingDeadlines;
   final VoidCallback? onRecentActivity;
+  final VoidCallback? onMessage;
 
   const MyFilesQuickActionsCard({
     super.key,
@@ -23,6 +24,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     this.onDocumentStatus,
     this.onUpcomingDeadlines,
     this.onRecentActivity,
+    this.onMessage
   });
 
   @override
@@ -105,7 +107,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            itemCount: 6,
+            itemCount: 7,
             itemBuilder: (context, index) {
               switch (index) {
                 case 0:
@@ -155,6 +157,14 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     label: 'Recent\nActivity',
                     color: Colors.amber.shade300,
                     onTap: onRecentActivity ?? () {},
+                  );
+                case 6:
+                  return _buildTile(
+                    context,
+                    icon: Icons.message,
+                    label: 'Message',
+                    color: Colors.green,
+                    onTap: onMessage ?? () {},
                   );
                 default:
                   return _buildTile(

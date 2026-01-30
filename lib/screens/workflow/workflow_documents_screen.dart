@@ -97,28 +97,26 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
   Widget build(BuildContext context) {
     final content = _buildContent();
 
-    if (widget.stageId != null) {
-      String stageName = widget.stageName ?? "Document";
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            stageName,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 1.2,
-            ),
-          ),
-          centerTitle: true,
-          elevation: 4,
-          backgroundColor: ThemeConfig.goldenYellow,
-          iconTheme: const IconThemeData(
+    String stageName = widget.stageName ?? "Document";
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          stageName,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
             color: Colors.white,
+            letterSpacing: 1.2,
           ),
         ),
-        body: content,
-      );
-    }
+        centerTitle: true,
+        elevation: 4,
+        backgroundColor: ThemeConfig.goldenYellow,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
+      ),
+      body: content,
+    );
 
     // Case 2 → stageId is NULL → No AppBar
     return content;

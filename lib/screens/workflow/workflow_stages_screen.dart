@@ -59,33 +59,44 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: ThemeConfig.navyBlue),
-      );
-    }
-
-    if (_error != null) {
-      return _buildErrorWidget(_error!, _loadWorkflowData);
-    }
-
-    if (_workflowResponse == null) {
-      return const Center(child: Text('No workflow data available'));
-    }
-
-    return RefreshIndicator(
-      color: ThemeConfig.goldenYellow,
-      onRefresh: _loadWorkflowData,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
-        child: WorkflowProgressWidget(
-          workflowResponse: _workflowResponse!,
-          onStageTap: _showStageDetails,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text(
+          'Workflow Stages',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: ThemeConfig.goldenYellow,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+      ),
+      body: _isLoading
+          ? const Center(
+        child: CircularProgressIndicator(
+          color: ThemeConfig.navyBlue,
+        ),
+      )
+          : _error != null
+          ? _buildErrorWidget(_error!, _loadWorkflowData)
+          : _workflowResponse == null
+          ? const Center(
+        child: Text('No workflow data available'),
+      )
+          : RefreshIndicator(
+        color: ThemeConfig.goldenYellow,
+        onRefresh: _loadWorkflowData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          child: WorkflowProgressWidget(
+            workflowResponse: _workflowResponse!,
+            onStageTap: _showStageDetails,
+          ),
         ),
       ),
     );
   }
+
 
   Widget _buildErrorWidget(String error, VoidCallback onRetry) {
     return Center(

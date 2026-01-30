@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:client/config/theme_config.dart';
 import 'package:client/screens/dashboard/personal_info/personal_information_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
+import 'package:client/screens/workflow/workflow_stages_screen.dart';
 import 'package:client/services/api_service_bansal_immigration.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -376,7 +377,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder:
-                                        (context) => const WorkflowScreen(),
+                                        (context) => const WorkflowStagesScreen(),
                                   ),
                                 );
                               },
@@ -404,6 +405,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Navigator.pushNamed(
                                   context,
                                   '/recent-activity',
+                                );
+                              },
+                              onMessage: (){
+                                Navigator.pushNamed(
+                                  context,
+                                  '/workflow-message',
                                 );
                               },
                             ),
