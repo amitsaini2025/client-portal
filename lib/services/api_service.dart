@@ -1138,6 +1138,27 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> processAppointmentPayment({
+    required int appointmentId,
+    required double amount,
+    required String paymentMethodId,
+    required String currency,
+  }) async {
+    final endpoint = ApiConfig.appointmentsProcessPayment;
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        'appointment_id': appointmentId,
+        'amount': amount,
+        'payment_method_id': paymentMethodId,
+        'currency': currency,
+      },
+      "POST",
+    );
+    return response;
+  }
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
     String endpoint,

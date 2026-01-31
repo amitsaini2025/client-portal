@@ -74,6 +74,7 @@ class ApiConfig {
   static const String appointments = "/appointments";
   static const String appointmentsGetDisabledDates = "/appointments/get-disabled-dates";
   static const String appointmentsGetDisabledSlots = "/appointments/get-disabled-slots";
+  static const String appointmentsProcessPayment = "/appointments/process-payment";
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

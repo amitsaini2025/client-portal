@@ -65,8 +65,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           const SizedBox(height: 32),
           NextButton(
             onTap: () {
-              widget.selectedOptions['service_id'] =
-                  widget.services[selectedIndex].id;
+              widget.selectedOptions['service_id'] = widget.services[selectedIndex].id;
+              widget.selectedOptions['service_price'] = widget.services[selectedIndex].price;
               Navigator.push(
                 context,
                 MaterialPageRoute(

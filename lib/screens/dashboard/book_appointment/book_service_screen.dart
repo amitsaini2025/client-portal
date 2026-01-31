@@ -55,6 +55,7 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
             onTap: () {
               if (selectedService != null) {
                 widget.selectedOptions['noe_id'] = selectedService?.id;
+                widget.selectedOptions["service_name"] = selectedService?.name;
                 Navigator.push(
                   context,
                   MaterialPageRoute(
