@@ -62,7 +62,6 @@ class _BookConfirmAppointmentScreenState
         final amountInMinorUnit =
         StripeService.amountToMinorUnit(price.toDouble());
 
-        // 1️⃣ Create PaymentIntent on backend
         final paymentIntent = await StripeService.createPaymentIntent(
           amountInMinorUnit: amountInMinorUnit,
           currency: StripeConfig.defaultCurrency.toLowerCase(),
@@ -80,7 +79,6 @@ class _BookConfirmAppointmentScreenState
           throw Exception('Missing Stripe client secret');
         }
 
-        // 2️⃣ Initialize PaymentSheet
         await Stripe.instance.initPaymentSheet(
           paymentSheetParameters: SetupPaymentSheetParameters(
             paymentIntentClientSecret: clientSecret,
@@ -91,26 +89,22 @@ class _BookConfirmAppointmentScreenState
           ),
         );
 
-        // 3️⃣ Present PaymentSheet to collect card details
         await Stripe.instance.presentPaymentSheet();
 
-        // 4️⃣ Retrieve PaymentIntent result to get payment_method_id (pm_…)
         final paymentIntentResult =
         await Stripe.instance.retrievePaymentIntent(clientSecret);
 
         paymentMethodId = paymentIntentResult.paymentMethodId;
       }
 
-      // 5️⃣ Create appointment after payment
       final appointmentResponse = await _createAppointment();
       final appointmentId = appointmentResponse['data']['id'];
 
-      // 6️⃣ Send payment info to backend
       if (price != 0 && appointmentId != null && paymentMethodId != null) {
         final requestData = {
           'appointment_id': appointmentId,
           'amount': price.toDouble(),
-          'payment_method_id': paymentMethodId, // pm_… sent to backend
+          'payment_method_id': paymentMethodId,
           'currency': StripeConfig.defaultCurrency.toLowerCase(),
         };
 
