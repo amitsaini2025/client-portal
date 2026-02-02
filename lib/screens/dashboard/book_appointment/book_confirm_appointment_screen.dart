@@ -25,8 +25,6 @@ class _BookConfirmAppointmentScreenState
   bool isLoading = false;
   bool isProcessingPayment = false;
 
-  /* -------------------- APPOINTMENT CREATION -------------------- */
-
   Future<Map<String, dynamic>> _createAppointment() async {
     final serviceId =
         int.tryParse(widget.selectedOptions['service_id'].toString()) ?? 0;
@@ -54,8 +52,6 @@ class _BookConfirmAppointmentScreenState
     return response;
   }
 
-  /* -------------------- STRIPE PAYMENT FLOW -------------------- */
-
   Future<void> _handlePaymentAndCreateAppointment() async {
     final price = widget.selectedOptions['service_price'] ?? 0;
 
@@ -67,7 +63,6 @@ class _BookConfirmAppointmentScreenState
     try {
       String? paymentMethodId;
 
-      /// ---------------- FREE SERVICE ----------------
       if (price != 0) {
         final amountInMinorUnit =
         StripeService.amountToMinorUnit(price.toDouble());
@@ -101,16 +96,13 @@ class _BookConfirmAppointmentScreenState
 
         await StripeService.presentPaymentSheet();
 
-        /// Stripe payment method ID
         //paymentMethodId = paymentIntent['payment_method'];
         paymentMethodId = paymentIntent['id'];
       }
 
-      /// ---------------- CREATE APPOINTMENT ----------------
       final appointmentResponse = await _createAppointment();
-      final appointmentId = appointmentResponse['bansal_appointment_id'];
+      final appointmentId = appointmentResponse['data']['id'];
 
-      /// ---------------- PROCESS PAYMENT (BACKEND) ----------------
       if (price != 0 && appointmentId != null && paymentMethodId != null) {
         final requestData = {
           'appointment_id': appointmentId,
@@ -133,7 +125,6 @@ class _BookConfirmAppointmentScreenState
 
       if (!mounted) return;
 
-      /// ---------------- SUCCESS SCREEN ----------------
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -169,7 +160,6 @@ class _BookConfirmAppointmentScreenState
     }
   }
 
-  /* -------------------- UI HELPERS -------------------- */
 
   Widget _row(String label, String value) {
     return Padding(
@@ -188,8 +178,6 @@ class _BookConfirmAppointmentScreenState
       ),
     );
   }
-
-  /* -------------------- BUILD -------------------- */
 
   @override
   Widget build(BuildContext context) {
