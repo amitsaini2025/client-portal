@@ -17,8 +17,8 @@ class StripeConfig {
 
   static const String merchantDisplayName = 'LegiComply';
   static const String merchantIdentifier = 'merchant.com.legicomply';
-  static const String merchantCountryCode = 'US';
-  static const String defaultCurrency = 'usd';
+  static const String merchantCountryCode = 'AU';
+  static const String defaultCurrency = 'aud';
 
   static const Duration paymentTimeout = Duration(minutes: 15);
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 
@@ -26,9 +25,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
 
   Future<void> fetchDetail() async {
     try {
-      final response = await ApiService.getAppointmentById(
-        widget.appointmentId,
-      );
+      final response =
+      await ApiService.getAppointmentById(widget.appointmentId);
 
       setState(() {
         data = response['data'];
@@ -45,127 +43,159 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF6F7FB),
       appBar: AppBar(
         title: const Text(
           'Appointment Details',
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : error != null
-              ? Center(child: Text(error!))
-              : _buildBody(),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : error != null
+          ? Center(child: Text(error!))
+          : _buildBody(),
     );
   }
 
   Widget _buildBody() {
     final d = data!;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFE9EDF5), Color(0xFFF4F6FB)],
-        ),
-      ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// SERVICE TITLE
-          Text(
-            _capitalize(d['specific_service'] ?? ''),
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-          ),
-
-          const SizedBox(height: 16),
-
-          /// TIME
-          Row(
-            children: [
-              const Icon(Icons.access_time, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                _formatTimeRange(d['appointment_time'], d['duration_minutes']),
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          /// DATE
-          Row(
-            children: [
-              const Icon(Icons.calendar_month, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                _formatFullDate(d['appointment_date']),
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          /// ENQUIRY
-          Text(
-            d['enquiry_details'] ?? '',
-            style: const TextStyle(fontSize: 16),
-          ),
-
-          const SizedBox(height: 40),
-
-          /// CREATED BY
-          const Text("Created By:", style: TextStyle(fontSize: 16)),
-
-          const SizedBox(height: 12),
-
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: Colors.blue,
-                child: Text(
-                  _creatorInitial(),
+          _InfoCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _capitalize(d['specific_service'] ?? ''),
                   style: const TextStyle(
-                    color: Colors.white,
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Column(
+                const SizedBox(height: 8),
+                _InfoRow(
+                  icon: Icons.calendar_month,
+                  text: _formatFullDate(d['appointment_date']),
+                ),
+                _InfoRow(
+                  icon: Icons.schedule,
+                  text: _formatTimeRange(
+                    d['appointment_time'],
+                    d['duration_minutes'],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          _InfoCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Client Information",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 10),
+                _KeyValue("Name", d['full_name']),
+                _KeyValue("Email", d['email']),
+                _KeyValue("Phone", d['phone']),
+                _KeyValue("Location", d['location']),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          _InfoCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Appointment Details",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 10),
+                _KeyValue("Meeting Type", d['meeting_type_display']),
+                _KeyValue("Language", d['preferred_language']),
+                _KeyValue("Enquiry Type", d['enquiry_type_display']),
+                _KeyValue("Status", d['status_display']),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          _InfoCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Payment Summary",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 10),
+                _KeyValue("Amount", "\$${d['amount']}"),
+                _KeyValue("Discount", "\$${d['discount_amount']}"),
+                _KeyValue("Final Amount", "\$${d['final_amount']}"),
+                _KeyValue("Payment Status", d['payment']),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          _InfoCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Enquiry Notes",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  d['enquiry_details'] ?? "-",
+                  style: const TextStyle(color: Colors.black54, height: 1.4),
+                ),
+              ],
+            ),
+          ),
+
+          if (d['cancellation_reason'] != null) ...[
+            const SizedBox(height: 14),
+            _InfoCard(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "Super1",
+                children: [
+                  const Text(
+                    "Cancellation",
                     style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.blue,
                       fontWeight: FontWeight.w600,
+                      color: Colors.redAccent,
                     ),
                   ),
-                  SizedBox(height: 4),
-                  Text("admin1@gmail.com", style: TextStyle(fontSize: 14)),
+                  const SizedBox(height: 8),
+                  Text(
+                    d['cancellation_reason'],
+                    style: const TextStyle(color: Colors.black54),
+                  ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ],
       ),
     );
-  }
-
-  String _creatorInitial() {
-    return "S";
   }
 
   String _capitalize(String text) {
@@ -190,11 +220,11 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       "Sep",
       "Oct",
       "Nov",
-      "Dec",
+      "Dec"
     ];
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-    return "${d.day} ${days[d.weekday - 1]}, ${months[d.month - 1]} ${d.year}";
+    return "${days[d.weekday - 1]}, ${d.day} ${months[d.month - 1]} ${d.year}";
   }
 
   String _formatTimeRange(String time, int duration) {
@@ -211,6 +241,83 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     );
 
     return "${start.formatDummy()} - ${end.formatDummy()}";
+  }
+}
+
+class _InfoCard extends StatelessWidget {
+  final Widget child;
+
+  const _InfoCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _InfoRow({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.black54),
+          const SizedBox(width: 8),
+          Text(text, style: const TextStyle(color: Colors.black87)),
+        ],
+      ),
+    );
+  }
+}
+
+class _KeyValue extends StatelessWidget {
+  final String keyText;
+  final String? value;
+
+  const _KeyValue(this.keyText, this.value);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            keyText,
+            style: const TextStyle(color: Colors.black54),
+          ),
+          Flexible(
+            child: Text(
+              value ?? "-",
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

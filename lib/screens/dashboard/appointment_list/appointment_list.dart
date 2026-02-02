@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import 'appointment_detail_screen.dart';
@@ -25,7 +24,6 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   Future<void> fetchAppointments() async {
     try {
       final response = await ApiService.getAppointments(page: 1, perPage: 50);
-
       final list = response['data']['data'];
 
       setState(() {
@@ -43,80 +41,64 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF6F7FB),
       appBar: AppBar(
         title: const Text(
           'Appointments',
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : error != null
-              ? Center(child: Text(error!))
-              : ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: appointments.length,
-                itemBuilder: (context, index) {
-                  final item = appointments[index];
-                  final isLatest = false;
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : error != null
+          ? Center(child: Text(error!))
+          : ListView.builder(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
+        itemCount: appointments.length,
+        itemBuilder: (context, index) {
+          final item = appointments[index];
 
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (_) => AppointmentDetailScreen(
-                                appointmentId: item['id'],
-                              ),
-                        ),
-                      );
-                    },
-                    child: AppointmentCard(data: item, highlighted: isLatest),
-                  );
-                },
-              ),
+          return AppointmentCard(
+            data: item,
+          );
+        },
+      ),
     );
   }
 }
 
 class AppointmentCard extends StatelessWidget {
   final Map<String, dynamic> data;
-  final bool highlighted;
 
   const AppointmentCard({
     super.key,
     required this.data,
-    this.highlighted = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = highlighted ? const Color(0xFF6C7CF0) : Colors.white;
-    final textColor = highlighted ? Colors.white : Colors.black87;
-    final subTextColor = highlighted ? Colors.white70 : Colors.black54;
-
     final createdBy = data['assigned_admin']?['name'];
-    final avatarChar =
-        createdBy != null && createdBy.isNotEmpty
-            ? createdBy[0].toUpperCase()
-            : data['full_name'][0].toUpperCase();
+    final avatarChar = createdBy != null && createdBy.isNotEmpty
+        ? createdBy[0].toUpperCase()
+        : data['full_name'][0].toUpperCase();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -125,35 +107,42 @@ class AppointmentCard extends StatelessWidget {
         children: [
           Text(
             _formatDate(data['appointment_date']),
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: textColor,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
             ),
           ),
 
           const SizedBox(height: 6),
 
-          Text(
-            _formatTime(data['appointment_time'], data['duration_minutes']),
-            style: TextStyle(color: subTextColor),
+          Row(
+            children: [
+              const Icon(Icons.schedule, size: 16, color: Colors.grey),
+              const SizedBox(width: 6),
+              Text(
+                _formatTime(
+                  data['appointment_time'],
+                  data['duration_minutes'],
+                ),
+                style: const TextStyle(color: Colors.black54),
+              ),
+            ],
           ),
 
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
 
           Text(
             _timeAgo(data['created_at']),
-            style: TextStyle(color: subTextColor, fontSize: 12),
+            style: const TextStyle(fontSize: 12, color: Colors.black45),
           ),
 
-          const SizedBox(height: 14),
+          const Divider(height: 24),
 
           Text(
             data['service_type'] ?? '',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: textColor,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
             ),
           ),
 
@@ -161,27 +150,81 @@ class AppointmentCard extends StatelessWidget {
 
           Text(
             data['enquiry_details'] ?? '',
-            style: TextStyle(color: subTextColor),
+            style: const TextStyle(
+              color: Colors.black54,
+              height: 1.4,
+            ),
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
 
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text("Created By:", style: TextStyle(color: subTextColor)),
-              const SizedBox(width: 8),
-              CircleAvatar(
-                radius: 16,
-                backgroundColor:
-                    highlighted ? Colors.white : const Color(0xFF6C7CF0),
-                child: Text(
-                  avatarChar,
-                  style: TextStyle(
-                    color: highlighted ? const Color(0xFF6C7CF0) : Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+              Expanded(
+                child: _LightActionButton(
+                  icon: Icons.info_outline,
+                  label: "Appointment Details",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AppointmentDetailScreen(
+                          appointmentId: data['id'],
+                        ),
+                      ),
+                    );
+                  },
                 ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _LightActionButton(
+                  icon: Icons.history,
+                  label: "Payment History",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AppointmentDetailScreen(
+                          appointmentId: data['id'],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Created By",
+                style: TextStyle(fontSize: 12, color: Colors.black45),
+              ),
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 14,
+                    backgroundColor: const Color(0xFF6C7CF0),
+                    child: Text(
+                      avatarChar,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    createdBy ?? data['full_name'],
+                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                ],
               ),
             ],
           ),
@@ -221,6 +264,49 @@ class AppointmentCard extends StatelessWidget {
     if (diff.inHours < 24) return "${diff.inHours} hours ago";
     if (diff.inDays < 30) return "${diff.inDays} days ago";
     return "${(diff.inDays / 30).floor()} months ago";
+  }
+}
+
+class _LightActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _LightActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: onTap,
+      child: Container(
+        height: 36,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF1F3F9),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.black12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 16, color: Colors.black54),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

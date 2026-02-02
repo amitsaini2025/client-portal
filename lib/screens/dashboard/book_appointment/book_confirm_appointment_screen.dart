@@ -31,10 +31,7 @@ class _BookConfirmAppointmentScreenState
     final noeId =
         int.tryParse(widget.selectedOptions['noe_id'].toString()) ?? 0;
     final inPersonAddress =
-        int.tryParse(
-          widget.selectedOptions['inperson_address']?.toString() ?? '0',
-        ) ??
-            0;
+        int.tryParse(widget.selectedOptions['inperson_address']?.toString() ?? '0') ?? 0;
 
     final response = await ApiService.createAppointmentNew(
       noeId: noeId,
@@ -42,10 +39,8 @@ class _BookConfirmAppointmentScreenState
       appointDate: widget.selectedOptions['appoint_date'],
       appointTime: widget.selectedOptions['appoint_time'],
       description: widget.selectedOptions['description'],
-      appointmentDetails:
-      widget.selectedOptions['appointment_details'] ?? '',
-      preferredLanguage:
-      widget.selectedOptions['preferred_language'] ?? '',
+      appointmentDetails: widget.selectedOptions['appointment_details'] ?? '',
+      preferredLanguage: widget.selectedOptions['preferred_language'] ?? '',
       inPersonAddress: inPersonAddress,
     );
 
@@ -67,18 +62,16 @@ class _BookConfirmAppointmentScreenState
         final amountInMinorUnit =
         StripeService.amountToMinorUnit(price.toDouble());
 
+        // 1️⃣ Create PaymentIntent on backend
         final paymentIntent = await StripeService.createPaymentIntent(
           amountInMinorUnit: amountInMinorUnit,
           currency: StripeConfig.defaultCurrency.toLowerCase(),
           description:
           'Appointment payment for ${widget.selectedOptions['service_name']}',
           metadata: {
-            'service_id':
-            widget.selectedOptions['service_id']?.toString() ?? '',
-            'appointment_date':
-            widget.selectedOptions['appoint_date']?.toString() ?? '',
-            'appointment_time':
-            widget.selectedOptions['appoint_time']?.toString() ?? '',
+            'service_id': widget.selectedOptions['service_id']?.toString() ?? '',
+            'appointment_date': widget.selectedOptions['appoint_date']?.toString() ?? '',
+            'appointment_time': widget.selectedOptions['appoint_time']?.toString() ?? '',
           },
         );
 
@@ -87,27 +80,37 @@ class _BookConfirmAppointmentScreenState
           throw Exception('Missing Stripe client secret');
         }
 
-        await StripeService.initPaymentSheet(
-          clientSecret: clientSecret,
-          style: Theme.of(context).brightness == Brightness.dark
-              ? ThemeMode.dark
-              : ThemeMode.light,
+        // 2️⃣ Initialize PaymentSheet
+        await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentIntentClientSecret: clientSecret,
+            merchantDisplayName: StripeConfig.merchantDisplayName,
+            style: Theme.of(context).brightness == Brightness.dark
+                ? ThemeMode.dark
+                : ThemeMode.light,
+          ),
         );
 
-        await StripeService.presentPaymentSheet();
+        // 3️⃣ Present PaymentSheet to collect card details
+        await Stripe.instance.presentPaymentSheet();
 
-        //paymentMethodId = paymentIntent['payment_method'];
-        paymentMethodId = paymentIntent['id'];
+        // 4️⃣ Retrieve PaymentIntent result to get payment_method_id (pm_…)
+        final paymentIntentResult =
+        await Stripe.instance.retrievePaymentIntent(clientSecret);
+
+        paymentMethodId = paymentIntentResult.paymentMethodId;
       }
 
+      // 5️⃣ Create appointment after payment
       final appointmentResponse = await _createAppointment();
       final appointmentId = appointmentResponse['data']['id'];
 
+      // 6️⃣ Send payment info to backend
       if (price != 0 && appointmentId != null && paymentMethodId != null) {
         final requestData = {
           'appointment_id': appointmentId,
           'amount': price.toDouble(),
-          'payment_method_id': paymentMethodId,
+          'payment_method_id': paymentMethodId, // pm_… sent to backend
           'currency': StripeConfig.defaultCurrency.toLowerCase(),
         };
 
@@ -159,7 +162,6 @@ class _BookConfirmAppointmentScreenState
       });
     }
   }
-
 
   Widget _row(String label, String value) {
     return Padding(
