@@ -68,11 +68,15 @@ class WorkflowMessagesScreen extends StatefulWidget {
 
 class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
   bool _isLoading = true;
+  bool _isLoadingMore = false;
   String? _error;
   List<Message> _messages = [];
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isSending = false;
+  int _currentPage = 1;
+  final int _limit = 20;
+  bool _hasMore = true;
 
   @override
   void initState() {
@@ -81,6 +85,15 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
     PusherService.onMessageReceived = _handleIncomingMessage;
     PusherService.init_();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 100 &&
+          !_isLoadingMore &&
+          _hasMore) {
+        _loadMoreMessages();
+      }
+    });
   }
 
   void _handleIncomingMessage(MessageDetail msgDetail) {
@@ -118,7 +131,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
     _scrollToBottom();
   }
 
-
   Future<void> _markMessageAsRead(int messageId) async {
     try {
       final response = await ApiService.markMessageAsRead(messageId: messageId);
@@ -141,12 +153,16 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
     setState(() {
       _isLoading = true;
       _error = null;
+      _currentPage = 1;
+      _hasMore = true;
     });
 
     try {
       final response = await ApiService.getWorkflowMessages(
         clientMatterId: AuthService.selectedMatterId!,
         clientMatterStageId: AuthService.clientMatterStageId ?? 0,
+        page: _currentPage,
+        limit: _limit,
       );
 
       if (response['success'] == true) {
@@ -154,9 +170,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
         setState(() {
           _messages = parsed.data.messages;
           _isLoading = false;
+          _hasMore = parsed.data.messages.length == _limit;
         });
 
-        // Mark visible messages as read
         for (final msg in _messages) {
           if (!(msg.isRead ?? false) && !msg.isSender) {
             await _markMessageAsRead(msg.id);
@@ -175,6 +191,43 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
         _error = e.toString();
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _loadMoreMessages() async {
+    if (!_hasMore) return;
+
+    setState(() => _isLoadingMore = true);
+    _currentPage++;
+
+    try {
+      final response = await ApiService.getWorkflowMessages(
+        clientMatterId: AuthService.selectedMatterId!,
+        clientMatterStageId: AuthService.clientMatterStageId ?? 0,
+        page: _currentPage,
+        limit: _limit,
+      );
+
+      if (response['success'] == true) {
+        final parsed = WorkflowMessagesResponse.fromJson(response);
+        final newMessages = parsed.data.messages;
+
+        setState(() {
+          _messages.addAll(newMessages);
+          _hasMore = newMessages.length == _limit;
+          _isLoadingMore = false;
+        });
+
+        for (final msg in newMessages) {
+          if (!(msg.isRead ?? false) && !msg.isSender) {
+            await _markMessageAsRead(msg.id);
+          }
+        }
+      } else {
+        setState(() => _isLoadingMore = false);
+      }
+    } catch (e) {
+      setState(() => _isLoadingMore = false);
     }
   }
 
@@ -275,26 +328,28 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       child: ListView.builder(
         controller: _scrollController,
         padding: const EdgeInsets.all(12),
-        itemCount: _messages.length,
+        itemCount: _messages.length + (_isLoadingMore ? 1 : 0),
         itemBuilder: (context, index) {
+          if (index >= _messages.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+
           final msg = _messages[index];
           final isSender = msg.isSender;
-          final time = _formatDateTime(msg.sentAt);
           String avatarName = isSender
               ? msg.sender
               : msg.recipientIds.map((r) => r.recipient).join(", ");
 
-          // Determine tick icons
-          Icon tickIcon;
-          if (!isSender) {
-            tickIcon = const Icon(Icons.check, size: 14, color: Colors.transparent); // hide for received
-          } else {
-            if (msg.isRead ?? false) {
-              tickIcon = const Icon(Icons.done_all, size: 16, color: Colors.blue);
-            } else {
-              tickIcon = const Icon(Icons.done_all, size: 16, color: Colors.grey);
-            }
-          }
+          Icon tickIcon = Icon(
+            Icons.done_all,
+            size: 16,
+            color: isSender
+                ? (msg.isRead ?? false ? Colors.blue : Colors.grey)
+                : Colors.transparent,
+          );
 
           return GestureDetector(
             onTap: () {
@@ -307,7 +362,8 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
             child: Container(
               margin: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
-                mainAxisAlignment: isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+                mainAxisAlignment:
+                isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   if (!isSender)
@@ -326,9 +382,12 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                   if (!isSender) const SizedBox(width: 8),
                   Flexible(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
                       decoration: BoxDecoration(
-                        color: isSender ? ThemeConfig.navyBlue.withOpacity(0.9) : Colors.white,
+                        color: isSender
+                            ? ThemeConfig.navyBlue.withOpacity(0.9)
+                            : Colors.white,
                         borderRadius: BorderRadius.only(
                           topLeft: const Radius.circular(16),
                           topRight: const Radius.circular(16),
@@ -346,7 +405,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Message text
                           Text(
                             msg.message,
                             style: TextStyle(
@@ -355,30 +413,23 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          // Sent time
                           Text(
                             _formatDateTime(msg.sentAt),
                             style: TextStyle(
                               fontSize: 11,
-                              color: isSender ? Colors.white70 : Colors.grey.shade600,
+                              color: isSender
+                                  ? Colors.white70
+                                  : Colors.grey.shade600,
                             ),
                           ),
                           const SizedBox(height: 2),
-                          // Tick and readAt vertically
-                          //if (!isSender)
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // Tick icon only if message is read
                               if (msg.isRead ?? false)
-                                Icon(
-                                  Icons.done_all,
-                                  size: 16,
-                                  color: Colors.blue,
-                                ),
+                                Icon(Icons.done_all, size: 16, color: Colors.blue),
                               if (msg.isRead ?? false) const SizedBox(width: 4),
-                              // Read timestamp
                               if (msg.isRead ?? false && msg.readAt != null)
                                 Text(
                                   _formatDateTime(msg.readAt!),
@@ -393,7 +444,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                       ),
                     ),
                   ),
-
                   if (isSender) const SizedBox(width: 8),
                   if (isSender)
                     CircleAvatar(
@@ -413,7 +463,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
             ),
           );
         },
-
       ),
     );
   }
