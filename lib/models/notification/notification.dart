@@ -1,3 +1,41 @@
+class NotificationResponse {
+  final bool success;
+  final NotificationData data;
+
+  NotificationResponse({
+    required this.success,
+    required this.data,
+  });
+
+  factory NotificationResponse.fromJson(Map<String, dynamic> json) {
+    return NotificationResponse(
+      success: json['success'],
+      data: NotificationData.fromJson(json['data']),
+    );
+  }
+}
+
+class NotificationData {
+  final List<NotificationModel> notifications;
+  final Pagination pagination;
+
+  NotificationData({
+    required this.notifications,
+    required this.pagination,
+  });
+
+  factory NotificationData.fromJson(Map<String, dynamic> json) {
+    var list = json['notifications'] as List;
+    List<NotificationModel> notificationsList =
+    list.map((i) => NotificationModel.fromJson(i)).toList();
+
+    return NotificationData(
+      notifications: notificationsList,
+      pagination: Pagination.fromJson(json['pagination']),
+    );
+  }
+}
+
 class NotificationModel {
   final int id;
   final int senderId;
@@ -5,9 +43,11 @@ class NotificationModel {
   final String url;
   final String notificationType;
   final String message;
-  final bool isRead;
+  bool isRead;
+  final bool seen;
   final String senderName;
-  final DateTime createdAt; // DateTime, not String
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   NotificationModel({
     required this.id,
@@ -17,8 +57,10 @@ class NotificationModel {
     required this.notificationType,
     required this.message,
     required this.isRead,
+    required this.seen,
     required this.senderName,
     required this.createdAt,
+    required this.updatedAt,
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
@@ -30,8 +72,33 @@ class NotificationModel {
       notificationType: json['notification_type'],
       message: json['message'],
       isRead: json['is_read'] == 1,
+      seen: json['seen'] == 1,
       senderName: json['sender_name'],
-      createdAt: DateTime.parse(json['created_at']), // ✅ parse here
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+    );
+  }
+}
+
+class Pagination {
+  final int currentPage;
+  final int perPage;
+  final int total;
+  final int lastPage;
+
+  Pagination({
+    required this.currentPage,
+    required this.perPage,
+    required this.total,
+    required this.lastPage,
+  });
+
+  factory Pagination.fromJson(Map<String, dynamic> json) {
+    return Pagination(
+      currentPage: json['current_page'],
+      perPage: json['per_page'],
+      total: json['total'],
+      lastPage: json['last_page'],
     );
   }
 }

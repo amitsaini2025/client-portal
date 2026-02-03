@@ -694,7 +694,7 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> getDocumentCategories({
-    String type = "personal", // personal or visa
+    String type = "personal",
   }) async {
     return await _makeRequest(
       "${ApiConfig.documentsEndpoint}/$type/categories",
@@ -1194,6 +1194,33 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> getNotificationDetail({
+    required int notificationId,
+  }) async {
+    final url =
+        '${ApiConfig.notifications}/$notificationId';
+
+    return await _makeRequest(
+      url,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+  static Future<bool> markNotificationAsRead({
+    required int notificationId,
+  }) async {
+    final url = '${ApiConfig.notifications}/$notificationId/read';
+
+    final response = await _makeRequest(
+      url,
+      _buildHeaders(),
+      null,
+      'POST',
+    );
+    return response['success'] ?? false;
+  }
 
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(

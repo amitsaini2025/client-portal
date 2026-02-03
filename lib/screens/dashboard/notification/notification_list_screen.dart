@@ -1,3 +1,4 @@
+import 'package:client/screens/dashboard/notification/notification_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -13,7 +14,8 @@ class NotificationsScreen extends StatefulWidget {
   State<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
+class _NotificationsScreenState extends State<NotificationsScreen>
+    with WidgetsBindingObserver {
   int currentPage = 1;
   bool isLoading = false;
   bool hasMore = true;
@@ -24,10 +26,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     fetchNotifications();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 200 &&
+              _scrollController.position.maxScrollExtent - 200 &&
           !isLoading &&
           hasMore) {
         fetchNotifications();
@@ -35,10 +38,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refresh();
+    }
+  }
+
   Future<void> fetchNotifications() async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
 
     try {
       final data = await ApiService.getNotifications(
@@ -48,9 +63,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       );
 
       final newNotifications =
-      (data['data']['notifications'] as List)
-          .map((json) => NotificationModel.fromJson(json))
-          .toList();
+          (data['data']['notifications'] as List)
+              .map((json) => NotificationModel.fromJson(json))
+              .toList();
 
       setState(() {
         currentPage++;
@@ -59,9 +74,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
@@ -78,119 +91,158 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   String _formatDate(DateTime dateTime) {
-    return DateFormat('MMM dd, yyyy – hh:mm a').format(dateTime);
+    return DateFormat('MMM dd, yyyy • hh:mm a').format(dateTime);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: ThemeConfig.goldenYellow,
+        backgroundColor: ThemeConfig.goldenYellow.withOpacity(0.9),
         title: const Text(
           "Notifications",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 4,
-        shadowColor: Colors.black45,
+        elevation: 2,
       ),
       body: RefreshIndicator(
         onRefresh: _refresh,
-        child: ListView.builder(
-          controller: _scrollController,
-          itemCount: notifications.length + (hasMore ? 1 : 0),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          itemBuilder: (context, index) {
-            if (index == notifications.length) {
-              return const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-
-            final item = notifications[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              child: Material(
-                borderRadius: BorderRadius.circular(14),
-                elevation: 3,
-                shadowColor: Colors.black26,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(14),
-                  onTap: () {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text('Open: ${item.url}')));
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      gradient: item.isRead
-                          ? null
-                          : LinearGradient(
-                        colors: [
-                          Colors.yellow.shade50,
-                          Colors.yellow.shade100,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundColor:
-                          item.isRead ? Colors.green : Colors.redAccent,
-                          child: Text(
-                            item.senderName[0].toUpperCase(),
-                            style: const TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.message,
-                                style: TextStyle(
-                                  fontWeight: item.isRead
-                                      ? FontWeight.normal
-                                      : FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${item.senderName} • ${_formatDate(item.createdAt)}',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(
-                          item.isRead
-                              ? Icons.mark_email_read
-                              : Icons.mark_email_unread,
-                          color: item.isRead ? Colors.green : Colors.redAccent,
-                          size: 22,
-                        ),
-                      ],
+        child:
+            isLoading && notifications.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : notifications.isEmpty
+                ? Center(
+                  child: Text(
+                    'No notifications available',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                )
+                : ListView.builder(
+                  controller: _scrollController,
+                  itemCount: notifications.length + (hasMore ? 1 : 0),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemBuilder: (context, index) {
+                    if (index == notifications.length) {
+                      return const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+
+                    final item = notifications[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
+                      child: Material(
+                        borderRadius: BorderRadius.circular(14),
+                        elevation: 1.5,
+                        shadowColor: Colors.black12,
+                        color: Colors.white,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(14),
+                          onTap: () async {
+                            // Navigate to detail screen and refresh on return
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => NotificationDetailScreen(
+                                      notificationId: item.id,
+                                    ),
+                              ),
+                            );
+
+                            // Refresh list after returning
+                            _refresh();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              gradient:
+                                  item.isRead
+                                      ? null
+                                      : LinearGradient(
+                                        colors: const [
+                                          Color(0xFFF5F7FA),
+                                          Color(0xFFE8EEF5),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  radius: 22,
+                                  backgroundColor:
+                                      item.isRead
+                                          ? const Color(0xFFE6F4F1)
+                                          : const Color(0xFFE8EEF5),
+                                  child: Text(
+                                    item.senderName[0].toUpperCase(),
+                                    style: const TextStyle(
+                                      color: Color(0xFF374151),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.message,
+                                        style: TextStyle(
+                                          fontWeight:
+                                              item.isRead
+                                                  ? FontWeight.w400
+                                                  : FontWeight.w600,
+                                          fontSize: 15.5,
+                                          color: Colors.grey.shade800,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${item.senderName} • ${_formatDate(item.createdAt)}',
+                                        style: TextStyle(
+                                          fontSize: 12.5,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  item.isRead
+                                      ? Icons.mark_email_read
+                                      : Icons.mark_email_unread,
+                                  color:
+                                      item.isRead
+                                          ? Colors.blueGrey.shade400
+                                          : Colors.blueGrey.shade600,
+                                  size: 20,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              ),
-            );
-          },
-        ),
       ),
     );
   }
