@@ -91,34 +91,31 @@ class _BookConfirmAppointmentScreenState
 
         await Stripe.instance.presentPaymentSheet();
 
-        final paymentIntentResult =
-        await Stripe.instance.retrievePaymentIntent(clientSecret);
-
-        paymentMethodId = paymentIntentResult.paymentMethodId;
+        //final paymentIntentResult = await Stripe.instance.retrievePaymentIntent(clientSecret);
+        //paymentMethodId = paymentIntentResult.paymentMethodId;
+        paymentMethodId = paymentIntent['id'];
       }
 
       final appointmentResponse = await _createAppointment();
       final appointmentId = appointmentResponse['data']['id'];
 
-      if (price != 0 && appointmentId != null && paymentMethodId != null) {
+      if (appointmentId != null && paymentMethodId != null) {
         final requestData = {
           'appointment_id': appointmentId,
-          'amount': price.toDouble(),
-          'payment_method_id': paymentMethodId,
-          'currency': StripeConfig.defaultCurrency.toLowerCase(),
+          'payment_intent_id': paymentMethodId,
         };
 
-        print('processAppointmentPayment REQUEST: $requestData');
+        print('recordAppointmentPayment REQUEST: $requestData');
 
-        final paymentResponse = await ApiService.processAppointmentPayment(
+        final paymentResponse =
+        await ApiService.recordAppointmentPayment(
           appointmentId: appointmentId,
-          amount: price.toDouble(),
-          paymentMethodId: paymentMethodId,
-          currency: StripeConfig.defaultCurrency.toLowerCase(),
+          paymentIntentId: paymentMethodId,
         );
 
-        print('processAppointmentPayment RESPONSE: $paymentResponse');
+        print('recordAppointmentPayment RESPONSE: $paymentResponse');
       }
+
 
       if (!mounted) return;
 

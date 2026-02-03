@@ -1159,6 +1159,42 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> recordAppointmentPayment({
+    required int appointmentId,
+    required String paymentIntentId,
+  }) async {
+    final endpoint = ApiConfig.appointmentsRecordPayment;
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      {
+        'appointment_id': appointmentId,
+        'payment_intent_id': paymentIntentId,
+      },
+      "POST",
+    );
+
+    return response;
+  }
+
+  static Future<Map<String, dynamic>> getNotifications({
+    required int clientMatterId,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final url =
+        '${ApiConfig.notifications}?client_matter_id=$clientMatterId&page=$page&limit=$limit';
+
+    return await _makeRequest(
+      url,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
     String endpoint,

@@ -252,10 +252,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              showSnack(
+              Navigator.pushNamed(context, '/notifications');
+              /*showSnack(
                 context,
                 "This feature will be available in a future update.",
-              );
+              );*/
             },
           ),
           IconButton(
