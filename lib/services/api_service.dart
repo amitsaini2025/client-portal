@@ -1054,11 +1054,23 @@ class ApiService {
 
   static Future<Map<String, dynamic>> getAppointmentById(int id) async {
     final endpoint = "${ApiConfig.appointments}/$id";
+    final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
+    return response;
+  }
+
+  static Future<Map<String, dynamic>> cancelAppointment({
+    required int id,
+    required String reason,
+  }) async {
+    final endpoint = "${ApiConfig.appointments}/$id/status";
+
+    final body = {"type": "cancel", "cancel_reason": reason};
+
     final response = await _makeRequest(
       endpoint,
       _buildHeaders(),
-      null,
-      "GET",
+      body,
+      "POST",
     );
     return response;
   }
@@ -1070,16 +1082,11 @@ class ApiService {
   }) async {
     const endpoint = ApiConfig.appointmentsGetDisabledDates;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "id": id,
-        "enquiry_item": enquiryItem,
-        "inperson_address": inPersonAddress,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "id": id,
+      "enquiry_item": enquiryItem,
+      "inperson_address": inPersonAddress,
+    }, "POST");
 
     return response;
   }
@@ -1092,21 +1099,15 @@ class ApiService {
   }) async {
     const endpoint = ApiConfig.appointmentsGetDisabledSlots;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "service_id": serviceId,
-        "enquiry_item": enquiryItem,
-        "inperson_address": inPersonAddress,
-        "sel_date": selectedDate,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "service_id": serviceId,
+      "enquiry_item": enquiryItem,
+      "inperson_address": inPersonAddress,
+      "sel_date": selectedDate,
+    }, "POST");
 
     return response;
   }
-
 
   static Future<Map<String, dynamic>> createAppointmentNew({
     required int noeId,
@@ -1120,21 +1121,16 @@ class ApiService {
   }) async {
     const endpoint = ApiConfig.appointments;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        "noe_id": noeId,
-        "service_id": serviceId,
-        "appoint_date": appointDate,
-        "appoint_time": appointTime,
-        "description": description,
-        "appointment_details": appointmentDetails,
-        "preferred_language": preferredLanguage,
-        "inperson_address": inPersonAddress,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      "noe_id": noeId,
+      "service_id": serviceId,
+      "appoint_date": appointDate,
+      "appoint_time": appointTime,
+      "description": description,
+      "appointment_details": appointmentDetails,
+      "preferred_language": preferredLanguage,
+      "inperson_address": inPersonAddress,
+    }, "POST");
     return response;
   }
 
@@ -1145,17 +1141,12 @@ class ApiService {
     required String currency,
   }) async {
     final endpoint = ApiConfig.appointmentsProcessPayment;
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        'appointment_id': appointmentId,
-        'amount': amount,
-        'payment_method_id': paymentMethodId,
-        'currency': currency,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      'appointment_id': appointmentId,
+      'amount': amount,
+      'payment_method_id': paymentMethodId,
+      'currency': currency,
+    }, "POST");
     return response;
   }
 
@@ -1165,15 +1156,10 @@ class ApiService {
   }) async {
     final endpoint = ApiConfig.appointmentsRecordPayment;
 
-    final response = await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      {
-        'appointment_id': appointmentId,
-        'payment_intent_id': paymentIntentId,
-      },
-      "POST",
-    );
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      'appointment_id': appointmentId,
+      'payment_intent_id': paymentIntentId,
+    }, "POST");
 
     return response;
   }
@@ -1186,26 +1172,15 @@ class ApiService {
     final url =
         '${ApiConfig.notifications}?client_matter_id=$clientMatterId&page=$page&limit=$limit';
 
-    return await _makeRequest(
-      url,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(url, _buildHeaders(), null, 'GET');
   }
 
   static Future<Map<String, dynamic>> getNotificationDetail({
     required int notificationId,
   }) async {
-    final url =
-        '${ApiConfig.notifications}/$notificationId';
+    final url = '${ApiConfig.notifications}/$notificationId';
 
-    return await _makeRequest(
-      url,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(url, _buildHeaders(), null, 'GET');
   }
 
   static Future<bool> markNotificationAsRead({
@@ -1213,12 +1188,7 @@ class ApiService {
   }) async {
     final url = '${ApiConfig.notifications}/$notificationId/read';
 
-    final response = await _makeRequest(
-      url,
-      _buildHeaders(),
-      null,
-      'POST',
-    );
+    final response = await _makeRequest(url, _buildHeaders(), null, 'POST');
     return response['success'] ?? false;
   }
 

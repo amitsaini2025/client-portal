@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import 'appointment_detail_screen.dart';
+import 'package:http/http.dart' as http;
 
 class AppointmentListScreen extends StatefulWidget {
   const AppointmentListScreen({super.key});
@@ -38,6 +40,119 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
     }
   }
 
+  Future<void> cancelAppointment(int id, String reason) async {
+
+    try {
+      await ApiService.cancelAppointment(id: id, reason: reason,);
+      fetchAppointments();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Appointment cancelled successfully")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
+
+  void showCancelDialog(int id) {
+    final reasonController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 10,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Cancel Appointment",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "Please provide a reason for cancellation:",
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: reasonController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: "Type reason here...",
+                  filled: true,
+                  fillColor: const Color(0xFFF5F6FA),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.black54,
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    ),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      final reason = reasonController.text.trim();
+                      if (reason.isNotEmpty) {
+                        Navigator.pop(context);
+                        cancelAppointment(id, reason);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Reason cannot be empty")),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ThemeConfig.goldenYellow,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      "Submit",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,16 +171,14 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
           : error != null
           ? Center(child: Text(error!))
           : ListView.builder(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         itemCount: appointments.length,
         itemBuilder: (context, index) {
           final item = appointments[index];
 
           return AppointmentCard(
             data: item,
+            onCancel: () => showCancelDialog(item['id']),
           );
         },
       ),
@@ -75,10 +188,12 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
 
 class AppointmentCard extends StatelessWidget {
   final Map<String, dynamic> data;
+  final VoidCallback onCancel;
 
   const AppointmentCard({
     super.key,
     required this.data,
+    required this.onCancel,
   });
 
   @override
@@ -107,57 +222,35 @@ class AppointmentCard extends StatelessWidget {
         children: [
           Text(
             _formatDate(data['appointment_date']),
-            style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-            ),
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
           ),
-
           const SizedBox(height: 6),
-
           Row(
             children: [
               const Icon(Icons.schedule, size: 16, color: Colors.grey),
               const SizedBox(width: 6),
               Text(
-                _formatTime(
-                  data['appointment_time'],
-                  data['duration_minutes'],
-                ),
+                _formatTime(data['appointment_time'], data['duration_minutes']),
                 style: const TextStyle(color: Colors.black54),
               ),
             ],
           ),
-
           const SizedBox(height: 4),
-
           Text(
             _timeAgo(data['created_at']),
             style: const TextStyle(fontSize: 12, color: Colors.black45),
           ),
-
           const Divider(height: 24),
-
           Text(
             data['service_type'] ?? '',
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
           ),
-
           const SizedBox(height: 6),
-
           Text(
             data['enquiry_details'] ?? '',
-            style: const TextStyle(
-              color: Colors.black54,
-              height: 1.4,
-            ),
+            style: const TextStyle(color: Colors.black54, height: 1.4),
           ),
-
           const SizedBox(height: 16),
-
           Row(
             children: [
               Expanded(
@@ -195,16 +288,17 @@ class AppointmentCard extends StatelessWidget {
               ),
             ],
           ),
-
+          const SizedBox(height: 10),
+          _LightActionButton(
+            icon: Icons.cancel_outlined,
+            label: "Cancel Appointment",
+            onTap: onCancel,
+          ),
           const SizedBox(height: 18),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Created By",
-                style: TextStyle(fontSize: 12, color: Colors.black45),
-              ),
+              const Text("Created By", style: TextStyle(fontSize: 12, color: Colors.black45)),
               Row(
                 children: [
                   CircleAvatar(
@@ -241,17 +335,9 @@ class AppointmentCard extends StatelessWidget {
 
   String _formatTime(String time, int duration) {
     final parts = time.split(":");
-    final start = TimeOfDay(
-      hour: int.parse(parts[0]),
-      minute: int.parse(parts[1]),
-    );
-
+    final start = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
     final endMinutes = start.hour * 60 + start.minute + duration;
-    final end = TimeOfDay(
-      hour: (endMinutes ~/ 60) % 24,
-      minute: endMinutes % 60,
-    );
-
+    final end = TimeOfDay(hour: (endMinutes ~/ 60) % 24, minute: endMinutes % 60);
     return "${start.formatDummy()} - ${end.formatDummy()}";
   }
 
@@ -309,12 +395,3 @@ class _LightActionButton extends StatelessWidget {
     );
   }
 }
-
-/*extension TimeFormat on TimeOfDay {
-  String formatDummy() {
-    final h = hourOfPeriod == 0 ? 12 : hourOfPeriod;
-    final m = minute.toString().padLeft(2, '0');
-    final p = period == DayPeriod.am ? "AM" : "PM";
-    return "$h:$m $p";
-  }
-}*/
