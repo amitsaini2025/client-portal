@@ -192,6 +192,7 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
                   NextButton(
                     onTap: () {
                       Map<String, dynamic> selectedOptions = {
+                        'is_add': true,
                         'location_name' : selectedLocation?.name.toString(),
                         'meeting_type' : selectedMeeting?.name.toString(),
                         'inperson_address': selectedLocation?.id.toString(),

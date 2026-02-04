@@ -1,10 +1,10 @@
-import 'package:client/screens/dashboard/book_appointment/book_appointment_success_screen.dart';
 import 'package:client/screens/dashboard/book_appointment/book_confirm_appointment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../services/api_service.dart';
+import '../../../services/auth_service.dart';
 import 'booking_widget.dart';
 
 class BookConfirmScreen extends StatefulWidget {
@@ -18,6 +18,7 @@ class BookConfirmScreen extends StatefulWidget {
 
 class _BookConfirmScreenState extends State<BookConfirmScreen> {
   bool isLoading = true;
+  bool isSubmitting = false;
   String? error;
 
   Set<DateTime> disabledDates = {};
@@ -32,15 +33,34 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
   late TextEditingController emailController;
   late TextEditingController phoneController;
 
+  // Determine if we are adding a new appointment or updating an existing one
+  bool get isAdd => widget.selectedOptions['is_add'] ?? true;
+
   @override
   void initState() {
     super.initState();
 
-    enquiryController =
-        TextEditingController(text: widget.selectedOptions['description'] ?? '');
-    fullNameController = TextEditingController();
-    emailController = TextEditingController();
-    phoneController = TextEditingController();
+    enquiryController = TextEditingController(
+      text: widget.selectedOptions['description'] ?? '',
+    );
+    fullNameController = TextEditingController(
+      text: widget.selectedOptions['full_name'] ?? '',
+    );
+    emailController = TextEditingController(
+      text: widget.selectedOptions['email'] ?? '',
+    );
+    phoneController = TextEditingController(
+      text: widget.selectedOptions['phone'] ?? '',
+    );
+
+    // Pre-select existing date and time if available
+    if (!isAdd) {
+      final appointDate = widget.selectedOptions['appoint_date'];
+      if (appointDate != null) {
+        selectedDay = DateTime.tryParse(appointDate);
+      }
+      selectedTime = widget.selectedOptions['appoint_time'];
+    }
 
     loadCalendarData();
   }
@@ -67,7 +87,9 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
 
       setState(() {
         disabledDates =
-            (data['disabledatesarray'] as List).map((d) => formatter.parse(d)).toSet();
+            (data['disabledatesarray'] as List)
+                .map((d) => formatter.parse(d))
+                .toSet();
         disabledWeekdays = List<int>.from(data['weeks']);
         isLoading = false;
       });
@@ -101,23 +123,104 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BookConfirmAppointmentScreen(
-          selectedOptions: {
-            ...widget.selectedOptions,
-            'full_name': fullNameController.text.trim(),
-            'email': emailController.text.trim(),
-            'phone': phoneController.text.trim(),
-            'appoint_date': formatter.format(selectedDay!),
-            'appoint_time': selectedTime!,
-            'description': enquiryController.text.trim(),
-          },
-        ),
+        builder:
+            (_) => BookConfirmAppointmentScreen(
+              selectedOptions: {
+                ...widget.selectedOptions,
+                'full_name': fullNameController.text.trim(),
+                'email': emailController.text.trim(),
+                'phone': phoneController.text.trim(),
+                'appoint_date': formatter.format(selectedDay!),
+                'appoint_time': selectedTime!,
+                'description': enquiryController.text.trim(),
+              },
+            ),
       ),
     );
   }
 
+  void _submitAppointment() async {
+    if (!isAdd) {
+      // UPDATE appointment flow
+      if (selectedDay == null || selectedTime == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select date and time')),
+        );
+        return;
+      }
+
+      setState(() => isSubmitting = true);
+
+      try {
+        final dateFormatter = DateFormat('yyyy-MM-dd');
+        final formattedDate = dateFormatter.format(selectedDay!);
+
+        final formattedTime = convertTo24Hour(selectedTime!);
+
+        final response = await ApiService.updateAppointment(
+          appointmentId: widget.selectedOptions['id'],
+          appointmentDate: formattedDate,
+          appointmentTime: formattedTime,
+          meetingType: 3,
+          preferredLanguage: 1,
+        );
+
+        if (response['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Appointment updated successfully')),
+          );
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/dashboard',
+                (Route<dynamic> route) => false,
+            arguments: AuthService.selectedMatterId!.toString(),
+          );
+
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                response['message'] ?? 'Failed to update appointment',
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      } finally {
+        setState(() => isSubmitting = false);
+      }
+    } else {
+      _goToConfirmation();
+    }
+  }
+
+  String convertTo24Hour(String time12h) {
+    try {
+      final cleanTime = cleanTimeString(time12h);
+      final date = DateFormat.jm().parse(cleanTime);
+      return DateFormat('HH:mm').format(date);
+    } catch (e) {
+      debugPrint('Failed to parse time "$time12h": $e');
+      return '00:00';
+    }
+  }
+
+  String cleanTimeString(String input) {
+    final regex = RegExp(r'\d{1,2}:\d{2}\s?[APap][Mm]');
+    final match = regex.firstMatch(input);
+    if (match != null) {
+      return match.group(0)!.replaceAll(RegExp(r'\s+'), ' ').toUpperCase();
+    }
+    throw FormatException('Invalid time format: $input');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final inputEnabled = isAdd;
+
     return ScaffoldWrapper(
       activeStep: 4,
       title: 'Confirm Appointment',
@@ -133,45 +236,50 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
                 final isMobile = constraints.maxWidth < 600;
                 return isMobile
                     ? Column(
-                  children: [
-                    AppTextField(
-                      label: 'Full Name',
-                      controller: fullNameController,
-                    ),
-                    const SizedBox(height: 16),
-                    AppTextField(
-                      label: 'Email Address',
-                      controller: emailController,
-                    ),
-                  ],
-                )
+                      children: [
+                        AppTextField(
+                          label: 'Full Name',
+                          controller: fullNameController,
+                          enabled: inputEnabled,
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'Email Address',
+                          controller: emailController,
+                          enabled: inputEnabled,
+                        ),
+                      ],
+                    )
                     : Row(
-                  children: [
-                    Expanded(
-                      child: AppTextField(
-                        label: 'Full Name',
-                        controller: fullNameController,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: AppTextField(
-                        label: 'Email Address',
-                        controller: emailController,
-                      ),
-                    ),
-                  ],
-                );
+                      children: [
+                        Expanded(
+                          child: AppTextField(
+                            label: 'Full Name',
+                            controller: fullNameController,
+                            enabled: inputEnabled,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: AppTextField(
+                            label: 'Email Address',
+                            controller: emailController,
+                            enabled: inputEnabled,
+                          ),
+                        ),
+                      ],
+                    );
               },
             ),
 
             const SizedBox(height: 20),
-            PhoneField(controller: phoneController),
+            PhoneField(controller: phoneController, enabled: inputEnabled),
 
             const SizedBox(height: 20),
             TextField(
               controller: enquiryController,
               maxLines: 4,
+              enabled: inputEnabled,
               decoration: InputDecoration(
                 labelText: 'Details of Enquiry',
                 filled: true,
@@ -199,6 +307,8 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
                 disabledWeekdays: disabledWeekdays,
                 onTimeSelected: (time) => selectedTime = time,
                 selectedDayCallback: (day) => selectedDay = day,
+                preSelectedDay: selectedDay,
+                preSelectedTime: selectedTime,
               ),
 
             const SizedBox(height: 40),
@@ -207,7 +317,8 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
                 width: 220,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: isLoading ? null : _goToConfirmation,
+                  onPressed:
+                      isLoading || isSubmitting ? null : _submitAppointment,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1F3C88),
                     foregroundColor: Colors.white,
@@ -220,7 +331,12 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: const Text('Review & Confirm'),
+                  child:
+                      isSubmitting
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                            isAdd ? 'Review & Confirm' : 'Update Appointment',
+                          ),
                 ),
               ),
             ),
@@ -236,11 +352,13 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
 class AppTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
+  final bool enabled;
 
   const AppTextField({
     super.key,
     required this.label,
     required this.controller,
+    this.enabled = true,
   });
 
   @override
@@ -252,6 +370,7 @@ class AppTextField extends StatelessWidget {
         const SizedBox(height: 6),
         TextField(
           controller: controller,
+          enabled: enabled,
           decoration: InputDecoration(
             filled: true,
             fillColor: const Color(0xFFFFF1F1),
@@ -268,15 +387,19 @@ class AppTextField extends StatelessWidget {
 
 class PhoneField extends StatelessWidget {
   final TextEditingController controller;
+  final bool enabled;
 
-  const PhoneField({super.key, required this.controller});
+  const PhoneField({super.key, required this.controller, this.enabled = true});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Phone Number', style: TextStyle(fontWeight: FontWeight.w600)),
+        const Text(
+          'Phone Number',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 6),
         Row(
           children: [
@@ -294,6 +417,7 @@ class PhoneField extends StatelessWidget {
               child: TextField(
                 controller: controller,
                 keyboardType: TextInputType.phone,
+                enabled: enabled,
                 decoration: InputDecoration(
                   hintText: '400 000 000',
                   filled: true,
@@ -338,6 +462,8 @@ class CalendarSection extends StatefulWidget {
   final List<int> disabledWeekdays;
   final Function(String)? onTimeSelected;
   final Function(DateTime)? selectedDayCallback;
+  final DateTime? preSelectedDay;
+  final String? preSelectedTime;
 
   const CalendarSection({
     super.key,
@@ -345,6 +471,8 @@ class CalendarSection extends StatefulWidget {
     required this.disabledWeekdays,
     this.onTimeSelected,
     this.selectedDayCallback,
+    this.preSelectedDay,
+    this.preSelectedTime,
   });
 
   @override
@@ -354,10 +482,9 @@ class CalendarSection extends StatefulWidget {
 class _CalendarSectionState extends State<CalendarSection> {
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
-
   bool loadingSlots = false;
   List<String> availableSlots = [];
-  String? selectedSlot; // <-- track selected time slot
+  String? selectedSlot;
 
   bool sameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
@@ -368,11 +495,18 @@ class _CalendarSectionState extends State<CalendarSection> {
     return widget.disabledWeekdays.contains(apiWeekday);
   }
 
+  @override
+  void initState() {
+    super.initState();
+    selectedDay = widget.preSelectedDay;
+    selectedSlot = widget.preSelectedTime;
+    if (selectedDay != null) fetchAvailableSlots(selectedDay!);
+  }
+
   Future<void> fetchAvailableSlots(DateTime date) async {
     setState(() {
       loadingSlots = true;
       availableSlots.clear();
-      selectedSlot = null;
     });
 
     final formattedDate = DateFormat('dd/MM/yyyy').format(date);
@@ -435,10 +569,13 @@ class _CalendarSectionState extends State<CalendarSection> {
                 final slot = availableSlots[index];
                 final isSelected = slot == selectedSlot;
                 return GestureDetector(
-                  onTap: () {
-                    setState(() => selectedSlot = slot);
-                    widget.onTimeSelected?.call(slot);
-                  },
+                  onTap:
+                      widget.onTimeSelected != null
+                          ? () {
+                            setState(() => selectedSlot = slot);
+                            widget.onTimeSelected?.call(slot);
+                          }
+                          : null,
                   child: Container(
                     alignment: Alignment.center,
                     decoration: BoxDecoration(

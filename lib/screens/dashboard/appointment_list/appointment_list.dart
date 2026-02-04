@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
+import '../book_appointment/book_confirm_screen.dart';
 import 'appointment_detail_screen.dart';
-import 'package:http/http.dart' as http;
 
 class AppointmentListScreen extends StatefulWidget {
   const AppointmentListScreen({super.key});
@@ -41,9 +40,8 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   }
 
   Future<void> cancelAppointment(int id, String reason) async {
-
     try {
-      await ApiService.cancelAppointment(id: id, reason: reason,);
+      await ApiService.cancelAppointment(id: id, reason: reason);
       fetchAppointments();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Appointment cancelled successfully")),
@@ -293,6 +291,22 @@ class AppointmentCard extends StatelessWidget {
             icon: Icons.cancel_outlined,
             label: "Cancel Appointment",
             onTap: onCancel,
+          ),
+          const SizedBox(height: 10),
+          _LightActionButton(
+            icon: Icons.edit_outlined,
+            label: "Update Appointment",
+            onTap: () {
+              data['is_add'] =  false;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BookConfirmScreen(
+                    selectedOptions: data,
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 18),
           Row(

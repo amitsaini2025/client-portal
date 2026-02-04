@@ -1075,6 +1075,32 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> updateAppointment({
+    required int appointmentId,
+    required String appointmentDate,
+    required String appointmentTime,
+    required int meetingType,
+    required int preferredLanguage,
+  }) async {
+    final endpoint = ApiConfig.appointmentsUpdate;
+
+    final body = {
+      "appointment_id": appointmentId,
+      "appointment_date": appointmentDate,
+      "appointment_time": appointmentTime,
+      "meeting_type": meetingType,
+      "preferred_language": preferredLanguage,
+    };
+
+    final response = await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      body,
+      "POST",
+    );
+    return response;
+  }
+
   static Future<Map<String, dynamic>> getDisabledDates({
     required int id,
     required int enquiryItem,
