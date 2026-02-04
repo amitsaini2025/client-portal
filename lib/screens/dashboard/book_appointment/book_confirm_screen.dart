@@ -199,23 +199,48 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
 
   String convertTo24Hour(String time12h) {
     try {
-      final cleanTime = cleanTimeString(time12h);
-      final date = DateFormat.jm().parse(cleanTime);
-      return DateFormat('HH:mm').format(date);
+      final cleanTime = time12h.replaceAll(RegExp(r'\s+'), '').toUpperCase();
+
+      final regex = RegExp(r'^(\d{1,2}):(\d{2})(AM|PM)$');
+      final match = regex.firstMatch(cleanTime);
+
+      if (match != null) {
+        int hour = int.parse(match.group(1)!);
+        final int minute = int.parse(match.group(2)!);
+        final String period = match.group(3)!;
+
+        if (period == 'PM' && hour != 12) {
+          hour += 12;
+        } else if (period == 'AM' && hour == 12) {
+          hour = 0;
+        }
+
+        return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+      }
+
+      throw FormatException('Invalid time format: $time12h');
     } catch (e) {
       debugPrint('Failed to parse time "$time12h": $e');
       return '00:00';
     }
   }
 
+
   String cleanTimeString(String input) {
     final regex = RegExp(r'\d{1,2}:\d{2}\s?[APap][Mm]');
     final match = regex.firstMatch(input);
     if (match != null) {
-      return match.group(0)!.replaceAll(RegExp(r'\s+'), ' ').toUpperCase();
+      final normalized = match.group(0)!
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .replaceAll('\u202F', ' ')
+          .replaceAll('\u00A0', ' ')
+          .toUpperCase()
+          .trim();
+      return normalized;
     }
     throw FormatException('Invalid time format: $input');
   }
+
 
   @override
   Widget build(BuildContext context) {
