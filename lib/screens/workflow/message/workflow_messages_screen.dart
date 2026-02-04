@@ -238,11 +238,11 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
     setState(() => _isSending = true);
 
     try {
-      final base = _messages.isNotEmpty ? _messages.first : null;
-      if (base == null) return;
+      final clientMatterId = AuthService.selectedMatterId;
+      if (clientMatterId == null) return;
 
       final responseJson = await ApiService.sendChatMessage(
-        clientMatterId: base.clientMatterId,
+        clientMatterId: clientMatterId,
         message: text,
       );
 
@@ -253,12 +253,16 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.redAccent),
+        SnackBar(
+          content: Text("Error: $e"),
+          backgroundColor: Colors.redAccent,
+        ),
       );
     } finally {
       setState(() => _isSending = false);
     }
   }
+
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
@@ -306,15 +310,19 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       backgroundColor: const Color(0xFFF5F5F5),
       body: _isLoading
           ? Center(
-        child: CircularProgressIndicator(color: ThemeConfig.goldenYellow),
+        child: CircularProgressIndicator(
+          color: ThemeConfig.goldenYellow,
+        ),
       )
           : _error != null
           ? _buildErrorWidget(_error!)
-          : _messages.isEmpty
-          ? _buildEmptyWidget()
           : Column(
         children: [
-          Expanded(child: _buildMessageList()),
+          Expanded(
+            child: _messages.isEmpty
+                ? _buildEmptyWidget()
+                : _buildMessageList(),
+          ),
           _buildMessageInput(),
         ],
       ),
