@@ -1102,9 +1102,9 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> getDisabledDates({
-    required int id,
-    required int enquiryItem,
-    required int inPersonAddress,
+    required String id,
+    required String enquiryItem,
+    required String inPersonAddress,
   }) async {
     const endpoint = ApiConfig.appointmentsGetDisabledDates;
 
@@ -1118,9 +1118,9 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> getDisabledSlots({
-    required int serviceId,
-    required int enquiryItem,
-    required int inPersonAddress,
+    required String serviceId,
+    required String enquiryItem,
+    required String inPersonAddress,
     required String selectedDate,
   }) async {
     const endpoint = ApiConfig.appointmentsGetDisabledSlots;
