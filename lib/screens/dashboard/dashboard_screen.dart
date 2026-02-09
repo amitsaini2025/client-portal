@@ -319,17 +319,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 );*/
                               },
                               onHealthInsurance: () {
-                                /*Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) =>
-                                            const PersonalInformationScreen(),
-                                  ),
-                                );*/
-                                showSnack(
-                                  context,
-                                  "This feature will be available in a future update.",
-                                );
+                                Navigator.pushNamed(context, '/health-insurance');
                               },
                               onUpcomingDeadlines: () {
                                 Navigator.pushNamed(context, '/tasks');

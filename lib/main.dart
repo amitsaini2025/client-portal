@@ -4,6 +4,7 @@ import 'package:client/screens/auth/reset_password_screen.dart';
 import 'package:client/screens/cases/cases_list_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
+import 'package:client/screens/dashboard/health_insurance/health_insurance_screen.dart';
 import 'package:client/screens/dashboard/my_files/my_files_screen.dart';
 import 'package:client/screens/dashboard/notification/notification_list_screen.dart';
 import 'package:client/screens/dashboard/occupation_search/occupation_search_screen.dart';
@@ -331,6 +332,7 @@ class MyAppWithTheme extends StatelessWidget {
                   ModalRoute.of(context)!.settings.arguments as String;
               return DashboardScreen(matterId: matterId);
             },
+            '/health-insurance' : (context) => const HealthInsuranceScreen(),
             '/profile': (context) => const ProfileScreen(),
             '/profile/edit': (context) => const EditProfileScreen(),
             '/recent-cases': (context) => const CasesListScreen(),
