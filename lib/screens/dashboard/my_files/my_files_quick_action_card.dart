@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../../services/auth_service.dart';
+import '../../../widgets/dialog/login_required_dialog.dart';
 
 class MyFilesQuickActionsCard extends StatelessWidget {
   final VoidCallback onUploadDocument;
@@ -79,24 +80,38 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      AuthService.selectedMatterName ?? '',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white70,
+                    SizedBox(
+                      width: 200,
+                      child: Text(
+                        AuthService.selectedMatterName ?? '',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white70,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
                       ),
                     ),
+
                     const SizedBox(height: 2),
-                    Text(
-                      "ID: ${AuthService.selectedMatterId ?? ''}",
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white70,
+
+                    SizedBox(
+                      width: 120,
+                      child: Text(
+                        "ID: ${AuthService.selectedMatterId ?? ''}",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white70,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
                       ),
                     ),
                   ],
-                ),
+                )
               ),
             ],
           ),
@@ -190,7 +205,18 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return InkWell(
-      onTap: onTap,
+      onTap: (){
+        if ( !AuthService.isAuthenticated) {
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (_) => const LoginRequiredDialog(),
+          );
+          return;
+        }
+
+        onTap();
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),

@@ -328,11 +328,10 @@ class MyAppWithTheme extends StatelessWidget {
             '/reset-password': (context) => const ResetPasswordScreen(),
             '/matters': (context) => const MattersScreen(),
             '/dashboard': (context) {
-              final matterId =
-                  ModalRoute.of(context)!.settings.arguments as String;
-              return DashboardScreen(matterId: matterId);
+              final args = ModalRoute.of(context)?.settings.arguments;
+              return DashboardScreen(matterId: args as String?);
             },
-            '/health-insurance' : (context) => const HealthInsuranceScreen(),
+            '/health-insurance': (context) => const HealthInsuranceScreen(),
             '/profile': (context) => const ProfileScreen(),
             '/profile/edit': (context) => const EditProfileScreen(),
             '/recent-cases': (context) => const CasesListScreen(),

@@ -32,9 +32,9 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
   late TextEditingController emailController;
   late TextEditingController phoneController;
 
-  int slotDuration = 15; // Will be loaded from API
-  String startTime = "10:45"; // Will be loaded from API
-  String endTime = "16:00"; // Will be loaded from API
+  int slotDuration = 15;
+  String startTime = "10:45";
+  String endTime = "16:00";
 
   bool get isAdd => widget.selectedOptions['is_add'] ?? true;
 
@@ -86,7 +86,9 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
 
       setState(() {
         disabledDates =
-            (data['disabledatesarray'] as List).map((d) => formatter.parse(d)).toSet();
+            (data['disabledatesarray'] as List)
+                .map((d) => formatter.parse(d))
+                .toSet();
         disabledWeekdays = List<int>.from(data['weeks']);
         slotDuration = data['duration'] ?? 15;
         startTime = data['start_time'] ?? "10:45";
@@ -123,17 +125,18 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BookConfirmAppointmentScreen(
-          selectedOptions: {
-            ...widget.selectedOptions,
-            'full_name': fullNameController.text.trim(),
-            'email': emailController.text.trim(),
-            'phone': phoneController.text.trim(),
-            'appoint_date': formatter.format(selectedDay!),
-            'appoint_time': selectedTime!,
-            'description': enquiryController.text.trim(),
-          },
-        ),
+        builder:
+            (_) => BookConfirmAppointmentScreen(
+              selectedOptions: {
+                ...widget.selectedOptions,
+                'full_name': fullNameController.text.trim(),
+                'email': emailController.text.trim(),
+                'phone': phoneController.text.trim(),
+                'appoint_date': formatter.format(selectedDay!),
+                'appoint_time': selectedTime!,
+                'description': enquiryController.text.trim(),
+              },
+            ),
       ),
     );
   }
@@ -169,7 +172,7 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/dashboard',
-                (Route<dynamic> route) => false,
+            (Route<dynamic> route) => false,
             arguments: AuthService.selectedMatterId!.toString(),
           );
         } else {
@@ -182,8 +185,9 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
           );
         }
       } catch (e) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       } finally {
         setState(() => isSubmitting = false);
       }
@@ -230,39 +234,39 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
                 final isMobile = constraints.maxWidth < 600;
                 return isMobile
                     ? Column(
-                  children: [
-                    AppTextField(
-                      label: 'Full Name',
-                      controller: fullNameController,
-                      enabled: inputEnabled,
-                    ),
-                    const SizedBox(height: 16),
-                    AppTextField(
-                      label: 'Email Address',
-                      controller: emailController,
-                      enabled: inputEnabled,
-                    ),
-                  ],
-                )
+                      children: [
+                        AppTextField(
+                          label: 'Full Name',
+                          controller: fullNameController,
+                          enabled: inputEnabled,
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          label: 'Email Address',
+                          controller: emailController,
+                          enabled: inputEnabled,
+                        ),
+                      ],
+                    )
                     : Row(
-                  children: [
-                    Expanded(
-                      child: AppTextField(
-                        label: 'Full Name',
-                        controller: fullNameController,
-                        enabled: inputEnabled,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: AppTextField(
-                        label: 'Email Address',
-                        controller: emailController,
-                        enabled: inputEnabled,
-                      ),
-                    ),
-                  ],
-                );
+                      children: [
+                        Expanded(
+                          child: AppTextField(
+                            label: 'Full Name',
+                            controller: fullNameController,
+                            enabled: inputEnabled,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: AppTextField(
+                            label: 'Email Address',
+                            controller: emailController,
+                            enabled: inputEnabled,
+                          ),
+                        ),
+                      ],
+                    );
               },
             ),
             const SizedBox(height: 20),
@@ -310,7 +314,8 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
                 width: 220,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: isLoading || isSubmitting ? null : _submitAppointment,
+                  onPressed:
+                      isLoading || isSubmitting ? null : _submitAppointment,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1F3C88),
                     foregroundColor: Colors.white,
@@ -323,9 +328,12 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: isSubmitting
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(isAdd ? 'Review & Confirm' : 'Update Appointment'),
+                  child:
+                      isSubmitting
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                            isAdd ? 'Review & Confirm' : 'Update Appointment',
+                          ),
                 ),
               ),
             ),
@@ -519,13 +527,16 @@ class _CalendarSectionState extends State<CalendarSection> {
         selectedDate: formattedDate,
       );
 
-      disabledTimeSlots =
-      List<String>.from(res['data']['disabledtimeslotes'] ?? []);
+      disabledTimeSlots = List<String>.from(
+        res['data']['disabledtimeslotes'] ?? [],
+      );
 
-      availableSlots = generateTimeSlots(
-          widget.startTime, widget.endTime, widget.slotDuration)
-          .where((slot) => !disabledTimeSlots.contains(slot))
-          .toList();
+      availableSlots =
+          generateTimeSlots(
+            widget.startTime,
+            widget.endTime,
+            widget.slotDuration,
+          ).where((slot) => !disabledTimeSlots.contains(slot)).toList();
     } catch (e) {
       debugPrint('Disabled slot API error: $e');
     } finally {
@@ -539,10 +550,20 @@ class _CalendarSectionState extends State<CalendarSection> {
     final startParts = start.split(":");
     final endParts = end.split(":");
 
-    DateTime current =
-    DateTime(0, 0, 0, int.parse(startParts[0]), int.parse(startParts[1]));
-    DateTime last =
-    DateTime(0, 0, 0, int.parse(endParts[0]), int.parse(endParts[1]));
+    DateTime current = DateTime(
+      0,
+      0,
+      0,
+      int.parse(startParts[0]),
+      int.parse(startParts[1]),
+    );
+    DateTime last = DateTime(
+      0,
+      0,
+      0,
+      int.parse(endParts[0]),
+      int.parse(endParts[1]),
+    );
 
     while (!current.add(Duration(minutes: duration)).isAfter(last)) {
       slots.add(DateFormat('h:mm a').format(current));
@@ -552,7 +573,6 @@ class _CalendarSectionState extends State<CalendarSection> {
     return slots;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -561,7 +581,8 @@ class _CalendarSectionState extends State<CalendarSection> {
           firstDay: DateTime(2025),
           lastDay: DateTime(2027),
           focusedDay: focusedDay,
-          selectedDayPredicate: (d) => selectedDay != null && sameDay(selectedDay!, d),
+          selectedDayPredicate:
+              (d) => selectedDay != null && sameDay(selectedDay!, d),
           enabledDayPredicate: (day) => !isDisabled(day),
           onDaySelected: (selected, focused) {
             if (isDisabled(selected)) return;
@@ -577,44 +598,44 @@ class _CalendarSectionState extends State<CalendarSection> {
         loadingSlots
             ? const CircularProgressIndicator()
             : GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 3,
-          ),
-          itemCount: availableSlots.length,
-          itemBuilder: (context, index) {
-            final slot = availableSlots[index];
-            final isSelected = slot == selectedSlot;
-            return GestureDetector(
-              onTap: widget.onTimeSelected != null
-                  ? () {
-                setState(() => selectedSlot = slot);
-                widget.onTimeSelected?.call(slot);
-              }
-                  : null,
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? const Color(0xFF1E3A8A)
-                      : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  slot,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: isSelected ? Colors.white : Colors.grey,
-                  ),
-                ),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 3,
               ),
-            );
-          },
-        ),
+              itemCount: availableSlots.length,
+              itemBuilder: (context, index) {
+                final slot = availableSlots[index];
+                final isSelected = slot == selectedSlot;
+                return GestureDetector(
+                  onTap:
+                      widget.onTimeSelected != null
+                          ? () {
+                            setState(() => selectedSlot = slot);
+                            widget.onTimeSelected?.call(slot);
+                          }
+                          : null,
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color:
+                          isSelected ? Colors.grey.shade300 : Color(0xFF1E3A8A),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      slot,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: isSelected ? Colors.black : Colors.white,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
       ],
     );
   }

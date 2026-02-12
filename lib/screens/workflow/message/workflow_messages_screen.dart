@@ -59,6 +59,91 @@ class PusherService {
   }
 }
 
+
+class ReverbService {
+  static final PusherChannelsFlutter pusher =
+  PusherChannelsFlutter.getInstance();
+
+  static Function(MessageDetail message)? onMessageReceived;
+
+  static Future<void> init({
+    required String userId,
+    required String token,
+  }) async {
+    try {
+      await pusher.init(
+        apiKey: "145cd98cfea9f69732ae6755ac889bcc",
+        cluster: "mt1",
+        useTLS: true,
+
+        authEndpoint:
+        "https://revapi.bansalcrm.com/broadcasting/auth",
+
+        authParams: {
+          "headers": {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+          }
+        },
+
+        onConnectionStateChange: (current, previous) {
+          log("Connection: $previous → $current");
+        },
+
+        onError: (message, code, error) {
+          log("Pusher Error: $message | Code: $code | $error");
+        },
+
+        onSubscriptionSucceeded: (channelName, data) {
+          log("Subscribed to $channelName");
+        },
+
+        onSubscriptionError: (message, error) {
+          log("Subscription error: $message | $error");
+        },
+
+        onEvent: (event) {
+          log("Event: ${event.eventName}");
+          log("Raw Data: ${event.data}");
+
+          if (event.data != null && event.data.toString().isNotEmpty) {
+            try {
+              final json = event.data is String
+                  ? jsonDecode(event.data)
+                  : event.data;
+
+              if (json['data']?['message'] != null) {
+                final message =
+                MessageDetail.fromJson(json['data']['message']);
+
+                onMessageReceived?.call(message);
+              }
+            } catch (e) {
+              log("Parse Error: $e");
+            }
+          }
+        },
+      );
+
+      await pusher.subscribe(
+        channelName: "private-user.$userId",
+      );
+
+      await pusher.connect();
+
+      log("✅ Reverb Connected Successfully");
+    } catch (e) {
+      log("INIT ERROR: $e");
+    }
+  }
+
+  static Future<void> disconnect() async {
+    await pusher.disconnect();
+  }
+}
+
+
+
 class WorkflowMessagesScreen extends StatefulWidget {
   const WorkflowMessagesScreen({super.key});
 
@@ -85,6 +170,16 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
     PusherService.onMessageReceived = _handleIncomingMessage;
     PusherService.init_();
+
+    ReverbService.onMessageReceived = (message) {
+      _handleIncomingMessage(message);
+    };
+
+    ReverbService.init(
+      userId: AuthService.currentUserId.toString(),
+      token: AuthService.currentToken.toString(),
+    );
+
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=

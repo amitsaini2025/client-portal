@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:client/config/theme_config.dart';
 import 'package:client/screens/dashboard/personal_info/personal_information_screen.dart';
-import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:client/screens/workflow/workflow_stages_screen.dart';
 import 'package:client/services/api_service_bansal_immigration.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -20,15 +19,17 @@ import '../../models/recent_activity.dart';
 import '../../models/task.dart';
 import '../../models/upcoming_deadline_summary.dart';
 import '../../services/api_service.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
+import '../../widgets/dialog/login_required_dialog.dart';
 import '../documents/upload_document_screen.dart';
 import 'book_appointment/book_location_screen.dart';
 import 'my_files/my_files_quick_action_card.dart';
 
 class DashboardScreen extends StatefulWidget {
-  final String matterId;
+  final String? matterId;
 
   const DashboardScreen({super.key, required this.matterId});
 
@@ -123,6 +124,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadDashboardData() async {
+    if (widget.matterId == null) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = null;
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -130,7 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     try {
       final result = await ApiService.getDashboard(
-        selMatterId: widget.matterId,
+        selMatterId: widget.matterId!,
       );
 
       if (result['success'] == true) {
@@ -252,7 +261,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              Navigator.pushNamed(context, '/notifications');
+              if (AuthService.isAuthenticated) {
+                Navigator.pushNamed(context, '/notifications');
+              }else{
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (_) => const LoginRequiredDialog(),
+                );
+              }
               /*showSnack(
                 context,
                 "This feature will be available in a future update.",
@@ -262,19 +279,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder:
-                      (context) =>
-                  const PersonalInformationScreen(),
-                ),
-              );
+              if (AuthService.isAuthenticated) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const PersonalInformationScreen(),
+                  ),
+                );
+              } else {
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (_) => const LoginRequiredDialog(),
+                );
+              }
             },
           ),
           IconButton(
             icon: const Icon(Icons.person_outline),
             onPressed: () {
-              Navigator.pushNamed(context, '/profile');
+              if (AuthService.isAuthenticated) {
+                Navigator.pushNamed(context, '/profile');
+              } else {
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (_) => const LoginRequiredDialog(),
+                );
+              }
             },
           ),
         ],
@@ -309,8 +340,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder:
-                                        (context) =>
-                                            const BookLocationScreen(),
+                                        (context) => const BookLocationScreen(),
                                   ),
                                 );
                                 /*showSnack(
@@ -319,7 +349,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 );*/
                               },
                               onHealthInsurance: () {
-                                Navigator.pushNamed(context, '/health-insurance');
+                                Navigator.pushNamed(
+                                  context,
+                                  '/health-insurance',
+                                );
                               },
                               onUpcomingDeadlines: () {
                                 Navigator.pushNamed(context, '/tasks');
@@ -368,7 +401,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder:
-                                        (context) => const WorkflowStagesScreen(),
+                                        (context) =>
+                                            const WorkflowStagesScreen(),
                                   ),
                                 );
                               },
@@ -398,7 +432,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   '/recent-activity',
                                 );
                               },
-                              onMessage: (){
+                              onMessage: () {
                                 Navigator.pushNamed(
                                   context,
                                   '/workflow-message',
@@ -443,79 +477,80 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(height: 12),
         SizedBox(
           height: 140,
-          child: _isLoadingBlogs
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _blogs.length,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemBuilder: (context, index) {
-              final blog = _blogs[index];
+          child:
+              _isLoadingBlogs
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _blogs.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemBuilder: (context, index) {
+                      final blog = _blogs[index];
 
-              return InkWell(
-                borderRadius: BorderRadius.circular(14),
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/blogs/detail',
-                    arguments: {'blogId': blog.id},
-                  );
-                },
-                child: Container(
-                  width: 260,
-                  margin: EdgeInsets.only(
-                    right: index == _blogs.length - 1 ? 0 : 16,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    image: DecorationImage(
-                      image: NetworkImage(blog.image),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withOpacity(0.2),
-                            Colors.black.withOpacity(0.7),
-                          ],
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/blogs/detail',
+                            arguments: {'blogId': blog.id},
+                          );
+                        },
+                        child: Container(
+                          width: 260,
+                          margin: EdgeInsets.only(
+                            right: index == _blogs.length - 1 ? 0 : 16,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            image: DecorationImage(
+                              image: NetworkImage(blog.image),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.black.withOpacity(0.2),
+                                    Colors.black.withOpacity(0.7),
+                                  ],
+                                ),
+                              ),
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    blog.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    blog.date,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            blog.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            blog.date,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                ),
-              );
-            },
-          ),
         ),
       ],
     );
