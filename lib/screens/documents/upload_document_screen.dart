@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:client/config/theme_config.dart'; // Added for colors
 import '../../models/new/allowed_checklist.dart';
@@ -27,6 +28,8 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
   bool _isLoading = false;
   bool _isUploading = false;
 
+  final ImagePicker _imagePicker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
@@ -53,7 +56,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
           _checklists =
               list.map((json) => AllowedChecklist.fromJson(json)).toList();
         });
-        if ( list.isEmpty) {
+        if (list.isEmpty) {
           _showErrorSnackBar("No checklist available for this matter.");
         }
       } else {
@@ -67,6 +70,50 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
   }
 
   Future<void> _pickFile() async {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ThemeConfig.navyBlue,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.folder, color: Colors.white),
+                title: const Text('My Files', style: TextStyle(color: Colors.white)),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  await _pickFromFiles();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo, color: Colors.white),
+                title: const Text('Gallery', style: TextStyle(color: Colors.white)),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  await _pickFromGallery();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: Colors.white),
+                title: const Text('Camera', style: TextStyle(color: Colors.white)),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  await _pickFromCamera();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickFromFiles() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -92,6 +139,36 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       }
     } catch (e) {
       _showErrorSnackBar('Error picking file: $e');
+    }
+  }
+
+  Future<void> _pickFromGallery() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        setState(() {
+          _selectedFile = File(image.path);
+          _selectedFileName = image.name;
+          _selectedFileType = image.name.split('.').last;
+        });
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error picking image: $e');
+    }
+  }
+
+  Future<void> _pickFromCamera() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
+      if (image != null) {
+        setState(() {
+          _selectedFile = File(image.path);
+          _selectedFileName = image.name;
+          _selectedFileType = image.name.split('.').last;
+        });
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error taking photo: $e');
     }
   }
 
@@ -294,7 +371,8 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: ThemeConfig.goldenYellow, width: 2),
+                borderSide:
+                BorderSide(color: ThemeConfig.goldenYellow, width: 2),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -312,7 +390,8 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: ThemeConfig.goldenYellow, width: 2),
+                borderSide:
+                BorderSide(color: ThemeConfig.goldenYellow, width: 2),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),

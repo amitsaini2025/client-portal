@@ -64,21 +64,26 @@ class ReverbService {
   static final PusherChannelsFlutter pusher =
   PusherChannelsFlutter.getInstance();
 
+  /// Callback for incoming messages
   static Function(MessageDetail message)? onMessageReceived;
 
+  /// Initialize Reverb connection
   static Future<void> init({
     required String userId,
     required String token,
   }) async {
     try {
+      log("🔹 Initializing Reverb for user: $userId");
+
+      onMessageReceived ??= (message) {
+        log("📩 Received message: $message");
+      };
+
       await pusher.init(
         apiKey: "145cd98cfea9f69732ae6755ac889bcc",
-        cluster: "mt1",
+        cluster: "ap2", // can be any string, Reverb ignores it
         useTLS: true,
-
-        authEndpoint:
-        "https://revapi.bansalcrm.com/broadcasting/auth",
-
+        authEndpoint: "https://revapi.bansalcrm.com/broadcasting/auth",
         authParams: {
           "headers": {
             "Authorization": "Bearer $token",
@@ -87,61 +92,67 @@ class ReverbService {
         },
 
         onConnectionStateChange: (current, previous) {
-          log("Connection: $previous → $current");
+          log("🔄 Connection state: $previous → $current");
+          if (current.toString().toLowerCase().contains('connected')) {
+            log("✅ Reverb WebSocket is fully connected");
+          }
         },
 
         onError: (message, code, error) {
-          log("Pusher Error: $message | Code: $code | $error");
+          log("❌ Pusher error: $message | Code: $code | Error: $error");
         },
 
         onSubscriptionSucceeded: (channelName, data) {
-          log("Subscribed to $channelName");
+          log("✅ Subscribed successfully to $channelName | Data: $data");
         },
 
         onSubscriptionError: (message, error) {
-          log("Subscription error: $message | $error");
+          log("❌ Subscription error: $message | Error: $error");
         },
 
         onEvent: (event) {
-          log("Event: ${event.eventName}");
-          log("Raw Data: ${event.data}");
+          log("📩 Event received: ${event.eventName} | Raw: ${event.data}");
+          try {
+            if (event.data != null) {
+              final jsonData =
+              event.data is String ? jsonDecode(event.data) : event.data;
 
-          if (event.data != null && event.data.toString().isNotEmpty) {
-            try {
-              final json = event.data is String
-                  ? jsonDecode(event.data)
-                  : event.data;
-
-              if (json['data']?['message'] != null) {
+              // Check for Reverb payload
+              if (jsonData['data']?['message_sent'] != null) {
                 final message =
-                MessageDetail.fromJson(json['data']['message']);
-
+                MessageDetail.fromJson(jsonData['data']['message_sent']);
                 onMessageReceived?.call(message);
               }
-            } catch (e) {
-              log("Parse Error: $e");
             }
+          } catch (e) {
+            log("⚠️ Event parse error: $e");
           }
         },
       );
 
-      await pusher.subscribe(
-        channelName: "private-user.$userId",
-      );
-
+      // Connect first
       await pusher.connect();
 
-      log("✅ Reverb Connected Successfully");
-    } catch (e) {
-      log("INIT ERROR: $e");
+      // Subscribe to private channel
+      await pusher.subscribe(channelName: "private-user.$userId");
+
+      log("✅ Reverb initialized and connected (socketId handled internally)");
+    } catch (e, stack) {
+      log("❌ Reverb init error: $e");
+      log(stack.toString());
     }
   }
 
+  /// Disconnect
   static Future<void> disconnect() async {
-    await pusher.disconnect();
+    try {
+      await pusher.disconnect();
+      log("🛑 Reverb disconnected");
+    } catch (e) {
+      log("❌ Disconnect error: $e");
+    }
   }
 }
-
 
 
 class WorkflowMessagesScreen extends StatefulWidget {
