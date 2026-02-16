@@ -405,22 +405,25 @@ class AuthWrapper extends StatelessWidget {
         }
 
         if (snapshot.data == true) {
-          if (AuthService.isMatterSelected) {
-            return DashboardScreen(
-              matterId: AuthService.selectedMatterId!.toString(),
-            );
-          } else {
-            return const MattersScreen();
+          if(AuthService.isAuthenticated){
+            if (AuthService.isMatterSelected) {
+              return DashboardScreen(
+                matterId: AuthService.selectedMatterId!.toString(),
+              );
+            } else {
+              return const MattersScreen();
+            }
+          }else{
+            return DashboardScreen(matterId: null);
           }
         } else {
-          return const LoginScreen();
+          return DashboardScreen(matterId: null);
         }
       },
     );
   }
 
   Future<bool> _checkAuthStatus() async {
-    // Add a small delay to ensure AuthService is initialized
     await Future.delayed(Duration(milliseconds: 100));
     return AuthService.isAuthenticated;
   }

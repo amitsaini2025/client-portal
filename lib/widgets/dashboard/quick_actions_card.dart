@@ -9,6 +9,10 @@ class QuickActionsCard extends StatelessWidget {
   final VoidCallback? onStudentFundCalculator;
   final VoidCallback? onOccupationSearch;
   final VoidCallback? onPostCodeChecker;
+  final VoidCallback? onCourseSearch;
+  final VoidCallback? onImportantLinks;
+  final VoidCallback? onEnglishRequirement;
+  final VoidCallback? onWebSearch;
 
   const QuickActionsCard({
     super.key,
@@ -19,6 +23,10 @@ class QuickActionsCard extends StatelessWidget {
     this.onStudentFundCalculator,
     this.onOccupationSearch,
     this.onPostCodeChecker,
+    this.onCourseSearch,
+    this.onImportantLinks,
+    this.onEnglishRequirement,
+    this.onWebSearch,
   });
 
   static const double _radius = 12;
@@ -52,7 +60,7 @@ class QuickActionsCard extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
-            itemCount: 6,
+            itemCount: 10, // updated
             itemBuilder: (context, index) {
               switch (index) {
                 case 0:
@@ -97,13 +105,36 @@ class QuickActionsCard extends StatelessWidget {
                     color: Colors.redAccent,
                     onTap: onPostCodeChecker ?? () {},
                   );
-                default:
+                case 6:
                   return _tile(
-                    icon: Icons.event,
-                    label: 'Upcoming\nDeadlines',
-                    color: Colors.teal,
-                    onTap: onUpcomingDeadlines ?? () {},
+                    icon: Icons.school,
+                    label: 'Course\nSearch',
+                    color: Colors.orange,
+                    onTap: onCourseSearch ?? () {},
                   );
+                case 7:
+                  return _tile(
+                    icon: Icons.link,
+                    label: 'Important\nLinks',
+                    color: Colors.teal,
+                    onTap: onImportantLinks ?? () {},
+                  );
+                case 8:
+                  return _tile(
+                    icon: Icons.language,
+                    label: 'English\nRequirement',
+                    color: Colors.indigo,
+                    onTap: onEnglishRequirement ?? () {},
+                  );
+                case 9:
+                  return _tile(
+                    icon: Icons.web,
+                    label: 'Web\nSearch',
+                    color: Colors.pink,
+                    onTap: onWebSearch ?? () {},
+                  );
+                default:
+                  return const SizedBox.shrink();
               }
             },
           ),

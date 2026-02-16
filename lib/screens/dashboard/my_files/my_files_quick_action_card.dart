@@ -25,7 +25,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     this.onDocumentStatus,
     this.onUpcomingDeadlines,
     this.onRecentActivity,
-    this.onMessage
+    this.onMessage,
   });
 
   @override
@@ -34,88 +34,109 @@ class MyFilesQuickActionsCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF2A2F57),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'My Files',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  fontSize: 15,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder:
-                        (context) => AlertDialog(
-                          title: const Text("Change Matter"),
-                          content: const Text(
-                            "Do you want to change the selected matter?",
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("No"),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                Navigator.pushNamed(context, '/matters');
-                              },
-                              child: const Text("Yes"),
-                            ),
-                          ],
-                        ),
-                  );
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      width: 200,
-                      child: Text(
-                        AuthService.selectedMatterName ?? '',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white70,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-
-                    const SizedBox(height: 2),
-
-                    SizedBox(
-                      width: 120,
-                      child: Text(
-                        "ID: ${AuthService.selectedMatterId ?? ''}",
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white70,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                  ],
-                )
-              ),
-            ],
+          // Title
+          Text(
+            'My Files',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(height: 12),
+
+          // Single bordered box for all three elements
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text("Change Matter"),
+                  content: const Text(
+                    "Do you want to change the selected matter?",
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("No"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, '/matters');
+                      },
+                      child: const Text("Yes"),
+                    ),
+                  ],
+                ),
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white12,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.yellowAccent.shade400,
+                  width: 2,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Click here to change matter (highlighted)
+                  Text(
+                    "Click here to change matter",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.yellowAccent.shade400,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+
+                  // Matter Name
+                  Text(
+                    AuthService.selectedMatterName ?? 'No Matter Selected',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  // Matter ID
+                  if (AuthService.isAuthenticated)
+                    Text(
+                      "ID: ${AuthService.selectedMatterId ?? ''}",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Quick Action Tiles
           MasonryGridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
@@ -178,17 +199,11 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     context,
                     icon: Icons.message,
                     label: 'Message',
-                    color: Colors.green,
+                    color: Colors.greenAccent.shade100,
                     onTap: onMessage ?? () {},
                   );
                 default:
-                  return _buildTile(
-                    context,
-                    icon: Icons.event,
-                    label: 'Upcoming\nDeadlines',
-                    color: Colors.tealAccent.shade100,
-                    onTap: onUpcomingDeadlines ?? () {},
-                  );
+                  return const SizedBox.shrink();
               }
             },
           ),
@@ -198,15 +213,15 @@ class MyFilesQuickActionsCard extends StatelessWidget {
   }
 
   Widget _buildTile(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+      BuildContext context, {
+        required IconData icon,
+        required String label,
+        required Color color,
+        required VoidCallback onTap,
+      }) {
     return InkWell(
-      onTap: (){
-        if ( !AuthService.isAuthenticated) {
+      onTap: () {
+        if (!AuthService.isAuthenticated) {
           showDialog(
             context: context,
             barrierDismissible: true,
@@ -214,15 +229,14 @@ class MyFilesQuickActionsCard extends StatelessWidget {
           );
           return;
         }
-
         onTap();
       },
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
           color: const Color(0xFF262D50),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: color.withOpacity(0.3), width: 1),
         ),
         child: Row(
@@ -230,12 +244,12 @@ class MyFilesQuickActionsCard extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.all(6),
-              child: Icon(icon, size: 18, color: color), // smaller icon
+              child: Icon(icon, size: 18, color: color),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
                 label,

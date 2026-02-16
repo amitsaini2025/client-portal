@@ -263,7 +263,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onPressed: () {
               if (AuthService.isAuthenticated) {
                 Navigator.pushNamed(context, '/notifications');
-              }else{
+              } else {
                 showDialog(
                   context: context,
                   barrierDismissible: true,
@@ -378,6 +378,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   '/post-code-checker',
                                 );
                               },
+                              onCourseSearch: () => {},
+                              onImportantLinks: () => {},
+                              onEnglishRequirement: () => {},
+                              onWebSearch: () => {},
                             ),
                             const SizedBox(height: 24),
                             MyFilesQuickActionsCard(

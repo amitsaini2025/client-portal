@@ -1,36 +1,11 @@
+import 'package:client/screens/dashboard/health_insurance/student_visa_oshc_screen/student_visa_oshcs_screen.dart';
+import 'package:client/screens/dashboard/health_insurance/temporary_graduate_health_insurance/temporary_graduate_ovhc_screen.dart';
+import 'package:client/screens/dashboard/health_insurance/tourist_visa_ovhcs_screen/tourist_visa_ovhcs_screen.dart';
 import 'package:flutter/material.dart';
-
 import '../../../config/theme_config.dart';
-import '../../../widgets/webview/universal_webview.dart';
 
-class HealthInsuranceScreen extends StatefulWidget {
+class HealthInsuranceScreen extends StatelessWidget {
   const HealthInsuranceScreen({super.key});
-
-  @override
-  State<HealthInsuranceScreen> createState() => _HealthInsuranceScreenState();
-}
-
-class _HealthInsuranceScreenState extends State<HealthInsuranceScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  final List<String> urls = [
-    'https://www.bansalimmigration.com.au/student-visa-health-insurance',
-    'https://www.bansalimmigration.com.au/tourist-visa-health-insurance',
-    'https://www.bansalimmigration.com.au/temporary-graduate-health-insurance',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: urls.length, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,40 +17,77 @@ class _HealthInsuranceScreenState extends State<HealthInsuranceScreen>
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
-          tabs: const [
-            Tab(text: "Student Visa Health Insurance(OSHC)"),
-            Tab(text: "Tourist Visa Health Insurance(OVHC)"),
-            Tab(text: "Temporary Graduate Health Insurance(OVHC)"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: GridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 2.2,
+          children: [
+            _tile(
+              context,
+              label: 'Student Visa (OSHC)',
+              icon: Icons.school,
+              color: Colors.green,
+              screen: const StudentVisaOSHCScreen(),
+            ),
+            _tile(
+              context,
+              label: 'Tourist Visa (OVHC)',
+              icon: Icons.airplanemode_active,
+              color: Colors.orange,
+              screen: const TouristVisaOVHCScreen(),
+            ),
+            _tile(
+              context,
+              label: 'Temporary Graduate (OVHC)',
+              icon: Icons.person,
+              color: Colors.blue,
+              screen: const TemporaryGraduateOVHCScreen(),
+            ),
           ],
         ),
       ),
-      body: Container(
-        margin: const EdgeInsets.all(0),
+    );
+  }
+
+  Widget _tile(BuildContext context,
+      {required String label,
+        required IconData icon,
+        required Color color,
+        required Widget screen}) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => screen),
+        );
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.white,
-              blurRadius: 8,
-              offset: Offset(0, 4),
+          border: Border.all(color: color.withOpacity(0.25)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: color),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
             ),
           ],
-        ),
-        child: TabBarView(
-          controller: _tabController,
-          children: List.generate(
-            urls.length,
-                (index) => UniversalWebView(
-              url: urls[index],
-              viewId: 'iframe-$index',
-            ),
-          ),
         ),
       ),
     );
