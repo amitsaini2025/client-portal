@@ -116,6 +116,19 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         ),
       ),
       body: content,
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: ThemeConfig.goldenYellow,
+        elevation: 6,
+        onPressed: () {
+          Navigator.pushNamed(context, '/upload-documents');
+        },
+        icon: const Icon(Icons.upload_file, color: Colors.white),
+        label: const Text(
+          "Upload Document",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
 
     // Case 2 → stageId is NULL → No AppBar

@@ -28,13 +28,6 @@ class MyFilesScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MyFilesQuickActionsCard(
-              onUploadDocument: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const UploadDocumentScreen(),
-                  ),
-                );
-              },
               onSendMessage: () {
                 /*Navigator.of(context).push(
                             MaterialPageRoute(

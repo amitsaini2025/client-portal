@@ -5,13 +5,16 @@ import 'package:client/screens/cases/cases_list_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
 import 'package:client/screens/dashboard/health_insurance/health_insurance_screen.dart';
+import 'package:client/screens/dashboard/important_links/important_links_screen.dart';
 import 'package:client/screens/dashboard/my_files/my_files_screen.dart';
 import 'package:client/screens/dashboard/notification/notification_list_screen.dart';
 import 'package:client/screens/dashboard/occupation_search/occupation_search_screen.dart';
+import 'package:client/screens/dashboard/personal_info/personal_information_screen.dart';
 import 'package:client/screens/dashboard/post_code_checker/postcode_checker_screen.dart';
 import 'package:client/screens/dashboard/pr_calculator/pr_calculator_screen.dart';
 import 'package:client/screens/dashboard/student_fund_calculator/student_fund_calculator_screen.dart';
 import 'package:client/screens/document_management/document_management.dart';
+import 'package:client/screens/documents/upload_document_screen.dart';
 import 'package:client/screens/matters/matters_screen.dart';
 import 'package:client/screens/pdf/pdf_viewer_screen.dart';
 import 'package:client/screens/profile/edit_profile_screen.dart';
@@ -334,6 +337,8 @@ class MyAppWithTheme extends StatelessWidget {
             '/health-insurance': (context) => const HealthInsuranceScreen(),
             '/profile': (context) => const ProfileScreen(),
             '/profile/edit': (context) => const EditProfileScreen(),
+            '/personal-information':
+                (context) => const PersonalInformationScreen(),
             '/recent-cases': (context) => const CasesListScreen(),
             //'/documents': (context) => const DocumentsScreen(),
             '/documents': (context) => const WorkflowDocumentsScreen(),
@@ -341,6 +346,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/recent-activity': (context) => const RecentActivityScreen(),
             '/document-management':
                 (context) => const DocumentManagementScreen(),
+            '/upload-documents': (context) => const UploadDocumentScreen(),
             '/pdf-viewer': (context) {
               final args =
                   ModalRoute.of(context)!.settings.arguments
@@ -382,6 +388,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/occupation-search': (context) => OccupationSearchScreen(),
             '/post-code-checker': (context) => PostcodeCheckerScreen(),
             '/notifications': (context) => NotificationsScreen(),
+            '/important-links': (context) => ImportantLinksScreen(),
           },
         );
       },
@@ -405,7 +412,7 @@ class AuthWrapper extends StatelessWidget {
         }
 
         if (snapshot.data == true) {
-          if(AuthService.isAuthenticated){
+          if (AuthService.isAuthenticated) {
             if (AuthService.isMatterSelected) {
               return DashboardScreen(
                 matterId: AuthService.selectedMatterId!.toString(),
@@ -413,7 +420,7 @@ class AuthWrapper extends StatelessWidget {
             } else {
               return const MattersScreen();
             }
-          }else{
+          } else {
             return DashboardScreen(matterId: null);
           }
         } else {

@@ -5,7 +5,6 @@ import '../../../services/auth_service.dart';
 import '../../../widgets/dialog/login_required_dialog.dart';
 
 class MyFilesQuickActionsCard extends StatelessWidget {
-  final VoidCallback onUploadDocument;
   final VoidCallback onSendMessage;
   final VoidCallback? onViewWorkflow;
   final VoidCallback? onBilling;
@@ -17,7 +16,6 @@ class MyFilesQuickActionsCard extends StatelessWidget {
 
   const MyFilesQuickActionsCard({
     super.key,
-    required this.onUploadDocument,
     required this.onSendMessage,
     this.onViewWorkflow,
     this.onBilling,
@@ -57,86 +55,83 @@ class MyFilesQuickActionsCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Single bordered box for all three elements
-          GestureDetector(
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text("Change Matter"),
-                  content: const Text(
-                    "Do you want to change the selected matter?",
+          if (AuthService.isAuthenticated) ...[
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder:
+                      (context) => AlertDialog(
+                        title: const Text("Change Matter"),
+                        content: const Text(
+                          "Do you want to change the selected matter?",
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("No"),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, '/matters');
+                            },
+                            child: const Text("Yes"),
+                          ),
+                        ],
+                      ),
+                );
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white12,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.yellowAccent.shade400,
+                    width: 2,
                   ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("No"),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, '/matters');
-                      },
-                      child: const Text("Yes"),
-                    ),
-                  ],
                 ),
-              );
-            },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white12,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.yellowAccent.shade400,
-                  width: 2,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Click here to change matter (highlighted)
-                  Text(
-                    "Click here to change matter",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.yellowAccent.shade400,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-
-                  // Matter Name
-                  Text(
-                    AuthService.selectedMatterName ?? 'No Matter Selected',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Matter ID
-                  if (AuthService.isAuthenticated)
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      "ID: ${AuthService.selectedMatterId ?? ''}",
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w500,
+                      "Click here to change matter",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.yellowAccent.shade400,
                       ),
                     ),
-                ],
+                    const SizedBox(height: 6),
+
+                    Text(
+                      AuthService.selectedMatterName ?? 'No Matter Selected',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+
+                    if (AuthService.isAuthenticated)
+                      Text(
+                        "ID: ${AuthService.selectedMatterId ?? ''}",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
+            const SizedBox(height: 16),
+          ],
 
-          const SizedBox(height: 16),
-
-          // Quick Action Tiles
           MasonryGridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
@@ -146,15 +141,15 @@ class MyFilesQuickActionsCard extends StatelessWidget {
             itemCount: 7,
             itemBuilder: (context, index) {
               switch (index) {
-                case 0:
+                /*case 0:
                   return _buildTile(
                     context,
                     icon: Icons.upload_file,
                     label: 'Upload\nDocument',
                     color: Colors.blueAccent.shade100,
                     onTap: onUploadDocument,
-                  );
-                case 1:
+                  );*/
+                case 0:
                   return _buildTile(
                     context,
                     icon: Icons.timeline,
@@ -162,7 +157,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     color: Colors.purpleAccent.shade100,
                     onTap: onViewWorkflow ?? () {},
                   );
-                case 2:
+                case 1:
                   return _buildTile(
                     context,
                     icon: Icons.receipt_long,
@@ -170,7 +165,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     color: Colors.redAccent.shade100,
                     onTap: onBilling ?? () {},
                   );
-                case 3:
+                case 2:
                   return _buildTile(
                     context,
                     icon: Icons.assignment,
@@ -178,7 +173,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     color: Colors.indigoAccent.shade100,
                     onTap: onCaseSummary ?? () {},
                   );
-                case 4:
+                case 3:
                   return _buildTile(
                     context,
                     icon: Icons.description,
@@ -186,7 +181,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     color: Colors.orangeAccent.shade100,
                     onTap: onDocumentStatus ?? () {},
                   );
-                case 5:
+                case 4:
                   return _buildTile(
                     context,
                     icon: Icons.local_activity,
@@ -194,7 +189,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     color: Colors.amber.shade300,
                     onTap: onRecentActivity ?? () {},
                   );
-                case 6:
+                case 5:
                   return _buildTile(
                     context,
                     icon: Icons.message,
@@ -213,12 +208,12 @@ class MyFilesQuickActionsCard extends StatelessWidget {
   }
 
   Widget _buildTile(
-      BuildContext context, {
-        required IconData icon,
-        required String label,
-        required Color color,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: () {
         if (!AuthService.isAuthenticated) {

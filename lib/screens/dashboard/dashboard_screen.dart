@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:client/config/theme_config.dart';
-import 'package:client/screens/dashboard/personal_info/personal_information_screen.dart';
 import 'package:client/screens/workflow/workflow_stages_screen.dart';
 import 'package:client/services/api_service_bansal_immigration.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -24,7 +23,6 @@ import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
 import '../../widgets/dialog/login_required_dialog.dart';
-import '../documents/upload_document_screen.dart';
 import 'book_appointment/book_location_screen.dart';
 import 'my_files/my_files_quick_action_card.dart';
 
@@ -277,24 +275,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              if (AuthService.isAuthenticated) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const PersonalInformationScreen(),
-                  ),
-                );
-              } else {
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (_) => const LoginRequiredDialog(),
-                );
-              }
-            },
-          ),
-          IconButton(
             icon: const Icon(Icons.person_outline),
             onPressed: () {
               if (AuthService.isAuthenticated) {
@@ -378,28 +358,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   '/post-code-checker',
                                 );
                               },
-                              onCourseSearch: () => {},
-                              onImportantLinks: () => {},
-                              onEnglishRequirement: () => {},
-                              onWebSearch: () => {},
+                              onCourseSearch:
+                                  () => {
+                                    showSnack(
+                                      context,
+                                      "This feature will be available in a future update.",
+                                    ),
+                                  },
+                              onImportantLinks:
+                                  () => {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/important-links',
+                                    ),
+                                  },
+                              onEnglishRequirement:
+                                  () => {
+                                    showSnack(
+                                      context,
+                                      "This feature will be available in a future update.",
+                                    ),
+                                  },
+                              onWebSearch:
+                                  () => {
+                                    showSnack(
+                                      context,
+                                      "This feature will be available in a future update.",
+                                    ),
+                                  },
                             ),
                             const SizedBox(height: 24),
                             MyFilesQuickActionsCard(
-                              onUploadDocument: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) =>
-                                            const UploadDocumentScreen(),
-                                  ),
-                                );
-                              },
                               onSendMessage: () {
                                 /*Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const SendMessageScreen(),
-                            ),
-                          );*/
+                                  MaterialPageRoute(
+                                  builder: (context) => const SendMessageScreen(),
+                                  ),
+                                  );*/
                               },
                               onViewWorkflow: () {
                                 Navigator.of(context).push(
