@@ -147,6 +147,7 @@ class WorkflowStagesResponse {
   final bool hasActiveStage;
   final int clientId;
   final int? clientMatterId;
+  final CaseSummary? caseSummary;
 
   WorkflowStagesResponse({
     required this.workflowStages,
@@ -155,6 +156,7 @@ class WorkflowStagesResponse {
     required this.hasActiveStage,
     required this.clientId,
     this.clientMatterId,
+    this.caseSummary,
   });
 
   factory WorkflowStagesResponse.fromJson(Map<String, dynamic> json) {
@@ -170,6 +172,11 @@ class WorkflowStagesResponse {
       activeStageInfo = ActiveStageInfo.fromJson(json['active_stage']);
     }
 
+    CaseSummary? summary;
+    if (json['case_summary'] != null) {
+      summary = CaseSummary.fromJson(json['case_summary']);
+    }
+
     return WorkflowStagesResponse(
       workflowStages: stagesList,
       totalStages: _parseInt(json['total_stages']) ?? 0,
@@ -177,6 +184,7 @@ class WorkflowStagesResponse {
       hasActiveStage: json['has_active_stage'] ?? false,
       clientId: _parseInt(json['client_id']) ?? 0,
       clientMatterId: _parseInt(json['client_matter_id']),
+      caseSummary: summary,
     );
   }
 
@@ -207,3 +215,42 @@ class WorkflowStagesResponse {
     return totalStages - currentStageIndex - 1;
   }
 }
+
+
+
+class CaseSummary {
+  final String? caseName;
+  final String? caseStatus;
+  final String? migrationAgent;
+  final String? personResponsible;
+  final String? personAssisting;
+
+  CaseSummary({
+    this.caseName,
+    this.caseStatus,
+    this.migrationAgent,
+    this.personResponsible,
+    this.personAssisting,
+  });
+
+  factory CaseSummary.fromJson(Map<String, dynamic> json) {
+    return CaseSummary(
+      caseName: json['case_name'],
+      caseStatus: json['case_status'],
+      migrationAgent: json['migration_agent'],
+      personResponsible: json['person_responsible'],
+      personAssisting: json['person_assisting'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'case_name': caseName,
+      'case_status': caseStatus,
+      'migration_agent': migrationAgent,
+      'person_responsible': personResponsible,
+      'person_assisting': personAssisting,
+    };
+  }
+}
+

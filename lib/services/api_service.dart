@@ -1218,6 +1218,22 @@ class ApiService {
     return response['success'] ?? false;
   }
 
+  static Future<Map<String, dynamic>> getInvoices({
+    required int clientMatterId,
+    int page = 1,
+    int perPage = 10,
+  }) async {
+    final url =
+        '${ApiConfig.billingList}?client_matter_id=$clientMatterId&page=$page&per_page=$perPage';
+
+    return await _makeRequest(
+      url,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
     String endpoint,

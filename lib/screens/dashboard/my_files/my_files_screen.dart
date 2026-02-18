@@ -53,9 +53,6 @@ class MyFilesScreen extends StatelessWidget {
                   "This feature will be available in a future update.",
                 );
               },
-              onCaseSummary: () {
-                Navigator.pushNamed(context, '/recent-cases');
-              },
               onDocumentStatus: () {
                 Navigator.pushNamed(context, '/documents');
               },

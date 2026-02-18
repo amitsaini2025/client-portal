@@ -10,7 +10,8 @@ class WorkflowStagesScreen extends StatefulWidget {
   const WorkflowStagesScreen({super.key});
 
   @override
-  State<WorkflowStagesScreen> createState() => _WorkflowStagesScreenState();
+  State<WorkflowStagesScreen> createState() =>
+      _WorkflowStagesScreenState();
 }
 
 class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
@@ -37,15 +38,19 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
 
       if (response['success'] == true && response['data'] != null) {
         setState(() {
-          _workflowResponse = WorkflowStagesResponse.fromJson(response['data']);
+          _workflowResponse =
+              WorkflowStagesResponse.fromJson(response['data']);
+
           AuthService.setClientMatterStageId(
             _workflowResponse!.activeStage!.id,
           );
+
           _isLoading = false;
         });
       } else {
         setState(() {
-          _error = response['message'] ?? 'Failed to load workflow';
+          _error =
+              response['message'] ?? 'Failed to load workflow';
           _isLoading = false;
         });
       }
@@ -86,30 +91,84 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
         color: ThemeConfig.goldenYellow,
         onRefresh: _loadWorkflowData,
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics:
+          const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
-          child: WorkflowProgressWidget(
-            workflowResponse: _workflowResponse!,
-            onStageTap: _showStageDetails,
+          child: Column(
+            crossAxisAlignment:
+            CrossAxisAlignment.start,
+            children: [
+
+              if (_workflowResponse!
+                  .caseSummary !=
+                  null)
+                _buildCaseSummary(
+                    _workflowResponse!
+                        .caseSummary!),
+
+              const SizedBox(height: 20),
+
+              WorkflowProgressWidget(
+                workflowResponse:
+                _workflowResponse!,
+                onStageTap: _showStageDetails,
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
+  Widget _buildCaseSummary(CaseSummary summary) {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment:
+          CrossAxisAlignment.start,
+          children: [
+            Text(
+              summary.caseName ?? '',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: ThemeConfig.navyBlue,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text('Status: ${summary.caseStatus ?? ''}'),
+            Text(
+                'Migration Agent: ${summary.migrationAgent ?? ''}'),
+            Text(
+                'Person Responsible: ${summary.personResponsible ?? ''}'),
+            Text(
+                'Person Assisting: ${summary.personAssisting ?? ''}'),
+          ],
+        ),
+      ),
+    );
+  }
 
-  Widget _buildErrorWidget(String error, VoidCallback onRetry) {
+  Widget _buildErrorWidget(
+      String error, VoidCallback onRetry) {
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment:
+        MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: ThemeConfig.goldenYellow),
+          Icon(Icons.error_outline,
+              size: 64,
+              color: ThemeConfig.goldenYellow),
           const SizedBox(height: 16),
-          Text(error, textAlign: TextAlign.center),
+          Text(error,
+              textAlign: TextAlign.center),
           const SizedBox(height: 16),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: ThemeConfig.navyBlue,
+              backgroundColor:
+              ThemeConfig.navyBlue,
             ),
             onPressed: onRetry,
             icon: const Icon(Icons.refresh),
@@ -125,53 +184,66 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
       Navigator.pushNamed(
         context,
         '/workflow-documents',
-        arguments: {'stageId': stage.id, 'stageName': stage.stageName},
+        arguments: {
+          'stageId': stage.id,
+          'stageName': stage.stageName
+        },
       );
     } else {
       showDialog(
         context: context,
-        builder:
-            (context) => AlertDialog(
-              title: Text(
-                stage.stageName,
-                style: const TextStyle(color: ThemeConfig.navyBlue),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Status: ${stage.statusText}'),
-                  if (stage.isCurrentStage)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle,
-                            color: ThemeConfig.goldenYellow,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Current Stage',
-                            style: TextStyle(
-                              color: ThemeConfig.goldenYellow,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+        builder: (context) => AlertDialog(
+          title: Text(
+            stage.stageName,
+            style: const TextStyle(
+                color: ThemeConfig.navyBlue),
+          ),
+          content: Column(
+            mainAxisSize:
+            MainAxisSize.min,
+            crossAxisAlignment:
+            CrossAxisAlignment.start,
+            children: [
+              Text('Status: ${stage.statusText}'),
+              if (stage.isCurrentStage)
+                Padding(
+                  padding:
+                  const EdgeInsets.only(
+                      top: 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: ThemeConfig
+                            .goldenYellow,
+                        size: 18,
                       ),
-                    ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Close'),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Current Stage',
+                        style: TextStyle(
+                          color: ThemeConfig
+                              .goldenYellow,
+                          fontWeight:
+                          FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () =>
+                  Navigator.pop(context),
+              child:
+              const Text('Close'),
             ),
+          ],
+        ),
       );
     }
   }
 }
+

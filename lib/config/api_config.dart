@@ -79,6 +79,7 @@ class ApiConfig {
   static const String appointmentsRecordPayment = '/appointments/record-payment';
 
   static const String notifications = "/notifications";
+  static const String billingList = "/billing/list";
 
   // API settings
   static const Duration timeout = Duration(seconds: 30);

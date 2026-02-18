@@ -23,6 +23,7 @@ import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
 import '../../widgets/dialog/login_required_dialog.dart';
+import '../billing/billing_screen.dart';
 import 'book_appointment/book_location_screen.dart';
 import 'my_files/my_files_quick_action_card.dart';
 
@@ -92,8 +93,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         debugPrint(
           'Notification tapped while app in background: ${message.messageId}',
         );
-        // You can add navigation logic here based on the notification data
-        // For example, navigate to a specific page based on the notification type
       },
     );
 
@@ -406,18 +405,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 );
                               },
                               onBilling: () {
-                                /*Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const BillingScreen(),
-                            ),
-                          );*/
-                                showSnack(
-                                  context,
-                                  "This feature will be available in a future update.",
-                                );
-                              },
-                              onCaseSummary: () {
-                                Navigator.pushNamed(context, '/recent-cases');
+                                Navigator.pushNamed(context, '/billing-list');
                               },
                               onDocumentStatus: () {
                                 Navigator.pushNamed(context, '/documents');

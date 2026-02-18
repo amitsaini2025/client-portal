@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:client/screens/auth/reset_password_screen.dart';
 import 'package:client/screens/cases/cases_list_screen.dart';
+import 'package:client/screens/dashboard/billing_list/billing_list_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
 import 'package:client/screens/dashboard/health_insurance/health_insurance_screen.dart';
@@ -389,6 +390,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/post-code-checker': (context) => PostcodeCheckerScreen(),
             '/notifications': (context) => NotificationsScreen(),
             '/important-links': (context) => ImportantLinksScreen(),
+            '/billing-list': (context) => BillingListScreen(),
           },
         );
       },

@@ -8,7 +8,6 @@ class MyFilesQuickActionsCard extends StatelessWidget {
   final VoidCallback onSendMessage;
   final VoidCallback? onViewWorkflow;
   final VoidCallback? onBilling;
-  final VoidCallback? onCaseSummary;
   final VoidCallback? onDocumentStatus;
   final VoidCallback? onUpcomingDeadlines;
   final VoidCallback? onRecentActivity;
@@ -19,7 +18,6 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     required this.onSendMessage,
     this.onViewWorkflow,
     this.onBilling,
-    this.onCaseSummary,
     this.onDocumentStatus,
     this.onUpcomingDeadlines,
     this.onRecentActivity,
@@ -168,20 +166,12 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                 case 2:
                   return _buildTile(
                     context,
-                    icon: Icons.assignment,
-                    label: 'Case\nSummary',
-                    color: Colors.indigoAccent.shade100,
-                    onTap: onCaseSummary ?? () {},
-                  );
-                case 3:
-                  return _buildTile(
-                    context,
                     icon: Icons.description,
                     label: 'Document\nStatus',
                     color: Colors.orangeAccent.shade100,
                     onTap: onDocumentStatus ?? () {},
                   );
-                case 4:
+                case 3:
                   return _buildTile(
                     context,
                     icon: Icons.local_activity,
@@ -189,7 +179,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     color: Colors.amber.shade300,
                     onTap: onRecentActivity ?? () {},
                   );
-                case 5:
+                case 4:
                   return _buildTile(
                     context,
                     icon: Icons.message,
