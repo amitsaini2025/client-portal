@@ -84,7 +84,7 @@ class StepHeader extends StatelessWidget {
     final active = n == activeStep;
     return GestureDetector(
       onTap: () {
-        switch (n) {
+        /*switch (n) {
           case 1:
             Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (_) => const BookLocationScreen()));
@@ -101,7 +101,7 @@ class StepHeader extends StatelessWidget {
             Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (_) => const BookConfirmScreen()));
             break;
-        }
+        }*/
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
