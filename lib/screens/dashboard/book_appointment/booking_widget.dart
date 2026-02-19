@@ -186,6 +186,41 @@ class SelectionCard extends StatelessWidget {
   }
 }
 
+class PreviousButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const PreviousButton({super.key, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(
+            color: const Color(0xFF2C3E8F),
+            width: 2,
+          ),
+        ),
+        child: const Text(
+          "Previous",
+          style: TextStyle(
+            color: Color(0xFF2C3E8F),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
 class NextButton extends StatelessWidget {
   final VoidCallback onTap;
   const NextButton({super.key, required this.onTap});

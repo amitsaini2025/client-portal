@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,8 +34,14 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
   Future<void> _loadCachedData() async {
     final prefs = await SharedPreferences.getInstance();
 
-    services = await CacheHelper.loadData('locations', (e) => ServiceTypeModel.fromJson(e));
-    serviceCategories = await CacheHelper.loadData('serviceCategories', (e) => SimpleServiceModel.fromJson(e));
+    services = await CacheHelper.loadData(
+      'locations',
+      (e) => ServiceTypeModel.fromJson(e),
+    );
+    serviceCategories = await CacheHelper.loadData(
+      'serviceCategories',
+      (e) => SimpleServiceModel.fromJson(e),
+    );
 
     final cachedSelectedOptions = prefs.getString('selectedOptions');
     if (cachedSelectedOptions != null) {
@@ -47,7 +54,7 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
     // restore cache selection
     if (selectedOptions.containsKey("noe_id") && serviceCategories.isNotEmpty) {
       selectedService = serviceCategories.firstWhere(
-            (e) => e.id == selectedOptions["noe_id"],
+        (e) => e.id == selectedOptions["noe_id"],
         orElse: () => serviceCategories.first,
       );
     }
@@ -64,10 +71,7 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
 
   Future<void> _saveSelectedOptions() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      "selectedOptions",
-      jsonEncode(selectedOptions),
-    );
+    await prefs.setString("selectedOptions", jsonEncode(selectedOptions));
   }
 
   @override
@@ -75,46 +79,64 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
     return ScaffoldWrapper(
       activeStep: 2,
       title: 'Select Your Service',
-      child: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...serviceCategories.map((service) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 14),
-              child: SelectionCard(
-                title: service.name,
-                subtitle: service.name,
-                isSelected: selectedService?.id == service.id,
-                onTap: () {
-                  setState(() {
-                    selectedService = service;
-                  });
-                },
-              ),
-            );
-          }).toList(),
-          const SizedBox(height: 30),
-          NextButton(
-            onTap: () async {
-              if (selectedService != null) {
-                selectedOptions['noe_id'] = selectedService!.id;
-                selectedOptions["service_name"] = selectedService!.name;
+      child:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ...serviceCategories.map((service) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 14),
+                      child: SelectionCard(
+                        title: service.name,
+                        subtitle: service.name,
+                        isSelected: selectedService?.id == service.id,
+                        onTap: () {
+                          setState(() {
+                            selectedService = service;
+                          });
+                        },
+                      ),
+                    );
+                  }).toList(),
+                  const SizedBox(height: 30),
 
-                await _saveSelectedOptions();
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: PreviousButton(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: NextButton(
+                          onTap: () async {
+                            if (selectedService != null) {
+                              selectedOptions['noe_id'] = selectedService!.id;
+                              selectedOptions["service_name"] =
+                                  selectedService!.name;
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BookDetailsScreen(),
+                              await _saveSelectedOptions();
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => BookDetailsScreen(),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              }
-            },
-          ),
-        ],
-      ),
+                ],
+              ),
     );
   }
 }

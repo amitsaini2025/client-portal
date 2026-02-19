@@ -11,7 +11,6 @@ import '../../../services/auth_service.dart';
 import 'booking_widget.dart';
 
 class BookConfirmScreen extends StatefulWidget {
-
   const BookConfirmScreen({super.key});
 
   @override
@@ -59,8 +58,7 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
     final cachedOptions = prefs.getString("selectedOptions");
 
     if (cachedOptions != null) {
-      selectedOptions =
-      Map<String, dynamic>.from(jsonDecode(cachedOptions));
+      selectedOptions = Map<String, dynamic>.from(jsonDecode(cachedOptions));
     }
   }
 
@@ -81,10 +79,7 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
 
   Future<void> _saveSelectedOptions() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      "selectedOptions",
-      jsonEncode(selectedOptions),
-    );
+    await prefs.setString("selectedOptions", jsonEncode(selectedOptions));
   }
 
   @override
@@ -332,33 +327,57 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
                 endTime: endTime,
               ),
             const SizedBox(height: 40),
-            Center(
-              child: SizedBox(
-                width: 220,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed:
-                      isLoading || isSubmitting ? null : _submitAppointment,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1F3C88),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    textStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+
+                Expanded(
+                  child: PreviousButton(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Center(
+                    child: SizedBox(
+                      width: 220,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed:
+                            isLoading || isSubmitting
+                                ? null
+                                : _submitAppointment,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1F3C88),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        child:
+                            isSubmitting
+                                ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                                : Text(
+                                  isAdd
+                                      ? 'Review & Confirm'
+                                      : 'Update Appointment',
+                                ),
+                      ),
                     ),
                   ),
-                  child:
-                      isSubmitting
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(
-                            isAdd ? 'Review & Confirm' : 'Update Appointment',
-                          ),
                 ),
-              ),
+              ],
             ),
           ],
         ),
