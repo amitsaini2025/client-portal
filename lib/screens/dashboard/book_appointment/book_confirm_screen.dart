@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:client/screens/dashboard/book_appointment/book_confirm_appointment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../services/api_service.dart';
@@ -8,9 +11,8 @@ import '../../../services/auth_service.dart';
 import 'booking_widget.dart';
 
 class BookConfirmScreen extends StatefulWidget {
-  final Map<String, dynamic> selectedOptions;
 
-  const BookConfirmScreen({super.key, required this.selectedOptions});
+  const BookConfirmScreen({super.key});
 
   @override
   State<BookConfirmScreen> createState() => _BookConfirmScreenState();
@@ -21,47 +23,68 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
   bool isSubmitting = false;
   String? error;
 
+  Map<String, dynamic> selectedOptions = {};
+
   Set<DateTime> disabledDates = {};
   List<int> disabledWeekdays = [];
 
   DateTime? selectedDay;
   String? selectedTime;
 
-  late TextEditingController enquiryController;
-  late TextEditingController fullNameController;
-  late TextEditingController emailController;
-  late TextEditingController phoneController;
+  final TextEditingController enquiryController = TextEditingController();
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
   int slotDuration = 15;
   String startTime = "10:45";
   String endTime = "16:00";
 
-  bool get isAdd => widget.selectedOptions['is_add'] ?? true;
+  bool get isAdd => selectedOptions['is_add'] ?? true;
 
   @override
   void initState() {
     super.initState();
+    _initialize();
+  }
 
-    enquiryController = TextEditingController(
-      text: widget.selectedOptions['description'] ?? '',
-    );
-    fullNameController = TextEditingController(
-      text: widget.selectedOptions['full_name'] ?? '',
-    );
-    emailController = TextEditingController(
-      text: widget.selectedOptions['email'] ?? '',
-    );
-    phoneController = TextEditingController(
-      text: widget.selectedOptions['phone'] ?? '',
-    );
+  Future<void> _initialize() async {
+    await _loadCachedData();
+    _populateControllers();
+    await loadCalendarData();
+  }
+
+  Future<void> _loadCachedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final cachedOptions = prefs.getString("selectedOptions");
+
+    if (cachedOptions != null) {
+      selectedOptions =
+      Map<String, dynamic>.from(jsonDecode(cachedOptions));
+    }
+  }
+
+  void _populateControllers() {
+    enquiryController.text = selectedOptions['description'] ?? '';
+    fullNameController.text = selectedOptions['full_name'] ?? '';
+    emailController.text = selectedOptions['email'] ?? '';
+    phoneController.text = selectedOptions['phone'] ?? '';
 
     if (!isAdd) {
-      final appointDate = widget.selectedOptions['appoint_date'];
-      if (appointDate != null) selectedDay = DateTime.tryParse(appointDate);
-      selectedTime = widget.selectedOptions['appoint_time'];
+      final appointDate = selectedOptions['appoint_date'];
+      if (appointDate != null) {
+        selectedDay = DateTime.tryParse(appointDate);
+      }
+      selectedTime = selectedOptions['appoint_time'];
     }
+  }
 
-    loadCalendarData();
+  Future<void> _saveSelectedOptions() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      "selectedOptions",
+      jsonEncode(selectedOptions),
+    );
   }
 
   @override
@@ -76,9 +99,9 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
   Future<void> loadCalendarData() async {
     try {
       final res = await ApiService.getDisabledDates(
-        id: widget.selectedOptions['service_id'].toString(),
-        enquiryItem: widget.selectedOptions['noe_id'].toString(),
-        inPersonAddress: widget.selectedOptions['inperson_address'].toString(),
+        id: selectedOptions['service_id'].toString(),
+        enquiryItem: selectedOptions['noe_id'].toString(),
+        inPersonAddress: selectedOptions['inperson_address'].toString(),
       );
 
       final data = res['data'];
@@ -128,7 +151,7 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
         builder:
             (_) => BookConfirmAppointmentScreen(
               selectedOptions: {
-                ...widget.selectedOptions,
+                ...selectedOptions,
                 'full_name': fullNameController.text.trim(),
                 'email': emailController.text.trim(),
                 'phone': phoneController.text.trim(),
@@ -158,7 +181,7 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
         final formattedTime = convertTo24Hour(selectedTime!);
 
         final response = await ApiService.updateAppointment(
-          appointmentId: widget.selectedOptions['id'],
+          appointmentId: selectedOptions['id'],
           appointmentDate: formattedDate,
           appointmentTime: formattedTime,
           meetingType: 3,
@@ -299,7 +322,7 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
               CalendarSection(
                 disabledDates: disabledDates,
                 disabledWeekdays: disabledWeekdays,
-                selectedOptions: widget.selectedOptions,
+                selectedOptions: selectedOptions,
                 onTimeSelected: (time) => selectedTime = time,
                 selectedDayCallback: (day) => selectedDay = day,
                 preSelectedDay: selectedDay,

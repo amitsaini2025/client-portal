@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import '../book_appointment/book_confirm_screen.dart';
@@ -296,6 +299,25 @@ class AppointmentCard extends StatelessWidget {
           _LightActionButton(
             icon: Icons.edit_outlined,
             label: "Update Appointment",
+            onTap: () async {
+              data['is_add'] = false;
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString(
+                "selectedOptions",
+                jsonEncode(data),
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const BookConfirmScreen(),
+                ),
+              );
+            },
+          ),
+
+          /* _LightActionButton(
+            icon: Icons.edit_outlined,
+            label: "Update Appointment",
             onTap: () {
               data['is_add'] =  false;
               Navigator.push(
@@ -307,7 +329,7 @@ class AppointmentCard extends StatelessWidget {
                 ),
               );
             },
-          ),
+          ),*/
           const SizedBox(height: 18),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

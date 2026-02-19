@@ -1,49 +1,93 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../models/appointment/appointment_variable_list.dart';
+import '../../../utils/cache_helper.dart';
 import 'book_confirm_screen.dart';
 import 'booking_widget.dart';
 
 class BookDetailsScreen extends StatefulWidget {
-  final List<ServiceTypeModel> services;
-  final Map<String, dynamic> selectedOptions;
-
-  const BookDetailsScreen({
-    super.key,
-    required this.services,
-    required this.selectedOptions,
-  });
+  const BookDetailsScreen({super.key});
 
   @override
   State<BookDetailsScreen> createState() => _BookDetailsScreenState();
 }
 
 class _BookDetailsScreenState extends State<BookDetailsScreen> {
+  List<ServiceTypeModel> services = [];
+  Map<String, dynamic> selectedOptions = {};
+
   int selectedIndex = 0;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCachedData();
+  }
+
+  Future<void> _loadCachedData() async {
+    services = await CacheHelper.loadData('services', (e) => ServiceTypeModel.fromJson(e));
+
+    final prefs = await SharedPreferences.getInstance();
+    final cachedSelectedOptions = prefs.getString('selectedOptions');
+    if (cachedSelectedOptions != null) {
+      selectedOptions =
+      Map<String, dynamic>.from(jsonDecode(cachedSelectedOptions));
+    }
+
+    if (selectedOptions.containsKey("service_id")) {
+      final savedId = selectedOptions["service_id"];
+
+      selectedIndex = services.indexWhere(
+            (service) => service.id == savedId,
+      );
+
+      if (selectedIndex == -1) {
+        selectedIndex = 0;
+      }
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<void> _saveSelectedOptions() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString(
+      "selectedOptions",
+      jsonEncode(selectedOptions),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldWrapper(
       activeStep: 3,
       title: 'Select Service',
-      child: Column(
+      child: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
         children: [
-          ...List.generate(widget.services.length, (index) {
-            final service = widget.services[index];
+          ...List.generate(services.length, (index) {
+            final service = services[index];
 
             final tagText =
-                service.price == 0
-                    ? 'FREE'
-                    : service.availableForOverseas
-                    ? 'OVERSEAS'
-                    : service.priceDisplay;
+            service.price == 0
+                ? 'FREE'
+                : service.availableForOverseas
+                ? 'OVERSEAS'
+                : service.priceDisplay;
 
             final tagColor =
-                service.price == 0
-                    ? Colors.green
-                    : service.availableForOverseas
-                    ? const Color(0xFF1E3A8A)
-                    : Colors.orange;
+            service.price == 0
+                ? Colors.green
+                : service.availableForOverseas
+                ? const Color(0xFF1E3A8A)
+                : Colors.orange;
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 20),
@@ -53,29 +97,41 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 title: service.name,
                 priceText: service.priceDisplay,
                 duration:
-                    '${service.duration} ${service.durationUnit} • ${service.startTime} - ${service.endTime} ${service.timeFormat}',
+                '${service.duration} ${service.durationUnit} • ${service.startTime} - ${service.endTime} ${service.timeFormat}',
                 description: service.description,
                 availability:
-                    'Available: ${service.availableDays.join(', ')} • ${service.timeSlotDescription}',
+                'Available: ${service.availableDays.join(', ')} • ${service.timeSlotDescription}',
                 selected: selectedIndex == index,
-                onTap: () => setState(() => selectedIndex = index),
+                onTap: () {
+                  setState(() {
+                    selectedIndex = index;
+                  });
+                },
               ),
             );
           }),
           const SizedBox(height: 32),
           NextButton(
-            onTap: () {
-              widget.selectedOptions['service_id'] = widget.services[selectedIndex].id;
-              widget.selectedOptions['service_price'] = widget.services[selectedIndex].price;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (_) => BookConfirmScreen(
-                        selectedOptions: widget.selectedOptions,
-                      ),
-                ),
-              );
+            onTap: () async {
+              if (services.isNotEmpty) {
+                final selectedService = services[selectedIndex];
+
+                selectedOptions['service_id'] =
+                    selectedService.id;
+                selectedOptions['service_price'] =
+                    selectedService.price;
+                selectedOptions['service_name'] =
+                    selectedService.name;
+
+                await _saveSelectedOptions();
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const BookConfirmScreen(),
+                  ),
+                );
+              }
             },
           ),
         ],

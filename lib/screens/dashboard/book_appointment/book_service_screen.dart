@@ -1,34 +1,73 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../models/appointment/appointment_variable_list.dart';
+import '../../../utils/cache_helper.dart';
 import 'book_details_screen.dart';
 import 'booking_widget.dart';
 
 class BookServiceScreen extends StatefulWidget {
-  final List<ServiceTypeModel> services;
-  final List<SimpleServiceModel> serviceCategories;
-  final Map<String, dynamic> selectedOptions;
-
-  const BookServiceScreen({
-    super.key,
-    required this.services,
-    required this.serviceCategories,
-    required this.selectedOptions,
-  });
+  const BookServiceScreen({super.key});
 
   @override
   State<BookServiceScreen> createState() => _BookServiceScreenState();
 }
 
 class _BookServiceScreenState extends State<BookServiceScreen> {
+  List<ServiceTypeModel> services = [];
+  List<SimpleServiceModel> serviceCategories = [];
+
+  Map<String, dynamic> selectedOptions = {};
+
   SimpleServiceModel? selectedService;
+
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    if (widget.serviceCategories.isNotEmpty) {
-      selectedService = widget.serviceCategories.first;
+    _loadCachedData();
+  }
+
+  Future<void> _loadCachedData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    services = await CacheHelper.loadData('locations', (e) => ServiceTypeModel.fromJson(e));
+    serviceCategories = await CacheHelper.loadData('serviceCategories', (e) => SimpleServiceModel.fromJson(e));
+
+    final cachedSelectedOptions = prefs.getString('selectedOptions');
+    if (cachedSelectedOptions != null) {
+      final decoded = jsonDecode(cachedSelectedOptions);
+      if (decoded is Map<String, dynamic>) {
+        selectedOptions = decoded;
+      }
     }
+
+    // restore cache selection
+    if (selectedOptions.containsKey("noe_id") && serviceCategories.isNotEmpty) {
+      selectedService = serviceCategories.firstWhere(
+            (e) => e.id == selectedOptions["noe_id"],
+        orElse: () => serviceCategories.first,
+      );
+    }
+
+    // ✅ FIX: ensure at least one selected
+    if (selectedService == null && serviceCategories.isNotEmpty) {
+      selectedService = serviceCategories.first;
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<void> _saveSelectedOptions() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      "selectedOptions",
+      jsonEncode(selectedOptions),
+    );
   }
 
   @override
@@ -36,34 +75,39 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
     return ScaffoldWrapper(
       activeStep: 2,
       title: 'Select Your Service',
-      child: Column(
+      child: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...widget.serviceCategories.map((service) {
+          ...serviceCategories.map((service) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: SelectionCard(
                 title: service.name,
                 subtitle: service.name,
                 isSelected: selectedService?.id == service.id,
-                onTap: () => setState(() => selectedService = service),
+                onTap: () {
+                  setState(() {
+                    selectedService = service;
+                  });
+                },
               ),
             );
           }).toList(),
           const SizedBox(height: 30),
           NextButton(
-            onTap: () {
+            onTap: () async {
               if (selectedService != null) {
-                widget.selectedOptions['noe_id'] = selectedService?.id;
-                widget.selectedOptions["service_name"] = selectedService?.name;
+                selectedOptions['noe_id'] = selectedService!.id;
+                selectedOptions["service_name"] = selectedService!.name;
+
+                await _saveSelectedOptions();
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder:
-                        (_) => BookDetailsScreen(
-                          services: widget.services,
-                          selectedOptions: widget.selectedOptions,
-                        ),
+                    builder: (_) => BookDetailsScreen(),
                   ),
                 );
               }

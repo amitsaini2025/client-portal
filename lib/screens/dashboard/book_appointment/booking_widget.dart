@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-
 import '../../../config/theme_config.dart';
+import 'book_location_screen.dart';
+import 'book_service_screen.dart';
+import 'book_details_screen.dart';
+import 'book_confirm_screen.dart';
 
 class ScaffoldWrapper extends StatelessWidget {
   final int activeStep;
   final String title;
   final Widget child;
-  final List<Widget>? actions; // <-- Add this
+  final List<Widget>? actions;
 
   const ScaffoldWrapper({
     super.key,
     required this.activeStep,
     required this.title,
     required this.child,
-    this.actions, // <-- Add this
+    this.actions,
   });
 
   @override
@@ -26,9 +29,9 @@ class ScaffoldWrapper extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: ThemeConfig.goldenYellow,
-        elevation: 0,
         foregroundColor: Colors.white,
-        actions: actions, // <-- Pass actions here
+        elevation: 0,
+        actions: actions,
       ),
       body: Container(
         constraints: const BoxConstraints(maxWidth: 1100),
@@ -61,48 +64,67 @@ class ScaffoldWrapper extends StatelessWidget {
   }
 }
 
-
 class StepHeader extends StatelessWidget {
   final int activeStep;
-
   const StepHeader({super.key, required this.activeStep});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: _step(1, 'Location')),
-        Expanded(child: _step(2, 'Service')),
-        Expanded(child: _step(3, 'Details')),
-        Expanded(child: _step(4, 'Confirm')),
+        Expanded(child: _step(context, 1, 'Location')),
+        Expanded(child: _step(context, 2, 'Service')),
+        Expanded(child: _step(context, 3, 'Details')),
+        Expanded(child: _step(context, 4, 'Confirm')),
       ],
     );
   }
 
-  Widget _step(int n, String label) {
+  Widget _step(BuildContext context, int n, String label) {
     final active = n == activeStep;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircleAvatar(
-          radius: 18,
-          backgroundColor: active ? const Color(0xFF1E3A8A) : Colors.grey[300],
-          child: Text(
-            '$n',
-            style: TextStyle(color: active ? Colors.white : Colors.black),
+    return GestureDetector(
+      onTap: () {
+        switch (n) {
+          case 1:
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => const BookLocationScreen()));
+            break;
+          case 2:
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => const BookServiceScreen()));
+            break;
+          case 3:
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => const BookDetailsScreen()));
+            break;
+          case 4:
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => const BookConfirmScreen()));
+            break;
+        }
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: active ? const Color(0xFF1E3A8A) : Colors.grey[300],
+            child: Text(
+              '$n',
+              style: TextStyle(color: active ? Colors.white : Colors.black),
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            color: active ? const Color(0xFF1E3A8A) : Colors.grey,
+          const SizedBox(height: 6),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              color: active ? const Color(0xFF1E3A8A) : Colors.grey,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -113,7 +135,6 @@ class SelectionCard extends StatelessWidget {
   final IconData? icon;
   final bool isSelected;
   final VoidCallback onTap;
-
   const SelectionCard({
     super.key,
     required this.title,
@@ -167,7 +188,6 @@ class SelectionCard extends StatelessWidget {
 
 class NextButton extends StatelessWidget {
   final VoidCallback onTap;
-
   const NextButton({super.key, required this.onTap});
 
   @override
@@ -199,7 +219,6 @@ class NextButton extends StatelessWidget {
 
 class SectionTitle extends StatelessWidget {
   final String text;
-
   const SectionTitle(this.text, {super.key});
 
   @override

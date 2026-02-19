@@ -16,6 +16,14 @@ class LocationModel {
       fullAddress: json['full_address'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'full_address': fullAddress,
+    };
+  }
 }
 
 class MeetingTypeModel {
@@ -39,6 +47,15 @@ class MeetingTypeModel {
       icon: json['icon'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'icon': icon,
+    };
+  }
 }
 
 class LanguageModel {
@@ -59,8 +76,15 @@ class LanguageModel {
       flag: json['country_flag'] ?? '',
     );
   }
-}
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'country_flag': flag,
+    };
+  }
+}
 
 class ServiceTypeModel {
   final int id;
@@ -96,24 +120,52 @@ class ServiceTypeModel {
   });
 
   factory ServiceTypeModel.fromJson(Map<String, dynamic> json) {
+    final timeSlots = json['time_slots'] ?? {};
+    final availability = json['availability'] ?? {};
+
     return ServiceTypeModel(
-      id: json['id'],
-      name: json['name'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
       price: (json['price'] is int)
           ? (json['price'] as int).toDouble()
-          : json['price'] ?? 0.0,
+          : (json['price'] ?? 0.0).toDouble(),
       priceDisplay: json['price_display'] ?? '',
       duration: json['duration'] ?? 0,
       durationUnit: json['duration_unit'] ?? '',
-      startTime: json['time_slots']?['start_time'] ?? '',
-      endTime: json['time_slots']?['end_time'] ?? '',
-      timeFormat: json['time_slots']?['time_format'] ?? '',
-      availableDays: List<String>.from(json['availability']?['days'] ?? []),
-      timeSlotDescription: json['availability']?['time_slots'] ?? '',
+      startTime: timeSlots['start_time'] ?? '',
+      endTime: timeSlots['end_time'] ?? '',
+      timeFormat: timeSlots['time_format'] ?? '',
+      availableDays: availability['days'] != null
+          ? List<String>.from(availability['days'])
+          : [],
+      timeSlotDescription: availability['time_slots'] ?? '',
       description: json['description'] ?? '',
       includesVideoCall: json['includes_video_call'] ?? false,
       availableForOverseas: json['available_for_overseas'] ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'price': price,
+      'price_display': priceDisplay,
+      'duration': duration,
+      'duration_unit': durationUnit,
+      'time_slots': {
+        'start_time': startTime,
+        'end_time': endTime,
+        'time_format': timeFormat,
+      },
+      'availability': {
+        'days': availableDays,
+        'time_slots': timeSlotDescription,
+      },
+      'description': description,
+      'includes_video_call': includesVideoCall,
+      'available_for_overseas': availableForOverseas,
+    };
   }
 }
 
@@ -121,12 +173,22 @@ class SimpleServiceModel {
   final int id;
   final String name;
 
-  SimpleServiceModel({required this.id, required this.name});
+  SimpleServiceModel({
+    required this.id,
+    required this.name,
+  });
 
   factory SimpleServiceModel.fromJson(Map<String, dynamic> json) {
     return SimpleServiceModel(
       id: json['id'],
       name: json['name'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
   }
 }
