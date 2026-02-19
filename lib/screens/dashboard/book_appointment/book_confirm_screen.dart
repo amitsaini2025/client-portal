@@ -620,6 +620,7 @@ class _CalendarSectionState extends State<CalendarSection> {
     return Column(
       children: [
         TableCalendar(
+          availableGestures: AvailableGestures.none,
           firstDay: DateTime(2025),
           lastDay: DateTime(2027),
           focusedDay: focusedDay,
