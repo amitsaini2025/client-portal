@@ -61,6 +61,128 @@ class Message {
   final bool isSender;
   final bool isRecipient;
   final List<Recipient> recipientIds;
+  final String sentAt;
+  final int clientMatterId;
+  final int recipientCount;
+  late final bool? isRead;
+  late final String? readAt;
+  final String createdAt;
+  final String updatedAt;
+  final List<Attachment>? attachments;
+
+  Message({
+    required this.id,
+    required this.message,
+    required this.sender,
+    required this.senderId,
+    required this.senderShortname,
+    required this.isSender,
+    required this.isRecipient,
+    required this.recipientIds,
+    required this.sentAt,
+    required this.clientMatterId,
+    required this.recipientCount,
+    this.isRead,
+    this.readAt,
+    required this.createdAt,
+    required this.updatedAt,
+    this.attachments,
+  });
+
+  factory Message.fromJson(Map<String, dynamic> json) {
+    return Message(
+      id: json['id'],
+      message: json['message'] ?? '',
+      sender: json['sender'] ?? '',
+      senderId: json['sender_id'],
+      senderShortname: json['sender_shortname'] ?? '',
+      isSender: json['is_sender'] ?? false,
+      isRecipient: json['is_recipient'] ?? false,
+      recipientIds: (json['recipient_ids'] as List? ?? [])
+          .map((e) => Recipient.fromJson(e))
+          .toList(),
+      sentAt: json['sent_at'] ?? '',
+      clientMatterId: json['client_matter_id'],
+      recipientCount: json['recipient_count'] ?? 0,
+      isRead: json['is_read'],
+      readAt: json['read_at'],
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+      attachments: (json['attachments'] as List?)
+          ?.map((e) => Attachment.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'message': message,
+      'sender': sender,
+      'sender_id': senderId,
+      'sender_shortname': senderShortname,
+      'is_sender': isSender,
+      'is_recipient': isRecipient,
+      'recipient_ids': recipientIds.map((e) => e.toJson()).toList(),
+      'recipient_count': recipientCount,
+      'sent_at': sentAt,
+      'is_read': isRead,
+      'read_at': readAt,
+      'client_matter_id': clientMatterId,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+      'attachments': attachments?.map((e) => e.toJson()).toList() ?? [],
+    };
+  }
+}
+
+
+class Attachment {
+  final int id;
+  final String type;
+  final String filename;
+  final String url;
+  final int size;
+
+  Attachment({
+    required this.id,
+    required this.type,
+    required this.filename,
+    required this.url,
+    required this.size,
+  });
+
+  factory Attachment.fromJson(Map<String, dynamic> json) {
+    return Attachment(
+      id: json['id'],
+      type: json['type'] ?? '',
+      filename: json['filename'] ?? '',
+      url: json['url'] ?? '',
+      size: json['size'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type,
+      'filename': filename,
+      'url': url,
+      'size': size,
+    };
+  }
+}
+
+
+/*class Message {
+  final int id;
+  final String message;
+  final String sender;
+  final int senderId;
+  final String senderShortname;
+  final bool isSender;
+  final bool isRecipient;
+  final List<Recipient> recipientIds;
   final int recipientCount;
   final String sentAt;
   bool? isRead;
@@ -128,7 +250,7 @@ class Message {
       'updated_at': updatedAt,
     };
   }
-}
+}*/
 
 class Recipient {
   final int recipientId;

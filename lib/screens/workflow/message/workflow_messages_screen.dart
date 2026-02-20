@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:client/config/app_config.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -21,23 +23,7 @@ class PusherService {
 
   static void init_() async {
     try {
-      /*var key = "0410ad08e960563173b5";
-      var cluster = "ap2";
-      var channelName = "private-user.${AuthService.currentUserId}";
-
-      await pusher.init(
-        apiKey: key,
-        cluster: cluster,
-        onAuthorizer: onAuthorizer,
-        onConnectionStateChange: onConnectionStateChange,
-        onError: onError,
-        onSubscriptionSucceeded: onSubscriptionSucceeded,
-        onEvent: onEvent,
-        onSubscriptionError: onSubscriptionError,
-      );
-
-      await pusher.subscribe(channelName: channelName);
-      await pusher.connect();*/
+      /* Initialization commented for now */
     } catch (e) {
       log("ERROR: $e");
     }
@@ -59,15 +45,12 @@ class PusherService {
   }
 }
 
-
 class ReverbService {
   static final PusherChannelsFlutter pusher =
   PusherChannelsFlutter.getInstance();
 
-  /// Callback for incoming messages
   static Function(MessageDetail message)? onMessageReceived;
 
-  /// Initialize Reverb connection
   static Future<void> init({
     required String userId,
     required String token,
@@ -81,7 +64,7 @@ class ReverbService {
 
       await pusher.init(
         apiKey: "145cd98cfea9f69732ae6755ac889bcc",
-        cluster: "ap2", // can be any string, Reverb ignores it
+        cluster: "ap2",
         useTLS: true,
         authEndpoint: "https://revapi.bansalcrm.com/broadcasting/auth",
         authParams: {
@@ -90,34 +73,24 @@ class ReverbService {
             "Accept": "application/json",
           }
         },
-
         onConnectionStateChange: (current, previous) {
           log("🔄 Connection state: $previous → $current");
-          if (current.toString().toLowerCase().contains('connected')) {
-            log("✅ Reverb WebSocket is fully connected");
-          }
         },
-
         onError: (message, code, error) {
           log("❌ Pusher error: $message | Code: $code | Error: $error");
         },
-
         onSubscriptionSucceeded: (channelName, data) {
           log("✅ Subscribed successfully to $channelName | Data: $data");
         },
-
         onSubscriptionError: (message, error) {
           log("❌ Subscription error: $message | Error: $error");
         },
-
         onEvent: (event) {
           log("📩 Event received: ${event.eventName} | Raw: ${event.data}");
           try {
             if (event.data != null) {
               final jsonData =
               event.data is String ? jsonDecode(event.data) : event.data;
-
-              // Check for Reverb payload
               if (jsonData['data']?['message_sent'] != null) {
                 final message =
                 MessageDetail.fromJson(jsonData['data']['message_sent']);
@@ -130,20 +103,16 @@ class ReverbService {
         },
       );
 
-      // Connect first
       await pusher.connect();
-
-      // Subscribe to private channel
       await pusher.subscribe(channelName: "private-user.$userId");
 
-      log("✅ Reverb initialized and connected (socketId handled internally)");
+      log("✅ Reverb initialized and connected");
     } catch (e, stack) {
       log("❌ Reverb init error: $e");
       log(stack.toString());
     }
   }
 
-  /// Disconnect
   static Future<void> disconnect() async {
     try {
       await pusher.disconnect();
@@ -153,7 +122,6 @@ class ReverbService {
     }
   }
 }
-
 
 class WorkflowMessagesScreen extends StatefulWidget {
   const WorkflowMessagesScreen({super.key});
@@ -174,6 +142,8 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
   final int _limit = 20;
   bool _hasMore = true;
 
+  List<File> _attachments = [];
+
   @override
   void initState() {
     super.initState();
@@ -190,7 +160,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       userId: AuthService.currentUserId.toString(),
       token: AuthService.currentToken.toString(),
     );
-
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -240,7 +209,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
   Future<void> _markMessageAsRead(int messageId) async {
     try {
       final response = await ApiService.markMessageAsRead(messageId: messageId);
-
       if (response['success'] == true) {
         setState(() {
           final msgIndex = _messages.indexWhere((m) => m.id == messageId);
@@ -302,7 +270,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
   Future<void> _loadMoreMessages() async {
     if (!_hasMore) return;
-
     setState(() => _isLoadingMore = true);
     _currentPage++;
 
@@ -317,7 +284,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       if (response['success'] == true) {
         final parsed = WorkflowMessagesResponse.fromJson(response);
         final newMessages = parsed.data.messages;
-
         setState(() {
           _messages.addAll(newMessages);
           _hasMore = newMessages.length == _limit;
@@ -339,7 +305,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
-    if (text.isEmpty || _isSending) return;
+    if ((text.isEmpty && _attachments.isEmpty) || _isSending) return;
 
     setState(() => _isSending = true);
 
@@ -347,15 +313,17 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       final clientMatterId = AuthService.selectedMatterId;
       if (clientMatterId == null) return;
 
-      final responseJson = await ApiService.sendChatMessage(
+      final responseJson = await ApiService.sendChatMessageWithAttachments(
         clientMatterId: clientMatterId,
         message: text,
+        attachments: _attachments,
       );
 
       final response = SendMessageResponse.fromJson(responseJson);
       if (response.success && response.data.message != null) {
         _handleIncomingMessage(response.data.message);
         _messageController.clear();
+        _attachments.clear();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -369,6 +337,22 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
     }
   }
 
+  Future<void> _pickAttachments() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.any,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        setState(() {
+          _attachments = result.files.map((f) => File(f.path!)).toList();
+        });
+      }
+    } catch (e) {
+      log("Error picking attachments: $e");
+    }
+  }
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
@@ -405,10 +389,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Messages',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Messages', style: TextStyle(color: Colors.white)),
         backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
@@ -416,9 +397,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       backgroundColor: const Color(0xFFF5F5F5),
       body: _isLoading
           ? Center(
-        child: CircularProgressIndicator(
-          color: ThemeConfig.goldenYellow,
-        ),
+        child: CircularProgressIndicator(color: ThemeConfig.goldenYellow),
       )
           : _error != null
           ? _buildErrorWidget(_error!)
@@ -431,6 +410,97 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
           ),
           _buildMessageInput(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMessageInput() {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        color: Colors.white,
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.attach_file, color: Colors.grey),
+              onPressed: _pickAttachments,
+            ),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _messageController,
+                      decoration: const InputDecoration(
+                        hintText: 'Type a message...',
+                        border: InputBorder.none,
+                      ),
+                      minLines: 1,
+                      maxLines: 4,
+                    ),
+                    if (_attachments.isNotEmpty)
+                      SizedBox(
+                        height: 40,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _attachments.length,
+                          itemBuilder: (context, index) {
+                            final file = _attachments[index];
+                            final fileName = file.path.split('/').last;
+                            return Container(
+                              margin: const EdgeInsets.only(right: 6, top: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    fileName,
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() => _attachments.removeAt(index));
+                                    },
+                                    child: const Icon(Icons.close, size: 16),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            CircleAvatar(
+              radius: 22,
+              backgroundColor: ThemeConfig.navyBlue,
+              child: _isSending
+                  ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+                  : IconButton(
+                icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                onPressed: _sendMessage,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -457,14 +527,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
               ? msg.sender
               : msg.recipientIds.map((r) => r.recipient).join(", ");
 
-          Icon tickIcon = Icon(
-            Icons.done_all,
-            size: 16,
-            color: isSender
-                ? (msg.isRead ?? false ? Colors.blue : Colors.grey)
-                : Colors.transparent,
-          );
-
           return GestureDetector(
             onTap: () {
               Navigator.pushNamed(
@@ -487,10 +549,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                       child: Text(
                         _getInitials(avatarName),
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   if (!isSender) const SizedBox(width: 8),
@@ -526,33 +587,41 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                               color: isSender ? Colors.white : Colors.black87,
                             ),
                           ),
+                          if (msg.attachments != null &&
+                              msg.attachments!.isNotEmpty)
+                            SizedBox(
+                              height: 60,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: msg.attachments!.length,
+                                itemBuilder: (context, index) {
+                                  final attachment = msg.attachments![index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 6),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        attachment.url,
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                        headers: {
+                                          "Authorization": "Bearer ${AuthService.currentToken}",
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           const SizedBox(height: 6),
                           Text(
                             _formatDateTime(msg.sentAt),
                             style: TextStyle(
                               fontSize: 11,
-                              color: isSender
-                                  ? Colors.white70
-                                  : Colors.grey.shade600,
+                              color:
+                              isSender ? Colors.white70 : Colors.grey.shade600,
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              if (msg.isRead ?? false)
-                                Icon(Icons.done_all, size: 16, color: Colors.blue),
-                              if (msg.isRead ?? false) const SizedBox(width: 4),
-                              if (msg.isRead ?? false && msg.readAt != null)
-                                Text(
-                                  _formatDateTime(msg.readAt!),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                            ],
                           ),
                         ],
                       ),
@@ -577,55 +646,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildMessageInput() {
-    return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        color: Colors.white,
-        child: Row(
-          children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: TextField(
-                  controller: _messageController,
-                  decoration: const InputDecoration(
-                    hintText: 'Type a message...',
-                    border: InputBorder.none,
-                  ),
-                  minLines: 1,
-                  maxLines: 4,
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            CircleAvatar(
-              radius: 22,
-              backgroundColor: ThemeConfig.navyBlue,
-              child: _isSending
-                  ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-                  : IconButton(
-                icon: const Icon(Icons.send, color: Colors.white, size: 20),
-                onPressed: _sendMessage,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -777,6 +777,47 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> sendChatMessageWithAttachments({
+    required int clientMatterId,
+    required String message,
+    List<File>? attachments,
+  }) async {
+    try {
+      var uri = Uri.parse(ApiConfig.getEndpoint(ApiConfig.messagesSend));
+      var request = http.MultipartRequest('POST', uri);
+
+      request.headers.addAll(_buildHeaders());
+
+      request.fields['client_matter_id'] = clientMatterId.toString();
+      request.fields['message'] = message;
+
+      if (attachments != null && attachments.isNotEmpty) {
+        for (var file in attachments) {
+          final fileName = file.path.split('/').last;
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'attachments[]',
+              file.path,
+              filename: fileName,
+            ),
+          );
+        }
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+            'Failed to send message: ${response.statusCode} ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Error sending message with attachments: $e');
+    }
+  }
+
   static Future<Map<String, dynamic>> markMessageAsRead({
     required int messageId,
   }) async {
