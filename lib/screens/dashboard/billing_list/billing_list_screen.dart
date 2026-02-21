@@ -1,9 +1,11 @@
 import 'package:client/services/api_service.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_stripe/flutter_stripe.dart';
 import '../../../config/theme_config.dart';
 import '../../../models/billing_list/invoice.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/stripe_service.dart';
+import '../../../config/stripe_config.dart';
 
 class BillingListScreen extends StatefulWidget {
   const BillingListScreen({super.key});
@@ -35,7 +37,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
 
   void _paginationListener() {
     if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 150 &&
+        _scrollController.position.maxScrollExtent - 150 &&
         !_isPaginating &&
         _hasMore) {
       _fetchInvoices();
@@ -67,7 +69,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
       final pagination = data['pagination'];
 
       final fetchedInvoices =
-          invoicesJson.map((e) => Invoice.fromJson(e)).toList();
+      invoicesJson.map((e) => Invoice.fromJson(e)).toList();
 
       setState(() {
         _invoices.addAll(fetchedInvoices);
@@ -91,6 +93,76 @@ class _BillingListScreenState extends State<BillingListScreen> {
       .where((i) => i.status == 'pending')
       .fold(0, (sum, i) => sum + (i.totalAmount ?? 0));
 
+  // ==========================
+  // 🔥 PAYMENT FUNCTION
+  // ==========================
+
+  Future<void> _handleInvoicePayment(Invoice invoice) async {
+    setState(() {
+      _processingPayments.add(invoice.id);
+    });
+
+    try {
+      final amount =
+      StripeService.amountToMinorUnit(invoice.totalAmount ?? 0);
+
+      final paymentIntent = await StripeService.createPaymentIntent(
+        amountInMinorUnit: amount,
+        currency: StripeConfig.defaultCurrency.toLowerCase(),
+        description: 'Invoice Payment ${invoice.invoiceNumber}',
+        metadata: {
+          'invoice_id': invoice.id.toString(),
+        },
+      );
+
+      final clientSecret = paymentIntent['client_secret'];
+
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: clientSecret,
+          merchantDisplayName: StripeConfig.merchantDisplayName,
+
+          googlePay: const PaymentSheetGooglePay(
+            merchantCountryCode: "US",
+            currencyCode: "USD",
+            testEnv: true,
+          ),
+
+          applePay: const PaymentSheetApplePay(
+            merchantCountryCode: "US",
+          ),
+
+          style: ThemeMode.light,
+        ),
+      );
+
+      await Stripe.instance.presentPaymentSheet();
+
+      // Record payment in backend
+      /*await ApiService.recordInvoicePayment(
+        invoiceId: invoice.id!,
+        paymentIntentId: paymentIntent['id'],
+      );*/
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Payment successful")),
+      );
+
+      _fetchInvoices(refresh: true);
+    } catch (e) {
+      debugPrint("Payment error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Payment failed: $e")),
+      );
+    } finally {
+      setState(() {
+        _processingPayments.remove(invoice.id);
+      });
+    }
+  }
+
+  // ==========================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,11 +173,11 @@ class _BillingListScreenState extends State<BillingListScreen> {
         foregroundColor: Colors.white,
         title: const Text(
           "Billing & Invoices",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white,),
+            icon: const Icon(Icons.refresh),
             onPressed: () => _fetchInvoices(refresh: true),
           ),
         ],
@@ -114,27 +186,30 @@ class _BillingListScreenState extends State<BillingListScreen> {
         children: [
           _buildSummary(),
           Expanded(
-            child:
-                _isInitialLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : RefreshIndicator(
-                      onRefresh: () => _fetchInvoices(refresh: true),
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.all(16),
-                        itemCount: _invoices.length + (_isPaginating ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index >= _invoices.length) {
-                            return const Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Center(child: CircularProgressIndicator()),
-                            );
-                          }
+            child: _isInitialLoading
+                ? const Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+              onRefresh: () => _fetchInvoices(refresh: true),
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.all(16),
+                itemCount: _invoices.length +
+                    (_isPaginating ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index >= _invoices.length) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(
+                          child:
+                          CircularProgressIndicator()),
+                    );
+                  }
 
-                          return _buildInvoiceCard(_invoices[index]);
-                        },
-                      ),
-                    ),
+                  return _buildInvoiceCard(
+                      _invoices[index]);
+                },
+              ),
+            ),
           ),
         ],
       ),
@@ -173,23 +248,12 @@ class _BillingListScreenState extends State<BillingListScreen> {
   }
 
   Widget _modernSummaryCard(
-    String title,
-    double amount,
-    Gradient gradient,
-    IconData icon,
-  ) {
+      String title, double amount, Gradient gradient, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: gradient,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,15 +263,15 @@ class _BillingListScreenState extends State<BillingListScreen> {
           Text(
             "\$${amount.toStringAsFixed(2)}",
             style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
           ),
           const SizedBox(height: 4),
           Text(
             title,
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
+            style: const TextStyle(
+                color: Colors.white70, fontSize: 13),
           ),
         ],
       ),
@@ -216,20 +280,14 @@ class _BillingListScreenState extends State<BillingListScreen> {
 
   Widget _buildInvoiceCard(Invoice invoice) {
     final isPaid = invoice.status == 'paid';
-    final isProcessing = _processingPayments.contains(invoice.id);
+    final isProcessing =
+    _processingPayments.contains(invoice.id);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -237,61 +295,46 @@ class _BillingListScreenState extends State<BillingListScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment:
+              MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  invoice.invoiceNumber ?? "INV-${invoice.id}",
+                  invoice.invoiceNumber ??
+                      "INV-${invoice.id}",
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
                 ),
                 _statusBadge(invoice.status ?? ""),
               ],
             ),
-            if (invoice.description != null &&
-                invoice.description!.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(
-                invoice.description!,
-                style: TextStyle(color: Colors.grey[600], fontSize: 13),
-              ),
-            ],
             const SizedBox(height: 16),
             Text(
               "\$${invoice.totalAmount?.toStringAsFixed(2) ?? "0.00"}",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
             if (!isPaid) ...[
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1F3C88),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                  onPressed: isProcessing
+                      ? null
+                      : () =>
+                      _handleInvoicePayment(invoice),
+                  child: isProcessing
+                      ? const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child:
+                    CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
                     ),
-                  ),
-                  onPressed: isProcessing ? null : () {},
-                  child:
-                      isProcessing
-                          ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                          : const Text(
-                            "Pay Now",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                  )
+                      : const Text("Pay Now"),
                 ),
               ),
             ],
@@ -305,12 +348,12 @@ class _BillingListScreenState extends State<BillingListScreen> {
     final isPaid = status == 'paid';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+          horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color:
-            isPaid
-                ? Colors.green.withOpacity(0.1)
-                : Colors.orange.withOpacity(0.1),
+        color: isPaid
+            ? Colors.green.withOpacity(0.1)
+            : Colors.orange.withOpacity(0.1),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(
@@ -318,7 +361,9 @@ class _BillingListScreenState extends State<BillingListScreen> {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: isPaid ? Colors.green : Colors.orange,
+          color: isPaid
+              ? Colors.green
+              : Colors.orange,
         ),
       ),
     );
