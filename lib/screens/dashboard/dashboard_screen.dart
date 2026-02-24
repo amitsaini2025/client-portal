@@ -362,9 +362,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         },
                         onEnglishRequirement: () => {
-                          showSnack(
+                          Navigator.pushNamed(
                             context,
-                            "This feature will be available in a future update.",
+                            '/english-requirements',
                           ),
                         },
                         onWebSearch: () => {

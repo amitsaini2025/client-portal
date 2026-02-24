@@ -5,6 +5,7 @@ import 'package:client/screens/cases/cases_list_screen.dart';
 import 'package:client/screens/dashboard/billing_list/billing_list_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
+import 'package:client/screens/dashboard/english_requirement/english_requirement_screen.dart';
 import 'package:client/screens/dashboard/health_insurance/health_insurance_screen.dart';
 import 'package:client/screens/dashboard/important_links/important_links_screen.dart';
 import 'package:client/screens/dashboard/my_files/my_files_screen.dart';
@@ -383,6 +384,7 @@ class MyAppWithTheme extends StatelessWidget {
               return BlogDetailScreen(blogId: args['blogId']);
             },
             '/my-files': (context) => MyFilesScreen(),
+            '/english-requirements': (context) => EnglishRequirementScreen(),
             '/pr-calculator': (context) => PRCalculatorScreen(),
             '/student-fund-calculator':
                 (context) => StudentFundCalculatorScreen(),

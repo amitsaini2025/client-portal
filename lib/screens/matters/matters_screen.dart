@@ -19,7 +19,6 @@ class _MattersScreenState extends State<MattersScreen> {
     _mattersFuture = ApiService.getMatters();
   }
 
-  /// Confirm selected matter
   void _confirmSelection() {
     if (!AuthService.isMatterSelected) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,9 +64,10 @@ class _MattersScreenState extends State<MattersScreen> {
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
+            color: Colors.white
           ),
         ),
-        backgroundColor: ThemeConfig.navyBlue,
+        backgroundColor: ThemeConfig.goldenYellow,
         actions: [
           IconButton(
             icon: const Icon(Icons.check, color: Colors.white),
