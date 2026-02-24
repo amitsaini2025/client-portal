@@ -71,24 +71,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final data = _profileData!;
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            ThemeConfig.navyBlue.withOpacity(0.9),
-            ThemeConfig.navyBlue.withOpacity(0.7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Colors.black12,
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
         border: Border.all(
-          color: ThemeConfig.goldenYellow.withOpacity(0.4),
+          color: ThemeConfig.goldenYellow.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -109,15 +102,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: CircleAvatar(
                 radius: 45,
-                backgroundColor: ThemeConfig.navyBlue,
+                backgroundColor: Colors.white,
                 child: Text(
                   data["first_name"] != null && data["first_name"].isNotEmpty
-                      ? data["first_name"][0]
+                      ? data["first_name"][0].toUpperCase()
                       : "?",
                   style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: ThemeConfig.navyBlue,
                   ),
                 ),
               ),
@@ -127,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               "${data["first_name"] ?? ""} ${data["last_name"] ?? ""}",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: ThemeConfig.navyBlue,
                 letterSpacing: 0.5,
               ),
             ),
@@ -135,12 +128,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Text(
               data["email"] ?? "",
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.white70,
+                color: Colors.black54,
                 fontStyle: FontStyle.italic,
               ),
             ),
             const SizedBox(height: 20),
-            const Divider(color: Colors.white24, thickness: 1),
+            const Divider(color: Colors.black12, thickness: 1),
             const SizedBox(height: 10),
             _infoTile(Icons.phone, "Phone", data["phone"] ?? "-"),
             _infoTile(Icons.home, "Address", data["address"] ?? "-"),
@@ -160,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: ThemeConfig.goldenYellow.withOpacity(0.1),
+              color: ThemeConfig.goldenYellow.withOpacity(0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.all(8),
@@ -174,7 +167,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Text(
                   label,
                   style: const TextStyle(
-                    color: Colors.white70,
+                    color: Colors.black54,
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
                   ),
@@ -182,7 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Text(
                   value,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black87,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -198,7 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ThemeConfig.navyBlue,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
@@ -233,11 +226,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.error_outline,
-                    color: Colors.red, size: 48),
+                    color: Colors.redAccent, size: 48),
                 const SizedBox(height: 12),
                 Text(
                   _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.redAccent, fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
@@ -248,6 +241,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ThemeConfig.goldenYellow,
                     foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
               ],
@@ -258,7 +255,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildProfileCard(context),
                   const SizedBox(height: 30),
 
-                  // ✅ NEW Personal Information Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -272,13 +268,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        minimumSize:
-                        const Size(double.infinity, 52),
-                        backgroundColor: Colors.white,
-                        foregroundColor: ThemeConfig.navyBlue,
+                        minimumSize: const Size(double.infinity, 52),
+                        backgroundColor: ThemeConfig.navyBlue,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                          BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                       ),
                     ),
@@ -289,8 +283,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed:
-                      _isLoading ? null : () => _openEditProfile(),
+                      onPressed: _isLoading ? null : () => _openEditProfile(),
                       icon: const Icon(Icons.edit),
                       label: const Text(
                         "Edit Information",
@@ -300,14 +293,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        minimumSize:
-                        const Size(double.infinity, 52),
-                        backgroundColor:
-                        ThemeConfig.goldenYellow,
+                        minimumSize: const Size(double.infinity, 52),
+                        backgroundColor: ThemeConfig.goldenYellow,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                          BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                       ),
                     ),
@@ -326,13 +316,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      minimumSize:
-                      const Size(double.infinity, 52),
+                      minimumSize: const Size(double.infinity, 52),
                       backgroundColor: Colors.redAccent,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
                   ),

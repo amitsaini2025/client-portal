@@ -239,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ThemeConfig.navyBlue,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -267,7 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: ThemeConfig.goldenYellow,
+                          color: Colors.black,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -275,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         'Sign in to your client portal',
                         style: TextStyle(
                           fontSize: 16,
-                          color: ThemeConfig.goldenYellow.withOpacity(0.7),
+                          color: Colors.black54,
                         ),
                       ),
                     ],
@@ -299,7 +299,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: Colors.grey.shade100,
                           ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
@@ -334,7 +334,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: Colors.grey.shade100,
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -414,111 +414,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
 
                         const SizedBox(height: 20),
-
-                        /*if (_biometricAvailable) ...[
-                          if (_biometricEnabled)
-                            OutlinedButton.icon(
-                              onPressed:
-                              _isLoading ? null : _authenticateWithBiometrics,
-                              icon: const Icon(Icons.fingerprint),
-                              label: const Text('Sign in with Biometrics'),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: ThemeConfig.goldenYellow,
-                                side: BorderSide(color: ThemeConfig.goldenYellow),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            )
-                          else
-                            OutlinedButton.icon(
-                              onPressed: _isLoading ? null : _enableBiometric,
-                              icon: const Icon(Icons.fingerprint_outlined),
-                              label: const Text('Enable Biometric Login'),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: ThemeConfig.goldenYellow,
-                                side: BorderSide(color: ThemeConfig.goldenYellow),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ),
-                          const SizedBox(height: 20),
-                        ],*/
-
-                        // Test Login Button
-                        /*Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: ThemeConfig.goldenYellow.withOpacity(0.1),
-                            border: Border.all(
-                              color: ThemeConfig.goldenYellow.withOpacity(0.3),
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                '🧪 TEST MODE',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: ThemeConfig.goldenYellow,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton.icon(
-                                  onPressed: _isLoading ? null : _testLogin,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: ThemeConfig.goldenYellow,
-                                    foregroundColor: ThemeConfig.navyBlue,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 12,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  icon: const Icon(Icons.science, size: 18),
-                                  label: const Text(
-                                    'Quick Test Login',
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),*/
-
-                        const SizedBox(height: 20),
-
-                        /*Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                color: ThemeConfig.goldenYellow.withOpacity(0.5),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Text(
-                                'OR',
-                                style: TextStyle(
-                                  color: ThemeConfig.goldenYellow.withOpacity(0.5),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(
-                                color: ThemeConfig.goldenYellow.withOpacity(0.5),
-                              ),
-                            ),
-                          ],
-                        ),*/
                       ],
                     ),
                   ),

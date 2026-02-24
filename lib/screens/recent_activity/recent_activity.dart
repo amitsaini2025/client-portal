@@ -53,11 +53,11 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ThemeConfig.navyBlue, // ✅ Background applied
+      backgroundColor: Colors.white, // ✅ White background
       appBar: AppBar(
         title: const Text("Recent Activities"),
         centerTitle: true,
-        backgroundColor: ThemeConfig.goldenYellow, // ✅ Themed AppBar
+        backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -78,11 +78,11 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
                 });
                 _loadActivities();
               },
-              style: const TextStyle(color: Colors.white), // ✅ White text
+              style: const TextStyle(color: Colors.black87), // Dark text
               decoration: InputDecoration(
                 hintText: "Search activities...",
-                hintStyle: TextStyle(color: Colors.white70),
-                prefixIcon: const Icon(Icons.search, color: Colors.white),
+                hintStyle: const TextStyle(color: Colors.black45),
+                prefixIcon: const Icon(Icons.search, color: Colors.black54),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: ThemeConfig.goldenYellow),
@@ -96,7 +96,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
                   borderSide: BorderSide(color: ThemeConfig.goldenYellow, width: 2),
                 ),
                 filled: true,
-                fillColor: ThemeConfig.navyBlue.withOpacity(0.5),
+                fillColor: Colors.white,
               ),
             ),
           ),
@@ -107,7 +107,11 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
   }
 
   Widget _buildActivityList() {
-    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Colors.white));
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: ThemeConfig.goldenYellow),
+      );
+    }
 
     if (_errorMessage != null) {
       return Center(
@@ -118,7 +122,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
             const SizedBox(height: 16),
             Text(
               _errorMessage!,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.black87),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -139,12 +143,12 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.list_alt, size: 64, color: Colors.white70),
-            const SizedBox(height: 16),
+          children: const [
+            Icon(Icons.list_alt, size: 64, color: Colors.black38),
+            SizedBox(height: 16),
             Text(
               "No activities found",
-              style: const TextStyle(color: Colors.white70),
+              style: TextStyle(color: Colors.black38),
             ),
           ],
         ),
@@ -155,7 +159,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
       onRefresh: _loadActivities,
       color: ThemeConfig.goldenYellow,
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         itemCount: _activities.length,
         itemBuilder: (context, index) {
           final activity = _activities[index];
@@ -167,9 +171,9 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
 
   Widget _buildActivityCard(Activity activity) {
     return Card(
-      color: ThemeConfig.navyBlue.withOpacity(0.6), // ✅ Dark card
+      color: Colors.white, // ✅ White card
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
+      elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
@@ -177,26 +181,28 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         leading: Icon(Icons.task, color: ThemeConfig.goldenYellow),
-        title: Text(activity.title, style: const TextStyle(color: Colors.white)),
+        title: Text(activity.title, style: const TextStyle(color: Colors.black87)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              activity.description.isNotEmpty ? activity.description.replaceAll(RegExp(r'[\n\r\t]+'), ' ') : "No description",
-              style: const TextStyle(color: Colors.white70),
+              activity.description.isNotEmpty
+                  ? activity.description.replaceAll(RegExp(r'[\n\r\t]+'), ' ')
+                  : "No description",
+              style: const TextStyle(color: Colors.black54),
             ),
             const SizedBox(height: 4),
             Text(
               "Group: ${activity.taskGroup ?? "N/A"}",
-              style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+              style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.black87),
             ),
             Text(
               "Created: ${activity.createdAt} • ${activity.timeAgo}",
-              style: const TextStyle(fontSize: 12, color: Colors.white70),
+              style: const TextStyle(fontSize: 12, color: Colors.black45),
             ),
           ],
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white70),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black38),
         onTap: () => _showActivityDetails(activity),
       ),
     );
@@ -206,7 +212,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: ThemeConfig.navyBlue, // ✅ Themed bottom sheet
+      backgroundColor: Colors.white, // ✅ White bottom sheet
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -235,7 +241,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
                   Text(
                     activity.title,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black87,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
@@ -265,7 +271,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
             style: TextStyle(fontWeight: FontWeight.bold, color: ThemeConfig.goldenYellow),
           ),
           Expanded(
-            child: Text(value ?? "N/A", style: const TextStyle(color: Colors.white)),
+            child: Text(value ?? "N/A", style: const TextStyle(color: Colors.black87)),
           ),
         ],
       ),

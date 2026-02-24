@@ -249,10 +249,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ThemeConfig.navyBlue,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black,
         elevation: 0,
         actions: [
           IconButton(
@@ -267,10 +267,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   builder: (_) => const LoginRequiredDialog(),
                 );
               }
-              /*showSnack(
-                context,
-                "This feature will be available in a future update.",
-              );*/
             },
           ),
           IconButton(
@@ -289,151 +285,137 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body:
-          _isLoading
-              ? const LoadingWidget(message: 'Loading dashboard...')
-              : _errorMessage != null
-              ? CustomErrorWidget(
-                message: _errorMessage!,
-                onRetry: _loadDashboardData,
-              )
-              : RefreshIndicator(
-                onRefresh: () async {
-                  await Future.wait([_loadDashboardData(), _loadRecentBlogs()]);
-                },
-                child: SingleChildScrollView(
+      body: _isLoading
+          ? const LoadingWidget(message: 'Loading dashboard...')
+          : _errorMessage != null
+          ? CustomErrorWidget(
+        message: _errorMessage!,
+        onRetry: _loadDashboardData,
+      )
+          : RefreshIndicator(
+        onRefresh: () async {
+          await Future.wait([_loadDashboardData(), _loadRecentBlogs()]);
+        },
+        child: SingleChildScrollView(
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildRecentUpdatesSection(),
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _buildRecentUpdatesSection(),
-                      //_buildWelcomeSection(),
-                      const SizedBox(height: 24),
-
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            QuickActionsCard(
-                              onBookAppointment: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => const BookLocationScreen(),
-                                  ),
-                                );
-                                /*showSnack(
-                                  context,
-                                  "This feature will be available in a future update.",
-                                );*/
-                              },
-                              onHealthInsurance: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/health-insurance',
-                                );
-                              },
-                              onUpcomingDeadlines: () {
-                                Navigator.pushNamed(context, '/tasks');
-                              },
-                              onPRCalculator: () {
-                                Navigator.pushNamed(context, '/pr-calculator');
-                              },
-                              onStudentFundCalculator: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/student-fund-calculator',
-                                );
-                              },
-                              onOccupationSearch: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/occupation-search',
-                                );
-                              },
-                              onPostCodeChecker: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/post-code-checker',
-                                );
-                              },
-                              onCourseSearch:
-                                  () => {
-                                    showSnack(
-                                      context,
-                                      "This feature will be available in a future update.",
-                                    ),
-                                  },
-                              onImportantLinks:
-                                  () => {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/important-links',
-                                    ),
-                                  },
-                              onEnglishRequirement:
-                                  () => {
-                                    showSnack(
-                                      context,
-                                      "This feature will be available in a future update.",
-                                    ),
-                                  },
-                              onWebSearch:
-                                  () => {
-                                    showSnack(
-                                      context,
-                                      "This feature will be available in a future update.",
-                                    ),
-                                  },
+                      QuickActionsCard(
+                        onBookAppointment: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                              const BookLocationScreen(),
                             ),
-                            const SizedBox(height: 24),
-                            MyFilesQuickActionsCard(
-                              onSendMessage: () {
-                                /*Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                  builder: (context) => const SendMessageScreen(),
-                                  ),
-                                  );*/
-                              },
-                              onViewWorkflow: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) =>
-                                            const WorkflowStagesScreen(),
-                                  ),
-                                );
-                              },
-                              onBilling: () {
-                                Navigator.pushNamed(context, '/billing-list');
-                              },
-                              onDocumentStatus: () {
-                                Navigator.pushNamed(context, '/documents');
-                              },
-                              onUpcomingDeadlines: () {
-                                Navigator.pushNamed(context, '/tasks');
-                              },
-                              onRecentActivity: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/recent-activity',
-                                );
-                              },
-                              onMessage: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/workflow-message',
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 24),
-                          ],
-                        ),
+                          );
+                        },
+                        onHealthInsurance: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/health-insurance',
+                          );
+                        },
+                        onUpcomingDeadlines: () {
+                          Navigator.pushNamed(context, '/tasks');
+                        },
+                        onPRCalculator: () {
+                          Navigator.pushNamed(
+                              context, '/pr-calculator');
+                        },
+                        onStudentFundCalculator: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/student-fund-calculator',
+                          );
+                        },
+                        onOccupationSearch: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/occupation-search',
+                          );
+                        },
+                        onPostCodeChecker: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/post-code-checker',
+                          );
+                        },
+                        onCourseSearch: () => {
+                          showSnack(
+                            context,
+                            "This feature will be available in a future update.",
+                          ),
+                        },
+                        onImportantLinks: () => {
+                          Navigator.pushNamed(
+                            context,
+                            '/important-links',
+                          ),
+                        },
+                        onEnglishRequirement: () => {
+                          showSnack(
+                            context,
+                            "This feature will be available in a future update.",
+                          ),
+                        },
+                        onWebSearch: () => {
+                          showSnack(
+                            context,
+                            "This feature will be available in a future update.",
+                          ),
+                        },
                       ),
+                      const SizedBox(height: 24),
+                      MyFilesQuickActionsCard(
+                        onSendMessage: () {},
+                        onViewWorkflow: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                              const WorkflowStagesScreen(),
+                            ),
+                          );
+                        },
+                        onBilling: () {
+                          Navigator.pushNamed(context, '/billing-list');
+                        },
+                        onDocumentStatus: () {
+                          Navigator.pushNamed(context, '/documents');
+                        },
+                        onUpcomingDeadlines: () {
+                          Navigator.pushNamed(context, '/tasks');
+                        },
+                        onRecentActivity: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/recent-activity',
+                          );
+                        },
+                        onMessage: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/workflow-message',
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
-              ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -450,7 +432,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
               const Spacer(),
