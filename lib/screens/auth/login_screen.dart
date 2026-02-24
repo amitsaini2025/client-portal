@@ -7,6 +7,7 @@ import 'dart:convert';
 import '../../fcm_service.dart';
 import '../../services/auth_service.dart';
 import '../../config/theme_config.dart';
+import '../../utils/secure_storage_service.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../models/client.dart';
@@ -37,6 +38,26 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _checkBiometricAvailability();
     _checkBiometricStatus();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final creds = await SecureStorageService.loadCredentials();
+    setState(() {
+      _rememberMe = creds['remember'] ?? false;
+      if (_rememberMe) {
+        _emailController.text = creds['email'] ?? '';
+        _passwordController.text = creds['password'] ?? '';
+      }
+    });
+  }
+
+  Future<void> _saveCredentials() async {
+    await SecureStorageService.saveCredentials(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      rememberMe: _rememberMe,
+    );
   }
 
   @override
@@ -77,6 +98,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (result['success'] == true) {
+        await _saveCredentials();
+
         setState(() {
           _successMessage = result['message'];
         });
@@ -426,7 +449,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],*/
 
                         // Test Login Button
-                        Container(
+                        /*Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: ThemeConfig.goldenYellow.withOpacity(0.1),
@@ -469,7 +492,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ],
                           ),
-                        ),
+                        ),*/
 
                         const SizedBox(height: 20),
 

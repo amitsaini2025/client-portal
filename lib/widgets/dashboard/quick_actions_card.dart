@@ -129,7 +129,7 @@ class QuickActionsCard extends StatelessWidget {
                 case 9:
                   return _tile(
                     icon: Icons.web,
-                    label: 'Web\nSearch',
+                    label: 'VAC\nSearch',
                     color: Colors.pink,
                     onTap: onWebSearch ?? () {},
                   );

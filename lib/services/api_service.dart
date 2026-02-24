@@ -372,7 +372,7 @@ class ApiService {
       ApiConfig.clientProfileEndpoint,
       _buildHeaders(),
       data,
-      'PUT',
+      'POST',
     );
   }
 
