@@ -2,7 +2,6 @@ import 'package:client/screens/dashboard/english_requirement/student_visa_englis
 import 'package:client/screens/dashboard/english_requirement/temporary_graduate_visa_tr_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
-import '../../../widgets/webview/universal_webview.dart';
 import 'english_requirement_specified_test_scores_screen.dart';
 
 class EnglishRequirementScreen extends StatelessWidget {
