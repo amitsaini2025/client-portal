@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/api_service.dart';
 import '../../models/case.dart';
-import '../../config/theme_config.dart'; // ✅ Make sure ThemeConfig is imported
+import '../../config/theme_config.dart';
 
 class BookAppointmentScreen extends StatefulWidget {
   const BookAppointmentScreen({super.key});
@@ -160,7 +160,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Appointment Details
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -181,7 +180,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Title Field
                     TextFormField(
                       controller: _titleController,
                       style: const TextStyle(color: Colors.white),
@@ -198,7 +196,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Description Field
                     TextFormField(
                       style: const TextStyle(color: Colors.white),
                       controller: _descriptionController,
@@ -210,7 +207,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Case Selection
                     DropdownButtonFormField<int>(
                       dropdownColor: ThemeConfig.navyBlue,
                       value: _selectedCaseId,
@@ -239,11 +235,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Date and Time Selection
               _buildDateTimePicker(context),
               const SizedBox(height: 24),
 
-              // Book Button
               SizedBox(
                 height: 56,
                 child: ElevatedButton.icon(
@@ -270,7 +264,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Info Note
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -298,7 +291,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     );
   }
 
-  /// Helper: unified input decoration for white theme
   InputDecoration _inputDecoration({required String label, required IconData icon}) {
     return InputDecoration(
       labelText: label,
@@ -317,7 +309,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     );
   }
 
-  /// Helper: Date and Time section
   Widget _buildDateTimePicker(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -335,7 +326,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           ),
           const SizedBox(height: 20),
 
-          // Date Selection
           _dateOrTimeTile(
             icon: Icons.calendar_today,
             label: 'Date',
@@ -346,7 +336,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Time Selection
           _dateOrTimeTile(
             icon: Icons.access_time,
             label: 'Time',

@@ -72,11 +72,13 @@ class ApiConfig {
 
   static const String appointmentVariableLists = "/appointment-variable-lists";
   static const String appointments = "/appointments";
+  static const String appointmentsWithoutLogin = "/appointments/add-appointment-without-login";
   static const String appointmentsUpdate = "/appointments/update-appointment";
   static const String appointmentsGetDisabledDates = "/appointments/get-disabled-dates";
   static const String appointmentsGetDisabledSlots = "/appointments/get-disabled-slots";
   static const String appointmentsProcessPayment = "/appointments/process-payment";
   static const String appointmentsRecordPayment = '/appointments/record-payment';
+  static const String appointmentsRecordPaymentWithLogin = "/appointments/record-payment-without-login";
 
   static const String notifications = "/notifications";
   static const String billingList = "/billing/list";

@@ -1201,6 +1201,48 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> createAppointmentWithoutLogin({
+    required int noeId,
+    required int serviceId,
+    required String appointDate,
+    required String appointTime,
+    required String description,
+    required int appointmentDetails,
+    required int preferredLanguage,
+    required int inPersonAddress,
+    required String fullName,
+    required String email,
+    required String phone,
+    required String countryCode,
+  }) async {
+    const endpoint = ApiConfig.appointmentsWithoutLogin;
+
+    final response = await _makeRequest(
+      endpoint,
+      {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      {
+        "noe_id": noeId,
+        "service_id": serviceId,
+        "appoint_date": appointDate,
+        "appoint_time": appointTime,
+        "description": description,
+        "appointment_details": appointmentDetails,
+        "preferred_language": preferredLanguage,
+        "inperson_address": inPersonAddress,
+        "full_name": fullName,
+        "email": email,
+        "phone": phone,
+        "country_code": countryCode,
+      },
+      "POST",
+    );
+
+    return response;
+  }
+
   static Future<Map<String, dynamic>> processAppointmentPayment({
     required int appointmentId,
     required double amount,
@@ -1222,6 +1264,20 @@ class ApiService {
     required String paymentIntentId,
   }) async {
     final endpoint = ApiConfig.appointmentsRecordPayment;
+
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      'appointment_id': appointmentId,
+      'payment_intent_id': paymentIntentId,
+    }, "POST");
+
+    return response;
+  }
+
+  static Future<Map<String, dynamic>> recordAppointmentPaymentWithoutLogin({
+    required int appointmentId,
+    required String paymentIntentId,
+  }) async {
+    final endpoint = ApiConfig.appointmentsRecordPaymentWithLogin;
 
     final response = await _makeRequest(endpoint, _buildHeaders(), {
       'appointment_id': appointmentId,

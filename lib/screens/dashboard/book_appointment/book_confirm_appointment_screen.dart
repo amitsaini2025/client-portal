@@ -4,6 +4,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import '../../../config/theme_config.dart';
 import '../../../config/stripe_config.dart';
 import '../../../services/api_service.dart';
+import '../../../services/auth_service.dart';
 import '../../../services/stripe_service.dart';
 import 'book_appointment_success_screen.dart';
 
@@ -42,6 +43,40 @@ class _BookConfirmAppointmentScreenState
       appointmentDetails: widget.selectedOptions['appointment_details'] ?? '',
       preferredLanguage: widget.selectedOptions['preferred_language'] ?? '',
       inPersonAddress: inPersonAddress,
+    );
+
+    return response;
+  }
+
+  Future<Map<String, dynamic>> _createAppointmentWithoutLogin() async {
+    final serviceId =
+        int.tryParse(widget.selectedOptions['service_id'].toString()) ?? 0;
+
+    final noeId =
+        int.tryParse(widget.selectedOptions['noe_id'].toString()) ?? 0;
+
+    final inPersonAddress =
+        int.tryParse(widget.selectedOptions['inperson_address']?.toString() ?? '0') ?? 0;
+
+    final appointmentDetails =
+        int.tryParse(widget.selectedOptions['appointment_details']?.toString() ?? '0') ?? 0;
+
+    final preferredLanguage =
+        int.tryParse(widget.selectedOptions['preferred_language']?.toString() ?? '0') ?? 0;
+
+    final response = await ApiService.createAppointmentWithoutLogin(
+      noeId: noeId,
+      serviceId: serviceId,
+      appointDate: widget.selectedOptions['appoint_date'],
+      appointTime: widget.selectedOptions['appoint_time'],
+      description: widget.selectedOptions['description'],
+      appointmentDetails: appointmentDetails,
+      preferredLanguage: preferredLanguage,
+      inPersonAddress: inPersonAddress,
+      fullName: widget.selectedOptions['full_name'] ?? '',
+      email: widget.selectedOptions['email'] ?? '',
+      phone: widget.selectedOptions['phone'] ?? '',
+      countryCode: widget.selectedOptions['country_code'] ?? '"+61"',
     );
 
     return response;
@@ -96,7 +131,11 @@ class _BookConfirmAppointmentScreenState
         paymentMethodId = paymentIntent['id'];
       }
 
-      final appointmentResponse = await _createAppointment();
+      final appointmentResponse =
+      AuthService.isAuthenticated
+          ? await _createAppointment()
+          : await _createAppointmentWithoutLogin();
+
       final appointmentId = appointmentResponse['data']['id'];
 
       if (appointmentId != null && paymentMethodId != null) {
@@ -104,9 +143,7 @@ class _BookConfirmAppointmentScreenState
           'appointment_id': appointmentId,
           'payment_intent_id': paymentMethodId,
         };
-
         print('recordAppointmentPayment REQUEST: $requestData');
-
         final paymentResponse =
         await ApiService.recordAppointmentPayment(
           appointmentId: appointmentId,
@@ -115,10 +152,7 @@ class _BookConfirmAppointmentScreenState
 
         print('recordAppointmentPayment RESPONSE: $paymentResponse');
       }
-
-
       if (!mounted) return;
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

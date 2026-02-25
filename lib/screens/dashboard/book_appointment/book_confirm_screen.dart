@@ -456,7 +456,7 @@ class PhoneField extends StatelessWidget {
                 keyboardType: TextInputType.phone,
                 enabled: enabled,
                 decoration: InputDecoration(
-                  hintText: '400 000 000',
+                  hintText: '000 000 000',
                   filled: true,
                   fillColor: const Color(0xFFFFF1F1),
                   border: OutlineInputBorder(
