@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
-import '../../../config/theme_config.dart';
 import '../../../config/stripe_config.dart';
+import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/stripe_service.dart';
@@ -32,7 +32,10 @@ class _BookConfirmAppointmentScreenState
     final noeId =
         int.tryParse(widget.selectedOptions['noe_id'].toString()) ?? 0;
     final inPersonAddress =
-        int.tryParse(widget.selectedOptions['inperson_address']?.toString() ?? '0') ?? 0;
+        int.tryParse(
+          widget.selectedOptions['inperson_address']?.toString() ?? '0',
+        ) ??
+        0;
 
     final response = await ApiService.createAppointmentNew(
       noeId: noeId,
@@ -56,13 +59,22 @@ class _BookConfirmAppointmentScreenState
         int.tryParse(widget.selectedOptions['noe_id'].toString()) ?? 0;
 
     final inPersonAddress =
-        int.tryParse(widget.selectedOptions['inperson_address']?.toString() ?? '0') ?? 0;
+        int.tryParse(
+          widget.selectedOptions['inperson_address']?.toString() ?? '0',
+        ) ??
+        0;
 
     final appointmentDetails =
-        int.tryParse(widget.selectedOptions['appointment_details']?.toString() ?? '0') ?? 0;
+        int.tryParse(
+          widget.selectedOptions['appointment_details']?.toString() ?? '0',
+        ) ??
+        0;
 
     final preferredLanguage =
-        int.tryParse(widget.selectedOptions['preferred_language']?.toString() ?? '0') ?? 0;
+        int.tryParse(
+          widget.selectedOptions['preferred_language']?.toString() ?? '0',
+        ) ??
+        0;
 
     final response = await ApiService.createAppointmentWithoutLogin(
       noeId: noeId,
@@ -94,18 +106,22 @@ class _BookConfirmAppointmentScreenState
       String? paymentMethodId;
 
       if (price != 0) {
-        final amountInMinorUnit =
-        StripeService.amountToMinorUnit(price.toDouble());
+        final amountInMinorUnit = StripeService.amountToMinorUnit(
+          price.toDouble(),
+        );
 
         final paymentIntent = await StripeService.createPaymentIntent(
           amountInMinorUnit: amountInMinorUnit,
           currency: StripeConfig.defaultCurrency.toLowerCase(),
           description:
-          'Appointment payment for ${widget.selectedOptions['service_name']}',
+              'Appointment payment for ${widget.selectedOptions['service_name']}',
           metadata: {
-            'service_id': widget.selectedOptions['service_id']?.toString() ?? '',
-            'appointment_date': widget.selectedOptions['appoint_date']?.toString() ?? '',
-            'appointment_time': widget.selectedOptions['appoint_time']?.toString() ?? '',
+            'service_id':
+                widget.selectedOptions['service_id']?.toString() ?? '',
+            'appointment_date':
+                widget.selectedOptions['appoint_date']?.toString() ?? '',
+            'appointment_time':
+                widget.selectedOptions['appoint_time']?.toString() ?? '',
           },
         );
 
@@ -118,9 +134,10 @@ class _BookConfirmAppointmentScreenState
           paymentSheetParameters: SetupPaymentSheetParameters(
             paymentIntentClientSecret: clientSecret,
             merchantDisplayName: StripeConfig.merchantDisplayName,
-            style: Theme.of(context).brightness == Brightness.dark
-                ? ThemeMode.dark
-                : ThemeMode.light,
+            style:
+                Theme.of(context).brightness == Brightness.dark
+                    ? ThemeMode.dark
+                    : ThemeMode.light,
           ),
         );
 
@@ -132,9 +149,9 @@ class _BookConfirmAppointmentScreenState
       }
 
       final appointmentResponse =
-      AuthService.isAuthenticated
-          ? await _createAppointment()
-          : await _createAppointmentWithoutLogin();
+          AuthService.isAuthenticated
+              ? await _createAppointment()
+              : await _createAppointmentWithoutLogin();
 
       final appointmentId = appointmentResponse['data']['id'];
 
@@ -145,10 +162,15 @@ class _BookConfirmAppointmentScreenState
         };
         print('recordAppointmentPayment REQUEST: $requestData');
         final paymentResponse =
-        await ApiService.recordAppointmentPayment(
-          appointmentId: appointmentId,
-          paymentIntentId: paymentMethodId,
-        );
+            AuthService.isAuthenticated
+                ? await ApiService.recordAppointmentPayment(
+                  appointmentId: appointmentId,
+                  paymentIntentId: paymentMethodId,
+                )
+                : await ApiService.recordAppointmentPaymentWithoutLogin(
+                  appointmentId: appointmentId,
+                  paymentIntentId: paymentMethodId,
+                );
 
         print('recordAppointmentPayment RESPONSE: $paymentResponse');
       }
@@ -156,14 +178,14 @@ class _BookConfirmAppointmentScreenState
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) =>
-              BookAppointmentSuccessScreen(data: appointmentResponse),
+          builder:
+              (_) => BookAppointmentSuccessScreen(data: appointmentResponse),
         ),
       );
     } on StripeException catch (e) {
       final cancelled =
           e.error.code == FailureCode.Canceled ||
-              e.error.message?.toLowerCase() == 'canceled';
+          e.error.message?.toLowerCase() == 'canceled';
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -175,11 +197,9 @@ class _BookConfirmAppointmentScreenState
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Unable to complete booking: $e'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Unable to complete booking: $e')));
     } finally {
       setState(() {
         isLoading = false;
@@ -244,9 +264,9 @@ class _BookConfirmAppointmentScreenState
                 height: 48,
                 child: ElevatedButton(
                   onPressed:
-                  (isLoading || isProcessingPayment)
-                      ? null
-                      : _handlePaymentAndCreateAppointment,
+                      (isLoading || isProcessingPayment)
+                          ? null
+                          : _handlePaymentAndCreateAppointment,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1F3C88),
                     foregroundColor: Colors.white,
@@ -254,20 +274,21 @@ class _BookConfirmAppointmentScreenState
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  child: (isLoading || isProcessingPayment)
-                      ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: Colors.white,
-                    ),
-                  )
-                      : Text(
-                    price == 0
-                        ? 'Submit'
-                        : 'Pay & Submit (\$${price.toStringAsFixed(2)})',
-                  ),
+                  child:
+                      (isLoading || isProcessingPayment)
+                          ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                          : Text(
+                            price == 0
+                                ? 'Submit'
+                                : 'Pay & Submit (\$${price.toStringAsFixed(2)})',
+                          ),
                 ),
               ),
             ),

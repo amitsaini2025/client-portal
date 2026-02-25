@@ -45,11 +45,8 @@ class StripeService {
     Map<String, String>? metadata,
   }) async {
     final authToken = await AuthManager.getAuthToken();
-    if (authToken == null) {
-      throw Exception("Auth token is missing");
-    }
 
-    // Build JSON payload exactly like curl
+
     final Map<String, dynamic> payload = {
       "amount": amountInMinorUnit,
       "currency": currency,
@@ -63,9 +60,7 @@ class StripeService {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        // IMPORTANT: Use the exact same token as curl
-        "Authorization":
-        "Bearer $authToken",
+        if (authToken != null) "Authorization": "Bearer $authToken",
       },
       body: jsonEncode(payload),
     )
