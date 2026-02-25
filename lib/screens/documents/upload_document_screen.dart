@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:client/config/theme_config.dart'; // Added for colors
+import 'package:client/config/theme_config.dart';
 import '../../models/new/allowed_checklist.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
@@ -72,7 +72,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
   Future<void> _pickFile() async {
     showModalBottomSheet(
       context: context,
-      backgroundColor: ThemeConfig.navyBlue,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -83,24 +83,24 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.folder, color: Colors.white),
-                title: const Text('My Files', style: TextStyle(color: Colors.white)),
+                leading: const Icon(Icons.folder, color: Colors.black),
+                title: const Text('My Files', style: TextStyle(color: Colors.black)),
                 onTap: () async {
                   Navigator.of(context).pop();
                   await _pickFromFiles();
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo, color: Colors.white),
-                title: const Text('Gallery', style: TextStyle(color: Colors.white)),
+                leading: const Icon(Icons.photo, color: Colors.black),
+                title: const Text('Gallery', style: TextStyle(color: Colors.black)),
                 onTap: () async {
                   Navigator.of(context).pop();
                   await _pickFromGallery();
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.camera_alt, color: Colors.white),
-                title: const Text('Camera', style: TextStyle(color: Colors.white)),
+                leading: const Icon(Icons.camera_alt, color: Colors.black),
+                title: const Text('Camera', style: TextStyle(color: Colors.black)),
                 onTap: () async {
                   Navigator.of(context).pop();
                   await _pickFromCamera();
@@ -221,7 +221,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ThemeConfig.navyBlue,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Upload Document'),
         backgroundColor: ThemeConfig.goldenYellow,
@@ -282,7 +282,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ThemeConfig.navyBlue,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
       ),
@@ -293,7 +293,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
               style: Theme.of(context)
                   .textTheme
                   .titleLarge
-                  ?.copyWith(color: Colors.white)),
+                  ?.copyWith(color: Colors.black)),
           const SizedBox(height: 16),
           if (_selectedFile == null)
             GestureDetector(
@@ -310,7 +310,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 child: Column(
                   children: [
                     const Icon(Icons.cloud_upload_outlined,
-                        size: 48, color: Colors.white),
+                        size: 48, color: Colors.black),
                     const SizedBox(height: 12),
                     Text('Tap to select a file',
                         style: TextStyle(color: ThemeConfig.goldenYellow)),
@@ -326,7 +326,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 Expanded(
                     child: Text(
                       _selectedFileName ?? '',
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.black),
                     )),
                 IconButton(
                   icon: const Icon(Icons.close, color: Colors.red),
@@ -347,7 +347,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ThemeConfig.navyBlue,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
       ),
@@ -358,14 +358,14 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
               style: Theme.of(context)
                   .textTheme
                   .titleLarge
-                  ?.copyWith(color: Colors.white)),
+                  ?.copyWith(color: Colors.black)),
           const SizedBox(height: 20),
           TextFormField(
             controller: _titleController,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.black),
             decoration: InputDecoration(
               labelText: 'Title *',
-              labelStyle: const TextStyle(color: Colors.white70),
+              labelStyle: const TextStyle(color: Colors.black54),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: ThemeConfig.goldenYellow),
                 borderRadius: BorderRadius.circular(12),
@@ -384,7 +384,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
             value: _selectedChecklistId,
             decoration: InputDecoration(
               labelText: 'Related Checklist',
-              labelStyle: const TextStyle(color: Colors.white70),
+              labelStyle: const TextStyle(color: Colors.black54),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: ThemeConfig.goldenYellow),
                 borderRadius: BorderRadius.circular(12),
@@ -395,13 +395,13 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            dropdownColor: ThemeConfig.navyBlue,
-            style: const TextStyle(color: Colors.white),
+            dropdownColor: Colors.white,
+            style: const TextStyle(color: Colors.black),
             items: _checklists
                 .map((c) => DropdownMenuItem<int>(
               value: c.id,
               child: Text(c.checklistName,
-                  style: const TextStyle(color: Colors.white)),
+                  style: const TextStyle(color: Colors.black)),
             ))
                 .toList(),
             onChanged: (v) => setState(() => _selectedChecklistId = v),
