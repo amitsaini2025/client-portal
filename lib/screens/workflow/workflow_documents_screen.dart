@@ -96,8 +96,8 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
   @override
   Widget build(BuildContext context) {
     final content = _buildContent();
-
     String stageName = widget.stageName ?? "Document";
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -111,28 +111,44 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         centerTitle: true,
         elevation: 4,
         backgroundColor: ThemeConfig.goldenYellow,
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: content,
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: ThemeConfig.goldenYellow,
-        elevation: 6,
-        onPressed: () {
-          Navigator.pushNamed(context, '/upload-documents');
-        },
-        icon: const Icon(Icons.upload_file, color: Colors.white),
-        label: const Text(
-          "Upload Document",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            heroTag: "bulkUpload",
+            backgroundColor: ThemeConfig.goldenYellow,
+            elevation: 6,
+            onPressed: () {
+              Navigator.pushNamed(context, '/bulk-upload-documents');
+            },
+            icon: const Icon(Icons.upload_file, color: Colors.white),
+            label: const Text(
+              "Bulk Upload",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton.extended(
+            heroTag: "singleUpload",
+            backgroundColor: ThemeConfig.goldenYellow,
+            elevation: 6,
+            onPressed: () {
+              Navigator.pushNamed(context, '/upload-documents');
+            },
+            icon: const Icon(Icons.upload_file, color: Colors.white),
+            label: const Text(
+              "Upload Document",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
-
-    // Case 2 → stageId is NULL → No AppBar
-    return content;
   }
 
   Widget _buildContent() {

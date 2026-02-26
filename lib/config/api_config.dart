@@ -24,6 +24,7 @@ class ApiConfig {
       '/workflow/allowed-checklist';
   static const String workflowUploadChecklistEndpoint =
       '/workflow/upload-allowed-checklist';
+  static const String workflowUploadAllowedChecklistBulkUpload = '/workflow/upload-allowed-checklist-bulk-upload';
 
   // Client portal specific endpoints
   static const String clientProfileEndpoint = '/profile';

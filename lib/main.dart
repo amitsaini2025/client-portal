@@ -16,6 +16,7 @@ import 'package:client/screens/dashboard/post_code_checker/postcode_checker_scre
 import 'package:client/screens/dashboard/pr_calculator/pr_calculator_screen.dart';
 import 'package:client/screens/dashboard/student_fund_calculator/student_fund_calculator_screen.dart';
 import 'package:client/screens/document_management/document_management.dart';
+import 'package:client/screens/documents/bulk_upload_document_screen.dart';
 import 'package:client/screens/documents/upload_document_screen.dart';
 import 'package:client/screens/matters/matters_screen.dart';
 import 'package:client/screens/pdf/pdf_viewer_screen.dart';
@@ -349,6 +350,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/document-management':
                 (context) => const DocumentManagementScreen(),
             '/upload-documents': (context) => const UploadDocumentScreen(),
+            '/bulk-upload-documents': (context) => const BulkUploadDocumentScreen(),
             '/pdf-viewer': (context) {
               final args =
                   ModalRoute.of(context)!.settings.arguments

@@ -507,6 +507,34 @@ class ApiService {
     );
   }*/
 
+  static Future<Map<String, dynamic>> bulkUploadChecklistDocuments({
+    required List<File> files,
+    required List<int> allowedChecklistIds,
+    required int clientMatterId,
+  }) async {
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse(
+        ApiConfig.getEndpoint(ApiConfig.workflowUploadAllowedChecklistBulkUpload),
+      ),
+    );
+
+    request.headers.addAll(_buildHeaders());
+    request.headers.remove('Content-Type');
+
+    request.fields['client_matter_id'] = clientMatterId.toString();
+    request.fields['allowed_checklist_ids'] =
+        allowedChecklistIds.join(',');
+
+    for (var file in files) {
+      request.files.add(await http.MultipartFile.fromPath('files[]', file.path));
+    }
+
+    final streamed = await request.send();
+    final response = await http.Response.fromStream(streamed);
+    return jsonDecode(response.body);
+  }
+
   static Future<Map<String, dynamic>> getClientCases({
     int page = 1,
     int perPage = 10,
