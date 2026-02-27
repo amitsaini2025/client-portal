@@ -93,10 +93,6 @@ class _BillingListScreenState extends State<BillingListScreen> {
       .where((i) => i.status == 'pending')
       .fold(0, (sum, i) => sum + (i.totalAmount ?? 0));
 
-  // ==========================
-  // 🔥 PAYMENT FUNCTION
-  // ==========================
-
   Future<void> _handleInvoicePayment(Invoice invoice) async {
     setState(() {
       _processingPayments.add(invoice.id);
@@ -161,8 +157,6 @@ class _BillingListScreenState extends State<BillingListScreen> {
     }
   }
 
-  // ==========================
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,25 +182,31 @@ class _BillingListScreenState extends State<BillingListScreen> {
           Expanded(
             child: _isInitialLoading
                 ? const Center(child: CircularProgressIndicator())
+                : _invoices.isEmpty
+                ? const Center(
+              child: Text(
+                "No invoices found",
+                style: TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            )
                 : RefreshIndicator(
               onRefresh: () => _fetchInvoices(refresh: true),
               child: ListView.builder(
                 controller: _scrollController,
                 padding: const EdgeInsets.all(16),
-                itemCount: _invoices.length +
-                    (_isPaginating ? 1 : 0),
+                itemCount:
+                _invoices.length + (_isPaginating ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index >= _invoices.length) {
                     return const Padding(
                       padding: EdgeInsets.all(16),
                       child: Center(
-                          child:
-                          CircularProgressIndicator()),
+                          child: CircularProgressIndicator()),
                     );
                   }
 
-                  return _buildInvoiceCard(
-                      _invoices[index]);
+                  return _buildInvoiceCard(_invoices[index]);
                 },
               ),
             ),
