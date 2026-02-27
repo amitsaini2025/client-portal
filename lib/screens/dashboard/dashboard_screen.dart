@@ -367,12 +367,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             '/english-requirements',
                           ),
                         },
-                        onWebSearch: () => {
-                          showSnack(
+                        onVACSearch: () => {
+                          Navigator.pushNamed(
                             context,
-                            "This feature will be available in a future update.",
+                            '/vac-search',
                           ),
-                        },
+                        }
                       ),
                       const SizedBox(height: 24),
                       MyFilesQuickActionsCard(

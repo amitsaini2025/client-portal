@@ -15,6 +15,7 @@ import 'package:client/screens/dashboard/personal_info/personal_information_scre
 import 'package:client/screens/dashboard/post_code_checker/postcode_checker_screen.dart';
 import 'package:client/screens/dashboard/pr_calculator/pr_calculator_screen.dart';
 import 'package:client/screens/dashboard/student_fund_calculator/student_fund_calculator_screen.dart';
+import 'package:client/screens/dashboard/vac_search/vac_search_screen.dart';
 import 'package:client/screens/document_management/document_management.dart';
 import 'package:client/screens/documents/bulk_upload_document_screen.dart';
 import 'package:client/screens/documents/upload_document_screen.dart';
@@ -395,6 +396,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/notifications': (context) => NotificationsScreen(),
             '/important-links': (context) => ImportantLinksScreen(),
             '/billing-list': (context) => BillingListScreen(),
+            '/vac-search':  (context) => VacSearchScreen(),
           },
         );
       },

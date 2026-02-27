@@ -84,6 +84,9 @@ class ApiConfig {
   static const String notifications = "/notifications";
   static const String billingList = "/billing/list";
 
+  static const String visaEstimateVisaList = "/visa-estimate/visa-list";
+  static const String visaEstimateEstimate = "/visa-estimate/estimate";
+
   // API settings
   static const Duration timeout = Duration(seconds: 30);
   static const Duration refreshTokenThreshold = Duration(minutes: 5);

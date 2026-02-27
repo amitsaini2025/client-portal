@@ -515,7 +515,9 @@ class ApiService {
     final request = http.MultipartRequest(
       'POST',
       Uri.parse(
-        ApiConfig.getEndpoint(ApiConfig.workflowUploadAllowedChecklistBulkUpload),
+        ApiConfig.getEndpoint(
+          ApiConfig.workflowUploadAllowedChecklistBulkUpload,
+        ),
       ),
     );
 
@@ -523,11 +525,12 @@ class ApiService {
     request.headers.remove('Content-Type');
 
     request.fields['client_matter_id'] = clientMatterId.toString();
-    request.fields['allowed_checklist_ids'] =
-        allowedChecklistIds.join(',');
+    request.fields['allowed_checklist_ids'] = allowedChecklistIds.join(',');
 
     for (var file in files) {
-      request.files.add(await http.MultipartFile.fromPath('files[]', file.path));
+      request.files.add(
+        await http.MultipartFile.fromPath('files[]', file.path),
+      );
     }
 
     final streamed = await request.send();
@@ -839,7 +842,8 @@ class ApiService {
         return jsonDecode(response.body);
       } else {
         throw Exception(
-            'Failed to send message: ${response.statusCode} ${response.reasonPhrase}');
+          'Failed to send message: ${response.statusCode} ${response.reasonPhrase}',
+        );
       }
     } catch (e) {
       throw Exception('Error sending message with attachments: $e');
@@ -1247,10 +1251,7 @@ class ApiService {
 
     final response = await _makeRequest(
       endpoint,
-      {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-      },
+      {"Accept": "application/json", "Content-Type": "application/json"},
       {
         "noe_id": noeId,
         "service_id": serviceId,
@@ -1351,12 +1352,29 @@ class ApiService {
     final url =
         '${ApiConfig.billingList}?client_matter_id=$clientMatterId&page=$page&per_page=$perPage';
 
-    return await _makeRequest(
-      url,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(url, _buildHeaders(), null, 'GET');
+  }
+
+  static Future<Map<String, dynamic>> getVisaList() async {
+    final url = ApiConfig.visaEstimateVisaList;
+
+    return await _makeRequest(url, _buildHeaders(), null, 'GET');
+  }
+
+  static Future<Map<String, dynamic>> getVisaEstimate({
+    required String visaId,
+    int additional18Plus = 0,
+    int additionalU18 = 0,
+  }) async {
+    final url = ApiConfig.visaEstimateEstimate;
+
+    final body = {
+      "visa_id": visaId,
+      "additional_applicants_18_plus": additional18Plus,
+      "additional_applicants_u18": additionalU18,
+    };
+
+    return await _makeRequest(url, _buildHeaders(), body, 'POST');
   }
 
   // Generic methods for backward compatibility

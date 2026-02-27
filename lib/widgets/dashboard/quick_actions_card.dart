@@ -12,7 +12,7 @@ class QuickActionsCard extends StatelessWidget {
   final VoidCallback? onCourseSearch;
   final VoidCallback? onImportantLinks;
   final VoidCallback? onEnglishRequirement;
-  final VoidCallback? onWebSearch;
+  final VoidCallback? onVACSearch;
 
   const QuickActionsCard({
     super.key,
@@ -26,7 +26,7 @@ class QuickActionsCard extends StatelessWidget {
     this.onCourseSearch,
     this.onImportantLinks,
     this.onEnglishRequirement,
-    this.onWebSearch,
+    this.onVACSearch,
   });
 
   static const double _radius = 12;
@@ -131,7 +131,7 @@ class QuickActionsCard extends StatelessWidget {
                     icon: Icons.web,
                     label: 'VAC\nSearch',
                     color: Colors.pink,
-                    onTap: onWebSearch ?? () {},
+                    onTap: onVACSearch ?? () {},
                   );
                 default:
                   return const SizedBox.shrink();
