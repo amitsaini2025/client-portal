@@ -69,28 +69,26 @@ class WorkflowChecklist {
     return null;
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'checklist_name': checklistName,
-      'document_type': documentType,
-      'description': description,
-      'type': type,
-      'type_id': typeId,
-      'type_name': typeName,
-      'is_mandatory': isMandatory,
-      'due_date': dueDate,
-      'due_time': dueTime,
-      'is_upload': isUpload,
-      'file_name': fileName,
-      'file_url': fileUrl,
-      'doc_status_id': docStatusId,
-      'doc_status_text': docStatusText,
-      'doc_rejection_reason': docRejectionReason,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'checklist_name': checklistName,
+    'document_type': documentType,
+    'description': description,
+    'type': type,
+    'type_id': typeId,
+    'type_name': typeName,
+    'is_mandatory': isMandatory,
+    'due_date': dueDate,
+    'due_time': dueTime,
+    'is_upload': isUpload,
+    'file_name': fileName,
+    'file_url': fileUrl,
+    'doc_status_id': docStatusId,
+    'doc_status_text': docStatusText,
+    'doc_rejection_reason': docRejectionReason,
+    'created_at': createdAt,
+    'updated_at': updatedAt,
+  };
 
   bool get hasDueDate => dueDate != null && dueDate!.isNotEmpty;
 
@@ -98,7 +96,7 @@ class WorkflowChecklist {
     if (!hasDueDate) return null;
     try {
       return DateTime.parse(dueDate!);
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
@@ -109,17 +107,12 @@ class WorkflowChecklist {
     return date.isBefore(DateTime.now());
   }
 
-  String get priorityLabel {
-    if (isMandatory) return 'Required';
-    return 'Optional';
-  }
+  String get priorityLabel => isMandatory ? 'Required' : 'Optional';
 
   @override
-  String toString() {
-    return 'WorkflowChecklist(id: $id, name: $checklistName, mandatory: $isMandatory, upload: $isUpload, docStatusId: $docStatusId)';
-  }
+  String toString() =>
+      'WorkflowChecklist(id: $id, name: $checklistName, mandatory: $isMandatory, upload: $isUpload, docStatusId: $docStatusId)';
 }
-
 
 class ApplicationInfo {
   final int applicationId;
@@ -153,15 +146,13 @@ class ApplicationInfo {
     return null;
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'application_id': applicationId,
-      'client_matter_id': clientMatterId,
-      'client_id': clientId,
-      'current_stage': currentStage,
-      'status': status,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'application_id': applicationId,
+    'client_matter_id': clientMatterId,
+    'client_id': clientId,
+    'current_stage': currentStage,
+    'status': status,
+  };
 }
 
 class WorkflowChecklistResponse {
@@ -180,19 +171,23 @@ class WorkflowChecklistResponse {
   });
 
   factory WorkflowChecklistResponse.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] ?? {};
+
     var checklistsList = <WorkflowChecklist>[];
-    if (json['allowed_checklists'] != null) {
-      checklistsList = (json['allowed_checklists'] as List)
-          .map((checklist) => WorkflowChecklist.fromJson(checklist))
+    if (data['allowed_checklists'] != null) {
+      checklistsList = (data['allowed_checklists'] as List)
+          .map((c) => WorkflowChecklist.fromJson(c))
           .toList();
     }
 
     return WorkflowChecklistResponse(
-      applicationInfo: ApplicationInfo.fromJson(json['application_info']),
+      applicationInfo:
+      ApplicationInfo.fromJson(data['matter_info'] ?? {}),
       allowedChecklists: checklistsList,
-      totalAllowedChecklists: _parseInt(json['total_allowed_checklists']) ?? 0,
-      mandatoryChecklists: _parseInt(json['mandatory_checklists']) ?? 0,
-      clientMatterId: _parseInt(json['client_matter_id']) ?? 0,
+      totalAllowedChecklists:
+      _parseInt(data['total_allowed_checklists']) ?? 0,
+      mandatoryChecklists: _parseInt(data['mandatory_checklists']) ?? 0,
+      clientMatterId: _parseInt(data['client_matter_id']) ?? 0,
     );
   }
 

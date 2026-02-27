@@ -40,7 +40,7 @@ class _MattersScreenState extends State<MattersScreen> {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/dashboard',
-          (route) => false, // removes all previous routes
+          (route) => false,
       arguments: AuthService.selectedMatterId.toString(),
     );
 
@@ -74,6 +74,7 @@ class _MattersScreenState extends State<MattersScreen> {
             onPressed: _confirmSelection,
           ),
         ],
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _mattersFuture,
