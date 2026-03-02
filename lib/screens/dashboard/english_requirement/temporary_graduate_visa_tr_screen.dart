@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../config/theme_config.dart';
 
 class TemporaryGraduateVisaTRScreen extends StatelessWidget {
@@ -8,174 +9,187 @@ class TemporaryGraduateVisaTRScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("485 Temporary Graduate Visa (TR)"),
+        title: const Text(
+          "485 Temporary Graduate Visa (TR)",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: ThemeConfig.white,
+          ),
+        ),
         backgroundColor: ThemeConfig.goldenYellow,
+        iconTheme: const IconThemeData(
+          color: ThemeConfig.white,
+        ),
       ),
-      body: SingleChildScrollView(
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _sectionTitle(
+            "Acceptable minimum scores – Test taken on or after 7 August 2025",
+          ),
+          const SizedBox(height: 16),
+          ..._after2025Data().map((e) => _scoreCard(e)).toList(),
+          const SizedBox(height: 30),
+          _sectionTitle(
+            "Acceptable minimum scores – Test taken on or before 6 August 2025",
+          ),
+          const SizedBox(height: 16),
+          ..._before2025Data().map((e) => _scoreCard(e)).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionTitle(String text) {
+    return Text(
+      text,
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    );
+  }
+
+  Widget _scoreCard(Map<String, dynamic> data) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle(
-                "Acceptable minimum scores – Test taken on or after 7 August 2025"),
-            const SizedBox(height: 10),
-            _buildAfter2025Table(),
-            const SizedBox(height: 30),
-            _sectionTitle(
-                "Acceptable minimum scores – Test taken on or before 6 August 2025"),
-            const SizedBox(height: 10),
-            _buildBefore2025Table(),
+            Text(
+              data["title"],
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const Divider(height: 20),
+            ...data["scores"]
+                .map<Widget>(
+                  (score) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            score["label"],
+                            style: const TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        Text(score["value"]),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
           ],
         ),
       ),
     );
   }
 
-  Widget _sectionTitle(String text) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-      ),
-    );
-  }
-
-  Widget _buildAfter2025Table() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Table(
-        border: TableBorder.all(color: Colors.grey.shade300),
-        defaultColumnWidth: const IntrinsicColumnWidth(),
-        children: [
-          _headerRow([
-            "Test Sub-skill",
-            "C1 Advanced",
-            "CELPIP",
-            "IELTS Academic",
-            "IELTS GT",
-            "LanguageCert",
-            "MET",
-            "OET",
-            "PTE",
-            "TOEFL"
-          ]),
-          _dataRow([
-            "Overall",
-            "Not accepted",
-            "8",
-            "6.5",
-            "6.5",
-            "67",
-            "58",
-            "1310",
-            "55",
-            "81"
-          ]),
-          _dataRow([
-            "Listening",
-            "Not accepted",
-            "6",
-            "5.5",
-            "5.5",
-            "49",
-            "53",
-            "260",
-            "40",
-            "12"
-          ]),
-          _dataRow([
-            "Reading",
-            "Not accepted",
-            "6",
-            "5.5",
-            "5.5",
-            "54",
-            "51",
-            "280",
-            "42",
-            "12"
-          ]),
-          _dataRow([
-            "Writing",
-            "Not accepted",
-            "6",
-            "5.5",
-            "5.5",
-            "56",
-            "51",
-            "260",
-            "41",
-            "14"
-          ]),
-          _dataRow([
-            "Speaking",
-            "Not accepted",
-            "6",
-            "5.5",
-            "5.5",
-            "62",
-            "43",
-            "310",
-            "39",
-            "17"
-          ]),
+  List<Map<String, dynamic>> _after2025Data() {
+    return [
+      {
+        "title": "IELTS Academic / GT",
+        "scores": [
+          {"label": "Overall", "value": "6.5"},
+          {"label": "Listening", "value": "5.5"},
+          {"label": "Reading", "value": "5.5"},
+          {"label": "Writing", "value": "5.5"},
+          {"label": "Speaking", "value": "5.5"},
         ],
-      ),
-    );
-  }
-
-  Widget _buildBefore2025Table() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Table(
-        border: TableBorder.all(color: Colors.grey.shade300),
-        defaultColumnWidth: const IntrinsicColumnWidth(),
-        children: [
-          _headerRow([
-            "Test Sub-skill",
-            "CAE/C1",
-            "IELTS",
-            "OET",
-            "PTE",
-            "TOEFL"
-          ]),
-          _dataRow(["Overall", "176", "6.5", "B", "57", "83"]),
-          _dataRow(["Listening", "162", "5.5", "B", "43", "7"]),
-          _dataRow(["Reading", "162", "5.5", "B", "48", "8"]),
-          _dataRow(["Writing", "162", "5.5", "B", "51", "18"]),
-          _dataRow(["Speaking", "162", "5.5", "B", "42", "16"]),
+      },
+      {
+        "title": "PTE Academic",
+        "scores": [
+          {"label": "Overall", "value": "55"},
+          {"label": "Listening", "value": "40"},
+          {"label": "Reading", "value": "42"},
+          {"label": "Writing", "value": "41"},
+          {"label": "Speaking", "value": "39"},
         ],
-      ),
-    );
+      },
+      {
+        "title": "TOEFL iBT",
+        "scores": [
+          {"label": "Overall", "value": "81"},
+          {"label": "Listening", "value": "12"},
+          {"label": "Reading", "value": "12"},
+          {"label": "Writing", "value": "14"},
+          {"label": "Speaking", "value": "17"},
+        ],
+      },
+      {
+        "title": "CELPIP",
+        "scores": [
+          {"label": "Overall", "value": "8"},
+          {"label": "Listening", "value": "6"},
+          {"label": "Reading", "value": "6"},
+          {"label": "Writing", "value": "6"},
+          {"label": "Speaking", "value": "6"},
+        ],
+      },
+      {
+        "title": "OET",
+        "scores": [
+          {"label": "Overall", "value": "1310"},
+          {"label": "Listening", "value": "260"},
+          {"label": "Reading", "value": "280"},
+          {"label": "Writing", "value": "260"},
+          {"label": "Speaking", "value": "310"},
+        ],
+      },
+    ];
   }
 
-  TableRow _headerRow(List<String> cells) {
-    return TableRow(
-      decoration: BoxDecoration(color: Colors.grey.shade200),
-      children: cells
-          .map(
-            (e) => Padding(
-          padding: const EdgeInsets.all(10),
-          child: Text(
-            e,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-      )
-          .toList(),
-    );
-  }
-
-  TableRow _dataRow(List<String> cells) {
-    return TableRow(
-      children: cells
-          .map(
-            (e) => Padding(
-          padding: const EdgeInsets.all(10),
-          child: Text(e),
-        ),
-      )
-          .toList(),
-    );
+  List<Map<String, dynamic>> _before2025Data() {
+    return [
+      {
+        "title": "IELTS",
+        "scores": [
+          {"label": "Overall", "value": "6.5"},
+          {"label": "Listening", "value": "5.5"},
+          {"label": "Reading", "value": "5.5"},
+          {"label": "Writing", "value": "5.5"},
+          {"label": "Speaking", "value": "5.5"},
+        ],
+      },
+      {
+        "title": "PTE",
+        "scores": [
+          {"label": "Overall", "value": "57"},
+          {"label": "Listening", "value": "43"},
+          {"label": "Reading", "value": "48"},
+          {"label": "Writing", "value": "51"},
+          {"label": "Speaking", "value": "42"},
+        ],
+      },
+      {
+        "title": "TOEFL",
+        "scores": [
+          {"label": "Overall", "value": "83"},
+          {"label": "Listening", "value": "7"},
+          {"label": "Reading", "value": "8"},
+          {"label": "Writing", "value": "18"},
+          {"label": "Speaking", "value": "16"},
+        ],
+      },
+      {
+        "title": "CAE / C1",
+        "scores": [
+          {"label": "Overall", "value": "176"},
+          {"label": "Listening", "value": "162"},
+          {"label": "Reading", "value": "162"},
+          {"label": "Writing", "value": "162"},
+          {"label": "Speaking", "value": "162"},
+        ],
+      },
+      {
+        "title": "OET",
+        "scores": [
+          {"label": "All Bands", "value": "B"},
+        ],
+      },
+    ];
   }
 }
