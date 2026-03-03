@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../config/theme_config.dart';
 
 class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
@@ -22,21 +23,7 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: ThemeConfig.white),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: testData.length + 1,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return const Padding(
-              padding: EdgeInsets.only(bottom: 24),
-              child: EnglishLanguageRequirementsWidget(),
-            );
-          }
-
-          final data = testData[index - 1];
-          return _buildCard(data);
-        },
-      ),
+      body: EnglishLanguageRequirementsWidget(),
     );
   }
 
@@ -44,9 +31,7 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -54,10 +39,7 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
           children: [
             Text(
               "${data["item"]}. ${data["testName"]}",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
             ),
             const SizedBox(height: 10),
             _scoreRow("Score Level 1", data["col2"]),
@@ -81,18 +63,12 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
             flex: 4,
             child: Text(
               label,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
             ),
           ),
           Expanded(
             flex: 6,
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 13),
-            ),
+            child: Text(value, style: const TextStyle(fontSize: 13)),
           ),
         ],
       ),
@@ -188,17 +164,31 @@ class _EnglishLanguageRequirementsWidgetState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "English Language Requirements Specified Test Scores",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.indigo,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text(
+                "English Language Requirements",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.indigo,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Specified Test Scores for Visa Requirements",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.indigoAccent,
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 16),
 
-        /// MOBILE FRIENDLY TAB SWITCH
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -206,80 +196,97 @@ class _EnglishLanguageRequirementsWidgetState
             ChoiceChip(
               label: const Text("After 7 Aug 2025"),
               selected: selectedTab == 0,
+              selectedColor: Colors.indigo.shade100,
               onSelected: (_) => setState(() => selectedTab = 0),
             ),
             ChoiceChip(
               label: const Text("Before 6 Aug 2025"),
               selected: selectedTab == 1,
+              selectedColor: Colors.indigo.shade100,
               onSelected: (_) => setState(() => selectedTab = 1),
             ),
           ],
         ),
-
         const SizedBox(height: 16),
 
-        /// ONLY HORIZONTAL SCROLL
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columnSpacing: 14,
-            dataRowMinHeight: 36,
-            headingRowHeight: 40,
-            border: TableBorder.all(color: Colors.grey.shade300),
-            headingRowColor:
-            MaterialStateProperty.all(Colors.grey.shade200),
-            columns: const [
-              DataColumn(label: Text("Level", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("Component", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("IELTS", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("PTE", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("TOEFL", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("C1", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("OET", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("CELPIP", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("LANG CERT", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("MET", style: TextStyle(fontSize: 12))),
-            ],
-            rows: data.map((row) {
+        Expanded(
+          child: ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final row = data[index];
+
               if (row["isSection"] == true) {
-                return DataRow(
-                  cells: List.generate(
-                    10,
-                        (index) => DataCell(
-                      index == 0
-                          ? Text(
-                        row["level"],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      )
-                          : const SizedBox(),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6.0),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.indigo.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      row["level"],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.indigo,
+                      ),
                     ),
                   ),
                 );
               }
 
-              return DataRow(
-                cells: [
-                  _cell(row["level"]),
-                  _cell(row["component"]),
-                  _cell(row["ielts"]),
-                  _cell(row["pte"]),
-                  _cell(row["toefl"]),
-                  _cell(row["c1"]),
-                  _cell(row["oet"]),
-                  _cell(row["celpip"]),
-                  _cell(row["languageCert"]),
-                  _cell(row["met"]),
-                ],
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                shadowColor: Colors.indigo.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (row["level"] != "")
+                        Text(
+                          row["level"],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.indigo,
+                          ),
+                        ),
+                      if (row["component"] != "")
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0, bottom: 8),
+                          child: Text(
+                            row["component"],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      _valueRow(Icons.school, "IELTS", row["ielts"]),
+                      _valueRow(Icons.school, "PTE", row["pte"]),
+                      _valueRow(Icons.school, "TOEFL", row["toefl"]),
+                      _valueRow(Icons.language, "C1", row["c1"]),
+                      _valueRow(Icons.language, "OET", row["oet"]),
+                      _valueRow(Icons.language, "CELPIP", row["celpip"]),
+                      _valueRow(Icons.language, "LanguageCert", row["languageCert"]),
+                      _valueRow(Icons.school, "MET", row["met"]),
+                    ],
+                  ),
+                ),
               );
-            }).toList(),
+            },
           ),
         ),
 
         const SizedBox(height: 12),
-
         const Text(
           "Department of Home Affairs - English language visa requirements",
           style: TextStyle(
@@ -292,20 +299,44 @@ class _EnglishLanguageRequirementsWidgetState
     );
   }
 
-  DataCell _cell(dynamic value) {
-    return DataCell(
-      Text(
-        value ?? "",
-        style: const TextStyle(fontSize: 12),
+  Widget _valueRow(IconData icon, String label, String? value) {
+    if (value == null || value.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: Colors.indigo.shade300),
+          const SizedBox(width: 6),
+          Expanded(
+            flex: 3,
+            child: Text(
+              "$label:",
+              style: const TextStyle(
+                  fontWeight: FontWeight.w600, fontSize: 12, color: Colors.black87),
+            ),
+          ),
+          Expanded(
+            flex: 5,
+            child: Text(value, style: const TextStyle(fontSize: 12)),
+          ),
+        ],
       ),
     );
   }
 
-  // ---------- FULL DATA (UNCHANGED) ----------
-
   List<Map<String, dynamic>> get tableDataAfterAug2025 => [
-    _row("Functional", "", "Average band score at least 4.5", "Overall 24",
-        "Total 26", "Excluded", "1020", "5", "38", "38"),
+    _row(
+      "Functional",
+      "",
+      "Average band score at least 4.5",
+      "Overall 24",
+      "Total 26",
+      "Excluded",
+      "1020",
+      "5",
+      "38",
+      "38",
+    ),
     _section("Vocational"),
     _row("", "Listening", "5.0", "33", "8", "Excluded", "220", "5", "41", "49"),
     _row("", "Reading", "5.0", "36", "8", "Excluded", "240", "5", "44", "47"),
@@ -322,14 +353,69 @@ class _EnglishLanguageRequirementsWidgetState
     _row("", "Writing", "7.0", "69", "26", "193", "380", "10", "78", "74"),
     _row("", "Speaking", "7.0", "76", "24", "194", "360", "8", "82", "59"),
     _section("Superior (20 points)"),
-    _row("", "Listening", "8.0", "69", "26", "186", "390", "10", "80", "Excluded"),
-    _row("", "Reading", "8.0", "70", "27", "190", "400", "10", "83", "Excluded"),
-    _row("", "Writing", "8.0", "85", "30", "210", "420", "12", "89", "Excluded"),
-    _row("", "Speaking", "8.0", "88", "28", "208", "400", "10", "89", "Excluded"),
+    _row(
+      "",
+      "Listening",
+      "8.0",
+      "69",
+      "26",
+      "186",
+      "390",
+      "10",
+      "80",
+      "Excluded",
+    ),
+    _row(
+      "",
+      "Reading",
+      "8.0",
+      "70",
+      "27",
+      "190",
+      "400",
+      "10",
+      "83",
+      "Excluded",
+    ),
+    _row(
+      "",
+      "Writing",
+      "8.0",
+      "85",
+      "30",
+      "210",
+      "420",
+      "12",
+      "89",
+      "Excluded",
+    ),
+    _row(
+      "",
+      "Speaking",
+      "8.0",
+      "88",
+      "28",
+      "208",
+      "400",
+      "10",
+      "89",
+      "Excluded",
+    ),
   ];
 
   List<Map<String, dynamic>> get tableDataBeforeAug2025 => [
-    _row("Functional", "", "Average band 4.5", "Overall 30", "32", "147", "", "", "", ""),
+    _row(
+      "Functional",
+      "",
+      "Average band 4.5",
+      "Overall 30",
+      "32",
+      "147",
+      "",
+      "",
+      "",
+      "",
+    ),
     _section("Vocational"),
     _row("", "Listening", "5.0", "36", "4", "154", "B", "", "", ""),
     _row("", "Reading", "5.0", "36", "4", "154", "B", "", "", ""),
