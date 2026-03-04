@@ -139,12 +139,6 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
             ),
             const SizedBox(height: 8),
             Text('Status: ${summary.caseStatus ?? ''}'),
-            Text(
-                'Migration Agent: ${summary.migrationAgent ?? ''}'),
-            Text(
-                'Person Responsible: ${summary.personResponsible ?? ''}'),
-            Text(
-                'Person Assisting: ${summary.personAssisting ?? ''}'),
           ],
         ),
       ),

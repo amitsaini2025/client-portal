@@ -29,7 +29,7 @@ class QuickActionsCard extends StatelessWidget {
     this.onVACSearch,
   });
 
-  static const double _radius = 12;
+  static const double _radius = 16;
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +38,12 @@ class QuickActionsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(_radius),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 2)),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
@@ -49,101 +53,78 @@ class QuickActionsCard extends StatelessWidget {
             'Quick Actions',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
-              color: Colors.black,
               fontSize: 15,
             ),
           ),
-          const SizedBox(height: 12),
-          MasonryGridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+          const SizedBox(height: 20),
+
+          StaggeredGrid.count(
+            crossAxisCount: 4,
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
-            itemCount: 10, // updated
-            itemBuilder: (context, index) {
-              switch (index) {
-                case 0:
-                  return _tile(
-                    icon: Icons.schedule,
-                    label: 'Book\nAppointment',
-                    color: Colors.green,
-                    onTap: onBookAppointment,
-                  );
-                case 1:
-                  return _tile(
-                    icon: Icons.health_and_safety,
-                    label: 'Health\nInsurance',
-                    color: Colors.brown,
-                    onTap: onHealthInsurance ?? () {},
-                  );
-                case 2:
-                  return _tile(
-                    icon: Icons.calculate,
-                    label: 'PR\nCalculator',
-                    color: Colors.red,
-                    onTap: onPRCalculator ?? () {},
-                  );
-                case 3:
-                  return _tile(
-                    icon: Icons.calculate,
-                    label: 'Student\nFund Calculator',
-                    color: Colors.purple,
-                    onTap: onStudentFundCalculator ?? () {},
-                  );
-                case 4:
-                  return _tile(
-                    icon: Icons.search,
-                    label: 'Occupation\nSearch',
-                    color: Colors.blue,
-                    onTap: onOccupationSearch ?? () {},
-                  );
-                case 5:
-                  return _tile(
-                    icon: Icons.code,
-                    label: 'Post\nCode Checker',
-                    color: Colors.redAccent,
-                    onTap: onPostCodeChecker ?? () {},
-                  );
-                case 6:
-                  return _tile(
-                    icon: Icons.school,
-                    label: 'Course\nSearch',
-                    color: Colors.orange,
-                    onTap: onCourseSearch ?? () {},
-                  );
-                case 7:
-                  return _tile(
-                    icon: Icons.link,
-                    label: 'Important\nLinks',
-                    color: Colors.teal,
-                    onTap: onImportantLinks ?? () {},
-                  );
-                case 8:
-                  return _tile(
-                    icon: Icons.language,
-                    label: 'English\nRequirement',
-                    color: Colors.indigo,
-                    onTap: onEnglishRequirement ?? () {},
-                  );
-                case 9:
-                  return _tile(
-                    icon: Icons.web,
-                    label: 'VAC\nSearch',
-                    color: Colors.pink,
-                    onTap: onVACSearch ?? () {},
-                  );
-                default:
-                  return const SizedBox.shrink();
-              }
-            },
+            children: [
+
+              StaggeredGridTile.count(
+                crossAxisCellCount: 2,
+                mainAxisCellCount: 2.2,
+                child: _verticalTile(
+                  icon: Icons.schedule,
+                  label: 'Book\nAppointment',
+                  color: const Color(0xCC1B5E20),
+                  onTap: onBookAppointment,
+                ),
+              ),
+
+              StaggeredGridTile.count(
+                crossAxisCellCount: 2,
+                mainAxisCellCount: 2.2,
+                child: _verticalTile(
+                  icon: Icons.health_and_safety,
+                  label: 'Health\nInsurance',
+                  color: const Color(0xCC4E342E),
+                  onTap: onHealthInsurance ?? () {},
+                ),
+              ),
+
+              StaggeredGridTile.count(
+                crossAxisCellCount: 4,
+                mainAxisCellCount: 1.3,
+                child: _horizontalTile(
+                  icon: Icons.calculate,
+                  label: 'PR\nCalculator',
+                  color: const Color(0xCCB71C1C),
+                  onTap: onPRCalculator ?? () {},
+                ),
+              ),
+
+              _smallTile(Icons.calculate, 'Student\nFund Calculator',
+                  const Color(0xCC4A148C), onStudentFundCalculator ?? () {}),
+
+              _smallTile(Icons.search, 'Occupation\nSearch',
+                  const Color(0xCC0D47A1), onOccupationSearch ?? () {}),
+
+              _smallTile(Icons.code, 'Post\nCode Checker',
+                  const Color(0xCC880E4F), onPostCodeChecker ?? () {}),
+
+              _smallTile(Icons.school, 'Course\nSearch',
+                  const Color(0xCCE65100), onCourseSearch ?? () {}),
+
+              _smallTile(Icons.link, 'Important\nLinks',
+                  const Color(0xCC004D40), onImportantLinks ?? () {}),
+
+              _smallTile(Icons.language, 'English\nRequirement',
+                  const Color(0xCC1A237E), onEnglishRequirement ?? () {}),
+
+              _smallTile(Icons.web, 'VAC\nSearch',
+                  const Color(0xCC880E4F), onVACSearch ?? () {}),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _tile({
+  Widget _verticalTile({
     required IconData icon,
     required String label,
     required Color color,
@@ -153,35 +134,96 @@ class QuickActionsCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(_radius),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color,
           borderRadius: BorderRadius.circular(_radius),
-          border: Border.all(color: color.withOpacity(0.25)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 32, color: Colors.white),
+            const Spacer(),
+            Text(
+              label,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: Colors.white,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _horizontalTile({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(_radius),
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(_radius),
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, size: 18, color: color),
-            ),
-            const SizedBox(width: 12),
+            Icon(icon, size: 26, color: Colors.white),
+            const SizedBox(width: 16),
             Expanded(
               child: Text(
                 label,
-                style: TextStyle(
-                  color: color.withOpacity(0.95),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12,
-                  height: 1.2,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Colors.white,
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _smallTile(
+      IconData icon, String label, Color color, VoidCallback onTap) {
+    return StaggeredGridTile.count(
+      crossAxisCellCount: 2,
+      mainAxisCellCount: 1.2,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(_radius),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(_radius),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 20, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
