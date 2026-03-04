@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../config/theme_config.dart';
 import '../../../models/visa_search/visa_model.dart';
 import '../../../services/api_service.dart';
@@ -23,7 +24,65 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
   int additionalAdultCharge = 0;
   int additionalChildCharge = 0;
 
-  int get subtotal => baseCharge + additionalAdultCharge + additionalChildCharge;
+  int topBaseCharge = 0;
+  int topAdultCharge = 0;
+  int topChildCharge = 0;
+
+  final List<String> paymentMethods = [
+    "BPAY",
+    "PayPal",
+    "VISA",
+    "UnionPay",
+    "Other",
+  ];
+
+  final List<double> surchargeRates = [0.0, 0.0101, 0.014, 0.019, 0.0199];
+
+  int selectedPaymentIndex = 0;
+
+  int get subtotal =>
+      baseCharge + additionalAdultCharge + additionalChildCharge;
+
+  double get surchargeAmount => subtotal * surchargeRates[selectedPaymentIndex];
+
+  double get finalTotal => subtotal + surchargeAmount;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    await _calculateTopSection();
+    await _calculateEstimate();
+  }
+
+  Future<void> _calculateTopSection() async {
+    try {
+      final response = await ApiService.getVisaEstimate(
+        visaId: widget.visa.id,
+        additional18Plus: 1,
+        additionalU18: 1,
+      );
+
+      if (response['success'] == true) {
+        final data = response['data'];
+        final lineItems = data['line_items'] as List<dynamic>? ?? [];
+
+        setState(() {
+          topBaseCharge =
+              lineItems.isNotEmpty ? lineItems[0]['price']?.toInt() ?? 0 : 0;
+
+          topAdultCharge =
+              lineItems.length > 1 ? lineItems[1]['price']?.toInt() ?? 0 : 0;
+
+          topChildCharge =
+              lineItems.length > 2 ? lineItems[2]['price']?.toInt() ?? 0 : 0;
+        });
+      }
+    } catch (_) {}
+  }
 
   Future<void> _calculateEstimate() async {
     setState(() => isLoading = true);
@@ -36,20 +95,20 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
       );
 
       if (response['success'] == true) {
-        setState(() {
-          estimate = response['data'];
+        final data = response['data'];
+        final lineItems = data['line_items'] as List<dynamic>? ?? [];
 
-          // Parse line items
-          final lineItems = estimate?['line_items'] as List<dynamic>? ?? [];
-          baseCharge = lineItems.isNotEmpty
-              ? lineItems[0]['price']?.toInt() ?? 0
-              : 0;
-          additionalAdultCharge = lineItems.length > 1
-              ? lineItems[1]['price']?.toInt() ?? 0
-              : 0;
-          additionalChildCharge = lineItems.length > 2
-              ? lineItems[2]['price']?.toInt() ?? 0
-              : 0;
+        setState(() {
+          estimate = data;
+
+          baseCharge =
+              lineItems.isNotEmpty ? lineItems[0]['price']?.toInt() ?? 0 : 0;
+
+          additionalAdultCharge =
+              lineItems.length > 1 ? lineItems[1]['price']?.toInt() ?? 0 : 0;
+
+          additionalChildCharge =
+              lineItems.length > 2 ? lineItems[2]['price']?.toInt() ?? 0 : 0;
 
           isLoading = false;
         });
@@ -58,8 +117,6 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
       }
     } catch (e) {
       setState(() => isLoading = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
@@ -74,22 +131,22 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
       color: bg ?? Colors.grey.shade200,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: DefaultTextStyle(
               style: TextStyle(
-                fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
                 color: Colors.black,
+                fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+                fontSize: 15,
               ),
               child: left,
             ),
           ),
-          const SizedBox(width: 8),
           DefaultTextStyle(
             style: TextStyle(
-              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
               color: Colors.black,
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+              fontSize: 15,
             ),
             child: right,
           ),
@@ -113,22 +170,30 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
             iconSize: 20,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            onPressed: value > 0 ? () => onChanged(value - 1) : null,
+            onPressed:
+                value > 0
+                    ? () async {
+                      onChanged(value - 1);
+                      await _calculateEstimate();
+                    }
+                    : null,
             icon: const Icon(Icons.remove),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
               value.toString(),
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
           IconButton(
             iconSize: 20,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            onPressed: () => onChanged(value + 1),
+            onPressed: () async {
+              onChanged(value + 1);
+              await _calculateEstimate();
+            },
             icon: const Icon(Icons.add),
           ),
         ],
@@ -136,150 +201,147 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
     );
   }
 
-  Widget _verticalChargeSection({
-    required String title,
-    required int count,
-    required int charge,
-    required Function(int) onChanged,
-    required String currency,
-  }) {
-    return _tableRow(
-      left: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 10),
-          _counterBox(count, onChanged),
-        ],
-      ),
-      right: Text(
-        "$currency $charge",
-        style: const TextStyle(fontSize: 16),
-      ),
+  Widget _paymentSelector() {
+    return Wrap(
+      spacing: 12,
+      children: List.generate(paymentMethods.length, (index) {
+        return ChoiceChip(
+          label: Text(paymentMethods[index]),
+          selected: selectedPaymentIndex == index,
+          selectedColor: ThemeConfig.goldenYellow.withOpacity(0.3),
+          backgroundColor: Colors.white,
+          side: const BorderSide(color: Colors.black),
+          onSelected: (val) {
+            setState(() {
+              selectedPaymentIndex = index;
+            });
+          },
+        );
+      }),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final currency = estimate?['currency'] ?? "AUD";
-    final lineItems = estimate?['line_items'] as List<dynamic>? ?? [];
-    final total = estimate?['total']?.toInt() ?? subtotal;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Visa Estimate"),
+        title: const Text(
+          "Visa Estimate",
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: ThemeConfig.goldenYellow,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.visa.label,
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 18),
             const Text(
-              "PAYABLE FEES & SURCHARGE",
-              style: TextStyle(
-                  letterSpacing: 2,
-                  fontWeight: FontWeight.w700),
+              "for any other applicant:",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
 
             Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
+                border: Border.all(color: Colors.black),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
                 children: [
                   _tableRow(
-                    left: const Text(
-                      "Base application charge",
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    left: const Text("1  Base application charge"),
+                    right: Text("$currency $topBaseCharge"),
+                  ),
+                  _tableRow(
+                    left: const Text("2  Additional applicant charge >= 18"),
+                    right: Text("$currency $topAdultCharge"),
+                  ),
+                  _tableRow(
+                    left: const Text("3  Additional applicant charge < 18"),
+                    right: Text("$currency $topChildCharge"),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            const Text(
+              "PAYABLE FEES & SURCHARGE",
+              style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 12),
+
+            _paymentSelector(),
+            const SizedBox(height: 16),
+
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                children: [
+                  _tableRow(
+                    left: const Text("Base application charge"),
                     right: Text("$currency $baseCharge"),
                   ),
-
-                  _verticalChargeSection(
-                    title: "Additional applicant charge >= 18",
-                    count: adultCount,
-                    charge: additionalAdultCharge,
-                    currency: currency,
-                    onChanged: (v) {
-                      setState(() {
-                        adultCount = v;
-                        additionalAdultCharge = 4685 * v; // from response
-                      });
-                    },
+                  _tableRow(
+                    left: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Additional applicant charge >= 18"),
+                        const SizedBox(height: 8),
+                        _counterBox(
+                          adultCount,
+                          (v) => setState(() => adultCount = v),
+                        ),
+                      ],
+                    ),
+                    right: Text("$currency $additionalAdultCharge"),
                   ),
-
-                  _verticalChargeSection(
-                    title: "Additional applicant charge < 18",
-                    count: childCount,
-                    charge: additionalChildCharge,
-                    currency: currency,
-                    onChanged: (v) {
-                      setState(() {
-                        childCount = v;
-                        additionalChildCharge = 7035 ~/ 3 * v; // each child
-                      });
-                    },
+                  _tableRow(
+                    left: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Additional applicant charge < 18"),
+                        const SizedBox(height: 8),
+                        _counterBox(
+                          childCount,
+                          (v) => setState(() => childCount = v),
+                        ),
+                      ],
+                    ),
+                    right: Text("$currency $additionalChildCharge"),
                   ),
-
-                  ...lineItems.skip(3).map((item) {
-                    return _tableRow(
-                      left: Text("${item['product']} x${item['quantity']}"),
-                      right: Text("$currency ${item['price']}"),
-                    );
-                  }).toList(),
-
+                  _tableRow(
+                    left: const Text("Subtotal"),
+                    right: Text("$currency $subtotal"),
+                    bold: true,
+                  ),
+                  _tableRow(
+                    left: Text(
+                      "Surcharge (+ ${(surchargeRates[selectedPaymentIndex] * 100).toStringAsFixed(2)}%)",
+                    ),
+                    right: Text(
+                      "$currency ${surchargeAmount.toStringAsFixed(2)}",
+                    ),
+                  ),
                   _tableRow(
                     left: const Text("TOTAL"),
-                    right: Text("$currency $total"),
+                    right: Text("$currency ${finalTotal.toStringAsFixed(2)}"),
                     bold: true,
                     bg: Colors.grey.shade300,
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 24),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isLoading ? null : _calculateEstimate,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ThemeConfig.goldenYellow,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
-                  "Calculate Estimate",
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
-            if (estimate != null)
-              Text(
-                estimate!['disclaimer'] ?? "",
-                style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600),
-              ),
           ],
         ),
       ),
