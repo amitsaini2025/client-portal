@@ -376,7 +376,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       const SizedBox(height: 24),
                       MyFilesQuickActionsCard(
-                        onSendMessage: () {},
                         onViewWorkflow: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(

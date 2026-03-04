@@ -28,13 +28,6 @@ class MyFilesScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MyFilesQuickActionsCard(
-              onSendMessage: () {
-                /*Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const SendMessageScreen(),
-                            ),
-                          );*/
-              },
               onViewWorkflow: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(

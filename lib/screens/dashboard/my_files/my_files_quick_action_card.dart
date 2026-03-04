@@ -5,7 +5,6 @@ import '../../../services/auth_service.dart';
 import '../../../widgets/dialog/login_required_dialog.dart';
 
 class MyFilesQuickActionsCard extends StatelessWidget {
-  final VoidCallback onSendMessage;
   final VoidCallback? onViewWorkflow;
   final VoidCallback? onBilling;
   final VoidCallback? onDocumentStatus;
@@ -15,7 +14,6 @@ class MyFilesQuickActionsCard extends StatelessWidget {
 
   const MyFilesQuickActionsCard({
     super.key,
-    required this.onSendMessage,
     this.onViewWorkflow,
     this.onBilling,
     this.onDocumentStatus,
@@ -112,17 +110,6 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                 color: const Color(0xCC2E7D32),
                 onTap: onMessage ?? () {},
                 context: context,
-              ),
-
-              StaggeredGridTile.count(
-                crossAxisCellCount: 4,
-                mainAxisCellCount: 1.2,
-                child: _horizontalTile(
-                  icon: Icons.send,
-                  label: 'Send Message',
-                  color: const Color(0xCC1565C0),
-                  onTap: onSendMessage,
-                ),
               ),
             ],
           ),
