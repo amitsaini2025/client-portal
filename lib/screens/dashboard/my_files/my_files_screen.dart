@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/theme_config.dart';
-import '../../documents/upload_document_screen.dart';
 import '../../workflow/workflow_screen.dart';
-import '../personal_info/personal_information_screen.dart';
 import 'my_files_quick_action_card.dart';
 
 class MyFilesScreen extends StatelessWidget {

@@ -172,8 +172,9 @@ class AuthService {
       if (response['success'] == true) {
         final token = response['data']['token'];
         final refreshToken = response['data']['refresh_token'];
-        final clientData = response['data']['user'];
+        final clientData = response['data']['client'];
         final userId = clientData != null ? clientData['id'] as int : null;
+        final userName = clientData != null ? clientData['name'] as String : "";
 
         // Store token securely
         await _secureStorage.write(key: _tokenKey, value: token);
@@ -181,6 +182,7 @@ class AuthService {
         await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
         await AuthManager.saveAuthToken(token);
         await AuthManager.saveUserID(userId.toString());
+        await AuthManager.saveUserName(userName);
 
         // Store user data
         if (clientData != null) {
