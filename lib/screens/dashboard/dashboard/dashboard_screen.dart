@@ -106,35 +106,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const MyFilesTabScreen(),
           ],
         ),
-
         bottomNavigationBar: Container(
-          height: 55,
+          height: 70,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
           decoration: const BoxDecoration(
             color: Color(0xFFF2F2F2),
             boxShadow: [
               BoxShadow(
                 color: Colors.black12,
-                blurRadius: 8,
+                blurRadius: 6,
                 offset: Offset(0, -2),
               ),
             ],
           ),
           child: TabBar(
             indicator: BoxDecoration(
-              color: const Color(0xFFF9B000),
-              borderRadius: BorderRadius.circular(60),
+              color: Color(0xFFF9B000),
+              borderRadius: BorderRadius.circular(50),
             ),
             indicatorSize: TabBarIndicatorSize.tab,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.black87,
             labelStyle: const TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 14,
+              fontSize: 12,
             ),
             tabs: const [
-              Tab(icon: Icon(Icons.home_outlined), text: "Home"),
-              Tab(icon: Icon(Icons.folder_outlined), text: "Files"),
+              Tab(
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Icon(Icons.home_outlined, size: 22),
+                ),
+                text: "Home",
+              ),
+              Tab(
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Icon(Icons.folder_outlined, size: 22),
+                ),
+                text: "Files",
+              ),
             ],
           ),
         ),
