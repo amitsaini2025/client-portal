@@ -139,6 +139,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: ThemeConfig.goldenYellow,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body:
           _isLoading
