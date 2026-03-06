@@ -98,6 +98,7 @@ dependencies:
   flutter_html: ^3.0.0
   webview_flutter: ^4.13.1
   web: ^1.1.1
+  pay: ^3.3.0
 
 
 dev_dependencies:

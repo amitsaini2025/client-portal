@@ -35,6 +35,7 @@ import 'package:client/utils/navigation_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
@@ -215,15 +216,17 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Stripe.publishableKey = StripeConfig.publishableKey;
-  Stripe.merchantIdentifier = StripeConfig.merchantIdentifier;
-  await Stripe.instance.applySettings();
-
-  // Firebase
+  if (!kIsWeb) {
+    Stripe.publishableKey = StripeConfig.publishableKey;
+    Stripe.merchantIdentifier = StripeConfig.merchantIdentifier;
+    await Stripe.instance.applySettings();
+  }
   await initializeFirebaseSafely();
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  if (!kIsWeb) {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  }
   const AndroidInitializationSettings androidSettings =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+  AndroidInitializationSettings('@mipmap/ic_launcher');
   const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
     requestAlertPermission: true,
     requestBadgePermission: true,
@@ -234,31 +237,28 @@ void main() async {
     iOS: iosSettings,
   );
   await flutterLocalNotificationsPlugin.initialize(initSettings);
-  if (Platform.isAndroid) {
+  if (!kIsWeb && Platform.isAndroid) {
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
+        AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(defaultChannel);
   }
-  await FirebaseMessaging.instance.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-  FirebaseMessaging.onMessage.listen(_showForegroundNotification);
-
-  // Initialize services
+  if (!kIsWeb) {
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    FirebaseMessaging.onMessage.listen(_showForegroundNotification);
+  }
   await AuthService.initialize();
   final prefs = await SharedPreferences.getInstance();
   final isFirstLaunch = prefs.getBool('first_launch') ?? true;
-
   if (isFirstLaunch) {
     await AuthService.clearAllData();
     await prefs.setBool('first_launch', false);
   }
   await ApiService.initializeAuthToken();
-
   runApp(MyAppWithTheme());
 }
 

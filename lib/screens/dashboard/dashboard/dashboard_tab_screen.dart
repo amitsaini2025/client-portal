@@ -1,10 +1,7 @@
-import 'dart:io';
-
-import 'package:client/config/theme_config.dart';
-import 'package:client/screens/workflow/workflow_stages_screen.dart';
 import 'package:client/services/api_service_bansal_immigration.dart';
 import 'package:client/services/stripe_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../fcm_service.dart';
@@ -23,9 +20,7 @@ import '../../../services/auth_service.dart';
 import '../../../widgets/common/error_widget.dart';
 import '../../../widgets/common/loading_widget.dart';
 import '../../../widgets/dashboard/quick_actions_card.dart';
-import '../../../widgets/dialog/login_required_dialog.dart';
 import '../book_appointment/book_location_screen.dart';
-import '../my_files/my_files_quick_action_card.dart';
 
 class DashboardTabScreen extends StatefulWidget {
   final String? matterId;
@@ -61,7 +56,7 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
     super.initState();
     _loadDashboardData();
     _loadRecentBlogs();
-    if (!Platform.isWindows) {
+    if (!kIsWeb && defaultTargetPlatform != TargetPlatform.windows) {
       _setupNotifications();
     }
     _loadUser();
