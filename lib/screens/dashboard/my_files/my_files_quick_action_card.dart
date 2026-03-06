@@ -26,95 +26,118 @@ class MyFilesQuickActionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(_radius),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWeb = constraints.maxWidth > 600;
+        final tilePadding = isWeb ? 12.0 : 20.0;
+        final iconSize = isWeb ? 24.0 : 30.0;
+        final fontSize = isWeb ? 13.0 : 15.0;
 
-          Text(
-            'My Files',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          if (AuthService.isAuthenticated) ...[
-            _matterSelector(context),
-            const SizedBox(height: 20),
-          ],
-
-          StaggeredGrid.count(
-            crossAxisCount: 4,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            children: [
-
-              StaggeredGridTile.count(
-                crossAxisCellCount: 2,
-                mainAxisCellCount: 2.2,
-                child: _verticalTile(
-                  icon: Icons.timeline,
-                  label: 'View\nWorkflow',
-                  color: const Color(0xCC6A1B9A),
-                  onTap: onViewWorkflow ?? () {},
-                ),
-              ),
-
-              StaggeredGridTile.count(
-                crossAxisCellCount: 2,
-                mainAxisCellCount: 2.2,
-                child: _verticalTile(
-                  icon: Icons.receipt_long,
-                  label: 'Billing',
-                  color: const Color(0xCCC62828),
-                  onTap: onBilling ?? () {},
-                ),
-              ),
-
-              StaggeredGridTile.count(
-                crossAxisCellCount: 4,
-                mainAxisCellCount: 1.3,
-                child: _horizontalTile(
-                  icon: Icons.description,
-                  label: 'Document Status',
-                  color: const Color(0xCCEF6C00),
-                  onTap: onDocumentStatus ?? () {},
-                ),
-              ),
-
-              _smallTile(
-                icon: Icons.local_activity,
-                label: 'Recent\nActivity',
-                color: const Color(0xCCF9A825),
-                onTap: onRecentActivity ?? () {},
-                context: context,
-              ),
-
-              _smallTile(
-                icon: Icons.message,
-                label: 'Message',
-                color: const Color(0xCC2E7D32),
-                onTap: onMessage ?? () {},
-                context: context,
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(_radius),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 10,
+                offset: Offset(0, 4),
               ),
             ],
           ),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'My Files',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              if (AuthService.isAuthenticated) ...[
+                _matterSelector(context),
+                const SizedBox(height: 20),
+              ],
+
+              StaggeredGrid.count(
+                crossAxisCount: isWeb ? 6 : 4, // more columns on web
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                children: [
+
+                  StaggeredGridTile.count(
+                    crossAxisCellCount: isWeb ? 2 : 2,
+                    mainAxisCellCount: isWeb ? 1.5 : 2.2,
+                    child: _verticalTile(
+                      icon: Icons.timeline,
+                      label: 'View\nWorkflow',
+                      color: const Color(0xCC6A1B9A),
+                      onTap: onViewWorkflow ?? () {},
+                      iconSize: iconSize,
+                      fontSize: fontSize,
+                      padding: tilePadding,
+                    ),
+                  ),
+
+                  StaggeredGridTile.count(
+                    crossAxisCellCount: isWeb ? 2 : 2,
+                    mainAxisCellCount: isWeb ? 1.5 : 2.2,
+                    child: _verticalTile(
+                      icon: Icons.receipt_long,
+                      label: 'Billing',
+                      color: const Color(0xCCC62828),
+                      onTap: onBilling ?? () {},
+                      iconSize: iconSize,
+                      fontSize: fontSize,
+                      padding: tilePadding,
+                    ),
+                  ),
+
+                  /*StaggeredGridTile.count(
+                    crossAxisCellCount: isWeb ? 4 : 4,
+                    mainAxisCellCount: isWeb ? 1.0 : 1.3,
+                    child: _horizontalTile(
+                      icon: Icons.description,
+                      label: 'Document Status',
+                      color: const Color(0xCCEF6C00),
+                      onTap: onDocumentStatus ?? () {},
+                      iconSize: iconSize - 6,
+                      fontSize: fontSize,
+                      padding: tilePadding - 2,
+                    ),
+                  ),*/
+
+                  _smallTile(
+                    icon: Icons.local_activity,
+                    label: 'Recent\nActivity',
+                    color: const Color(0xCCF9A825),
+                    onTap: onRecentActivity ?? () {},
+                    context: context,
+                    iconSize: iconSize - 6,
+                    fontSize: fontSize - 1,
+                    padding: tilePadding - 4,
+                  ),
+
+                  _smallTile(
+                    icon: Icons.message,
+                    label: 'Message',
+                    color: const Color(0xCC2E7D32),
+                    onTap: onMessage ?? () {},
+                    context: context,
+                    iconSize: iconSize - 6,
+                    fontSize: fontSize - 1,
+                    padding: tilePadding - 4,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -189,13 +212,16 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     required String label,
     required Color color,
     required VoidCallback onTap,
+    required double iconSize,
+    required double fontSize,
+    required double padding,
   }) {
     return Builder(builder: (context) {
       return InkWell(
         onTap: () => _handleAuth(context, onTap),
         borderRadius: BorderRadius.circular(_radius),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(padding),
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(_radius),
@@ -203,14 +229,14 @@ class MyFilesQuickActionsCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, size: 30, color: Colors.white),
+              Icon(icon, size: iconSize, color: Colors.white),
               const Spacer(),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
-                  fontSize: 15,
+                  fontSize: fontSize,
                 ),
               ),
             ],
@@ -225,28 +251,31 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     required String label,
     required Color color,
     required VoidCallback onTap,
+    required double iconSize,
+    required double fontSize,
+    required double padding,
   }) {
     return Builder(builder: (context) {
       return InkWell(
         onTap: () => _handleAuth(context, onTap),
         borderRadius: BorderRadius.circular(_radius),
         child: Container(
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(padding),
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(_radius),
           ),
           child: Row(
             children: [
-              Icon(icon, size: 24, color: Colors.white),
+              Icon(icon, size: iconSize, color: Colors.white),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                    fontSize: fontSize,
                   ),
                 ),
               ),
@@ -263,6 +292,9 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     required String label,
     required Color color,
     required VoidCallback onTap,
+    required double iconSize,
+    required double fontSize,
+    required double padding,
   }) {
     return StaggeredGridTile.count(
       crossAxisCellCount: 2,
@@ -271,22 +303,22 @@ class MyFilesQuickActionsCard extends StatelessWidget {
         onTap: () => _handleAuth(context, onTap),
         borderRadius: BorderRadius.circular(_radius),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(padding),
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(_radius),
           ),
           child: Row(
             children: [
-              Icon(icon, size: 20, color: Colors.white),
+              Icon(icon, size: iconSize, color: Colors.white),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w500,
-                    fontSize: 13,
+                    fontSize: fontSize,
                   ),
                 ),
               ),

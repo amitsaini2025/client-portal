@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../services/auth_service.dart';
 import '../../../services/stripe_service.dart';
+import '../../../widgets/dialog/login_required_dialog.dart';
 import 'dashboard_tab_screen.dart';
 import 'myfiles_tab_screen.dart';
 
@@ -150,24 +151,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class LoginRequiredDialog extends StatelessWidget {
-  const LoginRequiredDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text("Login Required"),
-      content: const Text("Please login to continue."),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Close"),
-        ),
-      ],
     );
   }
 }
