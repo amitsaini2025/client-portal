@@ -1355,6 +1355,32 @@ class ApiService {
     return await _makeRequest(url, _buildHeaders(), null, 'GET');
   }
 
+  static Future<Map<String, dynamic>> updateInvoicePayment({
+    required int billingInvoiceId,
+    required int clientMatterId,
+    required String paymentType,
+    required String paymentToken,
+    required String paymentStatus,
+  }) async {
+
+    final url = ApiConfig.billingInvoiceUpdate;
+
+    final body = {
+      "billing_invoice_id": billingInvoiceId,
+      "client_matter_id": clientMatterId,
+      "payment_type": paymentType,
+      "payment_token": paymentToken,
+      "payment_status": paymentStatus
+    };
+
+    return await _makeRequest(
+      url,
+      _buildHeaders(),
+      body,
+      'POST',
+    );
+  }
+
   static Future<Map<String, dynamic>> getVisaList() async {
     final url = ApiConfig.visaEstimateVisaList;
 

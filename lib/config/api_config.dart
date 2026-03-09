@@ -83,6 +83,7 @@ class ApiConfig {
 
   static const String notifications = "/notifications";
   static const String billingList = "/billing/list";
+  static const String billingInvoiceUpdate = "/billing/invoice-update";
 
   static const String visaEstimateVisaList = "/visa-estimate/visa-list";
   static const String visaEstimateEstimate = "/visa-estimate/estimate";

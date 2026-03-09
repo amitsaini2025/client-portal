@@ -94,25 +94,28 @@ class _BillingListScreenState extends State<BillingListScreen> {
     debugPrint("Payment Result: $result");
 
     try {
-      /*await ApiService.recordAppointmentPayment(
-        invoiceId: invoice.id!,
-        paymentData: result,
-      );*/
 
-      await ApiService.recordAppointmentPayment(
-        appointmentId: invoice.id,
-        paymentIntentId: invoice.clientMatterId.toString(),
+      String paymentToken = result.toString();
+
+      await ApiService.updateInvoicePayment(
+        billingInvoiceId: invoice.id!,
+        clientMatterId: invoice.clientMatterId!,
+        paymentType: Platform.isIOS ? "apple_pay" : "google_pay",
+        paymentToken: paymentToken,
+        paymentStatus: "completed",
       );
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Payment successful")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Payment successful")),
+      );
 
       _fetchInvoices(refresh: true);
+
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Payment error: $e")));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Payment error: $e")),
+      );
     }
   }
 
