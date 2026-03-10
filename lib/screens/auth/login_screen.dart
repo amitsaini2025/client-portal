@@ -1,16 +1,10 @@
-import 'dart:io';
-
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:local_auth/local_auth.dart';
-import 'dart:convert';
-import '../../fcm_service.dart';
-import '../../services/auth_service.dart';
+
 import '../../config/theme_config.dart';
-import '../../utils/secure_storage_service.dart';
-import '../../widgets/common/loading_widget.dart';
-import '../../widgets/common/error_widget.dart';
 import '../../models/client.dart';
+import '../../services/auth_service.dart';
+import '../../utils/secure_storage_service.dart';
+import '../../widgets/common/error_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -222,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushNamedAndRemoveUntil(
           context,
           '/dashboard',
-              (Route<dynamic> route) => false,
+          (Route<dynamic> route) => false,
         );
       });
     } catch (e) {
@@ -259,7 +253,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: ThemeConfig.goldenYellow,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Icon(Icons.gavel, size: 40, color: ThemeConfig.navyBlue),
+                        child: Icon(
+                          Icons.gavel,
+                          size: 40,
+                          color: ThemeConfig.navyBlue,
+                        ),
                       ),
                       const SizedBox(height: 24),
                       Text(
@@ -273,10 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 8),
                       Text(
                         'Sign in to your client portal',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black54,
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
                       ),
                     ],
                   ),
@@ -374,7 +369,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                               child: Text(
                                 'Forgot Password?',
-                                style: TextStyle(color: ThemeConfig.goldenYellow),
+                                style: TextStyle(
+                                  color: ThemeConfig.goldenYellow,
+                                ),
                               ),
                             ),
                           ],
@@ -393,24 +390,63 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             elevation: 0,
                           ),
-                          child: _isLoading
-                              ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
+                          child:
+                              _isLoading
+                                  ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                  : const Text(
+                                    'Sign In',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/register');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ThemeConfig.goldenYellow,
+                            foregroundColor: ThemeConfig.navyBlue,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                          )
-                              : const Text(
-                            'Sign In',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            elevation: 0,
                           ),
+                          child:
+                              _isLoading
+                                  ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                  : const Text(
+                                    'Register',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                         ),
 
                         const SizedBox(height: 20),

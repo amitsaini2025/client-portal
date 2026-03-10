@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:client/services/stripe_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -220,7 +221,7 @@ class AuthService {
   }
 
   /// Register new user
-  static Future<Map<String, dynamic>> register({
+  /*static Future<Map<String, dynamic>> register({
     required String name,
     required String email,
     required String phone,
@@ -264,6 +265,51 @@ class AuthService {
       }
     } catch (e) {
       return {'success': false, 'message': 'Network error: ${e.toString()}'};
+    }
+  }*/
+
+  static Future<Map<String, dynamic>> register({
+    required String firstName,
+    required String lastName,
+    required String gender,
+    required String phone,
+    required String countryCode,
+    required String email,
+    required DateTime dob,
+    required String maritalStatus,
+  }) async {
+    try {
+
+      final userData = {
+        "first_name": firstName,
+        "last_name": lastName,
+        "gender": gender,
+        "phone": phone,
+        "country_code": countryCode,
+        "email": email,
+        "dob": DateFormat("dd/MM/yyyy").format(dob),
+        "marital_status": maritalStatus
+      };
+
+      final response = await ApiService.register(userData);
+
+      if (response['success'] == true) {
+        return {
+          "success": true,
+          "message": response['message'] ?? "Registration successful"
+        };
+      } else {
+        return {
+          "success": false,
+          "message": response['message'] ?? "Registration failed"
+        };
+      }
+
+    } catch (e) {
+      return {
+        "success": false,
+        "message": "Network error: ${e.toString()}"
+      };
     }
   }
 
