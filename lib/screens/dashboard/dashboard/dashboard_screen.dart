@@ -120,35 +120,62 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          child: TabBar(
-            indicator: BoxDecoration(
-              color: Color(0xFFF9B000),
-              borderRadius: BorderRadius.circular(50),
-            ),
-            indicatorSize: TabBarIndicatorSize.tab,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.black87,
-            labelStyle: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-            ),
-            tabs: const [
-              Tab(
-                icon: Padding(
-                  padding: EdgeInsets.only(bottom: 2),
-                  child: Icon(Icons.home_outlined, size: 22),
-                ),
-                text: "Home",
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            child: Container(
+              height: 55,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-              Tab(
-                icon: Padding(
-                  padding: EdgeInsets.only(bottom: 2),
-                  child: Icon(Icons.folder_outlined, size: 22),
+              child: TabBar(
+                dividerColor: Colors.transparent,
+                indicator: BoxDecoration(
+                  color: const Color(0xFFF9B000),
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                text: "Files",
+                indicatorPadding: const EdgeInsets.all(4),
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.black87,
+                splashFactory: NoSplash.splashFactory,
+                overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                tabs: const [
+                  Tab(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.home_outlined, size: 20),
+                        SizedBox(width: 6),
+                        Text("Home"),
+                      ],
+                    ),
+                  ),
+                  Tab(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.folder_outlined, size: 20),
+                        SizedBox(width: 6),
+                        Text("Files"),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          )
         ),
       ),
     );
