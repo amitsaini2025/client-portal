@@ -299,12 +299,12 @@ class WorkflowProgressWidget extends StatelessWidget {
                                 const Icon(
                                   Icons.check,
                                   size: 14,
-                                  color: Colors.green,
+                                  color: Colors.black,
                                 ),
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
-                                    item.name,
+                                    '${item.name} (${item.noOfDocumentUploaded})',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color:

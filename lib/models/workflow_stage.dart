@@ -1,13 +1,20 @@
 class ChecklistItem {
   final int id;
   final String name;
+  final int noOfDocumentUploaded;
 
-  ChecklistItem({required this.id, required this.name});
+  ChecklistItem({
+    required this.id,
+    required this.name,
+    required this.noOfDocumentUploaded,
+  });
 
   factory ChecklistItem.fromJson(Map<String, dynamic> json) {
     return ChecklistItem(
       id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
       name: json['name'] ?? '',
+      noOfDocumentUploaded:
+      int.tryParse(json['no_of_document_uploaded']?.toString() ?? '') ?? 0,
     );
   }
 
@@ -15,6 +22,7 @@ class ChecklistItem {
     return {
       'id': id,
       'name': name,
+      'no_of_document_uploaded': noOfDocumentUploaded,
     };
   }
 }
