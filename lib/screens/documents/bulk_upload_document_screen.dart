@@ -9,7 +9,14 @@ import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 
 class BulkUploadDocumentScreen extends StatefulWidget {
-  const BulkUploadDocumentScreen({super.key});
+  final int? stageId;
+  final int? allowedCheckListId;
+
+  const BulkUploadDocumentScreen({
+    super.key,
+    this.stageId,
+    this.allowedCheckListId,
+  });
 
   @override
   State<BulkUploadDocumentScreen> createState() =>
@@ -17,7 +24,6 @@ class BulkUploadDocumentScreen extends StatefulWidget {
 }
 
 class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
-
   List<AllowedChecklist> _checklists = [];
 
   Map<int, File?> _uploadedFiles = {};
@@ -32,24 +38,23 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
   }
 
   Future<void> _loadChecklists() async {
-
     setState(() => _isLoading = true);
 
     try {
-
       final res = await ApiService.getWorkflowAllowedChecklist(
         clientMatterId: AuthService.selectedMatterId!,
+        stageId: widget.stageId,
+        allowedChecklistID: widget.allowedCheckListId
       );
 
       if (res['success'] == true) {
-
         final list = res['data']['allowed_checklists'] ?? [];
 
-        _checklists = list
-            .map<AllowedChecklist>((e) => AllowedChecklist.fromJson(e))
-            .toList();
+        _checklists =
+            list
+                .map<AllowedChecklist>((e) => AllowedChecklist.fromJson(e))
+                .toList();
       }
-
     } catch (e) {
       _showSnack("Checklist load error: $e", isError: true);
     }
@@ -58,14 +63,12 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
   }
 
   Future<void> _pickFile(int checklistId) async {
-
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf','jpg','jpeg','png','doc','docx'],
+      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
     );
 
     if (result != null) {
-
       setState(() {
         _uploadedFiles[checklistId] = File(result.files.single.path!);
       });
@@ -73,12 +76,10 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
   }
 
   Future<void> _uploadAll() async {
-
     final files = <File>[];
     final ids = <int>[];
 
     _uploadedFiles.forEach((id, file) {
-
       if (file != null) {
         files.add(file);
         ids.add(id);
@@ -93,7 +94,6 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
     setState(() => _isUploading = true);
 
     try {
-
       final res = await ApiService.bulkUploadChecklistDocuments(
         files: files,
         allowedChecklistIds: ids,
@@ -101,15 +101,11 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
       );
 
       if (res['success'] == true) {
-
         _showSnack("Documents uploaded successfully");
         Navigator.pop(context);
-
       } else {
-
         _showSnack(res['message'] ?? "Upload failed", isError: true);
       }
-
     } catch (e) {
       _showSnack("Upload error: $e", isError: true);
     }
@@ -117,8 +113,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
     setState(() => _isUploading = false);
   }
 
-  void _showSnack(String msg,{bool isError=false}) {
-
+  void _showSnack(String msg, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
@@ -141,16 +136,14 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
             color: Colors.black.withOpacity(.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Row(
             children: [
-
               Expanded(
                 child: Text(
                   checklist.checklistName,
@@ -163,8 +156,10 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
 
               if (checklist.isMandatory)
                 Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.red.withOpacity(.1),
                     borderRadius: BorderRadius.circular(6),
@@ -193,7 +188,6 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
               ),
               child: Row(
                 children: [
-
                   const Icon(
                     Icons.description_rounded,
                     color: Colors.blue,
@@ -217,11 +211,10 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
                     onPressed: () => _pickFile(checklist.id),
                     icon: const Icon(Icons.refresh, size: 18),
                     label: const Text("Replace"),
-                  )
+                  ),
                 ],
               ),
             )
-
           else
             SizedBox(
               width: double.infinity,
@@ -229,10 +222,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
                 onPressed: () => _pickFile(checklist.id),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  side: BorderSide(
-                    color: ThemeConfig.goldenYellow,
-                    width: 1.5,
-                  ),
+                  side: BorderSide(color: ThemeConfig.goldenYellow, width: 1.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -251,7 +241,6 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -262,43 +251,46 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
 
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                children: [
+                  const SizedBox(height: 10),
 
-          const SizedBox(height: 10),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _checklists.length,
+                      itemBuilder: (_, i) {
+                        return _buildChecklistCard(_checklists[i]);
+                      },
+                    ),
+                  ),
 
-          Expanded(
-            child: ListView.builder(
-              itemCount: _checklists.length,
-              itemBuilder: (_, i) {
-                return _buildChecklistCard(_checklists[i]);
-              },
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _isUploading ? null : _uploadAll,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ThemeConfig.goldenYellow,
-                ),
-                child: _isUploading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
-                  "Upload Documents",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _isUploading ? null : _uploadAll,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ThemeConfig.goldenYellow,
+                        ),
+                        child:
+                            _isUploading
+                                ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                                : const Text(
+                                  "Upload Documents",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          )
-        ],
-      ),
     );
   }
 }

@@ -436,16 +436,16 @@ class ApiService {
   static Future<Map<String, dynamic>> getWorkflowAllowedChecklist({
     required int clientMatterId,
     int? stageId,
+    int? allowedChecklistID,
   }) async {
-    String endpoint =
-        '${ApiConfig.workflowAllowedChecklistEndpoint}?client_matter_id=$clientMatterId';
-
-    // Add only if stageId is provided
-    if (stageId != null) {
-      endpoint += '&stage_id=$stageId';
-    }
-
-    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
+    final queryParameters = {
+      'client_matter_id': clientMatterId.toString(),
+      'stage_id': stageId?.toString() ?? '',
+      'allowed_checklist_id': allowedChecklistID?.toString() ?? '',
+    };
+    final uri = Uri.parse(ApiConfig.workflowAllowedChecklistEndpoint)
+        .replace(queryParameters: queryParameters);
+    return await _makeRequest(uri.toString(), _buildHeaders(), null, 'GET');
   }
 
   static Future<Map<String, dynamic>> uploadWorkflowChecklistDocument({

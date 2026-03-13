@@ -351,7 +351,14 @@ class MyAppWithTheme extends StatelessWidget {
             '/document-management':
                 (context) => const DocumentManagementScreen(),
             '/upload-documents': (context) => const UploadDocumentScreen(),
-            '/bulk-upload-documents': (context) => const BulkUploadDocumentScreen(),
+            '/bulk-upload-documents': (context) {
+              final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+              return BulkUploadDocumentScreen(
+                stageId: args?['stageId'] ?? 0,
+                allowedCheckListId: args?['allowedChecklistId'],
+              );
+            },
             '/pdf-viewer': (context) {
               final args =
                   ModalRoute.of(context)!.settings.arguments

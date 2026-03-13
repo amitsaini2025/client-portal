@@ -312,29 +312,34 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
       );*/
       showDialog(
         context: context,
-        builder:
-            (context) => AlertDialog(
-              title: const Text('Choose Upload Type'),
-              content: const Text(
-                'Do you want to upload documents in bulk or one by one?',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/upload-documents');
+        builder: (context) => AlertDialog(
+          title: const Text('Upload Documents'),
+          content: const Text(
+            'Do you want to upload documents in bulk?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(
+                  context,
+                  '/bulk-upload-documents',
+                  arguments: {
+                    'stageId': stage.id,
+                    'allowedChecklistId': null,
                   },
-                  child: const Text('Single Upload'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/bulk-upload-documents');
-                  },
-                  child: const Text('Bulk Upload'),
-                ),
-              ],
+                );
+              },
+              child: const Text('Yes, Bulk Upload'),
             ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
       );
     } else {
       showDialog(

@@ -262,14 +262,14 @@ class WorkflowProgressWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                 /* Text(
                     stage.statusText,
                     style: TextStyle(
                       fontSize: 12,
                       color: isCurrent ? primary : Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 8),*/
 
                   /// Allowed Checklist
                   if (stage.allowedChecklist.isNotEmpty)
