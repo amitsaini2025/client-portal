@@ -4,11 +4,13 @@ import '../../models/workflow_stage.dart';
 class WorkflowProgressWidget extends StatelessWidget {
   final WorkflowStagesResponse workflowResponse;
   final Function(WorkflowStage)? onStageTap;
+  final Function(WorkflowStage stage, int checklistId)? onChecklistPlusTap;
 
   const WorkflowProgressWidget({
     super.key,
     required this.workflowResponse,
     this.onStageTap,
+    this.onChecklistPlusTap,
   });
 
   Color _getStageColor(WorkflowStage stage, BuildContext context) {
@@ -214,15 +216,6 @@ class WorkflowProgressWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 color: color,
                 shape: BoxShape.circle,
-                boxShadow: isCurrent
-                    ? [
-                  BoxShadow(
-                    color: color.withOpacity(0.3),
-                    blurRadius: 8,
-                    spreadRadius: 2,
-                  ),
-                ]
-                    : null,
               ),
               child: Icon(
                 icon,
@@ -277,6 +270,8 @@ class WorkflowProgressWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
+
+                  /// Allowed Checklist
                   if (stage.allowedChecklist.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,6 +285,7 @@ class WorkflowProgressWidget extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
+
                         ...stage.allowedChecklist.map(
                               (item) => Padding(
                             padding:
@@ -302,6 +298,7 @@ class WorkflowProgressWidget extends StatelessWidget {
                                   color: Colors.black,
                                 ),
                                 const SizedBox(width: 6),
+
                                 Expanded(
                                   child: Text(
                                     '${item.name} (${item.noOfDocumentUploaded})',
@@ -311,6 +308,17 @@ class WorkflowProgressWidget extends StatelessWidget {
                                       isCurrent ? primary : Colors.black87,
                                     ),
                                   ),
+                                ),
+
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.add_circle,
+                                    color: Colors.green,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    onChecklistPlusTap?.call(stage, item.id);
+                                  },
                                 ),
                               ],
                             ),

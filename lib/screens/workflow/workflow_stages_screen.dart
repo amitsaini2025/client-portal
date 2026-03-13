@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:client/config/theme_config.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../models/workflow_stage.dart';
 import '../../services/api_service.dart';
@@ -17,6 +21,10 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
   WorkflowStagesResponse? _workflowResponse;
   bool _isLoading = true;
   String? _error;
+
+  final ImagePicker _imagePicker = ImagePicker();
+
+  File? _selectedFile;
 
   @override
   void initState() {
@@ -59,6 +67,145 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     }
   }
 
+  Future<void> _openUploadOptions(WorkflowStage stage, int checklistId) async {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.folder),
+                title: const Text("My Files"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _pickFromFiles(stage, checklistId);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text("Gallery"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _pickFromGallery(stage, checklistId);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text("Camera"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _pickFromCamera(stage, checklistId);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickFromFiles(WorkflowStage stage, int checklistId) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      _selectedFile = File(result.files.first.path!);
+      await _uploadDocument(stage, checklistId);
+    }
+  }
+
+  Future<void> _pickFromGallery(WorkflowStage stage, int checklistId) async {
+    final image = await _imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      _selectedFile = File(image.path);
+      await _uploadDocument(stage, checklistId);
+    }
+  }
+
+  Future<void> _pickFromCamera(WorkflowStage stage, int checklistId) async {
+    final image = await _imagePicker.pickImage(source: ImageSource.camera);
+
+    if (image != null) {
+      _selectedFile = File(image.path);
+      await _uploadDocument(stage, checklistId);
+    }
+  }
+
+  Future<void> _uploadDocument(WorkflowStage stage, int checklistId) async {
+    if (_selectedFile == null) return;
+    _showUploadingDialog();
+    try {
+      final response = await ApiService.uploadWorkflowChecklistDocument(
+        filePath: _selectedFile!.path,
+        allowedChecklistId: checklistId,
+        clientMatterId: AuthService.selectedMatterId!,
+      );
+      _hideUploadingDialog();
+      if (response['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Document uploaded successfully"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await _loadWorkflowData();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? "Upload failed"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      _hideUploadingDialog();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Upload error: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _showUploadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return const Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Uploading document..."),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideUploadingDialog() {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,6 +245,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                       WorkflowProgressWidget(
                         workflowResponse: _workflowResponse!,
                         onStageTap: _showStageDetails,
+                        onChecklistPlusTap: _openUploadOptions,
                       ),
                     ],
                   ),
