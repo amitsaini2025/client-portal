@@ -17,9 +17,10 @@ class BulkUploadDocumentScreen extends StatefulWidget {
 }
 
 class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
-  List<File> _files = [];
+
   List<AllowedChecklist> _checklists = [];
-  Map<int, int?> _fileChecklistMap = {};
+
+  Map<int, File?> _uploadedFiles = {};
 
   bool _isLoading = false;
   bool _isUploading = false;
@@ -31,97 +32,93 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
   }
 
   Future<void> _loadChecklists() async {
+
     setState(() => _isLoading = true);
+
     try {
+
       final res = await ApiService.getWorkflowAllowedChecklist(
         clientMatterId: AuthService.selectedMatterId!,
       );
 
       if (res['success'] == true) {
+
         final list = res['data']['allowed_checklists'] ?? [];
-        _checklists =
-            list
-                .map<AllowedChecklist>((e) => AllowedChecklist.fromJson(e))
-                .toList();
-      } else {
-        _showSnack(
-          res['message'] ?? "Failed to load checklists",
-          isError: true,
-        );
+
+        _checklists = list
+            .map<AllowedChecklist>((e) => AllowedChecklist.fromJson(e))
+            .toList();
       }
+
     } catch (e) {
       _showSnack("Checklist load error: $e", isError: true);
-    } finally {
-      setState(() => _isLoading = false);
     }
+
+    setState(() => _isLoading = false);
   }
 
-  // Pick multiple files
-  Future<void> _pickFiles() async {
+  Future<void> _pickFile(int checklistId) async {
+
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
+      allowedExtensions: ['pdf','jpg','jpeg','png','doc','docx'],
     );
 
     if (result != null) {
-      _files.addAll(result.paths.map((p) => File(p!)));
-      for (int i = 0; i < _files.length; i++) {
-        _fileChecklistMap[i] ??= null;
-      }
-      setState(() {});
+
+      setState(() {
+        _uploadedFiles[checklistId] = File(result.files.single.path!);
+      });
     }
   }
 
-  Future<void> _upload() async {
-    if (_files.isEmpty) {
-      _showSnack("Please select files", isError: true);
-      return;
-    }
+  Future<void> _uploadAll() async {
 
-    if (_fileChecklistMap.values.any((e) => e == null)) {
-      _showSnack("Please assign checklist to all files", isError: true);
+    final files = <File>[];
+    final ids = <int>[];
+
+    _uploadedFiles.forEach((id, file) {
+
+      if (file != null) {
+        files.add(file);
+        ids.add(id);
+      }
+    });
+
+    if (files.isEmpty) {
+      _showSnack("Please upload at least one document", isError: true);
       return;
     }
 
     setState(() => _isUploading = true);
 
     try {
-      final response = await ApiService.bulkUploadChecklistDocuments(
-        files: _files,
-        allowedChecklistIds: _fileChecklistMap.values.cast<int>().toList(),
+
+      final res = await ApiService.bulkUploadChecklistDocuments(
+        files: files,
+        allowedChecklistIds: ids,
         clientMatterId: AuthService.selectedMatterId!,
       );
 
-      if (response['success'] == true) {
-        _showSnack("Uploaded successfully");
+      if (res['success'] == true) {
+
+        _showSnack("Documents uploaded successfully");
         Navigator.pop(context);
+
       } else {
-        _showSnack(response['message'] ?? "Upload failed", isError: true);
+
+        _showSnack(res['message'] ?? "Upload failed", isError: true);
       }
+
     } catch (e) {
       _showSnack("Upload error: $e", isError: true);
-    } finally {
-      setState(() => _isUploading = false);
     }
+
+    setState(() => _isUploading = false);
   }
 
-  // Remove a file
-  void _removeFile(int index) {
-    _files.removeAt(index);
-    _fileChecklistMap.remove(index);
+  void _showSnack(String msg,{bool isError=false}) {
 
-    // Re-index checklist map
-    final newMap = <int, int?>{};
-    for (int i = 0; i < _files.length; i++) {
-      newMap[i] = _fileChecklistMap[i] ?? null;
-    }
-    _fileChecklistMap = newMap;
-
-    setState(() {});
-  }
-
-  void _showSnack(String msg, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
@@ -130,129 +127,178 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
     );
   }
 
+  Widget _buildChecklistCard(AllowedChecklist checklist) {
+    final file = _uploadedFiles[checklist.id];
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          Row(
+            children: [
+
+              Expanded(
+                child: Text(
+                  checklist.checklistName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+
+              if (checklist.isMandatory)
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    "Required",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+
+          const SizedBox(height: 14),
+
+          if (file != null)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+
+                  const Icon(
+                    Icons.description_rounded,
+                    color: Colors.blue,
+                    size: 28,
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  Expanded(
+                    child: Text(
+                      file.path.split('/').last,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+
+                  TextButton.icon(
+                    onPressed: () => _pickFile(checklist.id),
+                    icon: const Icon(Icons.refresh, size: 18),
+                    label: const Text("Replace"),
+                  )
+                ],
+              ),
+            )
+
+          else
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _pickFile(checklist.id),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: BorderSide(
+                    color: ThemeConfig.goldenYellow,
+                    width: 1.5,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: const Icon(Icons.upload_file),
+                label: const Text(
+                  "Upload Document",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Bulk Upload",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          "Upload Documents",
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Column(
-                children: [
-                  const SizedBox(height: 12),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: ElevatedButton.icon(
-                      onPressed: _pickFiles,
-                      icon: const Icon(Icons.attach_file),
-                      label: const Text("Select Files"),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child:
-                        _files.isEmpty
-                            ? const Center(child: Text("No files selected"))
-                            : ListView.builder(
-                              itemCount: _files.length,
-                              itemBuilder: (_, i) {
-                                final file = _files[i];
-                                return Card(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.insert_drive_file,
-                                          color: Colors.blue,
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                file.path.split('/').last,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              DropdownButtonFormField<int>(
-                                                value: _fileChecklistMap[i],
-                                                hint: const Text(
-                                                  "Select Checklist",
-                                                ),
-                                                items:
-                                                    _checklists
-                                                        .map(
-                                                          (
-                                                            c,
-                                                          ) => DropdownMenuItem<
-                                                            int
-                                                          >(
-                                                            value: c.id,
-                                                            child: Text(
-                                                              c.checklistName,
-                                                            ),
-                                                          ),
-                                                        )
-                                                        .toList(),
-                                                onChanged: (v) {
-                                                  _fileChecklistMap[i] = v;
-                                                  setState(() {});
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            color: Colors.red,
-                                          ),
-                                          onPressed: () => _removeFile(i),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _isUploading ? null : _upload,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ThemeConfig.goldenYellow,
-                        ),
-                        child:
-                            _isUploading
-                                ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                                : const Text("Upload All"),
-                      ),
-                    ),
-                  ),
-                ],
+
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+        children: [
+
+          const SizedBox(height: 10),
+
+          Expanded(
+            child: ListView.builder(
+              itemCount: _checklists.length,
+              itemBuilder: (_, i) {
+                return _buildChecklistCard(_checklists[i]);
+              },
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isUploading ? null : _uploadAll,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ThemeConfig.goldenYellow,
+                ),
+                child: _isUploading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                  "Upload Documents",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

@@ -31,6 +31,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _errorMessage;
   String? _successMessage;
 
+  /// Show error dialog whenever there is an error
+  void _showErrorDialog(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            title: const Row(
+              children: [
+                Icon(Icons.error, color: Colors.red),
+                SizedBox(width: 8),
+                Text("Error"),
+              ],
+            ),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    });
+  }
+
   Future<void> _selectDob() async {
     final picked = await showDatePicker(
       context: context,
@@ -53,6 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       setState(() {
         _errorMessage = "Please select date of birth";
       });
+      _showErrorDialog(_errorMessage!);
       return;
     }
 
@@ -62,51 +93,75 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _successMessage = null;
     });
 
-    final result = await AuthService.register(
-      firstName: _firstNameController.text.trim(),
-      lastName: _lastNameController.text.trim(),
-      gender: _gender,
-      phone: _phoneController.text.trim(),
-      countryCode: _countryCode,
-      email: _emailController.text.trim(),
-      dob: _dob!,
-      maritalStatus: _maritalStatus,
-    );
+    try {
+      final result = await AuthService.register(
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        gender: _gender,
+        phone: _phoneController.text.trim(),
+        countryCode: _countryCode,
+        email: _emailController.text.trim(),
+        dob: _dob!,
+        maritalStatus: _maritalStatus,
+      );
 
-    if (result["success"]) {
-      setState(() {
-        _successMessage = result["message"];
-      });
+      if (result["success"]) {
+        setState(() {
+          _successMessage = result["message"];
+        });
 
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pushReplacementNamed(context, '/login');
-      });
-    } else {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              title: const Text("Success"),
+              content: Text(result["message"] ?? "Registration successful"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        setState(() {
+          _errorMessage = result["message"] ?? "Registration failed";
+        });
+        _showErrorDialog(_errorMessage!);
+      }
+    } catch (e) {
       setState(() {
-        _errorMessage = result["message"];
+        _errorMessage = "Unexpected error: ${e.toString()}";
+      });
+      _showErrorDialog(_errorMessage!);
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
-
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-
                 children: [
                   Column(
                     children: [
@@ -123,9 +178,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           color: ThemeConfig.navyBlue,
                         ),
                       ),
-
                       const SizedBox(height: 24),
-
                       const Text(
                         "Create Account",
                         style: TextStyle(
@@ -133,24 +186,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 8),
-
                       const Text(
                         "Register for the client portal",
                         style: TextStyle(fontSize: 16, color: Colors.black54),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 40),
-
                   Form(
                     key: _formKey,
-
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-
                       children: [
                         TextFormField(
                           controller: _firstNameController,
@@ -166,9 +213,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator:
                               (v) => v!.isEmpty ? "Enter first name" : null,
                         ),
-
                         const SizedBox(height: 20),
-
                         TextFormField(
                           controller: _lastNameController,
                           decoration: InputDecoration(
@@ -183,9 +228,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           validator:
                               (v) => v!.isEmpty ? "Enter last name" : null,
                         ),
-
                         const SizedBox(height: 20),
-
                         TextFormField(
                           controller: _emailController,
                           decoration: InputDecoration(
@@ -199,9 +242,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           validator: (v) => v!.isEmpty ? "Enter email" : null,
                         ),
-
                         const SizedBox(height: 20),
-
                         Row(
                           children: [
                             SizedBox(
@@ -221,9 +262,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 },
                               ),
                             ),
-
                             const SizedBox(width: 10),
-
                             Expanded(
                               child: TextFormField(
                                 controller: _phoneController,
@@ -241,9 +280,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 20),
-
                         DropdownButtonFormField(
                           value: _gender,
                           decoration: InputDecoration(
@@ -270,9 +307,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             });
                           },
                         ),
-
                         const SizedBox(height: 20),
-
                         DropdownButtonFormField(
                           value: _maritalStatus,
                           decoration: InputDecoration(
@@ -299,9 +334,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             });
                           },
                         ),
-
                         const SizedBox(height: 20),
-
                         InkWell(
                           onTap: _selectDob,
                           child: InputDecorator(
@@ -320,9 +353,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 30),
-
                         ElevatedButton(
                           onPressed: _isLoading ? null : _register,
                           style: ElevatedButton.styleFrom(
@@ -333,36 +364,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child:
-                              _isLoading
-                                  ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                  : const Text(
-                                    "Create Account",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                          child: _isLoading
+                              ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                              : const Text(
+                            "Create Account",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 20),
                     CustomErrorWidget(message: _errorMessage!),
                   ],
-
                   if (_successMessage != null) ...[
                     const SizedBox(height: 20),
                     Container(

@@ -35,6 +35,35 @@ class _LoginScreenState extends State<LoginScreen> {
     _loadSavedCredentials();
   }
 
+  void _showErrorDialog(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            title: const Row(
+              children: [
+                Icon(Icons.error, color: Colors.red),
+                SizedBox(width: 8),
+                Text("Error"),
+              ],
+            ),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    });
+  }
+
   Future<void> _loadSavedCredentials() async {
     final creds = await SecureStorageService.loadCredentials();
     setState(() {
@@ -105,11 +134,15 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _errorMessage = result['message'];
         });
+
+        _showErrorDialog(result['message'] ?? "Login failed");
       }
     } catch (e) {
       setState(() {
         _errorMessage = 'An unexpected error occurred: ${e.toString()}';
       });
+
+      _showErrorDialog(_errorMessage!);
     } finally {
       setState(() {
         _isLoading = false;
@@ -134,11 +167,15 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _errorMessage = 'Biometric authentication failed';
         });
+
+        _showErrorDialog(_errorMessage!);
       }
     } catch (e) {
       setState(() {
         _errorMessage = 'Biometric authentication error: ${e.toString()}';
       });
+
+      _showErrorDialog(_errorMessage!);
     } finally {
       setState(() {
         _isLoading = false;
@@ -164,11 +201,15 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _errorMessage = 'Failed to enable biometric authentication';
         });
+
+        _showErrorDialog(_errorMessage!);
       }
     } catch (e) {
       setState(() {
         _errorMessage = 'Error enabling biometric: ${e.toString()}';
       });
+
+      _showErrorDialog(_errorMessage!);
     } finally {
       setState(() {
         _isLoading = false;
@@ -216,13 +257,15 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushNamedAndRemoveUntil(
           context,
           '/dashboard',
-          (Route<dynamic> route) => false,
+              (Route<dynamic> route) => false,
         );
       });
     } catch (e) {
       setState(() {
         _errorMessage = 'Test login failed: ${e.toString()}';
       });
+
+      _showErrorDialog(_errorMessage!);
     } finally {
       setState(() {
         _isLoading = false;
@@ -260,7 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      Text(
+                      const Text(
                         'Welcome Back',
                         style: TextStyle(
                           fontSize: 28,
@@ -269,7 +312,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      const Text(
                         'Sign in to your client portal',
                         style: TextStyle(fontSize: 16, color: Colors.black54),
                       ),
@@ -391,25 +434,25 @@ class _LoginScreenState extends State<LoginScreen> {
                             elevation: 0,
                           ),
                           child:
-                              _isLoading
-                                  ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                  : const Text(
-                                    'Sign In',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                          _isLoading
+                              ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                              : const Text(
+                            'Sign In',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
 
                         const SizedBox(height: 20),
@@ -441,10 +484,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                  if (_errorMessage != null) ...[
+                  /*if (_errorMessage != null) ...[
                     const SizedBox(height: 20),
                     CustomErrorWidget(message: _errorMessage!),
-                  ],
+                  ],*/
 
                   if (_successMessage != null) ...[
                     const SizedBox(height: 20),
