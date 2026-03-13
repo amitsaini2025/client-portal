@@ -19,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
+  final _passwordController = TextEditingController(); // Added password controller
 
   String _gender = "Male";
   String _maritalStatus = "Single";
@@ -87,6 +88,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    if (_passwordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = "Please enter a password";
+      });
+      _showErrorDialog(_errorMessage!);
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -103,6 +112,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text.trim(),
         dob: _dob!,
         maritalStatus: _maritalStatus,
+        password: _passwordController.text.trim(),
       );
 
       if (result["success"]) {
@@ -279,6 +289,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          controller: _passwordController, // Password field
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: "Password",
+                            prefixIcon: const Icon(Icons.lock),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade100,
+                          ),
+                          validator: (v) =>
+                          v!.isEmpty ? "Enter password" : null,
                         ),
                         const SizedBox(height: 20),
                         DropdownButtonFormField(

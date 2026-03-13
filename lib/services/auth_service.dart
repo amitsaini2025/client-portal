@@ -277,6 +277,7 @@ class AuthService {
     required String email,
     required DateTime dob,
     required String maritalStatus,
+    required String password,
   }) async {
     try {
 
@@ -288,7 +289,8 @@ class AuthService {
         "country_code": countryCode,
         "email": email,
         "dob": DateFormat("dd/MM/yyyy").format(dob),
-        "marital_status": maritalStatus
+        "marital_status": maritalStatus,
+        "password": password
       };
 
       final response = await ApiService.register(userData);
