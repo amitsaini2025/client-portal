@@ -88,6 +88,8 @@ class ApiConfig {
   static const String visaEstimateVisaList = "/visa-estimate/visa-list";
   static const String visaEstimateEstimate = "/visa-estimate/estimate";
 
+  static const String checkUserAuthentication = "/check-user-authentication";
+
   // API settings
   static const Duration timeout = Duration(seconds: 30);
   static const Duration refreshTokenThreshold = Duration(minutes: 5);

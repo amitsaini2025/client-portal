@@ -24,6 +24,7 @@ class AuthService {
   static const String _selectedMatterNameKey = 'selected_matter_name';
   static const String _clientMatterStageKey = 'client_matter_stage_id';
   static const String _userIdKey = 'user_id';
+  static const String _cpStatusKey = "cp_status";
 
   // Current user data
   static Client? _currentClient;
@@ -33,6 +34,7 @@ class AuthService {
   static int? _selectedMatterId;
   static String? _selectedMatterName;
   static int? _clientMatterStageId;
+  static int? _cpStatus;
 
   // Getters
   static Client? get currentClient => _currentClient;
@@ -52,6 +54,8 @@ class AuthService {
   static bool get isAuthenticated => _currentToken != null;
 
   static bool get isMatterSelected => _selectedMatterId != null;
+
+  static int? get cpStatus => _cpStatus;
 
   /// Initialize authentication service and load matter
   static Future<void> initialize() async {
@@ -82,6 +86,12 @@ class AuthService {
       final storedUserId = await _secureStorage.read(key: _userIdKey);
       if (storedUserId != null) {
         _currentUserId = int.tryParse(storedUserId);
+      }
+
+
+      final cpStatus = await _secureStorage.read(key: _cpStatusKey);
+      if (cpStatus != null) {
+        _cpStatus = int.tryParse(cpStatus);
       }
     } catch (e) {
       print('Error initializing AuthService: $e');
@@ -176,8 +186,10 @@ class AuthService {
         final clientData = response['data']['client'];
         final userId = clientData != null ? clientData['id'] as int : null;
         final userName = clientData != null ? clientData['name'] as String : "";
+        final int cpStatus = (clientData['cp_status'] is int)
+            ? clientData['cp_status']
+            : int.tryParse(clientData['cp_status'].toString()) ?? 0;
 
-        // Store token securely
         await _secureStorage.write(key: _tokenKey, value: token);
         _currentToken = token;
         await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
@@ -189,11 +201,18 @@ class AuthService {
         if (clientData != null) {
           _currentClient = Client.fromJson(clientData);
           _currentUserId = userId;
+          _cpStatus = cpStatus;
           await _saveUserData();
           if (_currentUserId != null) {
             await _secureStorage.write(
               key: _userIdKey,
               value: _currentUserId.toString(),
+            );
+          }
+          if (_cpStatus != null) {
+            await _secureStorage.write(
+              key: _cpStatusKey,
+              value: _cpStatus.toString(),
             );
           }
         }
@@ -341,6 +360,7 @@ class AuthService {
       await _secureStorage.delete(key: _userDataKey);
       await _secureStorage.delete(key: _selectedMatterKey);
       await _secureStorage.delete(key: _userIdKey);
+      await _secureStorage.delete(key: _cpStatusKey);
 
       // Clear memory
       _currentToken = null;
@@ -348,6 +368,7 @@ class AuthService {
       _currentAdmin = null;
       _currentUserId = null;
       _selectedMatterId = null;
+      _cpStatus = null;
 
       ApiService.clearAuthToken();
 
@@ -579,6 +600,7 @@ class AuthService {
     _selectedMatterId = null;
     _selectedMatterName = null;
     _clientMatterStageId = null;
+    _cpStatus = null;
 
     ApiService.clearAuthToken();
   }

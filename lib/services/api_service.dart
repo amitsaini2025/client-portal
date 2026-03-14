@@ -808,6 +808,15 @@ class ApiService {
     );
   }
 
+  static Future<Map<String, dynamic>> checkUserAuthentication() async {
+    return await _makeRequest(
+      ApiConfig.checkUserAuthentication,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
+
   static Future<Map<String, dynamic>> sendChatMessageWithAttachments({
     required int clientMatterId,
     required String message,

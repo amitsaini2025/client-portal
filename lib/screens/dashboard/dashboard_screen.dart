@@ -294,7 +294,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 showDialog(
                   context: context,
                   barrierDismissible: true,
-                  builder: (_) => const LoginRequiredDialog(),
+                  builder: (_) => LoginRequiredDialog(parentContext: context),
                 );
               }
             },
@@ -308,7 +308,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 showDialog(
                   context: context,
                   barrierDismissible: true,
-                  builder: (_) => const LoginRequiredDialog(),
+                  builder: (_) => LoginRequiredDialog(parentContext: context),
                 );
               }
             },

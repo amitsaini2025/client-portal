@@ -334,7 +334,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
       showDialog(
         context: context,
         barrierDismissible: true,
-        builder: (_) => const LoginRequiredDialog(),
+        builder: (_) => LoginRequiredDialog(parentContext: context),
       );
       return;
     }

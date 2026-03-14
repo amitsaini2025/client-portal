@@ -80,7 +80,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 } else {
                   showDialog(
                     context: context,
-                    builder: (_) => const LoginRequiredDialog(),
+                    builder: (_) => LoginRequiredDialog(parentContext: context),
                   );
                 }
               },
@@ -93,7 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 } else {
                   showDialog(
                     context: context,
-                    builder: (_) => const LoginRequiredDialog(),
+                    builder: (_) => LoginRequiredDialog(parentContext: context),
                   );
                 }
               },

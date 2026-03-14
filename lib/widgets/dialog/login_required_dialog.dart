@@ -4,11 +4,15 @@ import '../../config/theme_config.dart';
 class LoginRequiredDialog extends StatelessWidget {
   final String title;
   final String message;
+  final VoidCallback? onCancel;
+  final BuildContext parentContext;
 
   const LoginRequiredDialog({
     super.key,
     this.title = "Login Required",
     this.message = "Please login to continue.",
+    this.onCancel,
+    required this.parentContext,
   });
 
   @override
@@ -52,7 +56,8 @@ class LoginRequiredDialog extends StatelessWidget {
             ),
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(parentContext).pop();
+            onCancel?.call();
           },
           child: Text(
             "Cancel",
@@ -69,7 +74,7 @@ class LoginRequiredDialog extends StatelessWidget {
             ),
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(parentContext).pop();
             Navigator.pushNamedAndRemoveUntil(
               context,
               '/login',

@@ -31,6 +31,7 @@ import 'package:client/screens/workflow/message/workflow_messages_screen.dart';
 import 'package:client/screens/workflow/workflow_documents_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:client/screens/workflow/workflow_stages_screen.dart';
+import 'package:client/services/stripe_service.dart';
 import 'package:client/utils/navigation_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -433,7 +434,12 @@ class AuthWrapper extends StatelessWidget {
                 matterId: AuthService.selectedMatterId!.toString(),
               );
             } else {
-              return const MattersScreen();
+              final int? cpStatus = AuthService.cpStatus;
+              if(cpStatus == 2){
+                return DashboardScreen(matterId: null);
+              }else{
+                return const MattersScreen();
+              }
             }
           } else {
             return DashboardScreen(matterId: null);

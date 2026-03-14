@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../config/theme_config.dart';
 import '../../models/client.dart';
 import '../../services/auth_service.dart';
+import '../../services/stripe_service.dart';
 import '../../utils/secure_storage_service.dart';
-import '../../widgets/common/error_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -122,13 +122,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (result['success'] == true) {
         await _saveCredentials();
+        final int? cpStatus = AuthService.cpStatus;
 
         setState(() {
           _successMessage = result['message'];
         });
 
         Future.delayed(const Duration(seconds: 1), () {
-          Navigator.pushReplacementNamed(context, '/matters');
+          if (cpStatus == 1) {
+            Navigator.pushReplacementNamed(context, '/matters');
+          } else if (cpStatus == 2) {
+            Navigator.pushReplacementNamed(context, '/dashboard');
+          } else {
+            Navigator.pushReplacementNamed(context, '/matters');
+          }
         });
       } else {
         setState(() {
@@ -488,7 +495,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
                     CustomErrorWidget(message: _errorMessage!),
                   ],*/
-
                   if (_successMessage != null) ...[
                     const SizedBox(height: 20),
                     Container(
