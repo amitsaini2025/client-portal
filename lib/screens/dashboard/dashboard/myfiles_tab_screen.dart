@@ -16,7 +16,7 @@ class MyFilesTabScreen extends StatefulWidget {
   State<MyFilesTabScreen> createState() => _MyFilesTabScreenState();
 }
 
-class _MyFilesTabScreenState extends State<MyFilesTabScreen>  with RouteAware {
+class _MyFilesTabScreenState extends State<MyFilesTabScreen> with RouteAware {
   bool _isBlocked = false;
   bool _isLoading = true;
 
@@ -69,8 +69,8 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>  with RouteAware {
         return;
       }
 
-      final int? cpStatus = AuthService.cpStatus;
-      if (cpStatus == 1) {
+      final bool matterSelected = AuthService.isMatterSelected;
+      if (isLoggedIn && matterSelected) {
         setState(() => _isLoading = false);
         return;
       }
@@ -80,8 +80,6 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>  with RouteAware {
 
       if (result['success'] == true) {
         int status = result['data']['cp_status'];
-
-        AuthService.setCpStatus(status);
 
         if (status == 1) {
           _showMatterSelect();
