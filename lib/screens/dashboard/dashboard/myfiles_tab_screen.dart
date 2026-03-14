@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:client/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
+import '../../../main.dart';
 import '../../../services/api_service.dart';
 import '../../../widgets/dialog/login_required_dialog.dart';
 import '../../workflow/workflow_stages_screen.dart';
@@ -15,13 +16,30 @@ class MyFilesTabScreen extends StatefulWidget {
   State<MyFilesTabScreen> createState() => _MyFilesTabScreenState();
 }
 
-class _MyFilesTabScreenState extends State<MyFilesTabScreen> {
+class _MyFilesTabScreenState extends State<MyFilesTabScreen>  with RouteAware {
   bool _isBlocked = false;
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _checkUserStatus();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)! as PageRoute);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
     _checkUserStatus();
   }
 
@@ -57,10 +75,13 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen> {
         return;
       }
 
+      setState(() => _isLoading = true);
       final result = await ApiService.checkUserAuthentication();
 
       if (result['success'] == true) {
         int status = result['data']['cp_status'];
+
+        AuthService.setCpStatus(status);
 
         if (status == 1) {
           _showMatterSelect();
@@ -114,23 +135,40 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen> {
 
   void _showMatterSelect() {
     if (!AuthService.isMatterSelected) {
+      final parentContext = context;
+
       showDialog(
-        context: context,
+        context: parentContext,
         barrierDismissible: false,
-        builder:
-            (_) => AlertDialog(
+        barrierColor: Colors.black.withOpacity(0.4),
+        builder: (context) {
+          return BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: const Text("Select Matter"),
-              content: const Text("Please select matter."),
+              content: const Text("Please select a matter to continue."),
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/matters');
+                    Navigator.pop(context); // close dialog
+                    DefaultTabController.of(parentContext)?.animateTo(0);
                   },
-                  child: const Text("Ok"),
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(parentContext, '/matters');
+                  },
+                  child: const Text("OK"),
                 ),
               ],
             ),
+          );
+        },
       );
     }
   }

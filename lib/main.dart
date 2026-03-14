@@ -312,6 +312,8 @@ Future<void> _showForegroundNotification(RemoteMessage message) async {
   }
 }*/
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 class MyAppWithTheme extends StatelessWidget {
   const MyAppWithTheme({super.key});
 
@@ -321,6 +323,7 @@ class MyAppWithTheme extends StatelessWidget {
       valueListenable: themeModeNotifier,
       builder: (context, mode, _) {
         return MaterialApp(
+          navigatorObservers: [routeObserver],
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'Client Portal',

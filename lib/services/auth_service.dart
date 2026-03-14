@@ -170,6 +170,19 @@ class AuthService {
     }
   }
 
+  /// Set the CP Status
+  static Future<void> setCpStatus(int status) async {
+    _cpStatus = status;
+    try {
+      await _secureStorage.write(
+        key: _cpStatusKey,
+        value: status.toString(),
+      );
+    } catch (e) {
+      print('Error saving CP status: $e');
+    }
+  }
+
   /// Login with email/phone and password
   static Future<Map<String, dynamic>> login({
     required String emailOrPhone,
