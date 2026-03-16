@@ -200,6 +200,20 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     );
   }
 
+  Future<void> _onViewTap(WorkflowStage stage, int checklistId) async {
+    if (stage.allowedChecklistCount > 0) {
+      Navigator.pushNamed(
+        context,
+        '/workflow-view-documents-by-checklist',
+        arguments: {
+          'stageId': stage.id,
+          'stageName': stage.stageName,
+          'checklistId': checklistId
+        },
+      );
+    }
+  }
+
   void _hideUploadingDialog() {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
@@ -246,6 +260,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                         workflowResponse: _workflowResponse!,
                         onStageTap: _showStageDetails,
                         onChecklistPlusTap: _openUploadOptions,
+                        onChecklistViewTap: _onViewTap,
                       ),
                     ],
                   ),

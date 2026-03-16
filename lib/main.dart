@@ -26,6 +26,7 @@ import 'package:client/screens/profile/edit_profile_screen.dart';
 import 'package:client/screens/profile/profile_screen.dart';
 import 'package:client/screens/recent_activity/recent_activity.dart';
 import 'package:client/screens/tasks/tasks_screen.dart';
+import 'package:client/screens/workflow/document_by_checklist/workflow_view_documents_by_checklist_screen.dart';
 import 'package:client/screens/workflow/message/workflow_message_detail_screen.dart';
 import 'package:client/screens/workflow/message/workflow_messages_screen.dart';
 import 'package:client/screens/workflow/workflow_documents_screen.dart';
@@ -227,7 +228,7 @@ void main() async {
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
   const AndroidInitializationSettings androidSettings =
-  AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@mipmap/ic_launcher');
   const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
     requestAlertPermission: true,
     requestBadgePermission: true,
@@ -241,7 +242,8 @@ void main() async {
   if (!kIsWeb && Platform.isAndroid) {
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(defaultChannel);
   }
   if (!kIsWeb) {
@@ -356,7 +358,9 @@ class MyAppWithTheme extends StatelessWidget {
                 (context) => const DocumentManagementScreen(),
             '/upload-documents': (context) => const UploadDocumentScreen(),
             '/bulk-upload-documents': (context) {
-              final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+              final args =
+                  ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>?;
 
               return BulkUploadDocumentScreen(
                 stageId: args?['stageId'] ?? 0,
@@ -390,6 +394,15 @@ class MyAppWithTheme extends StatelessWidget {
                 stageName: args['stageName'],
               );
             },
+            '/workflow-view-documents-by-checklist': (context) {
+              final args =
+                  ModalRoute.of(context)!.settings.arguments
+                      as Map<String, dynamic>;
+              return WorkflowViewDocumentsByChecklistScreen(
+                stageId: args['stageId'],
+                allowedCheckListId: args['checklistId'],
+              );
+            },
             '/blogs': (context) => const BlogListScreen(),
             '/blogs/detail': (context) {
               final args =
@@ -407,7 +420,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/notifications': (context) => NotificationsScreen(),
             '/important-links': (context) => ImportantLinksScreen(),
             '/billing-list': (context) => BillingListScreen(),
-            '/vac-search':  (context) => VacSearchScreen(),
+            '/vac-search': (context) => VacSearchScreen(),
           },
         );
       },
@@ -438,9 +451,9 @@ class AuthWrapper extends StatelessWidget {
               );
             } else {
               final int? cpStatus = AuthService.cpStatus;
-              if(cpStatus == 2){
+              if (cpStatus == 2) {
                 return DashboardScreen(matterId: null);
-              }else{
+              } else {
                 return const MattersScreen();
               }
             }

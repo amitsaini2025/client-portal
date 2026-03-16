@@ -5,12 +5,14 @@ class WorkflowProgressWidget extends StatelessWidget {
   final WorkflowStagesResponse workflowResponse;
   final Function(WorkflowStage)? onStageTap;
   final Function(WorkflowStage stage, int checklistId)? onChecklistPlusTap;
+  final Function(WorkflowStage stage, int checklistId)? onChecklistViewTap;
 
   const WorkflowProgressWidget({
     super.key,
     required this.workflowResponse,
     this.onStageTap,
     this.onChecklistPlusTap,
+    this.onChecklistViewTap
   });
 
   Color _getStageColor(WorkflowStage stage, BuildContext context) {
@@ -311,6 +313,21 @@ class WorkflowProgressWidget extends StatelessWidget {
                                 ),
 
                                 IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                  icon: const Icon(
+                                    Icons.remove_red_eye_outlined,
+                                    color: Colors.green,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    onChecklistViewTap?.call(stage, item.id);
+                                  },
+                                ),
+
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
                                   icon: const Icon(
                                     Icons.add_circle,
                                     color: Colors.green,
