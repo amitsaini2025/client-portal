@@ -186,7 +186,7 @@ class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
             Icon(Icons.chat_outlined, size: 80, color: Colors.grey.shade400),
             const SizedBox(height: 16),
             Text(
-              'No chat recipients available',
+              'No chat_bot recipients available',
               style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
             ),
           ],

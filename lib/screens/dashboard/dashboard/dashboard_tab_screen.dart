@@ -356,6 +356,12 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                             '/vac-search',
                           ),
                         },
+                        onChatBot: () =>{
+                          Navigator.pushNamed(
+                            context,
+                            '/chat-bots',
+                          ),
+                        },
                       ),
                       const SizedBox(height: 24),
                     ],

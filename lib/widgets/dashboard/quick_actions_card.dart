@@ -13,6 +13,7 @@ class QuickActionsCard extends StatelessWidget {
   final VoidCallback? onImportantLinks;
   final VoidCallback? onEnglishRequirement;
   final VoidCallback? onVACSearch;
+  final VoidCallback? onChatBot;
 
   const QuickActionsCard({
     super.key,
@@ -27,6 +28,7 @@ class QuickActionsCard extends StatelessWidget {
     this.onImportantLinks,
     this.onEnglishRequirement,
     this.onVACSearch,
+    this.onChatBot
   });
 
   static const double _radius = 16;
@@ -139,6 +141,10 @@ class QuickActionsCard extends StatelessWidget {
                 _smallTile(Icons.web, 'VAC\nSearch',
                     const Color(0xCC880E4F), onVACSearch ?? () {},
                     iconSize: iconSize - 6, fontSize: fontSize - 1, padding: tilePadding - 4),
+
+                /*_smallTile(Icons.web, 'VAC\nSearch',
+                    const Color(0xCC880E4F), onChatBot ?? () {},
+                    iconSize: iconSize - 6, fontSize: fontSize - 1, padding: tilePadding - 4),*/
               ],
             ),
           ],

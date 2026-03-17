@@ -5,6 +5,7 @@ import 'package:client/screens/cases/cases_list_screen.dart';
 import 'package:client/screens/dashboard/billing_list/billing_list_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
+import 'package:client/screens/dashboard/chat_bot/chat_bot_screen.dart';
 import 'package:client/screens/dashboard/dashboard/dashboard_screen.dart';
 import 'package:client/screens/dashboard/english_requirement/english_requirement_screen.dart';
 import 'package:client/screens/dashboard/health_insurance/health_insurance_screen.dart';
@@ -421,6 +422,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/important-links': (context) => ImportantLinksScreen(),
             '/billing-list': (context) => BillingListScreen(),
             '/vac-search': (context) => VacSearchScreen(),
+            '/chat-bots': (context) => ChatBotScreen(),
           },
         );
       },
