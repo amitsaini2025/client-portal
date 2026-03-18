@@ -8,10 +8,10 @@ class Qualification {
   String? state;
   String startDate;
   String finishDate;
-  bool relevantQualification;
-  bool specialistEducation;
-  bool stemQualification;
-  bool regionalStudy;
+  bool? relevantQualification;
+  bool? specialistEducation;
+  bool? stemQualification;
+  bool? regionalStudy;
 
   Qualification({
     required this.id,
@@ -39,9 +39,9 @@ class Qualification {
     state: json["state"],
     startDate: json["start_date"],
     finishDate: json["finish_date"],
-    relevantQualification: json["relevant_qualification"],
-    specialistEducation: json["specialist_education"],
-    stemQualification: json["stem_qualification"],
-    regionalStudy: json["regional_study"],
+    relevantQualification: json["relevant_qualification"] ?? false,
+    specialistEducation: json["specialist_education"] ?? false,
+    stemQualification: json["stem_qualification"] ?? false,
+    regionalStudy: json["regional_study"] ?? false,
   );
 }

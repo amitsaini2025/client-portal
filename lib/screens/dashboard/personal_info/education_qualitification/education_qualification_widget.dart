@@ -878,7 +878,7 @@ class _EducationalQualificationsWidgetState
 
   Widget _buildCheckbox(
     String label,
-    bool value,
+    bool? value,
     bool enabled,
     ValueChanged<bool> onChanged,
   ) {

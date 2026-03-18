@@ -15,6 +15,6 @@ class Email {
     id: json["id"],
     email: json["email"],
     type: json["type"],
-    isPrimary: json["is_primary"],
+    isPrimary: json["is_primary"] ?? false,
   );
 }

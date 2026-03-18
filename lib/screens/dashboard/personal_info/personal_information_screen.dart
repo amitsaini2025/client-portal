@@ -102,7 +102,7 @@ class _PersonalInformationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ThemeConfig.navyBlue,
+      backgroundColor: ThemeConfig.white,
       appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
         title: const Text("Personal Information",
