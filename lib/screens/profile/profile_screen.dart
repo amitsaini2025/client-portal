@@ -255,78 +255,86 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildProfileCard(context),
                   const SizedBox(height: 30),
 
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _openPersonalInformation,
-                      icon: const Icon(Icons.person_outline),
-                      label: const Text(
-                        "Personal Information",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 52),
-                        backgroundColor: ThemeConfig.navyBlue,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                    ),
+                  _elegantButton(
+                    label: "Personal Information",
+                    icon: Icons.person_outline,
+                    onTap: _openPersonalInformation,
+                    color: ThemeConfig.navyBlue,
                   ),
 
-                  const SizedBox(height: 16),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _isLoading ? null : () => _openEditProfile(),
-                      icon: const Icon(Icons.edit),
-                      label: const Text(
-                        "Edit Information",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 52),
-                        backgroundColor: ThemeConfig.goldenYellow,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                    ),
+                  _elegantButton(
+                    label: "Edit Information",
+                    icon: Icons.edit,
+                    onTap:
+                    _isLoading ? null : _openEditProfile,
+                    color: ThemeConfig.goldenYellow,
                   ),
 
-                  const SizedBox(height: 16),
-
-                  ElevatedButton.icon(
-                    onPressed: () => _handleLogout(context),
-                    icon: const Icon(Icons.logout),
-                    label: const Text(
-                      "Logout",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 52),
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
+                  _elegantButton(
+                    label: "Logout",
+                    icon: Icons.logout,
+                    onTap: () => _handleLogout(context),
+                    color: Colors.redAccent,
                   ),
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget _elegantButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback? onTap,
+    required Color color,
+  }) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: color.withOpacity(0.4),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: color,
+              ),
+            ],
           ),
         ),
       ),
