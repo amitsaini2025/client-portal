@@ -3,9 +3,8 @@ name: Deploy Production
 on:
   push:
     branches:
-      - production  # trigger when you push to production branch
+      - production
 
-# Force Node.js 24 for future-proofing
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -14,45 +13,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout production branch
       - name: Checkout production
         uses: actions/checkout@v4
         with:
           ref: production
 
-      # 2️⃣ Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.7'  # replace with your Flutter version
+          flutter-version: '3.32.7'
 
-      # 3️⃣ Install dependencies
+      - name: Enable Flutter web
+        run: flutter config --enable-web
+
       - name: Install dependencies
         run: flutter pub get
 
-      # 4️⃣ Write secret JSON at runtime
       - name: Write Google credentials
+        shell: bash
         run: |
           mkdir -p assets
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > assets/hummr-d17f7-3e476ccd9405.json
+          cat <<'EOF' > assets/hummr-d17f7-3e476ccd9405.json
+          ${{ secrets.GOOGLE_CREDENTIALS }}
+          EOF
 
-      # 5️⃣ Build Flutter web release
       - name: Build Flutter Web Release
         run: flutter build web --release
 
-      # 6️⃣ Setup SSH for deployment
       - name: Setup SSH
+        shell: bash
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      # 7️⃣ Deploy build/web to server via rsync
+      - name: Install rsync
+        run: sudo apt-get update && sudo apt-get install -y rsync
+
       - name: Deploy via rsync
         run: |
-          rsync -avz \
+          rsync -avz -e "ssh -p ${{ secrets.SSH_PORT }} -i ~/.ssh/id_ed25519" \
             --exclude=".git" \
             --exclude=".github" \
             --exclude="node_modules" \
-            ./build/web/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}
+            ./build/web/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}
