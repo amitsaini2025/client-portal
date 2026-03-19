@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:client/services/api_service_bansal_immigration.dart';
 import 'package:client/services/stripe_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -20,6 +22,7 @@ import '../../../services/auth_service.dart';
 import '../../../widgets/common/error_widget.dart';
 import '../../../widgets/common/loading_widget.dart';
 import '../../../widgets/dashboard/quick_actions_card.dart';
+import '../../../widgets/dialog/login_signup_dialog.dart';
 import '../book_appointment/book_location_screen.dart';
 
 class DashboardTabScreen extends StatefulWidget {
@@ -191,13 +194,13 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
         if (data['upcoming_deadlines']?['summary'] != null) {
           upcomingDeadlineSummary = UpcomingDeadlineSummary(
             dueThisWeekCount:
-            data['upcoming_deadlines']['summary']['due_this_week_count'] ??
+                data['upcoming_deadlines']['summary']['due_this_week_count'] ??
                 0,
             appointmentsCount:
-            data['upcoming_deadlines']['summary']['appointments_count'] ??
+                data['upcoming_deadlines']['summary']['appointments_count'] ??
                 0,
             overdueCount:
-            data['upcoming_deadlines']['summary']['overdue_count'] ?? 0,
+                data['upcoming_deadlines']['summary']['overdue_count'] ?? 0,
           );
         }
 
@@ -225,8 +228,8 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
               (data['recent_activity'] as List)
                   .map(
                     (e) =>
-                    RecentActivity.fromJson(Map<String, dynamic>.from(e)),
-              )
+                        RecentActivity.fromJson(Map<String, dynamic>.from(e)),
+                  )
                   .toList();
         }
 
@@ -261,117 +264,118 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body:
-      _isLoading
-          ? const LoadingWidget(message: 'Loading dashboard...')
-          : _errorMessage != null
-          ? CustomErrorWidget(
-        message: _errorMessage!,
-        onRetry: _loadDashboardData,
-      )
-          : RefreshIndicator(
-        onRefresh: () async {
-          await Future.wait([_loadDashboardData(), _loadRecentBlogs()]);
-        },
-        child: SingleChildScrollView(
-          child: Container(
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildRecentUpdatesSection(),
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      QuickActionsCard(
-                        onBookAppointment: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                              const BookLocationScreen(),
-                            ),
-                          );
-                        },
-                        onHealthInsurance: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/health-insurance',
-                          );
-                        },
-                        onUpcomingDeadlines: () {
-                          Navigator.pushNamed(context, '/tasks');
-                        },
-                        onPRCalculator: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/pr-calculator',
-                          );
-                        },
-                        onStudentFundCalculator: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/student-fund-calculator',
-                          );
-                        },
-                        onOccupationSearch: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/occupation-search',
-                          );
-                        },
-                        onPostCodeChecker: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/post-code-checker',
-                          );
-                        },
-                        onCourseSearch:
-                            () => {
-                          showSnack(
-                            context,
-                            "This feature will be available in a future update.",
+          _isLoading
+              ? const LoadingWidget(message: 'Loading dashboard...')
+              : _errorMessage != null
+              ? CustomErrorWidget(
+                message: _errorMessage!,
+                onRetry: _loadDashboardData,
+              )
+              : RefreshIndicator(
+                onRefresh: () async {
+                  await Future.wait([_loadDashboardData(), _loadRecentBlogs()]);
+                },
+                child: SingleChildScrollView(
+                  child: Container(
+                    color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildRecentUpdatesSection(),
+                        const SizedBox(height: 24),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              QuickActionsCard(
+                                onBookAppointment: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              const BookLocationScreen(),
+                                    ),
+                                  );
+                                },
+                                onHealthInsurance: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/health-insurance',
+                                  );
+                                },
+                                onUpcomingDeadlines: () {
+                                  Navigator.pushNamed(context, '/tasks');
+                                },
+                                onPRCalculator: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/pr-calculator',
+                                  );
+                                },
+                                onStudentFundCalculator: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/student-fund-calculator',
+                                  );
+                                },
+                                onOccupationSearch: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/occupation-search',
+                                  );
+                                },
+                                onPostCodeChecker: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/post-code-checker',
+                                  );
+                                },
+                                onCourseSearch:
+                                    () => {
+                                      showSnack(
+                                        context,
+                                        "This feature will be available in a future update.",
+                                      ),
+                                    },
+                                onImportantLinks:
+                                    () => {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/important-links',
+                                      ),
+                                    },
+                                onEnglishRequirement:
+                                    () => {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/english-requirements',
+                                      ),
+                                    },
+                                onVACSearch:
+                                    () => {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/vac-search',
+                                      ),
+                                    },
+                                onChatBot:
+                                    () => {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/chat-bots',
+                                      ),
+                                    },
+                              ),
+                              const SizedBox(height: 24),
+                            ],
                           ),
-                        },
-                        onImportantLinks:
-                            () => {
-                          Navigator.pushNamed(
-                            context,
-                            '/important-links',
-                          ),
-                        },
-                        onEnglishRequirement:
-                            () => {
-                          Navigator.pushNamed(
-                            context,
-                            '/english-requirements',
-                          ),
-                        },
-                        onVACSearch:
-                            () => {
-                          Navigator.pushNamed(
-                            context,
-                            '/vac-search',
-                          ),
-                        },
-                        onChatBot: () =>{
-                          Navigator.pushNamed(
-                            context,
-                            '/chat-bots',
-                          ),
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
+              ),
     );
   }
 
@@ -403,79 +407,100 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
         SizedBox(
           height: 140,
           child:
-          _isLoadingBlogs
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _blogs.length,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemBuilder: (context, index) {
-              final blog = _blogs[index];
+              _isLoadingBlogs
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _blogs.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemBuilder: (context, index) {
+                      final blog = _blogs[index];
 
-              return InkWell(
-                borderRadius: BorderRadius.circular(14),
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/blogs/detail',
-                    arguments: {'blogId': blog.id},
-                  );
-                },
-                child: Container(
-                  width: 260,
-                  margin: EdgeInsets.only(
-                    right: index == _blogs.length - 1 ? 0 : 16,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    image: DecorationImage(
-                      image: NetworkImage(blog.image),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withOpacity(0.2),
-                            Colors.black.withOpacity(0.7),
-                          ],
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () {
+                          final bool isLoggedIn = AuthService.isAuthenticated;
+                          if (isLoggedIn) {
+                            Navigator.pushNamed(
+                              context,
+                              '/blogs/detail',
+                              arguments: {'blogId': blog.id},
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              barrierColor: Colors.black.withOpacity(0.4),
+                              builder: (context) {
+                                return BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 6,
+                                    sigmaY: 6,
+                                  ),
+                                  child: LoginSignupDialog(
+                                    parentContext: context,
+                                    onCancel: () {},
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
+                        child: Container(
+                          width: 260,
+                          margin: EdgeInsets.only(
+                            right: index == _blogs.length - 1 ? 0 : 16,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            image: DecorationImage(
+                              image: NetworkImage(blog.image),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.black.withOpacity(0.2),
+                                    Colors.black.withOpacity(0.7),
+                                  ],
+                                ),
+                              ),
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    blog.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    blog.date,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            blog.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            blog.date,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                ),
-              );
-            },
-          ),
         ),
       ],
     );
@@ -646,11 +671,11 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
               icon: Icons.task,
               title: activity.title,
               subtitle:
-              activity.description
-                  .replaceAll('\n', ' ')
-                  .replaceAll('\t', ' ')
-                  .replaceAll(RegExp(r'\s+'), ' ')
-                  .trim(),
+                  activity.description
+                      .replaceAll('\n', ' ')
+                      .replaceAll('\t', ' ')
+                      .replaceAll(RegExp(r'\s+'), ' ')
+                      .trim(),
               time: activity.timeAgo,
               color: goldenYellow,
             );
