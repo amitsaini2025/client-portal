@@ -142,9 +142,9 @@ class QuickActionsCard extends StatelessWidget {
                     const Color(0xCC880E4F), onVACSearch ?? () {},
                     iconSize: iconSize - 6, fontSize: fontSize - 1, padding: tilePadding - 4),
 
-                /*_smallTile(Icons.web, 'VAC\nSearch',
+                _smallTile(Icons.web, 'ChatBot',
                     const Color(0xCC880E4F), onChatBot ?? () {},
-                    iconSize: iconSize - 6, fontSize: fontSize - 1, padding: tilePadding - 4),*/
+                    iconSize: iconSize - 6, fontSize: fontSize - 1, padding: tilePadding - 4),
               ],
             ),
           ],
