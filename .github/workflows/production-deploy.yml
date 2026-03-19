@@ -5,6 +5,10 @@ on:
     branches:
       - production  # trigger when you push to production branch
 
+# Force Node.js 24 for future-proofing
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
