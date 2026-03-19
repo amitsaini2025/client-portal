@@ -419,8 +419,7 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                       return InkWell(
                         borderRadius: BorderRadius.circular(14),
                         onTap: () {
-                          final bool isLoggedIn = AuthService.isAuthenticated;
-                          if (isLoggedIn) {
+                          if (AuthService.isAuthenticated) {
                             Navigator.pushNamed(
                               context,
                               '/blogs/detail',
