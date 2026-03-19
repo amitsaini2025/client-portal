@@ -1,19 +1,30 @@
-name: Deploy production
+name: Deploy Production
 
 on:
   push:
     branches:
-      - production
+      - production  # trigger when pushing production branch
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: CheckOut production
+      - name: Checkout production
         uses: actions/checkout@v4
         with:
           ref: production
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.7'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Flutter Web Release
+        run: flutter build web --release
 
       - name: Setup SSH
         run: |
@@ -24,9 +35,9 @@ jobs:
 
       - name: Deploy via rsync
         run: |
-          rsync -avz  \
+          rsync -avz \
             --exclude=".git" \
             --exclude=".github" \
             --exclude="node_modules" \
             -e "ssh -p ${{ secrets.SSH_PORT }}" \
-            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}
+            ./build/web/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}
