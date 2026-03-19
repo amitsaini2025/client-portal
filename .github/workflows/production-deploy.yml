@@ -3,29 +3,40 @@ name: Deploy Production
 on:
   push:
     branches:
-      - production  # trigger when pushing production branch
+      - production  # trigger when you push to production branch
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout production branch
       - name: Checkout production
         uses: actions/checkout@v4
         with:
           ref: production
 
+      # 2️⃣ Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.7'
+          flutter-version: '3.32.7'  # replace with your Flutter version
 
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
+      # 4️⃣ Write secret JSON at runtime
+      - name: Write Google credentials
+        run: |
+          mkdir -p assets
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > assets/hummr-d17f7-3e476ccd9405.json
+
+      # 5️⃣ Build Flutter web release
       - name: Build Flutter Web Release
         run: flutter build web --release
 
+      # 6️⃣ Setup SSH for deployment
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -33,11 +44,11 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
+      # 7️⃣ Deploy build/web to server via rsync
       - name: Deploy via rsync
         run: |
           rsync -avz \
             --exclude=".git" \
             --exclude=".github" \
             --exclude="node_modules" \
-            -e "ssh -p ${{ secrets.SSH_PORT }}" \
             ./build/web/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}
