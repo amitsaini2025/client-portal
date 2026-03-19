@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Ignore Google service account JSON
+assets/hummr-d17f7-3e476ccd9405.json
