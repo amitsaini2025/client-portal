@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 
-class StudentVisaEnglishRequirementScreen extends StatefulWidget {
-  const StudentVisaEnglishRequirementScreen({super.key});
+class EnglishRequirementForStudentVisaScreen extends StatefulWidget {
+  const EnglishRequirementForStudentVisaScreen({super.key});
 
   @override
-  State<StudentVisaEnglishRequirementScreen> createState() =>
-      _StudentVisaEnglishRequirementScreenState();
+  State<EnglishRequirementForStudentVisaScreen> createState() =>
+      _EnglishRequirementForStudentVisaScreenState();
 }
 
-class _StudentVisaEnglishRequirementScreenState
-    extends State<StudentVisaEnglishRequirementScreen> {
+class _EnglishRequirementForStudentVisaScreenState
+    extends State<EnglishRequirementForStudentVisaScreen> {
   int selectedTab = 0;
 
   @override

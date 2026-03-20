@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 
-class TemporaryGraduateVisaTRScreen extends StatefulWidget {
-  const TemporaryGraduateVisaTRScreen({super.key});
+class EnglishRequirementFor485TemporaryGraduateVisaTRScreen extends StatefulWidget {
+  const EnglishRequirementFor485TemporaryGraduateVisaTRScreen({super.key});
 
   @override
-  State<TemporaryGraduateVisaTRScreen> createState() =>
-      _TemporaryGraduateVisaTRScreenState();
+  State<EnglishRequirementFor485TemporaryGraduateVisaTRScreen> createState() =>
+      _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState();
 }
 
-class _TemporaryGraduateVisaTRScreenState
-    extends State<TemporaryGraduateVisaTRScreen> {
+class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
+    extends State<EnglishRequirementFor485TemporaryGraduateVisaTRScreen> {
   int selectedTab = 0;
 
   @override
