@@ -1,253 +1,180 @@
 import 'package:flutter/material.dart';
+
 import '../../../config/theme_config.dart';
 
-class EnglishRequirementFor485TemporaryGraduateVisaTRScreen extends StatefulWidget {
+class EnglishRequirementFor485TemporaryGraduateVisaTRScreen extends StatelessWidget {
   const EnglishRequirementFor485TemporaryGraduateVisaTRScreen({super.key});
 
   @override
-  State<EnglishRequirementFor485TemporaryGraduateVisaTRScreen> createState() =>
-      _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState();
-}
-
-class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
-    extends State<EnglishRequirementFor485TemporaryGraduateVisaTRScreen> {
-  int selectedTab = 0;
-
-  @override
   Widget build(BuildContext context) {
-    final data =
-    selectedTab == 0 ? tableDataAfterAug2025 : tableDataBeforeAug2025;
-
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: const Text(
-          "485 Temporary Graduate Visa (TR)",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: ThemeConfig.white,
-          ),
-        ),
         backgroundColor: ThemeConfig.goldenYellow,
-        iconTheme: const IconThemeData(color: ThemeConfig.white),
+        title: const Text(
+          "English Requirement for 485 Temporary Graduate Visa (TR)",
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /*Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  "Temporary Graduate Visa (Subclass 485)",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.indigo,
-                  ),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  "Specified Test Scores for English Requirement",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.indigoAccent,
-                  ),
-                ),
-              ],
-            ),
-          ),
-*/
-          /*Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                ChoiceChip(
-                  label: const Text("After 7 Aug 2025"),
-                  selected: selectedTab == 0,
-                  selectedColor: Colors.indigo.shade100,
-                  onSelected: (_) => setState(() => selectedTab = 0),
-                ),
-                ChoiceChip(
-                  label: const Text("Before 6 Aug 2025"),
-                  selected: selectedTab == 1,
-                  selectedColor: Colors.indigo.shade100,
-                  onSelected: (_) => setState(() => selectedTab = 1),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),*/
-
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                final row = data[index];
-
-                if (row["isSection"] == true) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6.0),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.indigo.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        row["level"],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Colors.indigo,
-                        ),
-                      ),
-                    ),
-                  );
-                }
-
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  shadowColor: Colors.indigo.shade50,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (row["level"] != "")
-                          Text(
-                            row["level"],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: Colors.indigo,
-                            ),
-                          ),
-                        if (row["component"] != "")
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4.0, bottom: 8),
-                            child: Text(
-                              row["component"],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ),
-                        _valueRow(Icons.school, "IELTS", row["ielts"]),
-                        _valueRow(Icons.school, "PTE", row["pte"]),
-                        _valueRow(Icons.school, "TOEFL", row["toefl"]),
-                        _valueRow(Icons.language, "C1", row["c1"]),
-                        _valueRow(Icons.language, "OET", row["oet"]),
-                        _valueRow(Icons.language, "CELPIP", row["celpip"]),
-                        _valueRow(Icons.language, "LanguageCert", row["languageCert"]),
-                        _valueRow(Icons.school, "MET", row["met"]),
-                      ],
-                    ),
-                  ),
-                );
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTestBox(
+              title: "IELTS",
+              afterAugLabel: "IELTS Academic / IELTS General",
+              afterAugScores: const {
+                "Overall": "6.5",
+                "Listening": "5.5",
+                "Reading": "5.5",
+                "Writing": "5.5",
+                "Speaking": "5.5",
+              },
+              beforeAugLabel: "IELTS",
+              beforeAugScores: const {
+                "Overall": "6.5",
+                "Listening": "5.5",
+                "Reading": "5.5",
+                "Writing": "5.5",
+                "Speaking": "5.5",
               },
             ),
-          ),
-
-          const SizedBox(height: 12),
-          /*const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-            child: Text(
-              "Department of Home Affairs - English language visa requirements",
-              style: TextStyle(
-                color: Colors.indigo,
-                fontSize: 13,
-                decoration: TextDecoration.underline,
-              ),
+            const SizedBox(height: 20),
+            _buildTestBox(
+              title: "PTE Academic",
+              afterAugLabel: "PTE",
+              afterAugScores: const {
+                "Overall": "55",
+                "Listening": "40",
+                "Reading": "42",
+                "Writing": "41",
+                "Speaking": "39",
+              },
+              beforeAugLabel: "PTE Academic",
+              beforeAugScores: const {
+                "Overall": "57",
+                "Listening": "43",
+                "Reading": "48",
+                "Writing": "51",
+                "Speaking": "42",
+              },
             ),
-          ),*/
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _valueRow(IconData icon, String label, String? value) {
-    if (value == null || value.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
+  Widget _buildTestBox({
+    required String title,
+    required String afterAugLabel,
+    required Map<String, String> afterAugScores,
+    required String beforeAugLabel,
+    required Map<String, String> beforeAugScores,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 14, color: Colors.indigo.shade300),
-          const SizedBox(width: 6),
-          Expanded(
-            flex: 3,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                  fontWeight: FontWeight.w600, fontSize: 12, color: Colors.black87),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: ThemeConfig.goldenYellow,
             ),
           ),
-          Expanded(
-            flex: 5,
-            child: Text(value, style: const TextStyle(fontSize: 12)),
+          const SizedBox(height: 16),
+          _buildDateSection(
+            "Acceptable minimum scores – Test taken on or after 7 August 2025",
+            afterAugLabel,
+            afterAugScores,
+          ),
+          const SizedBox(height: 16),
+          Divider(color: Colors.grey.shade300),
+          const SizedBox(height: 16),
+          _buildDateSection(
+            "Acceptable minimum scores – Test taken on or before 6 August 2025",
+            beforeAugLabel,
+            beforeAugScores,
           ),
         ],
       ),
     );
   }
 
-  List<Map<String, dynamic>> get tableDataAfterAug2025 => [
-    _row("Functional", "", "6.5", "55", "81", "", "1310", "8", "", ""),
-    _section("Vocational"),
-    _row("", "Listening", "5.5", "40", "12", "", "260", "6", "", ""),
-    _row("", "Reading", "5.5", "42", "12", "", "280", "6", "", ""),
-    _row("", "Writing", "5.5", "41", "14", "", "260", "6", "", ""),
-    _row("", "Speaking", "5.5", "39", "17", "", "310", "6", "", ""),
-  ];
-
-  List<Map<String, dynamic>> get tableDataBeforeAug2025 => [
-    _row("Functional", "", "6.5", "57", "83", "176", "B", "", "", ""),
-    _section("Vocational"),
-    _row("", "Listening", "5.5", "43", "7", "162", "", "", "", ""),
-    _row("", "Reading", "5.5", "48", "8", "162", "", "", "", ""),
-    _row("", "Writing", "5.5", "51", "18", "162", "", "", "", ""),
-    _row("", "Speaking", "5.5", "42", "16", "162", "", "", "", ""),
-  ];
-
-  static Map<String, dynamic> _row(
-      String level,
-      String component,
-      String ielts,
-      String pte,
-      String toefl,
-      String c1,
-      String oet,
-      String celpip,
-      String languageCert,
-      String met,
+  Widget _buildDateSection(
+      String heading,
+      String subTitle,
+      Map<String, String> scores,
       ) {
-    return {
-      "level": level,
-      "component": component,
-      "ielts": ielts,
-      "pte": pte,
-      "toefl": toefl,
-      "c1": c1,
-      "oet": oet,
-      "celpip": celpip,
-      "languageCert": languageCert,
-      "met": met,
-      "isSection": false,
-    };
-  }
-
-  static Map<String, dynamic> _section(String title) {
-    return {"level": title, "isSection": true};
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          heading,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          subTitle,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...scores.entries.map(
+              (entry) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    entry.key,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const Text(
+                  ": ",
+                  style: TextStyle(fontSize: 14),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    entry.value,
+                    style: const TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

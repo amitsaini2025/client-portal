@@ -23,7 +23,7 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: ThemeConfig.white),
         centerTitle: true,
       ),
-      body: EnglishLanguageRequirementsWidget(),
+      body: const EnglishLanguageRequirementsWidget(),
     );
   }
 
@@ -155,17 +155,31 @@ class EnglishLanguageRequirementsWidget extends StatefulWidget {
 class _EnglishLanguageRequirementsWidgetState
     extends State<EnglishLanguageRequirementsWidget> {
   int selectedTab = 0;
+  int selectedLevelTab = 0;
+
+  final List<String> levelTabs = [
+    "Functional",
+    "Vocational",
+    "Competent (0 points)",
+    "Proficient (10 points)",
+    "Superior (20 points)",
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final data =
+    final allData =
     selectedTab == 0 ? tableDataAfterAug2025 : tableDataBeforeAug2025;
+
+    final selectedLevel = levelTabs[selectedLevelTab];
+    final data = _filteredDataByLevel(allData, selectedLevel);
+    final groupedData = _groupDataByTest(data);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          padding:
+          const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
@@ -188,115 +202,275 @@ class _EnglishLanguageRequirementsWidgetState
             ],
           ),
         ),
-
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            ChoiceChip(
-              label: const Text("After 7 Aug 2025"),
-              selected: selectedTab == 0,
-              selectedColor: Colors.indigo.shade100,
-              onSelected: (_) => setState(() => selectedTab = 0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.indigo.shade100),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.indigo.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
-            ChoiceChip(
-              label: const Text("Before 6 Aug 2025"),
-              selected: selectedTab == 1,
-              selectedColor: Colors.indigo.shade100,
-              onSelected: (_) => setState(() => selectedTab = 1),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ChoiceChip(
+                  label: const Text("After 7 Aug 2025"),
+                  selected: selectedTab == 0,
+                  selectedColor: Colors.indigo.shade100,
+                  backgroundColor: Colors.grey.shade100,
+                  labelStyle: TextStyle(
+                    color: selectedTab == 0 ? Colors.indigo : Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    side: BorderSide(color: Colors.indigo.shade100),
+                  ),
+                  onSelected: (_) => setState(() => selectedTab = 0),
+                ),
+                ChoiceChip(
+                  label: const Text("Before 6 Aug 2025"),
+                  selected: selectedTab == 1,
+                  selectedColor: Colors.indigo.shade100,
+                  backgroundColor: Colors.grey.shade100,
+                  labelStyle: TextStyle(
+                    color: selectedTab == 1 ? Colors.indigo : Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    side: BorderSide(color: Colors.indigo.shade100),
+                  ),
+                  onSelected: (_) => setState(() => selectedTab = 1),
+                ),
+              ],
             ),
-          ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.indigo.shade50,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.indigo.shade200),
+            ),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: List.generate(levelTabs.length, (index) {
+                return ChoiceChip(
+                  label: Text(levelTabs[index]),
+                  selected: selectedLevelTab == index,
+                  selectedColor: Colors.indigo,
+                  backgroundColor: Colors.white,
+                  labelStyle: TextStyle(
+                    color: selectedLevelTab == index
+                        ? Colors.white
+                        : Colors.indigo,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Colors.indigo.shade200),
+                  ),
+                  onSelected: (_) => setState(() => selectedLevelTab = index),
+                );
+              }),
+            ),
+          ),
         ),
         const SizedBox(height: 16),
-
         Expanded(
           child: ListView.builder(
-            itemCount: data.length,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: groupedData.length,
             itemBuilder: (context, index) {
-              final row = data[index];
-
-              if (row["isSection"] == true) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6.0),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.indigo.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      row["level"],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Colors.indigo,
-                      ),
-                    ),
-                  ),
-                );
-              }
-
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                shadowColor: Colors.indigo.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (row["level"] != "")
-                        Text(
-                          row["level"],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.indigo,
-                          ),
-                        ),
-                      if (row["component"] != "")
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0, bottom: 8),
-                          child: Text(
-                            row["component"],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ),
-                      _valueRow(Icons.school, "IELTS", row["ielts"]),
-                      _valueRow(Icons.school, "PTE", row["pte"]),
-                      _valueRow(Icons.school, "TOEFL", row["toefl"]),
-                      _valueRow(Icons.language, "C1", row["c1"]),
-                      _valueRow(Icons.language, "OET", row["oet"]),
-                      _valueRow(Icons.language, "CELPIP", row["celpip"]),
-                      _valueRow(Icons.language, "LanguageCert", row["languageCert"]),
-                      _valueRow(Icons.school, "MET", row["met"]),
-                    ],
-                  ),
-                ),
-              );
+              final group = groupedData[index];
+              return _buildGroupedCard(group);
             },
           ),
         ),
-
-        const SizedBox(height: 12),
-        const Text(
-          "Department of Home Affairs - English language visa requirements",
-          style: TextStyle(
-            color: Colors.indigo,
-            fontSize: 13,
-            decoration: TextDecoration.underline,
+        const Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            "Department of Home Affairs - English language visa requirements",
+            style: TextStyle(
+              color: Colors.indigo,
+              fontSize: 13,
+              decoration: TextDecoration.underline,
+            ),
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildGroupedCard(Map<String, dynamic> group) {
+    final List<Map<String, String>> values =
+    (group["values"] as List).cast<Map<String, String>>();
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shadowColor: Colors.indigo.shade50,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              group["title"],
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: Colors.indigo,
+              ),
+            ),
+            if ((group["subtitle"] as String).isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, bottom: 10),
+                child: Text(
+                  group["subtitle"],
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: Colors.black87,
+                  ),
+                ),
+              )
+            else
+              const SizedBox(height: 10),
+            ...values.map(
+                  (item) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        "${item["label"]}:",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: Text(
+                        item["value"] ?? "",
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> _groupDataByTest(List<Map<String, dynamic>> data) {
+    final List<Map<String, dynamic>> grouped = [];
+
+    final List<Map<String, String>> tests = [
+      {"label": "IELTS", "key": "ielts"},
+      {"label": "PTE", "key": "pte"},
+      {"label": "TOEFL", "key": "toefl"},
+      {"label": "C1", "key": "c1"},
+      {"label": "OET", "key": "oet"},
+      {"label": "CELPIP", "key": "celpip"},
+      {"label": "LanguageCert", "key": "languageCert"},
+      {"label": "MET", "key": "met"},
+    ];
+
+    final bool isFunctional =
+        levelTabs[selectedLevelTab] == "Functional" && data.isNotEmpty;
+
+    for (final test in tests) {
+      final List<Map<String, String>> values = [];
+
+      if (isFunctional) {
+        final row = data.first;
+        final value = row[test["key"]];
+        if (value != null && value.toString().isNotEmpty) {
+          values.add({
+            "label": "Score",
+            "value": value.toString(),
+          });
+        }
+      } else {
+        for (final row in data) {
+          if (row["isSection"] == true) continue;
+          final value = row[test["key"]];
+          if (value != null && value.toString().isNotEmpty) {
+            values.add({
+              "label": row["component"].toString(),
+              "value": value.toString(),
+            });
+          }
+        }
+      }
+
+      if (values.isNotEmpty) {
+        grouped.add({
+          "title": test["label"]!,
+          "subtitle": isFunctional ? levelTabs[selectedLevelTab] : "",
+          "values": values,
+        });
+      }
+    }
+
+    return grouped;
+  }
+
+  List<Map<String, dynamic>> _filteredDataByLevel(
+      List<Map<String, dynamic>> allData,
+      String selectedLevel,
+      ) {
+    final List<Map<String, dynamic>> filtered = [];
+
+    for (int i = 0; i < allData.length; i++) {
+      final row = allData[i];
+
+      if ((selectedLevel == "Functional" && row["level"] == "Functional") ||
+          (selectedLevel != "Functional" &&
+              row["isSection"] == true &&
+              row["level"] == selectedLevel)) {
+        filtered.add(row);
+
+        for (int j = i + 1; j < allData.length; j++) {
+          final nextRow = allData[j];
+          if (nextRow["isSection"] == true) {
+            break;
+          }
+          filtered.add(nextRow);
+        }
+        break;
+      }
+    }
+
+    return filtered;
   }
 
   Widget _valueRow(IconData icon, String label, String? value) {
@@ -312,7 +486,10 @@ class _EnglishLanguageRequirementsWidgetState
             child: Text(
               "$label:",
               style: const TextStyle(
-                  fontWeight: FontWeight.w600, fontSize: 12, color: Colors.black87),
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                color: Colors.black87,
+              ),
             ),
           ),
           Expanded(
@@ -328,109 +505,73 @@ class _EnglishLanguageRequirementsWidgetState
     _row(
       "Functional",
       "",
-      "Average band score at least 4.5",
-      "Overall 24",
-      "Total 26",
+      "Average band score of at least 4.5",
+      "Overall band score of at least 24",
+      "Total band score of at least 26",
       "Excluded",
-      "1020",
-      "5",
-      "38",
-      "38",
+      "Overall band score of at least 1020",
+      "Overall band score of at least 5",
+      "Overall band score of at least 38",
+      "Overall band score of at least 38",
     ),
+
     _section("Vocational"),
     _row("", "Listening", "5.0", "33", "8", "Excluded", "220", "5", "41", "49"),
     _row("", "Reading", "5.0", "36", "8", "Excluded", "240", "5", "44", "47"),
     _row("", "Writing", "5.0", "29", "9", "Excluded", "200", "5", "45", "45"),
     _row("", "Speaking", "5.0", "24", "14", "Excluded", "270", "5", "54", "38"),
+
     _section("Competent (0 points)"),
     _row("", "Listening", "6.0", "47", "16", "163", "290", "7", "57", "56"),
     _row("", "Reading", "6.0", "48", "16", "163", "310", "7", "60", "55"),
     _row("", "Writing", "6.0", "51", "19", "170", "290", "7", "64", "57"),
     _row("", "Speaking", "6.0", "54", "19", "179", "330", "7", "70", "48"),
+
     _section("Proficient (10 points)"),
     _row("", "Listening", "7.0", "58", "22", "175", "350", "9", "67", "61"),
     _row("", "Reading", "7.0", "59", "22", "179", "360", "8", "71", "63"),
     _row("", "Writing", "7.0", "69", "26", "193", "380", "10", "78", "74"),
     _row("", "Speaking", "7.0", "76", "24", "194", "360", "8", "82", "59"),
+
     _section("Superior (20 points)"),
-    _row(
-      "",
-      "Listening",
-      "8.0",
-      "69",
-      "26",
-      "186",
-      "390",
-      "10",
-      "80",
-      "Excluded",
-    ),
-    _row(
-      "",
-      "Reading",
-      "8.0",
-      "70",
-      "27",
-      "190",
-      "400",
-      "10",
-      "83",
-      "Excluded",
-    ),
-    _row(
-      "",
-      "Writing",
-      "8.0",
-      "85",
-      "30",
-      "210",
-      "420",
-      "12",
-      "89",
-      "Excluded",
-    ),
-    _row(
-      "",
-      "Speaking",
-      "8.0",
-      "88",
-      "28",
-      "208",
-      "400",
-      "10",
-      "89",
-      "Excluded",
-    ),
+    _row("", "Listening", "8.0", "69", "26", "186", "390", "10", "80", "Excluded"),
+    _row("", "Reading", "8.0", "70", "27", "190", "400", "10", "83", "Excluded"),
+    _row("", "Writing", "8.0", "85", "30", "210", "420", "12", "89", "Excluded"),
+    _row("", "Speaking", "8.0", "88", "28", "208", "400", "10", "89", "Excluded"),
   ];
 
   List<Map<String, dynamic>> get tableDataBeforeAug2025 => [
     _row(
       "Functional",
       "",
-      "Average band 4.5",
-      "Overall 30",
-      "32",
-      "147",
+      "Average band score of at least 4.5",
+      "Overall band score of at least 30",
+      "Total band score of at least 32",
+      "Total band score of at least 147",
       "",
       "",
       "",
       "",
     ),
+
     _section("Vocational"),
     _row("", "Listening", "5.0", "36", "4", "154", "B", "", "", ""),
     _row("", "Reading", "5.0", "36", "4", "154", "B", "", "", ""),
     _row("", "Writing", "5.0", "36", "14", "154", "B", "", "", ""),
     _row("", "Speaking", "5.0", "36", "14", "154", "B", "", "", ""),
+
     _section("Competent (0 points)"),
     _row("", "Listening", "6.0", "50", "12", "169", "B", "", "", ""),
     _row("", "Reading", "6.0", "50", "13", "169", "B", "", "", ""),
     _row("", "Writing", "6.0", "50", "21", "169", "B", "", "", ""),
     _row("", "Speaking", "6.0", "50", "18", "169", "B", "", "", ""),
+
     _section("Proficient (10 points)"),
     _row("", "Listening", "7.0", "65", "24", "185", "B", "", "", ""),
     _row("", "Reading", "7.0", "65", "24", "185", "B", "", "", ""),
     _row("", "Writing", "7.0", "65", "27", "185", "B", "", "", ""),
     _row("", "Speaking", "7.0", "65", "23", "185", "B", "", "", ""),
+
     _section("Superior (20 points)"),
     _row("", "Listening", "8.0", "79", "28", "200", "A", "", "", ""),
     _row("", "Reading", "8.0", "79", "29", "200", "A", "", "", ""),
