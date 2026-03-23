@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../config/theme_config.dart';
 import '../../../fcm_service.dart';
 import '../../../models/blog.dart';
 import '../../../models/case.dart';
@@ -331,13 +332,6 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                                     '/post-code-checker',
                                   );
                                 },
-                                onCourseSearch:
-                                    () => {
-                                      showSnack(
-                                        context,
-                                        "This feature will be available in a future update.",
-                                      ),
-                                    },
                                 onImportantLinks:
                                     () => {
                                       Navigator.pushNamed(
@@ -359,13 +353,6 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                                         '/vac-search',
                                       ),
                                     },
-                                onChatBot:
-                                    () => {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/chat-bots',
-                                      ),
-                                    },
                               ),
                               const SizedBox(height: 24),
                             ],
@@ -376,6 +363,17 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                   ),
                 ),
               ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/chat-bots');
+        },
+        backgroundColor: ThemeConfig.goldenYellow,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        elevation: 6,
+        tooltip: 'Chatbot',
+        child: const Icon(Icons.chat, size: 28, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 

@@ -14,11 +14,9 @@ class QuickActionsCard extends StatelessWidget {
   final VoidCallback? onStudentFundCalculator;
   final VoidCallback? onOccupationSearch;
   final VoidCallback? onPostCodeChecker;
-  final VoidCallback? onCourseSearch;
   final VoidCallback? onImportantLinks;
   final VoidCallback? onEnglishRequirement;
   final VoidCallback? onVACSearch;
-  final VoidCallback? onChatBot;
 
   const QuickActionsCard({
     super.key,
@@ -29,11 +27,9 @@ class QuickActionsCard extends StatelessWidget {
     this.onStudentFundCalculator,
     this.onOccupationSearch,
     this.onPostCodeChecker,
-    this.onCourseSearch,
     this.onImportantLinks,
     this.onEnglishRequirement,
     this.onVACSearch,
-    this.onChatBot,
   });
 
   static const double _radius = 16;
@@ -175,17 +171,6 @@ class QuickActionsCard extends StatelessWidget {
                   ),
 
                   _smallTile(
-                    Icons.school,
-                    'Course\nSearch',
-                    const Color(0xCCE65100),
-                    onCourseSearch ?? () {},
-                    context: context,
-                    iconSize: iconSize - 6,
-                    fontSize: fontSize - 1,
-                    padding: tilePadding - 4,
-                  ),
-
-                  _smallTile(
                     Icons.link,
                     'Important\nLinks',
                     const Color(0xCC004D40),
@@ -212,17 +197,6 @@ class QuickActionsCard extends StatelessWidget {
                     'VAC\nSearch',
                     const Color(0xCC880E4F),
                     onVACSearch ?? () {},
-                    context: context,
-                    iconSize: iconSize - 6,
-                    fontSize: fontSize - 1,
-                    padding: tilePadding - 4,
-                  ),
-
-                  _smallTile(
-                    Icons.web,
-                    'ChatBot',
-                    const Color(0xCC880E4F),
-                    onChatBot ?? () {},
                     context: context,
                     iconSize: iconSize - 6,
                     fontSize: fontSize - 1,

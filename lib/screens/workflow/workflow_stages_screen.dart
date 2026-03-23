@@ -200,6 +200,14 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     );
   }
 
+  Future<void> _onBulkUploadTap(WorkflowStage stage) async {
+    Navigator.pushNamed(
+      context,
+      '/bulk-upload-documents',
+      arguments: {'stageId': stage.id, 'allowedChecklistId': null},
+    );
+  }
+
   Future<void> _onViewTap(WorkflowStage stage, int checklistId) async {
     if (stage.allowedChecklistCount > 0) {
       Navigator.pushNamed(
@@ -208,7 +216,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
         arguments: {
           'stageId': stage.id,
           'stageName': stage.stageName,
-          'checklistId': checklistId
+          'checklistId': checklistId,
         },
       );
     }
@@ -261,6 +269,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                         onStageTap: _showStageDetails,
                         onChecklistPlusTap: _openUploadOptions,
                         onChecklistViewTap: _onViewTap,
+                        onBulkUploadTap: _onBulkUploadTap,
                       ),
                     ],
                   ),
@@ -325,7 +334,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
           'stageName': stage.stageName
         },
       );*/
-      showDialog(
+      /*showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Upload Documents'),
@@ -355,7 +364,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
             ),
           ],
         ),
-      );
+      );*/
     } else {
       showDialog(
         context: context,

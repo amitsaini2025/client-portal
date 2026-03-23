@@ -68,7 +68,6 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
                 children: [
-
                   StaggeredGridTile.count(
                     crossAxisCellCount: isWeb ? 2 : 2,
                     mainAxisCellCount: isWeb ? 1.5 : 2.2,
@@ -110,7 +109,6 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                       padding: tilePadding - 2,
                     ),
                   ),*/
-
                   _smallTile(
                     icon: Icons.local_activity,
                     label: 'Recent\nActivity',
@@ -147,25 +145,26 @@ class MyFilesQuickActionsCard extends StatelessWidget {
       onTap: () {
         showDialog(
           context: context,
-          builder: (_) => AlertDialog(
-            title: const Text("Change Matter"),
-            content: const Text(
-              "Do you want to change the selected matter?",
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("No"),
+          builder:
+              (_) => AlertDialog(
+                title: const Text("Change Matter"),
+                content: const Text(
+                  "Do you want to change the selected matter?",
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("No"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/matters');
+                    },
+                    child: const Text("Yes"),
+                  ),
+                ],
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/matters');
-                },
-                child: const Text("Yes"),
-              ),
-            ],
-          ),
         );
       },
       child: Container(
@@ -178,6 +177,16 @@ class MyFilesQuickActionsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
+              'Click here to change Matter',
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.blue,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 6),
+
+            const Text(
               "Selected Matter",
               style: TextStyle(
                 fontSize: 12,
@@ -188,18 +197,12 @@ class MyFilesQuickActionsCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               AuthService.selectedMatterName ?? 'No Matter Selected',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
               "ID: ${AuthService.selectedMatterId ?? ''}",
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.black54,
-              ),
+              style: const TextStyle(fontSize: 12, color: Colors.black54),
             ),
           ],
         ),
@@ -216,34 +219,36 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     required double fontSize,
     required double padding,
   }) {
-    return Builder(builder: (context) {
-      return InkWell(
-        onTap: () => _handleAuth(context, onTap),
-        borderRadius: BorderRadius.circular(_radius),
-        child: Container(
-          padding: EdgeInsets.all(padding),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(_radius),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, size: iconSize, color: Colors.white),
-              const Spacer(),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: fontSize,
+    return Builder(
+      builder: (context) {
+        return InkWell(
+          onTap: () => _handleAuth(context, onTap),
+          borderRadius: BorderRadius.circular(_radius),
+          child: Container(
+            padding: EdgeInsets.all(padding),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(_radius),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(icon, size: iconSize, color: Colors.white),
+                const Spacer(),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: fontSize,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   Widget _horizontalTile({
@@ -255,35 +260,37 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     required double fontSize,
     required double padding,
   }) {
-    return Builder(builder: (context) {
-      return InkWell(
-        onTap: () => _handleAuth(context, onTap),
-        borderRadius: BorderRadius.circular(_radius),
-        child: Container(
-          padding: EdgeInsets.all(padding),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(_radius),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, size: iconSize, color: Colors.white),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: fontSize,
+    return Builder(
+      builder: (context) {
+        return InkWell(
+          onTap: () => _handleAuth(context, onTap),
+          borderRadius: BorderRadius.circular(_radius),
+          child: Container(
+            padding: EdgeInsets.all(padding),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(_radius),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, size: iconSize, color: Colors.white),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: fontSize,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   Widget _smallTile({
