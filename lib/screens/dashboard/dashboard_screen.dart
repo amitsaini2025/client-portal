@@ -383,13 +383,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     '/post-code-checker',
                                   );
                                 },
-                                onCourseSearch:
-                                    () => {
-                                      showSnack(
-                                        context,
-                                        "This feature will be available in a future update.",
-                                      ),
-                                    },
                                 onImportantLinks:
                                     () => {
                                       Navigator.pushNamed(

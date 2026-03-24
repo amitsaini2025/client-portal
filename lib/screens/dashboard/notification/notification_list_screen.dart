@@ -6,6 +6,12 @@ import '../../../config/theme_config.dart';
 import '../../../models/notification/notification.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../workflow/message/workflow_messages_screen.dart';
+import '../../workflow/workflow_documents_screen.dart';
+import '../../workflow/workflow_stages_screen.dart';
+import '../billing_list/billing_list_screen.dart';
+import '../dashboard/dashboard_screen.dart';
+import '../personal_info/personal_information_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -150,7 +156,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                           borderRadius: BorderRadius.circular(14),
                           onTap: () async {
                             // Navigate to detail screen and refresh on return
-                            await Navigator.push(
+                            /*await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder:
@@ -158,8 +164,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                                       notificationId: item.id,
                                     ),
                               ),
-                            );
-
+                            );*/
+                            _handleNotificationTap(context, item);
                             // Refresh list after returning
                             _refresh();
                           },
@@ -245,5 +251,48 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 ),
       ),
     );
+  }
+
+  void _handleNotificationTap(
+    BuildContext context,
+    NotificationModel item,
+  ) async {
+    Widget? screen;
+    switch (item.notificationType) {
+      case 'message':
+        screen = WorkflowMessagesScreen();
+        break;
+      case 'stage_change':
+      case 'matter_discontinued':
+      case 'matter_reopened':
+      case 'checklist':
+      case 'checklist_added':
+        screen = WorkflowStagesScreen();
+        break;
+      case 'document_approved':
+      case 'document_rejected':
+      case 'document_deleted':
+      case 'document_downloaded':
+        screen = WorkflowStagesScreen();
+        break;
+      case 'detail_approved':
+      case 'detail_rejected':
+        screen = PersonalInformationScreen();
+        break;
+      case 'invoice_sent_to_client_app':
+        screen = BillingListScreen();
+        break;
+      case 'action_completed':
+      case 'lead_converted_to_client':
+        screen = NotificationDetailScreen(notificationId: item.id);
+        break;
+      default:
+        screen = NotificationDetailScreen(notificationId: item.id);
+        break;
+    }
+    if (screen != null) {
+      await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
+      _refresh();
+    }
   }
 }

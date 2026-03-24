@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/stripe_service.dart';
 import '../../../widgets/dialog/login_required_dialog.dart';
@@ -20,11 +21,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? userName;
   bool isAuthenticated = false;
 
+  int _unreadNotificationCount = 0;
+  bool _isLoadingNotificationCount = false;
+
   @override
   void initState() {
     super.initState();
     _loadUser();
+    _loadUnreadNotificationCount();
   }
+
 
   Future<void> _loadUser() async {
     isAuthenticated = AuthService.isAuthenticated;
@@ -40,6 +46,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
         isLoadingUser = false;
       });
     }
+  }
+
+  Future<void> _loadUnreadNotificationCount() async {
+    if (!AuthService.isAuthenticated) return;
+
+    setState(() => _isLoadingNotificationCount = true);
+
+    try {
+      final response = await ApiService.getUnreadNotificationCount();
+
+      if (response['success'] == true) {
+        final count = response['data']?['unread_count'] ?? 0;
+        if (mounted) {
+          setState(() {
+            _unreadNotificationCount = count;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Unread count error: $e");
+    }
+
+    if (mounted) setState(() => _isLoadingNotificationCount = false);
   }
 
   @override
@@ -69,7 +98,72 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
 
           actions: [
+            Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_outlined,
+                      color: Colors.white),
+                  onPressed: () async {
+                    if (AuthService.isAuthenticated) {
+                      await Navigator.pushNamed(context, '/notifications');
+                      _loadUnreadNotificationCount(); // refresh after return
+                    } else {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (_) =>
+                            LoginRequiredDialog(parentContext: context),
+                      );
+                    }
+                  },
+                ),
+                if (_unreadNotificationCount > 0)
+                  Positioned(
+                    right: 6,
+                    top: 6,
+                    child: Container(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 18,
+                        minHeight: 18,
+                      ),
+                      child: Text(
+                        _unreadNotificationCount > 99
+                            ? '99+'
+                            : _unreadNotificationCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             IconButton(
+              icon: const Icon(Icons.person_outline, color: Colors.white),
+              onPressed: () {
+                if (AuthService.isAuthenticated) {
+                  Navigator.pushNamed(context, '/profile');
+                } else {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (_) =>
+                        LoginRequiredDialog(parentContext: context),
+                  );
+                }
+              },
+            ),
+
+            /*IconButton(
               icon: const Icon(
                 Icons.notifications_outlined,
                 color: Colors.white,
@@ -97,7 +191,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   );
                 }
               },
-            ),
+            ),*/
           ],
         ),
 

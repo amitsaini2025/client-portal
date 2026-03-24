@@ -1325,14 +1325,51 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> recordPaymentWallet({
+    required int appointmentId,
+    required String paymentIntentId,
+    required String paymentType
+  }) async {
+    final endpoint = ApiConfig.appointmentsRecordPaymentWallet;
+
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      'appointment_id': appointmentId,
+      'payment_intent_id': paymentIntentId,
+      'payment_type': paymentType
+    }, "POST");
+
+    return response;
+  }
+
+  static Future<Map<String, dynamic>> recordPaymentWalletWithoutLogin({
+    required int appointmentId,
+    required String paymentIntentId,
+    required String paymentType
+  }) async {
+    final endpoint = ApiConfig.appointmentsRecordPaymentWalletWithoutLogin;
+
+    final response = await _makeRequest(endpoint, _buildHeaders(), {
+      'appointment_id': appointmentId,
+      'payment_intent_id': paymentIntentId,
+      'payment_type': paymentType
+    }, "POST");
+
+    return response;
+  }
+
+
   static Future<Map<String, dynamic>> getNotifications({
     required int clientMatterId,
     int page = 1,
     int limit = 20,
   }) async {
-    final url =
-        '${ApiConfig.notifications}?client_matter_id=$clientMatterId&page=$page&limit=$limit';
+    //final url = '${ApiConfig.notifications}?client_matter_id=$clientMatterId&page=$page&limit=$limit';
+    final url = '${ApiConfig.notifications}?page=$page&limit=$limit';
+    return await _makeRequest(url, _buildHeaders(), null, 'GET');
+  }
 
+  static Future<Map<String, dynamic>> getUnreadNotificationCount() async {
+    final url = ApiConfig.notificationsUnreadCount;
     return await _makeRequest(url, _buildHeaders(), null, 'GET');
   }
 

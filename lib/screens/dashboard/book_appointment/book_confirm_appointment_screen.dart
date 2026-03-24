@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:pay/pay.dart';
 
 import '../../../config/stripe_config.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/stripe_service.dart';
+import '../../../utils/payment_config.dart';
 import 'book_appointment_success_screen.dart';
 
 class BookConfirmAppointmentScreen extends StatefulWidget {
@@ -24,7 +28,62 @@ class BookConfirmAppointmentScreen extends StatefulWidget {
 class _BookConfirmAppointmentScreenState
     extends State<BookConfirmAppointmentScreen> {
   bool isLoading = false;
+  bool isLoadingWallet = false;
   bool isProcessingPayment = false;
+
+  Future<void> _handleWalletPayment(Map<String, dynamic> result) async {
+    final price = widget.selectedOptions['service_price'] ?? 0;
+
+    setState(() {
+      isLoadingWallet = true;
+    });
+
+    try {
+      //String paymentToken = result.toString();
+      final paymentToken =
+          result['paymentMethodData']?['tokenizationData']?['token'] ??
+          result.toString();
+
+      final appointmentResponse =
+          AuthService.isAuthenticated
+              ? await _createAppointment()
+              : await _createAppointmentWithoutLogin();
+
+      final appointmentId = appointmentResponse['data']['id'];
+
+      if (appointmentId != null) {
+        AuthService.isAuthenticated
+            ? await ApiService.recordPaymentWallet(
+              appointmentId: appointmentId,
+              paymentIntentId: paymentToken,
+              paymentType: Platform.isIOS ? "apple_pay" : "gpay",
+            )
+            : await ApiService.recordPaymentWalletWithoutLogin(
+              appointmentId: appointmentId,
+              paymentIntentId: paymentToken,
+              paymentType: Platform.isIOS ? "apple_pay" : "gpay",
+            );
+      }
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder:
+              (_) => BookAppointmentSuccessScreen(data: appointmentResponse),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Wallet payment failed: $e")));
+    } finally {
+      setState(() {
+        isLoadingWallet = false;
+      });
+    }
+  }
 
   Future<Map<String, dynamic>> _createAppointment() async {
     final serviceId =
@@ -134,17 +193,11 @@ class _BookConfirmAppointmentScreenState
           paymentSheetParameters: SetupPaymentSheetParameters(
             paymentIntentClientSecret: clientSecret,
             merchantDisplayName: StripeConfig.merchantDisplayName,
-            style:
-                Theme.of(context).brightness == Brightness.dark
-                    ? ThemeMode.dark
-                    : ThemeMode.light,
           ),
         );
 
         await Stripe.instance.presentPaymentSheet();
 
-        //final paymentIntentResult = await Stripe.instance.retrievePaymentIntent(clientSecret);
-        //paymentMethodId = paymentIntentResult.paymentMethodId;
         paymentMethodId = paymentIntent['id'];
       }
 
@@ -156,24 +209,17 @@ class _BookConfirmAppointmentScreenState
       final appointmentId = appointmentResponse['data']['id'];
 
       if (appointmentId != null && paymentMethodId != null) {
-        final requestData = {
-          'appointment_id': appointmentId,
-          'payment_intent_id': paymentMethodId,
-        };
-        print('recordAppointmentPayment REQUEST: $requestData');
-        final paymentResponse =
-            AuthService.isAuthenticated
-                ? await ApiService.recordAppointmentPayment(
-                  appointmentId: appointmentId,
-                  paymentIntentId: paymentMethodId,
-                )
-                : await ApiService.recordAppointmentPaymentWithoutLogin(
-                  appointmentId: appointmentId,
-                  paymentIntentId: paymentMethodId,
-                );
-
-        print('recordAppointmentPayment RESPONSE: $paymentResponse');
+        AuthService.isAuthenticated
+            ? await ApiService.recordAppointmentPayment(
+              appointmentId: appointmentId,
+              paymentIntentId: paymentMethodId,
+            )
+            : await ApiService.recordAppointmentPaymentWithoutLogin(
+              appointmentId: appointmentId,
+              paymentIntentId: paymentMethodId,
+            );
       }
+
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -182,24 +228,10 @@ class _BookConfirmAppointmentScreenState
               (_) => BookAppointmentSuccessScreen(data: appointmentResponse),
         ),
       );
-    } on StripeException catch (e) {
-      final cancelled =
-          e.error.code == FailureCode.Canceled ||
-          e.error.message?.toLowerCase() == 'canceled';
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            cancelled
-                ? 'Payment cancelled.'
-                : (e.error.message ?? 'Payment failed.'),
-          ),
-        ),
-      );
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Unable to complete booking: $e')));
+      ).showSnackBar(SnackBar(content: Text('Payment failed: $e')));
     } finally {
       setState(() {
         isLoading = false;
@@ -238,7 +270,6 @@ class _BookConfirmAppointmentScreenState
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: ThemeConfig.goldenYellow,
-        elevation: 0,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -257,7 +288,81 @@ class _BookConfirmAppointmentScreenState
               '${opts['appoint_date']} at ${opts['appoint_time']}',
             ),
             _row('Enquiry Details', opts['description'] ?? '-'),
-            const SizedBox(height: 40),
+
+            const SizedBox(height: 30),
+
+            // ================= WALLET BUTTON =================
+            if (price != 0) ...[
+              Center(
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child:
+                      Platform.isIOS
+                          ? AbsorbPointer(
+                            absorbing: isLoadingWallet,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                ApplePayButton(
+                                  paymentConfiguration:
+                                      PaymentConfiguration.fromJsonString(
+                                        applePayConfig,
+                                      ),
+                                  paymentItems: [
+                                    PaymentItem(
+                                      label: opts['service_name'],
+                                      amount: price.toString(),
+                                      status: PaymentItemStatus.final_price,
+                                    ),
+                                  ],
+                                  width: double.infinity,
+                                  height: 50,
+                                  onPaymentResult: _handleWalletPayment,
+                                ),
+                                if (isLoadingWallet)
+                                  const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                              ],
+                            ),
+                          )
+                          : AbsorbPointer(
+                            absorbing: isLoadingWallet,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                GooglePayButton(
+                                  paymentConfiguration:
+                                      PaymentConfiguration.fromJsonString(
+                                        googlePayConfig,
+                                      ),
+                                  paymentItems: [
+                                    PaymentItem(
+                                      label: opts['service_name'],
+                                      amount: price.toString(),
+                                      status: PaymentItemStatus.final_price,
+                                    ),
+                                  ],
+                                  width: double.infinity,
+                                  height: 50,
+                                  onPaymentResult: _handleWalletPayment,
+                                ),
+                                if (isLoadingWallet)
+                                  const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                              ],
+                            ),
+                          ),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+              const Center(child: Text("OR")),
+              const SizedBox(height: 12),
+            ],
+
             Center(
               child: SizedBox(
                 width: 220,
@@ -270,20 +375,10 @@ class _BookConfirmAppointmentScreenState
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1F3C88),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
                   ),
                   child:
                       (isLoading || isProcessingPayment)
-                          ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: Colors.white,
-                            ),
-                          )
+                          ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
                             price == 0
                                 ? 'Submit'

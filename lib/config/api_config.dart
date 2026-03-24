@@ -78,10 +78,14 @@ class ApiConfig {
   static const String appointmentsGetDisabledDates = "/appointments/get-disabled-dates";
   static const String appointmentsGetDisabledSlots = "/appointments/get-disabled-slots";
   static const String appointmentsProcessPayment = "/appointments/process-payment";
-  static const String appointmentsRecordPayment = '/appointments/record-payment';
+  static const String appointmentsRecordPayment = "/appointments/record-payment";
   static const String appointmentsRecordPaymentWithLogin = "/appointments/record-payment-without-login";
+  static const String appointmentsRecordPaymentWallet = "/appointments/record-payment-wallet";
+  static const String appointmentsRecordPaymentWalletWithoutLogin = "/appointments/record-payment-without-login-wallet";
+
 
   static const String notifications = "/notifications";
+  static const String notificationsUnreadCount = "/notifications/unread-count";
   static const String billingList = "/billing/list";
   static const String billingInvoiceUpdate = "/billing/invoice-update";
 
