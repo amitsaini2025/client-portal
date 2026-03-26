@@ -425,12 +425,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 onUpcomingDeadlines: () {
                                   Navigator.pushNamed(context, '/tasks');
                                 },
-                                onRecentActivity: () {
+                                /*onRecentActivity: () {
                                   Navigator.pushNamed(
                                     context,
                                     '/recent-activity',
                                   );
-                                },
+                                },*/
                                 onMessage: () {
                                   Navigator.pushNamed(
                                     context,

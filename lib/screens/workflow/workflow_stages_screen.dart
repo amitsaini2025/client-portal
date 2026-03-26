@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:client/config/theme_config.dart';
+import 'package:client/widgets/common_app_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -201,11 +202,13 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
   }
 
   Future<void> _onBulkUploadTap(WorkflowStage stage) async {
-    Navigator.pushNamed(
+    await Navigator.pushNamed(
       context,
       '/bulk-upload-documents',
       arguments: {'stageId': stage.id, 'allowedChecklistId': null},
     );
+
+    _loadWorkflowData();
   }
 
   Future<void> _onViewTap(WorkflowStage stage, int checklistId) async {
@@ -232,7 +235,8 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
+      appBar: CommonAppBar(titleName: 'Workflow Stages'),
+      /*appBar: AppBar(
         title: const Text(
           'Workflow Stages',
           style: TextStyle(color: Colors.white),
@@ -240,7 +244,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
-      ),
+      ),*/
       body:
           _isLoading
               ? const Center(

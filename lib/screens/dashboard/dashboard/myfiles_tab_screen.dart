@@ -200,9 +200,9 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen> with RouteAware {
               onUpcomingDeadlines: () {
                 Navigator.pushNamed(context, '/tasks');
               },
-              onRecentActivity: () {
+              /*onRecentActivity: () {
                 Navigator.pushNamed(context, '/recent-activity');
-              },
+              },*/
               onMessage: () {
                 Navigator.pushNamed(context, '/workflow-message');
               },

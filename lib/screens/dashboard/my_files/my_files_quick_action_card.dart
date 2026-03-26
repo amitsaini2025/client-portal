@@ -9,7 +9,6 @@ class MyFilesQuickActionsCard extends StatelessWidget {
   final VoidCallback? onBilling;
   final VoidCallback? onDocumentStatus;
   final VoidCallback? onUpcomingDeadlines;
-  final VoidCallback? onRecentActivity;
   final VoidCallback? onMessage;
 
   const MyFilesQuickActionsCard({
@@ -18,7 +17,6 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     this.onBilling,
     this.onDocumentStatus,
     this.onUpcomingDeadlines,
-    this.onRecentActivity,
     this.onMessage,
   });
 
@@ -109,7 +107,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                       padding: tilePadding - 2,
                     ),
                   ),*/
-                  _smallTile(
+                  /*_smallTile(
                     icon: Icons.local_activity,
                     label: 'Recent\nActivity',
                     color: const Color(0xCCF9A825),
@@ -118,7 +116,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     iconSize: iconSize - 6,
                     fontSize: fontSize - 1,
                     padding: tilePadding - 4,
-                  ),
+                  ),*/
 
                   _smallTile(
                     icon: Icons.message,

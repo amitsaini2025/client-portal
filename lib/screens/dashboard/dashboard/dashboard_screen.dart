@@ -31,7 +31,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadUnreadNotificationCount();
   }
 
-
   Future<void> _loadUser() async {
     isAuthenticated = AuthService.isAuthenticated;
 
@@ -101,8 +100,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Stack(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.notifications_outlined,
-                      color: Colors.white),
+                  icon: const Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.white,
+                  ),
                   onPressed: () async {
                     if (AuthService.isAuthenticated) {
                       await Navigator.pushNamed(context, '/notifications');
@@ -111,8 +112,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       showDialog(
                         context: context,
                         barrierDismissible: true,
-                        builder: (_) =>
-                            LoginRequiredDialog(parentContext: context),
+                        builder:
+                            (_) => LoginRequiredDialog(parentContext: context),
                       );
                     }
                   },
@@ -122,8 +123,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     right: 6,
                     top: 6,
                     child: Container(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(10),
@@ -133,9 +136,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         minHeight: 18,
                       ),
                       child: Text(
-                        _unreadNotificationCount > 99
-                            ? '99+'
-                            : _unreadNotificationCount.toString(),
+                        _unreadNotificationCount.toString(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
@@ -156,8 +157,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   showDialog(
                     context: context,
                     barrierDismissible: true,
-                    builder: (_) =>
-                        LoginRequiredDialog(parentContext: context),
+                    builder: (_) => LoginRequiredDialog(parentContext: context),
                   );
                 }
               },
@@ -240,7 +240,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.black87,
                 splashFactory: NoSplash.splashFactory,
-                overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+                overlayColor: const MaterialStatePropertyAll(
+                  Colors.transparent,
+                ),
                 labelStyle: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
@@ -269,7 +271,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
             ),
-          )
+          ),
         ),
       ),
     );

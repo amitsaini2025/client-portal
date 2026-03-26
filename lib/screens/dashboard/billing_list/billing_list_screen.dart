@@ -5,12 +5,12 @@ import 'package:pay/pay.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
 import '../../../config/stripe_config.dart';
-import '../../../config/theme_config.dart';
 import '../../../models/billing_list/invoice.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
 import '../../../utils/payment_config.dart';
 import '../../../services/stripe_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class BillingListScreen extends StatefulWidget {
   const BillingListScreen({super.key});
@@ -122,7 +122,6 @@ class _BillingListScreenState extends State<BillingListScreen> {
   }
 
   Future<void> _handleStripePayment(Invoice invoice) async {
-    // Process one invoice at a time
     setState(() => _processingStripeInvoiceId = invoice.id);
 
     try {
@@ -133,10 +132,14 @@ class _BillingListScreenState extends State<BillingListScreen> {
         throw Exception("Invalid invoice amount: $rawAmount");
       }
 
-      // Convert to minor unit (cents/paisa)
       final amountInMinorUnit = StripeService.amountToMinorUnit(amountDouble);
+      if (amountInMinorUnit < 50) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Minimum payment amount is 0.50 AUD")),
+        );
+        return;
+      }
 
-      // Create PaymentIntent via backend
       final paymentIntent = await StripeService.createPaymentIntent(
         amountInMinorUnit: amountInMinorUnit,
         currency: StripeConfig.defaultCurrency.toLowerCase(),
@@ -152,7 +155,6 @@ class _BillingListScreenState extends State<BillingListScreen> {
         throw Exception('Missing Stripe client secret');
       }
 
-      // Initialize Stripe PaymentSheet
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
@@ -163,15 +165,13 @@ class _BillingListScreenState extends State<BillingListScreen> {
         ),
       );
 
-      // Present PaymentSheet
       await Stripe.instance.presentPaymentSheet();
 
-      // Record payment in backend
       await ApiService.updateInvoicePayment(
-        billingInvoiceId: invoice.id!,
-        clientMatterId: invoice.clientMatterId!,
+        billingInvoiceId: invoice.id,
+        clientMatterId: invoice.clientMatterId,
         paymentType: "stripe",
-        paymentToken: paymentIntent['id'], // Stripe PaymentIntent ID
+        paymentToken: paymentIntent['id'],
         paymentStatus: "completed",
       );
 
@@ -203,7 +203,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
-      appBar: AppBar(
+      /*appBar: AppBar(
         elevation: 0,
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
@@ -211,7 +211,8 @@ class _BillingListScreenState extends State<BillingListScreen> {
           "Billing & Invoices",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-      ),
+      ),*/
+      appBar: CommonAppBar(titleName: 'Billing & Invoices'),
       body: Column(
         children: [
           _buildSummary(),

@@ -14,6 +14,7 @@ import '../../../models/workflow_message.dart';
 import '../../../models/workflow_send_message_response.dart' hide Recipient;
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class PusherService {
   PusherService._();
@@ -388,12 +389,13 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: const Text('Messages', style: TextStyle(color: Colors.white)),
         backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
-      ),
+      ),*/
+      appBar: CommonAppBar(titleName: 'Messages'),
       backgroundColor: const Color(0xFFF5F5F5),
       body: _isLoading
           ? Center(
