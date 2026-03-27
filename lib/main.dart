@@ -33,7 +33,6 @@ import 'package:client/screens/workflow/message/workflow_messages_screen.dart';
 import 'package:client/screens/workflow/workflow_documents_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:client/screens/workflow/workflow_stages_screen.dart';
-import 'package:client/services/stripe_service.dart';
 import 'package:client/utils/navigation_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -364,6 +363,7 @@ class MyAppWithTheme extends StatelessWidget {
                       as Map<String, dynamic>?;
 
               return BulkUploadDocumentScreen(
+                matterID: args?['matter_id'] ?? 0,
                 stageId: args?['stageId'] ?? 0,
                 allowedCheckListId: args?['allowedChecklistId'],
               );
@@ -377,9 +377,27 @@ class MyAppWithTheme extends StatelessWidget {
                 title: args['title'] ?? 'PDF Document',
               );
             },
+
+            //My Files
+            '/billing-list': (context) {
+              final args =
+                  ModalRoute.of(context)!.settings.arguments
+                      as Map<String, dynamic>;
+              return BillingListScreen(matterID: args['matter_id']);
+            },
             '/workflow': (context) => const WorkflowScreen(),
-            '/workflow-stages': (context) => const WorkflowStagesScreen(),
-            '/workflow-message': (context) => const WorkflowMessagesScreen(),
+            '/workflow-stages': (context) {
+              final args =
+                  ModalRoute.of(context)!.settings.arguments
+                      as Map<String, dynamic>;
+              return WorkflowStagesScreen(matterID: args['matter_id']);
+            },
+            '/workflow-message': (context) {
+              final args =
+                  ModalRoute.of(context)!.settings.arguments
+                      as Map<String, dynamic>;
+              return WorkflowMessagesScreen(matterID: args['matter_id']);
+            },
             '/workflow-message-detail': (context) {
               final args =
                   ModalRoute.of(context)!.settings.arguments
@@ -400,6 +418,7 @@ class MyAppWithTheme extends StatelessWidget {
                   ModalRoute.of(context)!.settings.arguments
                       as Map<String, dynamic>;
               return WorkflowViewDocumentsByChecklistScreen(
+                matterId: args['matter_id'],
                 stageId: args['stageId'],
                 allowedCheckListId: args['checklistId'],
               );
@@ -420,7 +439,6 @@ class MyAppWithTheme extends StatelessWidget {
             '/post-code-checker': (context) => PostcodeCheckerScreen(),
             '/notifications': (context) => NotificationsScreen(),
             '/important-links': (context) => ImportantLinksScreen(),
-            '/billing-list': (context) => BillingListScreen(),
             '/vac-search': (context) => VacSearchScreen(),
             '/chat-bots': (context) => ChatBotScreen(),
           },

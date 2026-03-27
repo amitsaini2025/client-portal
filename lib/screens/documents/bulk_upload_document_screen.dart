@@ -10,11 +10,13 @@ import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 
 class BulkUploadDocumentScreen extends StatefulWidget {
+  final int? matterID;
   final int? stageId;
   final int? allowedCheckListId;
 
   const BulkUploadDocumentScreen({
     super.key,
+    this.matterID,
     this.stageId,
     this.allowedCheckListId,
   });
@@ -43,7 +45,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
 
     try {
       final res = await ApiService.getWorkflowAllowedChecklist(
-        clientMatterId: AuthService.selectedMatterId!,
+        clientMatterId: widget.matterID ?? 0,
         stageId: widget.stageId,
         allowedChecklistID: widget.allowedCheckListId,
       );
@@ -158,7 +160,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
       final res = await ApiService.bulkUploadChecklistDocuments(
         files: files,
         allowedChecklistIds: ids,
-        clientMatterId: AuthService.selectedMatterId!,
+        clientMatterId: widget.matterID ?? 0,
       );
 
       if (res['success'] == true) {

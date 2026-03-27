@@ -7,11 +7,13 @@ import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
 
 class WorkflowViewDocumentsByChecklistScreen extends StatefulWidget {
+  final int matterId;
   final int stageId;
   final int allowedCheckListId;
 
   const WorkflowViewDocumentsByChecklistScreen({
     super.key,
+    required this.matterId,
     required this.stageId,
     required this.allowedCheckListId,
   });
@@ -37,7 +39,7 @@ class _WorkflowViewDocumentsByChecklistScreenState
 
     try {
       final res = await ApiService.getWorkflowAllowedChecklist(
-        clientMatterId: AuthService.selectedMatterId!,
+        clientMatterId: widget.matterId,
         stageId: widget.stageId,
         allowedChecklistID: widget.allowedCheckListId,
       );

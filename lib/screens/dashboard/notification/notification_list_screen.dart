@@ -255,30 +255,36 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     BuildContext context,
     NotificationModel item,
   ) async {
+    if (!item.isRead) {
+      await ApiService.markNotificationAsRead(
+        notificationId: item.id,
+      );
+      item.isRead = true;
+    }
     Widget? screen;
     switch (item.notificationType) {
       case 'message':
-        screen = WorkflowMessagesScreen();
+        screen = WorkflowMessagesScreen(matterID: item.clientMatterId);
         break;
       case 'stage_change':
       case 'matter_discontinued':
       case 'matter_reopened':
       case 'checklist':
       case 'checklist_added':
-        screen = WorkflowStagesScreen();
+        screen = WorkflowStagesScreen(matterID: item.clientMatterId);
         break;
       case 'document_approved':
       case 'document_rejected':
       case 'document_deleted':
       case 'document_downloaded':
-        screen = WorkflowStagesScreen();
+        screen = WorkflowStagesScreen(matterID: item.clientMatterId);
         break;
       case 'detail_approved':
       case 'detail_rejected':
         screen = PersonalInformationScreen();
         break;
       case 'invoice_sent_to_client_app':
-        screen = BillingListScreen();
+        screen = BillingListScreen(matterID: item.clientMatterId);
         break;
       case 'action_completed':
       case 'lead_converted_to_client':

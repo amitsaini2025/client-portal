@@ -411,8 +411,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder:
-                                          (context) =>
-                                              const WorkflowStagesScreen(),
+                                          (context) => WorkflowStagesScreen(
+                                            matterID:
+                                                AuthService.selectedMatterId ??
+                                                0,
+                                          ),
                                     ),
                                   );
                                 },

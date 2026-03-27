@@ -7,8 +7,13 @@ import 'dialog/login_required_dialog.dart';
 
 class CommonAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String titleName;
+  final int? matterID;
 
-  const CommonAppBar({super.key, required this.titleName});
+  const CommonAppBar({
+    super.key,
+    required this.titleName,
+    required this.matterID,
+  });
 
   @override
   State<CommonAppBar> createState() => _CommonAppBarState();
@@ -21,10 +26,14 @@ class _CommonAppBarState extends State<CommonAppBar> {
   int _unreadNotificationCount = 0;
   bool _isLoadingNotificationCount = false;
 
+  String? _matterName;
+  bool _isLoadingMatter = true;
+
   @override
   void initState() {
     super.initState();
     _loadUnreadNotificationCount();
+    _loadMatterName();
   }
 
   Future<void> _loadUnreadNotificationCount() async {
@@ -50,6 +59,49 @@ class _CommonAppBarState extends State<CommonAppBar> {
     if (mounted) setState(() => _isLoadingNotificationCount = false);
   }
 
+  Future<void> _loadMatterName() async {
+    try {
+      final response = await ApiService.getMatters();
+      if (response['success'] == true && response['data'] != null) {
+        final matters = response['data']['matters'] as List<dynamic>;
+        final matchedMatter = matters.firstWhere(
+          (m) => m['matter_id'].toString() == widget.matterID,
+          orElse: () => null,
+        );
+
+        if (mounted) {
+          final matchedMatter = matters.firstWhere(
+            (m) => m['matter_id'] == widget.matterID,
+            orElse: () => {},
+          );
+
+          setState(() {
+            _matterName =
+                matchedMatter.isNotEmpty
+                    ? matchedMatter['matter_name'].toString()
+                    : 'Unknown Matter';
+            _isLoadingMatter = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _matterName = 'No Matter Found';
+            _isLoadingMatter = false;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Error loading matter: $e");
+      if (mounted) {
+        setState(() {
+          _matterName = 'Error';
+          _isLoadingMatter = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -66,13 +118,25 @@ class _CommonAppBarState extends State<CommonAppBar> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            AuthService.selectedMatterName ?? 'No Matter Selected',
-            style: const TextStyle(fontSize: 13, color: Colors.white),
-          ),
-          Text(
-            "ID: ${AuthService.selectedMatterId ?? ''}",
-            style: const TextStyle(fontSize: 11, color: Colors.white),
+          const SizedBox(height: 2),
+          Visibility(
+            visible: !_isLoadingMatter,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _matterName ?? '',
+                  style: const TextStyle(fontSize: 13, color: Colors.white),
+                ),
+                Text(
+                  "ID: ${widget.matterID ?? ''}",
+                  style: const TextStyle(fontSize: 11, color: Colors.white),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -1,19 +1,21 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:pay/pay.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:pay/pay.dart';
 
 import '../../../config/stripe_config.dart';
 import '../../../models/billing_list/invoice.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
-import '../../../utils/payment_config.dart';
 import '../../../services/stripe_service.dart';
+import '../../../utils/payment_config.dart';
 import '../../../widgets/common_app_bar.dart';
 
 class BillingListScreen extends StatefulWidget {
-  const BillingListScreen({super.key});
+  final int? matterID;
+
+  const BillingListScreen({super.key, required this.matterID});
 
   @override
   State<BillingListScreen> createState() => _BillingListScreenState();
@@ -41,7 +43,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
 
   void _paginationListener() {
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 150 &&
+            _scrollController.position.maxScrollExtent - 150 &&
         !_isPaginating &&
         _hasMore) {
       _fetchInvoices();
@@ -61,7 +63,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
 
     try {
       final response = await ApiService.getInvoices(
-        clientMatterId: AuthService.selectedMatterId ?? 0,
+        clientMatterId: widget.matterID ?? 0,
         page: _currentPage,
         perPage: _perPage,
       );
@@ -71,7 +73,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
       final pagination = data['pagination'];
 
       final fetchedInvoices =
-      invoicesJson.map((e) => Invoice.fromJson(e)).toList();
+          invoicesJson.map((e) => Invoice.fromJson(e)).toList();
 
       setState(() {
         _invoices.addAll(fetchedInvoices);
@@ -109,15 +111,15 @@ class _BillingListScreenState extends State<BillingListScreen> {
         paymentStatus: "completed",
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Payment successful")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Payment successful")));
 
       _fetchInvoices(refresh: true);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Payment error: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Payment error: $e")));
     }
   }
 
@@ -159,9 +161,10 @@ class _BillingListScreenState extends State<BillingListScreen> {
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
           merchantDisplayName: StripeConfig.merchantDisplayName,
-          style: Theme.of(context).brightness == Brightness.dark
-              ? ThemeMode.dark
-              : ThemeMode.light,
+          style:
+              Theme.of(context).brightness == Brightness.dark
+                  ? ThemeMode.dark
+                  : ThemeMode.light,
         ),
       );
 
@@ -181,19 +184,22 @@ class _BillingListScreenState extends State<BillingListScreen> {
 
       _fetchInvoices(refresh: true);
     } on StripeException catch (e) {
-      final cancelled = e.error.code == FailureCode.Canceled ||
+      final cancelled =
+          e.error.code == FailureCode.Canceled ||
           e.error.message?.toLowerCase() == 'canceled';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            cancelled ? 'Payment cancelled.' : (e.error.message ?? 'Payment failed'),
+            cancelled
+                ? 'Payment cancelled.'
+                : (e.error.message ?? 'Payment failed'),
           ),
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Stripe payment failed: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Stripe payment failed: $e")));
     } finally {
       setState(() => _processingStripeInvoiceId = null);
     }
@@ -212,21 +218,25 @@ class _BillingListScreenState extends State<BillingListScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),*/
-      appBar: CommonAppBar(titleName: 'Billing & Invoices'),
+      appBar: CommonAppBar(
+        titleName: 'Billing & Invoices',
+        matterID: AuthService.selectedMatterId,
+      ),
       body: Column(
         children: [
           _buildSummary(),
           Expanded(
-            child: _isInitialLoading
-                ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: _invoices.length,
-              itemBuilder: (context, index) {
-                return _buildInvoiceCard(_invoices[index]);
-              },
-            ),
+            child:
+                _isInitialLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _invoices.length,
+                      itemBuilder: (context, index) {
+                        return _buildInvoiceCard(_invoices[index]);
+                      },
+                    ),
           ),
         ],
       ),
@@ -265,7 +275,11 @@ class _BillingListScreenState extends State<BillingListScreen> {
   }
 
   Widget _modernSummaryCard(
-      String title, double amount, Gradient gradient, IconData icon) {
+    String title,
+    double amount,
+    Gradient gradient,
+    IconData icon,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -332,43 +346,46 @@ class _BillingListScreenState extends State<BillingListScreen> {
               const SizedBox(height: 16),
               Platform.isIOS
                   ? ApplePayButton(
-                paymentConfiguration:
-                PaymentConfiguration.fromJsonString(applePayConfig),
-                paymentItems: [
-                  PaymentItem(
-                    label: "Invoice ${invoice.invoiceNumber}",
-                    amount: invoice.totalAmount!.toString(),
-                    status: PaymentItemStatus.final_price,
-                  ),
-                ],
-                width: double.infinity,
-                height: 48,
-                onPaymentResult: (result) =>
-                    _onPaymentResult(result, invoice),
-              )
+                    paymentConfiguration: PaymentConfiguration.fromJsonString(
+                      applePayConfig,
+                    ),
+                    paymentItems: [
+                      PaymentItem(
+                        label: "Invoice ${invoice.invoiceNumber}",
+                        amount: invoice.totalAmount!.toString(),
+                        status: PaymentItemStatus.final_price,
+                      ),
+                    ],
+                    width: double.infinity,
+                    height: 48,
+                    onPaymentResult:
+                        (result) => _onPaymentResult(result, invoice),
+                  )
                   : GooglePayButton(
-                paymentConfiguration:
-                PaymentConfiguration.fromJsonString(googlePayConfig),
-                paymentItems: [
-                  PaymentItem(
-                    label: "Invoice ${invoice.invoiceNumber}",
-                    amount: invoice.totalAmount!.toString(),
-                    status: PaymentItemStatus.final_price,
+                    paymentConfiguration: PaymentConfiguration.fromJsonString(
+                      googlePayConfig,
+                    ),
+                    paymentItems: [
+                      PaymentItem(
+                        label: "Invoice ${invoice.invoiceNumber}",
+                        amount: invoice.totalAmount!.toString(),
+                        status: PaymentItemStatus.final_price,
+                      ),
+                    ],
+                    width: double.infinity,
+                    height: 48,
+                    onPaymentResult:
+                        (result) => _onPaymentResult(result, invoice),
                   ),
-                ],
-                width: double.infinity,
-                height: 48,
-                onPaymentResult: (result) =>
-                    _onPaymentResult(result, invoice),
-              ),
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: isProcessingStripe
-                      ? null
-                      : () => _handleStripePayment(invoice),
+                  onPressed:
+                      isProcessingStripe
+                          ? null
+                          : () => _handleStripePayment(invoice),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1F3C88),
                     foregroundColor: Colors.white,
@@ -376,16 +393,17 @@ class _BillingListScreenState extends State<BillingListScreen> {
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  child: isProcessingStripe
-                      ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: Colors.white,
-                    ),
-                  )
-                      : const Text('Pay with Stripe'),
+                  child:
+                      isProcessingStripe
+                          ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text('Pay with Stripe'),
                 ),
               ),
             ],
@@ -400,9 +418,10 @@ class _BillingListScreenState extends State<BillingListScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isPaid
-            ? Colors.green.withOpacity(0.1)
-            : Colors.orange.withOpacity(0.1),
+        color:
+            isPaid
+                ? Colors.green.withOpacity(0.1)
+                : Colors.orange.withOpacity(0.1),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(

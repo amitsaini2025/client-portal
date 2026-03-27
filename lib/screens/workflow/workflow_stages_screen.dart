@@ -12,7 +12,9 @@ import '../../services/auth_service.dart';
 import '../../widgets/workflow/workflow_progress_widget.dart';
 
 class WorkflowStagesScreen extends StatefulWidget {
-  const WorkflowStagesScreen({super.key});
+  final int? matterID;
+
+  const WorkflowStagesScreen({super.key, required this.matterID});
 
   @override
   State<WorkflowStagesScreen> createState() => _WorkflowStagesScreenState();
@@ -41,7 +43,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
 
     try {
       final response = await ApiService.getWorkflowStages(
-        clientMatterId: AuthService.selectedMatterId ?? 0,
+        clientMatterId: widget.matterID ?? 0,
       );
 
       if (response['success'] == true && response['data'] != null) {
@@ -149,7 +151,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
       final response = await ApiService.uploadWorkflowChecklistDocument(
         filePath: _selectedFile!.path,
         allowedChecklistId: checklistId,
-        clientMatterId: AuthService.selectedMatterId!,
+        clientMatterId: widget.matterID ?? 0,
       );
       _hideUploadingDialog();
       if (response['success'] == true) {
@@ -205,7 +207,11 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     await Navigator.pushNamed(
       context,
       '/bulk-upload-documents',
-      arguments: {'stageId': stage.id, 'allowedChecklistId': null},
+      arguments: {
+        'matter_id': widget.matterID,
+        'stageId': stage.id,
+        'allowedChecklistId': null,
+      },
     );
 
     _loadWorkflowData();
@@ -235,7 +241,10 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CommonAppBar(titleName: 'Workflow Stages'),
+      appBar: CommonAppBar(
+        titleName: 'Workflow Stages',
+        matterID: widget.matterID ?? 0,
+      ),
       /*appBar: AppBar(
         title: const Text(
           'Workflow Stages',

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import '../../../main.dart';
 import '../../../services/api_service.dart';
 import '../../../widgets/dialog/login_required_dialog.dart';
-import '../../workflow/workflow_stages_screen.dart';
 import '../my_files/my_files_quick_action_card.dart';
 
 class MyFilesTabScreen extends StatefulWidget {
@@ -185,26 +184,43 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen> with RouteAware {
           children: [
             MyFilesQuickActionsCard(
               onViewWorkflow: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const WorkflowStagesScreen(),
-                  ),
+                Navigator.pushNamed(
+                  context,
+                  '/workflow-stages',
+                  arguments: {"matter_id": AuthService.selectedMatterId},
                 );
               },
               onBilling: () {
-                Navigator.pushNamed(context, '/billing-list');
+                //Navigator.pushNamed(context, '/billing-list');
+                Navigator.pushNamed(
+                  context,
+                  '/billing-list',
+                  arguments: {"matter_id": AuthService.selectedMatterId},
+                );
               },
               onDocumentStatus: () {
-                Navigator.pushNamed(context, '/documents');
+                Navigator.pushNamed(
+                  context,
+                  '/documents',
+                  arguments: {"matter_id": AuthService.selectedMatterId},
+                );
               },
               onUpcomingDeadlines: () {
-                Navigator.pushNamed(context, '/tasks');
+                Navigator.pushNamed(
+                  context,
+                  '/tasks',
+                  arguments: {"matter_id": AuthService.selectedMatterId},
+                );
               },
               /*onRecentActivity: () {
                 Navigator.pushNamed(context, '/recent-activity');
               },*/
               onMessage: () {
-                Navigator.pushNamed(context, '/workflow-message');
+                Navigator.pushNamed(
+                  context,
+                  '/workflow-message',
+                  arguments: {"matter_id": AuthService.selectedMatterId},
+                );
               },
             ),
             const SizedBox(height: 24),

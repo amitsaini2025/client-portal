@@ -1,12 +1,11 @@
 import 'package:client/screens/workflow/message/workflow_messages_screen.dart';
-import 'package:client/screens/workflow/workflow_recipients_screen.dart';
 import 'package:client/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/theme_config.dart';
+import '../../services/api_service.dart';
 import 'workflow_documents_screen.dart';
 import 'workflow_stages_screen.dart';
-import '../../services/api_service.dart';
 
 class WorkflowScreen extends StatefulWidget {
   const WorkflowScreen({super.key});
@@ -91,8 +90,10 @@ class _WorkflowScreenState extends State<WorkflowScreen>
                   if (_unreadCount > 0) ...[
                     const SizedBox(width: 6),
                     Container(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.redAccent,
                         borderRadius: BorderRadius.circular(12),
@@ -117,10 +118,10 @@ class _WorkflowScreenState extends State<WorkflowScreen>
         color: ThemeConfig.navyBlue,
         child: TabBarView(
           controller: _tabController,
-          children: const [
-            WorkflowStagesScreen(),
-            WorkflowDocumentsScreen(),
-            WorkflowMessagesScreen(),
+          children: [
+            WorkflowStagesScreen(matterID: AuthService.selectedMatterId ?? 0),
+            const WorkflowDocumentsScreen(),
+            WorkflowMessagesScreen(matterID: AuthService.selectedMatterId ?? 0),
           ],
         ),
       ),
