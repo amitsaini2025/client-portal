@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class StudentFundCalculatorScreen extends StatefulWidget {
   const StudentFundCalculatorScreen({super.key});
@@ -49,11 +51,15 @@ class _StudentFundCalculatorScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Student Fund Calculator",
+      /*appBar: AppBar(
+        title: const Text("",
             style: TextStyle(color: Colors.white)),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
+      ),*/
+      appBar: CommonAppBar(
+        titleName: 'Student Fund Calculator',
+        matterID: AuthService.selectedMatterId,
       ),
       body: loading || data == null
           ? const Center(child: CircularProgressIndicator())

@@ -264,105 +264,110 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body:
-          _isLoading
-              ? const LoadingWidget(message: 'Loading dashboard...')
-              : _errorMessage != null
-              ? CustomErrorWidget(
-                message: _errorMessage!,
-                onRetry: _loadDashboardData,
-              )
-              : RefreshIndicator(
-                onRefresh: () async {
-                  await Future.wait([_loadDashboardData(), _loadRecentBlogs()]);
-                },
-                child: SingleChildScrollView(
-                  child: Container(
-                    color: Colors.white,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _buildRecentUpdatesSection(),
-                        const SizedBox(height: 24),
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              QuickActionsCard(
-                                onBookAppointment: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) =>
-                                              const BookLocationScreen(),
-                                    ),
-                                  );
-                                },
-                                onHealthInsurance: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/health-insurance',
-                                  );
-                                },
-                                onUpcomingDeadlines: () {
-                                  Navigator.pushNamed(context, '/tasks');
-                                },
-                                onPRCalculator: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/pr-calculator',
-                                  );
-                                },
-                                onStudentFundCalculator: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/student-fund-calculator',
-                                  );
-                                },
-                                onOccupationSearch: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/occupation-search',
-                                  );
-                                },
-                                onPostCodeChecker: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/post-code-checker',
-                                  );
-                                },
-                                onImportantLinks:
-                                    () => {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/important-links',
+      body: SafeArea(
+        child:
+            _isLoading
+                ? const LoadingWidget(message: 'Loading dashboard...')
+                : _errorMessage != null
+                ? CustomErrorWidget(
+                  message: _errorMessage!,
+                  onRetry: _loadDashboardData,
+                )
+                : RefreshIndicator(
+                  onRefresh: () async {
+                    await Future.wait([
+                      _loadDashboardData(),
+                      _loadRecentBlogs(),
+                    ]);
+                  },
+                  child: SingleChildScrollView(
+                    child: Container(
+                      color: Colors.white,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildRecentUpdatesSection(),
+                          const SizedBox(height: 24),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                QuickActionsCard(
+                                  onBookAppointment: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                const BookLocationScreen(),
                                       ),
-                                    },
-                                onEnglishRequirement:
-                                    () => {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/english-requirements',
-                                      ),
-                                    },
-                                onVACSearch:
-                                    () => {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/vac-search',
-                                      ),
-                                    },
-                              ),
-                              const SizedBox(height: 24),
-                            ],
+                                    );
+                                  },
+                                  onHealthInsurance: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/health-insurance',
+                                    );
+                                  },
+                                  onUpcomingDeadlines: () {
+                                    Navigator.pushNamed(context, '/tasks');
+                                  },
+                                  onPRCalculator: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/pr-calculator',
+                                    );
+                                  },
+                                  onStudentFundCalculator: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/student-fund-calculator',
+                                    );
+                                  },
+                                  onOccupationSearch: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/occupation-search',
+                                    );
+                                  },
+                                  onPostCodeChecker: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/post-code-checker',
+                                    );
+                                  },
+                                  onImportantLinks:
+                                      () => {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/important-links',
+                                        ),
+                                      },
+                                  onEnglishRequirement:
+                                      () => {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/english-requirements',
+                                        ),
+                                      },
+                                  onVACSearch:
+                                      () => {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/vac-search',
+                                        ),
+                                      },
+                                ),
+                                const SizedBox(height: 24),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, '/chat-bots');

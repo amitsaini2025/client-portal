@@ -2,7 +2,8 @@ import 'package:client/screens/dashboard/health_insurance/student_visa_oshc_scre
 import 'package:client/screens/dashboard/health_insurance/temporary_graduate_health_insurance/temporary_graduate_ovhc_screen.dart';
 import 'package:client/screens/dashboard/health_insurance/tourist_visa_ovhcs_screen/tourist_visa_ovhcs_screen.dart';
 import 'package:flutter/material.dart';
-import '../../../config/theme_config.dart';
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class HealthInsuranceScreen extends StatelessWidget {
   const HealthInsuranceScreen({super.key});
@@ -10,13 +11,17 @@ class HealthInsuranceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
         title: const Text(
           "Health Insurance",
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+      ),*/
+      appBar: CommonAppBar(
+        titleName: 'Health Insurance',
+        matterID: AuthService.selectedMatterId,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

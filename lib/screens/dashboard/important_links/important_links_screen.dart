@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/theme_config.dart';
+import '../../../services/auth_service.dart';
 import '../../../utils/constants.dart';
+import '../../../widgets/common_app_bar.dart';
 import '../../../widgets/webview/universal_webview.dart';
 
 class ImportantLinksScreen extends StatelessWidget {
@@ -43,13 +45,17 @@ class ImportantLinksScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
         title: const Text(
           "Important Links",
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+      ),*/
+      appBar: CommonAppBar(
+        titleName: 'Important Links',
+        matterID: AuthService.selectedMatterId,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

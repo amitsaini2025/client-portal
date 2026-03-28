@@ -3,19 +3,18 @@ import 'dart:async';
 import 'package:client/services/api_service.dart';
 import 'package:flutter/material.dart';
 
-import '../../../config/theme_config.dart';
 import '../../../models/occupation.dart';
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class OccupationSearchScreen extends StatefulWidget {
   const OccupationSearchScreen({super.key});
 
   @override
-  State<OccupationSearchScreen> createState() =>
-      _OccupationSearchScreenState();
+  State<OccupationSearchScreen> createState() => _OccupationSearchScreenState();
 }
 
-class _OccupationSearchScreenState
-    extends State<OccupationSearchScreen> {
+class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
   final TextEditingController _controller = TextEditingController();
 
   List<Occupation> _results = [];
@@ -41,15 +40,12 @@ class _OccupationSearchScreenState
     setState(() => _loading = true);
 
     try {
-      final Map<String, dynamic> response =
-      await ApiService.occupationFinder(
+      final Map<String, dynamic> response = await ApiService.occupationFinder(
         _controller.text.trim(),
       );
 
       final List list = response['data'] ?? [];
-      _results = list
-          .map((e) => Occupation.fromJson(e))
-          .toList();
+      _results = list.map((e) => Occupation.fromJson(e)).toList();
     } catch (e) {
       debugPrint(e.toString());
       _results = [];
@@ -68,35 +64,38 @@ class _OccupationSearchScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
         title: const Text(
           "Occupation Search",
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+      ),*/
+      appBar: CommonAppBar(
+        titleName: 'Occupation Search',
+        matterID: AuthService.selectedMatterId,
       ),
       body: Column(
         children: [
           _searchBar(),
           Expanded(
-            child: _loading
-                ? const Center(
-              child: CircularProgressIndicator(),
-            )
-                : _results.isEmpty
-                ? const Center(
-              child: Text(
-                'No occupations found',
-                style: TextStyle(color: Colors.black54),
-              ),
-            )
-                : ListView.builder(
-              itemCount: _results.length,
-              itemBuilder: (context, index) {
-                return OccupationCard(_results[index]);
-              },
-            ),
+            child:
+                _loading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _results.isEmpty
+                    ? const Center(
+                      child: Text(
+                        'No occupations found',
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    )
+                    : ListView.builder(
+                      itemCount: _results.length,
+                      itemBuilder: (context, index) {
+                        return OccupationCard(_results[index]);
+                      },
+                    ),
           ),
         ],
       ),
@@ -133,7 +132,7 @@ class _OccupationSearchScreenState
             onPressed: _search,
             icon: const Icon(Icons.search),
             label: const Text('Search'),
-          )
+          ),
         ],
       ),
     );
@@ -176,10 +175,7 @@ class _OccupationCardState extends State<OccupationCard> {
           children: [
             Text(
               occupation.title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 6),
             Text(
@@ -193,24 +189,15 @@ class _OccupationCardState extends State<OccupationCard> {
             const SizedBox(height: 14),
             const Divider(),
 
-            _rowWithBadge(
-              'SKILL LEVEL',
-              'LEVEL ${occupation.skillLevel}',
-            ),
+            _rowWithBadge('SKILL LEVEL', 'LEVEL ${occupation.skillLevel}'),
 
             const Divider(),
 
-            _row(
-              'ASSESSING AUTHORITY',
-              occupation.assessingAuthority,
-            ),
+            _row('ASSESSING AUTHORITY', occupation.assessingAuthority),
 
             const Divider(),
 
-            _row(
-              'ASSESSMENT VALIDITY',
-              '${occupation.validityYears} years',
-            ),
+            _row('ASSESSMENT VALIDITY', '${occupation.validityYears} years'),
 
             const SizedBox(height: 16),
 
@@ -227,47 +214,44 @@ class _OccupationCardState extends State<OccupationCard> {
 
             Wrap(
               spacing: 10,
-              children: occupation.occupationLists.map((e) {
-                final isGreen = e == 'MLTSSL';
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isGreen
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFF6B7280),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Text(
-                    e,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                );
-              }).toList(),
+              children:
+                  occupation.occupationLists.map((e) {
+                    final isGreen = e == 'MLTSSL';
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color:
+                            isGreen
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFF6B7280),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Text(
+                        e,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    );
+                  }).toList(),
             ),
 
             const SizedBox(height: 14),
 
             RichText(
               text: TextSpan(
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Colors.black87,
-                ),
+                style: const TextStyle(fontSize: 13, color: Colors.black87),
                 children: [
                   const TextSpan(
                     text: 'Also known as: ',
                     style: TextStyle(fontWeight: FontWeight.w700),
                   ),
-                  TextSpan(
-                    text: occupation.alternateTitles,
-                  ),
+                  TextSpan(text: occupation.alternateTitles),
                 ],
               ),
             ),
@@ -294,9 +278,7 @@ class _OccupationCardState extends State<OccupationCard> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      expanded
-                          ? 'Less Information'
-                          : 'More Information',
+                      expanded ? 'Less Information' : 'More Information',
                       style: const TextStyle(
                         fontSize: 13,
                         color: Colors.black54,
@@ -319,10 +301,7 @@ class _OccupationCardState extends State<OccupationCard> {
                 ),
                 child: Text(
                   occupation.additionalInfo,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.black54,
-                  ),
+                  style: const TextStyle(fontSize: 13, color: Colors.black54),
                 ),
               ),
             ],
@@ -348,10 +327,7 @@ class _OccupationCardState extends State<OccupationCard> {
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -373,10 +349,7 @@ class _OccupationCardState extends State<OccupationCard> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 6,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
               color: const Color(0xFF8B5CF6),
               borderRadius: BorderRadius.circular(30),

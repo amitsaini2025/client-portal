@@ -4,6 +4,8 @@ import 'package:client/services/api_service.dart';
 import '../../../config/theme_config.dart';
 import '../../../models/post_code_checker/postcode_result.dart';
 import '../../../models/post_code_checker/postcode_search_item.dart';
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class PostcodeCheckerScreen extends StatefulWidget {
   const PostcodeCheckerScreen({super.key});
@@ -55,13 +57,17 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
         title: const Text(
           "Postcode Checker Tool",
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+      ),*/
+      appBar: CommonAppBar(
+        titleName: 'Postcode Checker Tool',
+        matterID: AuthService.selectedMatterId,
       ),
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,

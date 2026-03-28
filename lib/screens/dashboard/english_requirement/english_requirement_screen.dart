@@ -2,6 +2,8 @@ import 'package:client/screens/dashboard/english_requirement/english_requirement
 import 'package:client/screens/dashboard/english_requirement/english_requirement_for_485_temporary_graduate_visa_tr_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 import 'english_requirement_specified_test_scores_screen.dart';
 
 class EnglishRequirementScreen extends StatelessWidget {
@@ -28,13 +30,17 @@ class EnglishRequirementScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
         title: const Text(
           "English Requirements",
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+      ),*/
+      appBar: CommonAppBar(
+        titleName: "English Requirements",
+        matterID: AuthService.selectedMatterId,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

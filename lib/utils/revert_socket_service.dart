@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:client/models/workflow_send_message_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -11,19 +10,23 @@ class ReverbSocketService {
   static Timer? _reconnectTimer;
   static bool _isConnected = false;
 
-  static Function(MessageDetail message)? onMessageReceived;
+  static Function(dynamic message)? onMessageReceived;
 
-  static const String _appId = "952b2edc3f42e289";
-  static const String _appKey = "145cd98cfea9f69732ae6755ac889bcc";
+  // ---- CONFIG ----
   static const String _host = "revapi.bansalcrm.com";
   static const int _port = 443;
   static const String _scheme = "wss";
 
-  static String get _url =>
-      "$_scheme://$_host:$_port/app/$_appKey?protocol=7&client=flutter";
+  static const String _appKey = "145cd98cfea9f69732ae6755ac889bcc";
 
-  static String get _authUrl =>
-      "https://$_host/reverb/broadcasting/auth";
+  // WebSocket URL as you requested
+  static String get _url => "$_scheme://$_host/app/$_appKey";
+
+  // Auth URL
+  //static String get _authUrl => "https://$_host/broadcasting/auth";
+  static String get _authUrl => "https://$_host/api/broadcasting/auth";
+
+  // -------------------------
 
   static Future<void> connect({
     required String userId,
@@ -55,9 +58,9 @@ class ReverbSocketService {
 
   static Future<void> _handleEvent(
       dynamic event, String userId, String token) async {
-    try {
-      log("📦 RAW: $event");
+    log("📦 RAW: $event");
 
+    try {
       final decoded = jsonDecode(event);
 
       switch (decoded['event']) {
@@ -68,15 +71,12 @@ class ReverbSocketService {
           log("✅ Connected | socket_id: $socketId");
           _isConnected = true;
 
+          // Subscribe to private-user channel
           await _subscribe(userId, token, socketId);
           break;
 
         case 'pusher:subscription_succeeded':
-          log("✅ Channel subscribed");
-          break;
-
-        case 'pusher:pong':
-          log("❤️ Pong received");
+          log("🎉 Subscription successful");
           break;
 
         default:
@@ -93,12 +93,11 @@ class ReverbSocketService {
 
       final data = jsonDecode(decoded['data']);
 
-      if (data['message'] != null) {
-        final message = MessageDetail.fromJson(data['message']);
-        onMessageReceived?.call(message);
-      }
+      log("📩 EVENT DATA: $data");
+
+      onMessageReceived?.call(data);
     } catch (e) {
-      log("⚠️ Custom parse error: $e");
+      log("⚠️ Custom event parse error: $e");
     }
   }
 
@@ -112,17 +111,17 @@ class ReverbSocketService {
         headers: {
           "Authorization": "Bearer $token",
           "Accept": "application/json",
-          "Content-Type": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: jsonEncode({
+        // NOT JSON — Reverb expects form-data/x-www-form-urlencoded
+        body: {
           "socket_id": socketId,
           "channel_name": "private-user.$userId",
-        }),
+        },
       );
 
       if (response.statusCode != 200) {
-        throw Exception(
-            "Auth failed: ${response.statusCode} ${response.body}");
+        throw Exception("Auth failed: ${response.statusCode} ${response.body}");
       }
 
       final data = jsonDecode(response.body);
@@ -130,22 +129,18 @@ class ReverbSocketService {
       final payload = {
         "event": "pusher:subscribe",
         "data": {
-          "channel": "private-user.$userId",
           "auth": data['auth'],
+          "channel": "private-user.$userId",
         }
       };
+
+      log("📡 Subscribing payload: $payload");
 
       _channel!.sink.add(jsonEncode(payload));
 
       log("📡 Subscribed to private-user.$userId");
     } catch (e) {
       log("❌ Auth error: $e");
-    }
-  }
-
-  static void sendPing() {
-    if (_isConnected) {
-      _channel?.sink.add(jsonEncode({"event": "pusher:ping"}));
     }
   }
 
@@ -157,7 +152,7 @@ class ReverbSocketService {
   }
 
   static void _reconnect(String userId, String token) {
-    if (_reconnectTimer != null) return;
+    if (_reconnectTimer != null) return; // Prevent multiple timers
 
     log("🔄 Reconnecting in 5s...");
 

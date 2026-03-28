@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme_config.dart';
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class EnglishRequirementForStudentVisaScreen extends StatefulWidget {
   const EnglishRequirementForStudentVisaScreen({super.key});
@@ -108,57 +109,61 @@ class _EnglishRequirementForStudentVisaScreenState
                 .toList();
 
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
         title: const Text(
           "English Requirement For Student Visa",
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+      ),*/
+      appBar: CommonAppBar(
+        titleName: "English Requirement For Student Visa",
+        matterID: AuthService.selectedMatterId,
       ),
       body: Column(
         children: [
           const SizedBox(height: 10),
 
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.indigo.shade50,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.indigo.shade200),
-            ),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: List.generate(filters.length, (index) {
-                final isSelected = selectedFilter == filters[index];
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.indigo.shade50,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.indigo.shade200),
+              ),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: List.generate(filters.length, (index) {
+                  final isSelected = selectedFilter == filters[index];
 
-                return ChoiceChip(
-                  label: Text(filters[index]),
-                  selected: isSelected,
-                  selectedColor: Colors.indigo,
-                  backgroundColor: Colors.white,
-                  showCheckmark: false,
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : Colors.indigo,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    side: BorderSide(color: Colors.indigo.shade200),
-                  ),
-                  onSelected: (_) {
-                    setState(() => selectedFilter = filters[index]);
-                  },
-                );
-              }),
+                  return ChoiceChip(
+                    label: Text(filters[index]),
+                    selected: isSelected,
+                    selectedColor: Colors.indigo,
+                    backgroundColor: Colors.white,
+                    showCheckmark: false,
+                    labelStyle: TextStyle(
+                      color: isSelected ? Colors.white : Colors.indigo,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: Colors.indigo.shade200),
+                    ),
+                    onSelected: (_) {
+                      setState(() => selectedFilter = filters[index]);
+                    },
+                  );
+                }),
+              ),
             ),
           ),
-        ),
 
           const SizedBox(height: 10),
 

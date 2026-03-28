@@ -176,55 +176,60 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen> with RouteAware {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return AbsorbPointer(
-      absorbing: _isBlocked,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            MyFilesQuickActionsCard(
-              onViewWorkflow: () {
-                Navigator.pushNamed(
-                  context,
-                  '/workflow-stages',
-                  arguments: {"matter_id": AuthService.selectedMatterId},
-                );
-              },
-              onBilling: () {
-                //Navigator.pushNamed(context, '/billing-list');
-                Navigator.pushNamed(
-                  context,
-                  '/billing-list',
-                  arguments: {"matter_id": AuthService.selectedMatterId},
-                );
-              },
-              onDocumentStatus: () {
-                Navigator.pushNamed(
-                  context,
-                  '/documents',
-                  arguments: {"matter_id": AuthService.selectedMatterId},
-                );
-              },
-              onUpcomingDeadlines: () {
-                Navigator.pushNamed(
-                  context,
-                  '/tasks',
-                  arguments: {"matter_id": AuthService.selectedMatterId},
-                );
-              },
-              /*onRecentActivity: () {
+    return Scaffold(
+      body: SafeArea(
+        // <-- IMPORTANT
+        child: AbsorbPointer(
+          absorbing: _isBlocked,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                MyFilesQuickActionsCard(
+                  onViewWorkflow: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/workflow-stages',
+                      arguments: {"matter_id": AuthService.selectedMatterId},
+                    );
+                  },
+                  onBilling: () {
+                    //Navigator.pushNamed(context, '/billing-list');
+                    Navigator.pushNamed(
+                      context,
+                      '/billing-list',
+                      arguments: {"matter_id": AuthService.selectedMatterId},
+                    );
+                  },
+                  onDocumentStatus: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/documents',
+                      arguments: {"matter_id": AuthService.selectedMatterId},
+                    );
+                  },
+                  onUpcomingDeadlines: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/tasks',
+                      arguments: {"matter_id": AuthService.selectedMatterId},
+                    );
+                  },
+                  /*onRecentActivity: () {
                 Navigator.pushNamed(context, '/recent-activity');
               },*/
-              onMessage: () {
-                Navigator.pushNamed(
-                  context,
-                  '/workflow-message',
-                  arguments: {"matter_id": AuthService.selectedMatterId},
-                );
-              },
+                  onMessage: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/workflow-message',
+                      arguments: {"matter_id": AuthService.selectedMatterId},
+                    );
+                  },
+                ),
+                const SizedBox(height: 24),
+              ],
             ),
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
       ),
     );

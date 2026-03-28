@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/theme_config.dart';
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
   const EnglishRequirementSpecifiedTestScoresScreen({super.key});
@@ -11,7 +13,7 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: const Text(
           "English Requirement for Specified Test Scores",
           style: TextStyle(
@@ -22,6 +24,10 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
         backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: ThemeConfig.white),
         centerTitle: true,
+      ),*/
+      appBar: CommonAppBar(
+        titleName: "English Requirement for Specified Test Scores",
+        matterID: AuthService.selectedMatterId,
       ),
       body: const EnglishLanguageRequirementsWidget(),
     );

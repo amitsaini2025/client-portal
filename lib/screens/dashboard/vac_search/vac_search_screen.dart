@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../models/visa_search/visa_model.dart';
 import '../../../services/api_service.dart';
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class VacSearchScreen extends StatefulWidget {
   const VacSearchScreen({super.key});
@@ -97,7 +99,6 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
         ),
         child: Row(
           children: [
-            /// 🔶 Icon
             Container(
               height: 44,
               width: 44,
@@ -113,7 +114,6 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
 
             const SizedBox(width: 12),
 
-            /// 📄 Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +144,6 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
     );
   }
 
-  /// 🏷 Small chip
   Widget _chip(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -159,7 +158,6 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
     );
   }
 
-  /// 🔎 Search bar
   Widget _searchBar() {
     return Container(
       margin: const EdgeInsets.fromLTRB(14, 14, 14, 8),
@@ -182,11 +180,15 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: const Text('VAC Search'),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
         elevation: 0,
+      ),*/
+      appBar: CommonAppBar(
+        titleName: "VAC Search",
+        matterID: AuthService.selectedMatterId,
       ),
       body:
       _isLoading

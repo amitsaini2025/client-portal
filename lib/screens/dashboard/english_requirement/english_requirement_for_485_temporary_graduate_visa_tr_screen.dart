@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class EnglishRequirementFor485TemporaryGraduateVisaTRScreen
     extends StatefulWidget {
@@ -41,7 +43,7 @@ class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: const Text(
           "English Requirement for 485 Temporary Graduate Visa (TR)",
           style: TextStyle(
@@ -52,6 +54,10 @@ class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
         backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: ThemeConfig.white),
         centerTitle: true,
+      ),*/
+      appBar: CommonAppBar(
+        titleName: "English Requirement for 485 Temporary Graduate Visa (TR)",
+        matterID: AuthService.selectedMatterId,
       ),
       body: Column(
         children: [

@@ -195,11 +195,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
 
-        body: TabBarView(
-          children: [
-            DashboardTabScreen(matterId: widget.matterId),
-            const MyFilesTabScreen(),
-          ],
+        body: SafeArea(
+          child: TabBarView(
+            children: [
+              DashboardTabScreen(matterId: widget.matterId),
+              const MyFilesTabScreen(),
+            ],
+          ),
         ),
         bottomNavigationBar: Container(
           height: 70,

@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../config/theme_config.dart';
+import '../../services/auth_service.dart';
+import '../common_app_bar.dart';
 
 class UniversalWebView extends StatefulWidget {
   final String url;
@@ -59,13 +61,17 @@ class _UniversalWebViewState extends State<UniversalWebView> {
     }
 
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
         title: Text(
           widget.title,
           style: const TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+      ),*/
+      appBar: CommonAppBar(
+        titleName: widget.title,
+        matterID: AuthService.selectedMatterId,
       ),
       body: Stack(
         children: [

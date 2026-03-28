@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../models/visa_search/visa_model.dart';
 import '../../../services/api_service.dart';
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
 
 class VisaEstimateScreen extends StatefulWidget {
   final VisaModel visa;
@@ -227,7 +229,7 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: const Text(
           "Visa Estimate",
           style: TextStyle(color: Colors.white),
@@ -235,6 +237,10 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.black,
+      ),*/
+      appBar: CommonAppBar(
+        titleName: "Visa Estimate",
+        matterID: AuthService.selectedMatterId,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(14),

@@ -3,6 +3,9 @@ import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import 'package:client/models/pr_points_response.dart';
 
+import '../../../services/auth_service.dart';
+import '../../../widgets/common_app_bar.dart';
+
 class PRCalculatorScreen extends StatefulWidget {
   const PRCalculatorScreen({super.key});
 
@@ -55,13 +58,17 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: const Text(
           'PR Calculator',
           style: TextStyle(color: Colors.white, fontSize: 18),
         ),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
+      ),*/
+      appBar: CommonAppBar(
+        titleName: 'PR Calculator',
+        matterID: AuthService.selectedMatterId,
       ),
       body: loading || data == null
           ? const Center(child: CircularProgressIndicator())
@@ -196,8 +203,6 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
       ),
     );
   }
-
-  /// ================= UI HELPERS =================
 
   Widget _infoBox() {
     return Container(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../config/theme_config.dart';
+import '../../../../services/auth_service.dart';
 import '../../../../utils/constants.dart';
+import '../../../../widgets/common_app_bar.dart';
 import '../../../../widgets/webview/universal_webview.dart';
 
 class TemporaryGraduateOVHCScreen extends StatelessWidget {
@@ -10,13 +12,17 @@ class TemporaryGraduateOVHCScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
         title: const Text(
           "Temporary Graduate - OVHC",
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+      ),*/
+      appBar: CommonAppBar(
+        titleName: 'Temporary Graduate - OVHC',
+        matterID: AuthService.selectedMatterId,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
