@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:client/config/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
+
+import '../models/workflow_send_message_response.dart';
 
 class ReverbSocketService {
   static WebSocketChannel? _channel;
@@ -24,7 +27,7 @@ class ReverbSocketService {
 
   // Auth URL
   //static String get _authUrl => "https://$_host/broadcasting/auth";
-  static String get _authUrl => "https://$_host/api/broadcasting/auth";
+  static String get _authUrl => "${ApiConfig.baseUrl}/broadcasting/auth";
 
   // -------------------------
 
@@ -95,7 +98,10 @@ class ReverbSocketService {
 
       log("📩 EVENT DATA: $data");
 
-      onMessageReceived?.call(data);
+      final message = MessageDetail.fromJson(data);
+      if (message.message.isEmpty) return;
+
+      onMessageReceived?.call(message);
     } catch (e) {
       log("⚠️ Custom event parse error: $e");
     }
@@ -125,6 +131,7 @@ class ReverbSocketService {
       }
 
       final data = jsonDecode(response.body);
+
 
       final payload = {
         "event": "pusher:subscribe",
