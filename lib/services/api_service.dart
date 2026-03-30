@@ -443,8 +443,9 @@ class ApiService {
       'stage_id': stageId?.toString() ?? '',
       'allowed_checklist_id': allowedChecklistID?.toString() ?? '',
     };
-    final uri = Uri.parse(ApiConfig.workflowAllowedChecklistEndpoint)
-        .replace(queryParameters: queryParameters);
+    final uri = Uri.parse(
+      ApiConfig.workflowAllowedChecklistEndpoint,
+    ).replace(queryParameters: queryParameters);
     return await _makeRequest(uri.toString(), _buildHeaders(), null, 'GET');
   }
 
@@ -1328,14 +1329,14 @@ class ApiService {
   static Future<Map<String, dynamic>> recordPaymentWallet({
     required int appointmentId,
     required String paymentIntentId,
-    required String paymentType
+    required String paymentType,
   }) async {
     final endpoint = ApiConfig.appointmentsRecordPaymentWallet;
 
     final response = await _makeRequest(endpoint, _buildHeaders(), {
       'appointment_id': appointmentId,
       'payment_intent_id': paymentIntentId,
-      'payment_type': paymentType
+      'payment_type': paymentType,
     }, "POST");
 
     return response;
@@ -1344,19 +1345,18 @@ class ApiService {
   static Future<Map<String, dynamic>> recordPaymentWalletWithoutLogin({
     required int appointmentId,
     required String paymentIntentId,
-    required String paymentType
+    required String paymentType,
   }) async {
     final endpoint = ApiConfig.appointmentsRecordPaymentWalletWithoutLogin;
 
     final response = await _makeRequest(endpoint, _buildHeaders(), {
       'appointment_id': appointmentId,
       'payment_intent_id': paymentIntentId,
-      'payment_type': paymentType
+      'payment_type': paymentType,
     }, "POST");
 
     return response;
   }
-
 
   static Future<Map<String, dynamic>> getNotifications({
     required int clientMatterId,
@@ -1365,6 +1365,11 @@ class ApiService {
   }) async {
     //final url = '${ApiConfig.notifications}?client_matter_id=$clientMatterId&page=$page&limit=$limit';
     final url = '${ApiConfig.notifications}?page=$page&limit=$limit';
+    return await _makeRequest(url, _buildHeaders(), null, 'GET');
+  }
+
+  static Future<Map<String, dynamic>> getRecentUnreadNotifications() async {
+    final url = ApiConfig.notificationsRecentUnread;
     return await _makeRequest(url, _buildHeaders(), null, 'GET');
   }
 
@@ -1408,7 +1413,6 @@ class ApiService {
     required String paymentToken,
     required String paymentStatus,
   }) async {
-
     final url = ApiConfig.billingInvoiceUpdate;
 
     final body = {
@@ -1416,21 +1420,21 @@ class ApiService {
       "client_matter_id": clientMatterId,
       "payment_type": paymentType,
       "payment_token": paymentToken,
-      "payment_status": paymentStatus
+      "payment_status": paymentStatus,
     };
 
-    return await _makeRequest(
-      url,
-      _buildHeaders(),
-      body,
-      'POST',
-    );
+    return await _makeRequest(url, _buildHeaders(), body, 'POST');
   }
 
-  static Future<Map<String, dynamic>> getVisaList() async {
+  /*static Future<Map<String, dynamic>> getVisaList() async {
     final url = ApiConfig.visaEstimateVisaList;
 
     return await _makeRequest(url, _buildHeaders(), null, 'GET');
+  }*/
+
+  static Future<dynamic> getVisaList({int page = 1}) async {
+    final url = ApiConfig.visaEstimateVisaList;
+    return await ApiService.get("$url?page=$page");
   }
 
   static Future<Map<String, dynamic>> getVisaEstimate({

@@ -86,6 +86,7 @@ class ApiConfig {
 
   static const String notifications = "/notifications";
   static const String notificationsUnreadCount = "/notifications/unread-count";
+  static const String notificationsRecentUnread = "/notifications/recent-unread";
   static const String billingList = "/billing/list";
   static const String billingInvoiceUpdate = "/billing/invoice-update";
 

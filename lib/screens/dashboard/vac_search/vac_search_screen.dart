@@ -17,57 +17,102 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
   List<VisaModel> _allVisas = [];
   List<VisaModel> _filteredVisas = [];
   bool _isLoading = true;
+  bool _isLoadingMore = false;
+
+  int _currentPage = 1;
+  int _lastPage = 1;
 
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _fetchVisas();
     _searchController.addListener(_filterVisas);
+
+    // Pagination listener
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 100 &&
+          !_isLoadingMore &&
+          _currentPage < _lastPage) {
+        _loadMore();
+      }
+    });
   }
 
   Future<void> _fetchVisas() async {
     try {
-      final response = await ApiService.getVisaList();
+      final response = await ApiService.getVisaList(page: 1);
 
       if (response['success'] == true) {
-        final List data = response['data'];
+        final List data = response['data']['data'];
+
         final visas = data.map((e) => VisaModel.fromJson(e)).toList();
 
         setState(() {
           _allVisas = visas;
           _filteredVisas = visas;
           _isLoading = false;
+
+          _currentPage = response['data']['pagination']['current_page'];
+          _lastPage = response['data']['pagination']['last_page'];
         });
       } else {
         throw Exception(response['message']);
       }
     } catch (e) {
       setState(() => _isLoading = false);
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error: $e")));
     }
+  }
+
+  Future<void> _loadMore() async {
+    setState(() => _isLoadingMore = true);
+
+    try {
+      final nextPage = _currentPage + 1;
+
+      final response = await ApiService.getVisaList(page: nextPage);
+
+      if (response['success'] == true) {
+        final List data = response['data']['data'];
+        final visas = data.map((e) => VisaModel.fromJson(e)).toList();
+
+        setState(() {
+          _allVisas.addAll(visas);
+          _filteredVisas.addAll(visas);
+          _currentPage = nextPage;
+
+          _lastPage = response['data']['pagination']['last_page'];
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Load more error: $e")));
+    }
+
+    setState(() => _isLoadingMore = false);
   }
 
   void _filterVisas() {
     final query = _searchController.text.toLowerCase();
 
     setState(() {
-      _filteredVisas =
-          _allVisas.where((visa) {
-            return visa.label.toLowerCase().contains(query) ||
-                visa.subclass.toLowerCase().contains(query) ||
-                (visa.stream?.toLowerCase().contains(query) ?? false);
-          }).toList();
+      _filteredVisas = _allVisas.where((visa) {
+        return visa.label.toLowerCase().contains(query) ||
+            visa.subclass.toLowerCase().contains(query) ||
+            (visa.stream?.toLowerCase().contains(query) ?? false);
+      }).toList();
     });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -111,9 +156,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
                 color: ThemeConfig.goldenYellow,
               ),
             ),
-
             const SizedBox(width: 12),
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,7 +179,6 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
                 ],
               ),
             ),
-
             const Icon(Icons.chevron_right, color: Colors.grey),
           ],
         ),
@@ -180,31 +222,34 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      /*appBar: AppBar(
-        title: const Text('VAC Search'),
-        backgroundColor: ThemeConfig.goldenYellow,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),*/
       appBar: CommonAppBar(
         titleName: "VAC Search",
         matterID: AuthService.selectedMatterId,
       ),
-      body:
-      _isLoading
+      body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
         children: [
           _searchBar(),
           Expanded(
-            child:
-            _filteredVisas.isEmpty
+            child: _filteredVisas.isEmpty
                 ? const Center(child: Text("No visa found"))
                 : ListView.builder(
-              itemCount: _filteredVisas.length,
-              itemBuilder:
-                  (context, index) =>
-                  _visaCard(_filteredVisas[index]),
+              controller: _scrollController,
+              itemCount: _filteredVisas.length +
+                  (_isLoadingMore ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == _filteredVisas.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                return _visaCard(_filteredVisas[index]);
+              },
             ),
           ),
         ],
