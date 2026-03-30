@@ -57,6 +57,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   Future<void> fetchNotifications() async {
+    if (!mounted) return;
+
     setState(() => isLoading = true);
 
     try {
@@ -71,6 +73,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
               .map((json) => NotificationModel.fromJson(json))
               .toList();
 
+      if (!mounted) return;
       setState(() {
         currentPage++;
         notifications.addAll(newNotifications);
@@ -78,6 +81,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoading = false);
       ScaffoldMessenger.of(
         context,
@@ -86,11 +90,14 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   Future<void> _refresh() async {
+    if (!mounted) return;
+
     setState(() {
       currentPage = 1;
       notifications.clear();
       hasMore = true;
     });
+
     await fetchNotifications();
   }
 
@@ -153,19 +160,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                         child: InkWell(
                           borderRadius: BorderRadius.circular(14),
                           onTap: () async {
-                            // Navigate to detail screen and refresh on return
-                            /*await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => NotificationDetailScreen(
-                                      notificationId: item.id,
-                                    ),
-                              ),
-                            );*/
-                            _handleNotificationTap(context, item);
-                            // Refresh list after returning
-                            _refresh();
+                            await _handleNotificationTap(context, item);
+                            if (mounted) _refresh();
                           },
                           child: Container(
                             padding: const EdgeInsets.all(16),
@@ -174,8 +170,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                               gradient:
                                   item.isRead
                                       ? null
-                                      : LinearGradient(
-                                        colors: const [
+                                      : const LinearGradient(
+                                        colors: [
                                           Color(0xFFF5F7FA),
                                           Color(0xFFE8EEF5),
                                         ],
@@ -251,52 +247,65 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     );
   }
 
-  void _handleNotificationTap(
+  Future<void> _handleNotificationTap(
     BuildContext context,
     NotificationModel item,
   ) async {
     if (!item.isRead) {
-      await ApiService.markNotificationAsRead(
-        notificationId: item.id,
-      );
+      await ApiService.markNotificationAsRead(notificationId: item.id);
       item.isRead = true;
     }
+
     Widget? screen;
-    switch (item.notificationType) {
-      case 'message':
+
+    final type = item.notificationType.trim();
+    final url = item.url.trim();
+
+    switch (type) {
+      case "message":
         screen = WorkflowMessagesScreen(matterID: item.clientMatterId);
         break;
-      case 'stage_change':
-      case 'matter_discontinued':
-      case 'matter_reopened':
-      case 'checklist':
-      case 'checklist_added':
+
+      case "stage_change":
+      case "matter_discontinued":
+      case "matter_reopened":
+      case "checklist":
+      case "checklist_added":
+      case "document_approved":
+      case "document_rejected":
+      case "document_deleted":
+      case "document_downloaded":
         screen = WorkflowStagesScreen(matterID: item.clientMatterId);
         break;
-      case 'document_approved':
-      case 'document_rejected':
-      case 'document_deleted':
-      case 'document_downloaded':
-        screen = WorkflowStagesScreen(matterID: item.clientMatterId);
-        break;
-      case 'detail_approved':
-      case 'detail_rejected':
+
+      case "detail_approved":
+      case "detail_rejected":
         screen = PersonalInformationScreen();
         break;
-      case 'invoice_sent_to_client_app':
+
+      case "invoice_sent_to_client_app":
         screen = BillingListScreen(matterID: item.clientMatterId);
         break;
-      case 'action_completed':
-      case 'lead_converted_to_client':
+
+      case "action_completed":
+        if (url == "/activities") {
+          screen = WorkflowStagesScreen(matterID: item.clientMatterId);
+        } else {
+          screen = NotificationDetailScreen(notificationId: item.id);
+        }
+        break;
+
+      case "lead_converted_to_client":
         screen = NotificationDetailScreen(notificationId: item.id);
         break;
+
       default:
         screen = NotificationDetailScreen(notificationId: item.id);
         break;
     }
-    if (screen != null) {
+
+    if (screen != null && mounted) {
       await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
-      _refresh();
     }
   }
 }

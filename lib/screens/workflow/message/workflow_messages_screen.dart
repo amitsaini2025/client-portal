@@ -182,6 +182,12 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    ReverbSocketService.disconnect();
+    super.dispose();
+  }
+
   void _handleIncomingMessage(MessageDetail msgDetail) {
     final newMessage = Message(
       id: msgDetail.id,
