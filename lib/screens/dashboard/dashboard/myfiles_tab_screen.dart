@@ -33,7 +33,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this); // Observe app lifecycle
+    WidgetsBinding.instance.addObserver(this);
     _checkUserStatus();
     _fetchNotifications();
   }
@@ -61,12 +61,13 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _fetchNotifications(); // refresh notifications when app comes foreground
+      _fetchNotifications();
     }
   }
 
   Future<void> _fetchNotifications() async {
-    if (!mounted || isFetchingNotifications) return;
+    final bool isLoggedIn = await AuthService.isAuthenticated;
+    if (!isLoggedIn || !mounted || isFetchingNotifications) return;
 
     setState(() => isFetchingNotifications = true);
 
