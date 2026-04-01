@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:client/screens/dashboard/vac_search/visa_estimate_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
@@ -14,24 +15,28 @@ class VacSearchScreen extends StatefulWidget {
 }
 
 class _VacSearchScreenState extends State<VacSearchScreen> {
-  List<VisaModel> _allVisas = [];
-  List<VisaModel> _filteredVisas = [];
+  List<VisaModel> _visas = [];
   bool _isLoading = true;
   bool _isLoadingMore = false;
 
   int _currentPage = 1;
   int _lastPage = 1;
 
+  String _currentQuery = "";
+  String _lastSearchedText = "";
+
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    _fetchVisas();
-    _searchController.addListener(_filterVisas);
+    _fetchVisas(query: "");
 
-    // Pagination listener
+    _searchController.addListener(_onSearchChanged);
+
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100 &&
@@ -42,20 +47,45 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
     });
   }
 
-  Future<void> _fetchVisas() async {
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 600), () {
+      final query = _searchController.text.trim();
+
+      if (query == _lastSearchedText) return;
+
+      _lastSearchedText = query;
+      _currentQuery = query;
+
+      if (query.isEmpty) {
+        _fetchVisas(query: "");
+        return;
+      }
+
+      if (query.length >= 3) {
+        _fetchVisas(query: query);
+      }
+    });
+  }
+
+  Future<void> _fetchVisas({required String query}) async {
+    setState(() {
+      _isLoading = true;
+      _currentPage = 1;
+      _visas = [];
+    });
+
     try {
-      final response = await ApiService.getVisaList(page: 1);
+      final response = await ApiService.getVisaList(page: 1, q: query);
 
       if (response['success'] == true) {
         final List data = response['data']['data'];
-
         final visas = data.map((e) => VisaModel.fromJson(e)).toList();
 
         setState(() {
-          _allVisas = visas;
-          _filteredVisas = visas;
+          _visas = visas;
           _isLoading = false;
-
           _currentPage = response['data']['pagination']['current_page'];
           _lastPage = response['data']['pagination']['last_page'];
         });
@@ -64,55 +94,47 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Error: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
     }
   }
 
   Future<void> _loadMore() async {
+    if (_currentPage >= _lastPage) return;
+
     setState(() => _isLoadingMore = true);
 
     try {
       final nextPage = _currentPage + 1;
 
-      final response = await ApiService.getVisaList(page: nextPage);
+      final response =
+      await ApiService.getVisaList(page: nextPage, q: _currentQuery);
 
       if (response['success'] == true) {
         final List data = response['data']['data'];
         final visas = data.map((e) => VisaModel.fromJson(e)).toList();
 
         setState(() {
-          _allVisas.addAll(visas);
-          _filteredVisas.addAll(visas);
+          _visas.addAll(visas);
           _currentPage = nextPage;
-
           _lastPage = response['data']['pagination']['last_page'];
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Load more error: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Load more error: $e")),
+      );
     }
 
     setState(() => _isLoadingMore = false);
-  }
-
-  void _filterVisas() {
-    final query = _searchController.text.toLowerCase();
-
-    setState(() {
-      _filteredVisas = _allVisas.where((visa) {
-        return visa.label.toLowerCase().contains(query) ||
-            visa.subclass.toLowerCase().contains(query) ||
-            (visa.stream?.toLowerCase().contains(query) ?? false);
-      }).toList();
-    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _scrollController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -123,9 +145,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
       borderRadius: BorderRadius.circular(14),
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => VisaEstimateScreen(visa: visa),
-        ),
+        MaterialPageRoute(builder: (_) => VisaEstimateScreen(visa: visa)),
       ),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -232,14 +252,13 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
         children: [
           _searchBar(),
           Expanded(
-            child: _filteredVisas.isEmpty
+            child: _visas.isEmpty
                 ? const Center(child: Text("No visa found"))
                 : ListView.builder(
               controller: _scrollController,
-              itemCount: _filteredVisas.length +
-                  (_isLoadingMore ? 1 : 0),
+              itemCount: _visas.length + (_isLoadingMore ? 1 : 0),
               itemBuilder: (context, index) {
-                if (index == _filteredVisas.length) {
+                if (index == _visas.length) {
                   return const Padding(
                     padding: EdgeInsets.all(16),
                     child: Center(
@@ -247,8 +266,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
                     ),
                   );
                 }
-
-                return _visaCard(_filteredVisas[index]);
+                return _visaCard(_visas[index]);
               },
             ),
           ),

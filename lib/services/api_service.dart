@@ -1432,9 +1432,9 @@ class ApiService {
     return await _makeRequest(url, _buildHeaders(), null, 'GET');
   }*/
 
-  static Future<dynamic> getVisaList({int page = 1}) async {
+  static Future<dynamic> getVisaList({int page = 1, String q = ""}) async {
     final url = ApiConfig.visaEstimateVisaList;
-    return await ApiService.get("$url?page=$page");
+    return await ApiService.get("$url?page=$page&q=$q");
   }
 
   static Future<Map<String, dynamic>> getVisaEstimate({
