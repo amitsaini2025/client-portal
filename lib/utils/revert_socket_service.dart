@@ -15,7 +15,6 @@ class ReverbSocketService {
 
   static Function(dynamic message)? onMessageReceived;
 
-  // ---- CONFIG ----
   static const String _host = "revapi.bansalcrm.com";
   static const int _port = 443;
   static const String _scheme = "wss";
@@ -26,10 +25,7 @@ class ReverbSocketService {
   static String get _url => "$_scheme://$_host/app/$_appKey";
 
   // Auth URL
-  //static String get _authUrl => "https://$_host/broadcasting/auth";
   static String get _authUrl => "${ApiConfig.baseUrl}/broadcasting/auth";
-
-  // -------------------------
 
   static Future<void> connect({
     required String userId,
@@ -74,7 +70,6 @@ class ReverbSocketService {
           log("✅ Connected | socket_id: $socketId");
           _isConnected = true;
 
-          // Subscribe to private-user channel
           await _subscribe(userId, token, socketId);
           break;
 
@@ -119,7 +114,6 @@ class ReverbSocketService {
           "Accept": "application/json",
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        // NOT JSON — Reverb expects form-data/x-www-form-urlencoded
         body: {
           "socket_id": socketId,
           "channel_name": "private-user.$userId",
@@ -159,7 +153,7 @@ class ReverbSocketService {
   }
 
   static void _reconnect(String userId, String token) {
-    if (_reconnectTimer != null) return; // Prevent multiple timers
+    if (_reconnectTimer != null) return;
 
     log("🔄 Reconnecting in 5s...");
 

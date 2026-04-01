@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:client/screens/dashboard/vac_search/visa_estimate_screen.dart';
 import 'package:flutter/material.dart';
+
 import '../../../config/theme_config.dart';
 import '../../../models/visa_search/visa_model.dart';
 import '../../../services/api_service.dart';
@@ -39,7 +41,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 100 &&
+              _scrollController.position.maxScrollExtent - 100 &&
           !_isLoadingMore &&
           _currentPage < _lastPage) {
         _loadMore();
@@ -94,9 +96,9 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
@@ -108,8 +110,10 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
     try {
       final nextPage = _currentPage + 1;
 
-      final response =
-      await ApiService.getVisaList(page: nextPage, q: _currentQuery);
+      final response = await ApiService.getVisaList(
+        page: nextPage,
+        q: _currentQuery,
+      );
 
       if (response['success'] == true) {
         final List data = response['data']['data'];
@@ -122,9 +126,9 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Load more error: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Load more error: $e")));
     }
 
     setState(() => _isLoadingMore = false);
@@ -143,10 +147,11 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
 
     return InkWell(
       borderRadius: BorderRadius.circular(14),
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => VisaEstimateScreen(visa: visa)),
-      ),
+      onTap:
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => VisaEstimateScreen(visa: visa)),
+          ),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         padding: const EdgeInsets.all(14),
@@ -193,7 +198,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
                     children: [
                       _chip("Subclass ${visa.subclass}"),
                       const SizedBox(width: 6),
-                      _chip("Stream $streamText"),
+                      if (streamText != "N/A") _chip("Stream $streamText"),
                     ],
                   ),
                 ],
@@ -246,32 +251,35 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
         titleName: "VAC Search",
         matterID: AuthService.selectedMatterId,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
-          _searchBar(),
-          Expanded(
-            child: _visas.isEmpty
-                ? const Center(child: Text("No visa found"))
-                : ListView.builder(
-              controller: _scrollController,
-              itemCount: _visas.length + (_isLoadingMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == _visas.length) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-                return _visaCard(_visas[index]);
-              },
-            ),
-          ),
-        ],
-      ),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                children: [
+                  _searchBar(),
+                  Expanded(
+                    child:
+                        _visas.isEmpty
+                            ? const Center(child: Text("No visa found"))
+                            : ListView.builder(
+                              controller: _scrollController,
+                              itemCount:
+                                  _visas.length + (_isLoadingMore ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index == _visas.length) {
+                                  return const Padding(
+                                    padding: EdgeInsets.all(16),
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                }
+                                return _visaCard(_visas[index]);
+                              },
+                            ),
+                  ),
+                ],
+              ),
     );
   }
 }
