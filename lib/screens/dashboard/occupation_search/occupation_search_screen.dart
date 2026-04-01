@@ -193,7 +193,7 @@ class _OccupationCardState extends State<OccupationCard> {
 
             const Divider(),
 
-            _row('ASSESSING AUTHORITY', occupation.assessingAuthority),
+            _row('ASSESSING AUTHORITY', occupation.assessingAuthority ?? "n/a"),
 
             const Divider(),
 
@@ -300,7 +300,7 @@ class _OccupationCardState extends State<OccupationCard> {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Text(
-                  occupation.additionalInfo,
+                  occupation.additionalInfo ?? "n/a",
                   style: const TextStyle(fontSize: 13, color: Colors.black54),
                 ),
               ),
