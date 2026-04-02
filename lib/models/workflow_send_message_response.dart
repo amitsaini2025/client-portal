@@ -70,7 +70,7 @@ class MessageDetail {
   final DateTime sentAt;
   final int clientMatterId;
   final int recipientCount;
-  bool? isRead; // <-- add this
+  bool? isRead;
   String? readAt;
 
   MessageDetail({
@@ -96,20 +96,20 @@ class MessageDetail {
       sender: json['sender'] ?? '',
       senderId: int.tryParse(json['sender_id'].toString()) ?? 0,
       senderShortname: json['sender_shortname'] ?? '',
-      isSender: json['is_sender'] ?? false,
-      isRecipient: json['is_recipient'] ?? false,
+      isSender: json['is_sender'] as bool? ?? false,
+      isRecipient: json['is_recipient'] as bool? ?? false,
       recipientIds:
-          (json['recipient_ids'] as List<dynamic>?)
-              ?.map((e) => Recipient.fromJson(e))
-              .toList() ??
+      (json['recipient_ids'] as List<dynamic>?)
+          ?.map((e) => Recipient.fromJson(e))
+          .toList() ??
           [],
       sentAt: DateTime.parse(
         json['sent_at'] ?? DateTime.now().toIso8601String(),
       ),
       clientMatterId: int.tryParse(json['client_matter_id'].toString()) ?? 0,
       recipientCount: int.tryParse(json['recipient_count'].toString()) ?? 0,
-      isRead: json['is_read'],
-      readAt: json['read_at'],
+      isRead: json['is_read'] as bool?, // handle null properly
+      readAt: json['read_at'] as String?,
     );
   }
 
@@ -120,11 +120,13 @@ class MessageDetail {
       'sender': sender,
       'sender_id': senderId,
       'sender_shortname': senderShortname,
+      'is_sender': isSender,
+      'is_recipient': isRecipient,
       'recipient_ids': recipientIds.map((e) => e.toJson()).toList(),
       'sent_at': sentAt.toIso8601String(),
       'client_matter_id': clientMatterId,
       'recipient_count': recipientCount,
-      'is_read': isRead, // <-- add this
+      'is_read': isRead,
       'read_at': readAt,
     };
   }
