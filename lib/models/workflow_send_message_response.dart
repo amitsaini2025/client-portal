@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 
 class SendMessageResponse {
   final bool success;
@@ -20,11 +20,7 @@ class SendMessageResponse {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'success': success,
-      'message': message,
-      'data': data.toJson(),
-    };
+    return {'success': success, 'message': message, 'data': data.toJson()};
   }
 }
 
@@ -45,7 +41,9 @@ class Data {
     return Data(
       messageId: int.tryParse(json['message_id'].toString()) ?? 0,
       message: MessageDetail.fromJson(json['message'] ?? {}),
-      sentAt: DateTime.parse(json['sent_at'] ?? DateTime.now().toIso8601String()),
+      sentAt: DateTime.parse(
+        json['sent_at'] ?? DateTime.now().toIso8601String(),
+      ),
       recipientCount: int.tryParse(json['recipient_count'].toString()) ?? 0,
     );
   }
@@ -66,11 +64,13 @@ class MessageDetail {
   final String sender;
   final int senderId;
   final String senderShortname;
+  bool isSender;
+  bool isRecipient;
   final List<Recipient> recipientIds;
   final DateTime sentAt;
   final int clientMatterId;
   final int recipientCount;
-  bool? isRead;      // <-- add this
+  bool? isRead; // <-- add this
   String? readAt;
 
   MessageDetail({
@@ -79,6 +79,8 @@ class MessageDetail {
     required this.sender,
     required this.senderId,
     required this.senderShortname,
+    required this.isSender,
+    required this.isRecipient,
     required this.recipientIds,
     required this.sentAt,
     required this.clientMatterId,
@@ -94,15 +96,20 @@ class MessageDetail {
       sender: json['sender'] ?? '',
       senderId: int.tryParse(json['sender_id'].toString()) ?? 0,
       senderShortname: json['sender_shortname'] ?? '',
-      recipientIds: (json['recipient_ids'] as List<dynamic>?)
-          ?.map((e) => Recipient.fromJson(e))
-          .toList() ??
+      isSender: json['is_sender'] ?? false,
+      isRecipient: json['is_recipient'] ?? false,
+      recipientIds:
+          (json['recipient_ids'] as List<dynamic>?)
+              ?.map((e) => Recipient.fromJson(e))
+              .toList() ??
           [],
-      sentAt: DateTime.parse(json['sent_at'] ?? DateTime.now().toIso8601String()),
+      sentAt: DateTime.parse(
+        json['sent_at'] ?? DateTime.now().toIso8601String(),
+      ),
       clientMatterId: int.tryParse(json['client_matter_id'].toString()) ?? 0,
       recipientCount: int.tryParse(json['recipient_count'].toString()) ?? 0,
       isRead: json['is_read'],
-      readAt: json['read_at']
+      readAt: json['read_at'],
     );
   }
 
@@ -117,7 +124,7 @@ class MessageDetail {
       'sent_at': sentAt.toIso8601String(),
       'client_matter_id': clientMatterId,
       'recipient_count': recipientCount,
-      'is_read': isRead,                 // <-- add this
+      'is_read': isRead, // <-- add this
       'read_at': readAt,
     };
   }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:client/config/api_config.dart';
+import 'package:client/services/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -37,7 +38,7 @@ class ReverbSocketService {
       _channel = WebSocketChannel.connect(Uri.parse(_url));
 
       _channel!.stream.listen(
-            (event) => _handleEvent(event, userId, token),
+        (event) => _handleEvent(event, userId, token),
         onDone: () {
           log("❌ Disconnected");
           _isConnected = false;
@@ -56,7 +57,10 @@ class ReverbSocketService {
   }
 
   static Future<void> _handleEvent(
-      dynamic event, String userId, String token) async {
+    dynamic event,
+    String userId,
+    String token,
+  ) async {
     log("📦 RAW: $event");
 
     try {
@@ -87,23 +91,30 @@ class ReverbSocketService {
 
   static void _handleCustomEvent(dynamic decoded) {
     try {
-      if (decoded['data'] == null) return;
+      if (decoded == null || decoded['data'] == null) return;
 
       final data = jsonDecode(decoded['data']);
 
-      log("📩 EVENT DATA: $data");
+      final messageJson = data['message'];
+      if (messageJson == null) return;
 
-      final message = MessageDetail.fromJson(data);
-      if (message.message.isEmpty) return;
+      final message = MessageDetail.fromJson(messageJson);
 
-      onMessageReceived?.call(message);
-    } catch (e) {
-      log("⚠️ Custom event parse error: $e");
+      log("📩 Message received from ${message.sender}: ${message.message}");
+      if (message.senderId != AuthService.currentUserId) {
+        onMessageReceived?.call(message);
+      }
+    } catch (e, st) {
+      log("⚠️ Error parsing message: $e");
+      log(st.toString());
     }
   }
 
   static Future<void> _subscribe(
-      String userId, String token, String socketId) async {
+    String userId,
+    String token,
+    String socketId,
+  ) async {
     try {
       log("🔐 Authorizing...");
 
@@ -114,10 +125,7 @@ class ReverbSocketService {
           "Accept": "application/json",
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: {
-          "socket_id": socketId,
-          "channel_name": "private-user.$userId",
-        },
+        body: {"socket_id": socketId, "channel_name": "private-user.$userId"},
       );
 
       if (response.statusCode != 200) {
@@ -126,13 +134,9 @@ class ReverbSocketService {
 
       final data = jsonDecode(response.body);
 
-
       final payload = {
         "event": "pusher:subscribe",
-        "data": {
-          "auth": data['auth'],
-          "channel": "private-user.$userId",
-        }
+        "data": {"auth": data['auth'], "channel": "private-user.$userId"},
       };
 
       log("📡 Subscribing payload: $payload");
