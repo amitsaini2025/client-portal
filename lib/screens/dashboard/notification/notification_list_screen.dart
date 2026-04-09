@@ -255,6 +255,20 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       await ApiService.markNotificationAsRead(notificationId: item.id);
       item.isRead = true;
     }
+    final Map<String, dynamic> matters = await ApiService.getMatters();
+    final int matterId = item.clientMatterId;
+    String? matterName;
+    if (matters["data"]["matters"] != null) {
+      for (var m in matters["data"]["matters"]) {
+        if (m["matter_id"] == matterId) {
+          matterName = m["matter_name"] ?? "";
+          break;
+        }
+      }
+    }
+    matterName ??= "Unknown";
+
+    await AuthService.selectMatter(matterId: matterId, matterName: matterName);
 
     Widget? screen;
 
@@ -263,7 +277,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
     switch (type) {
       case "message":
-        screen = WorkflowMessagesScreen(matterID: item.clientMatterId);
+        screen = WorkflowMessagesScreen(matterID: matterId);
         break;
 
       case "stage_change":
@@ -275,7 +289,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       case "document_rejected":
       case "document_deleted":
       case "document_downloaded":
-        screen = WorkflowStagesScreen(matterID: item.clientMatterId);
+        screen = WorkflowStagesScreen(matterID: matterId);
         break;
 
       case "detail_approved":
@@ -284,12 +298,12 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         break;
 
       case "invoice_sent_to_client_app":
-        screen = BillingListScreen(matterID: item.clientMatterId);
+        screen = BillingListScreen(matterID: matterId);
         break;
 
       case "action_completed":
         if (url == "/activities") {
-          screen = WorkflowStagesScreen(matterID: item.clientMatterId);
+          screen = WorkflowStagesScreen(matterID: matterId);
         } else {
           screen = NotificationDetailScreen(notificationId: item.id);
         }
@@ -304,8 +318,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         break;
     }
 
-    if (screen != null && mounted) {
-      await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
-    }
+    if (!mounted) return;
+
+    await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
   }
 }
