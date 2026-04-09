@@ -196,6 +196,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
 
         body: SafeArea(
+          bottom: false,
           child: TabBarView(
             children: [
               DashboardTabScreen(matterId: widget.matterId),
@@ -203,74 +204,76 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
         ),
-        bottomNavigationBar: Container(
-          height: 70,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-          decoration: const BoxDecoration(
-            color: Color(0xFFF2F2F2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 6,
-                offset: Offset(0, -2),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            child: Container(
-              height: 55,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: TabBar(
-                dividerColor: Colors.transparent,
-                indicator: BoxDecoration(
-                  color: const Color(0xFFF9B000),
+
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: Container(
+            height: 70,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF2F2F2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 6,
+                  offset: Offset(0, -2),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              child: Container(
+                height: 55,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(30),
-                ),
-                indicatorPadding: const EdgeInsets.all(4),
-                indicatorSize: TabBarIndicatorSize.tab,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.black87,
-                splashFactory: NoSplash.splashFactory,
-                overlayColor: const MaterialStatePropertyAll(
-                  Colors.transparent,
-                ),
-                labelStyle: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-                tabs: const [
-                  Tab(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.home_outlined, size: 20),
-                        SizedBox(width: 6),
-                        Text("Home"),
-                      ],
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
                     ),
+                  ],
+                ),
+                child: TabBar(
+                  dividerColor: Colors.transparent,
+                  indicator: BoxDecoration(
+                    color: const Color(0xFFF9B000),
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  Tab(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.folder_outlined, size: 20),
-                        SizedBox(width: 6),
-                        Text("Files"),
-                      ],
+                  indicatorPadding: const EdgeInsets.all(4),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.black87,
+                  splashFactory: NoSplash.splashFactory,
+                  overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+                  labelStyle: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                  tabs: const [
+                    Tab(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.home_outlined, size: 20),
+                          SizedBox(width: 6),
+                          Text("Home"),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    Tab(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.folder_outlined, size: 20),
+                          SizedBox(width: 6),
+                          Text("Files"),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
