@@ -1453,6 +1453,20 @@ class ApiService {
     return await _makeRequest(url, _buildHeaders(), body, 'POST');
   }
 
+  static Future<Map<String, dynamic>> getActionRequired() async {
+    final url = ApiConfig.actionRequired;
+    return await _makeRequest(url, _buildHeaders(), null, 'GET');
+  }
+
+
+  static Future<Map<String, dynamic>> getActionRequiredList({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final url = '${ApiConfig.actionRequired}?page=$page&limit=$limit';
+    return await _makeRequest(url, _buildHeaders(), null, 'GET');
+  }
+
   // Generic methods for backward compatibility
   static Future<Map<String, dynamic>> post(
     String endpoint,

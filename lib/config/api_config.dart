@@ -95,6 +95,8 @@ class ApiConfig {
 
   static const String checkUserAuthentication = "/check-user-authentication";
 
+  static const String actionRequired = "/action-required/unread";
+
   // API settings
   static const Duration timeout = Duration(seconds: 30);
   static const Duration refreshTokenThreshold = Duration(minutes: 5);

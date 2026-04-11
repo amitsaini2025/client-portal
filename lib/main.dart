@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:client/screens/auth/reset_password_screen.dart';
 import 'package:client/screens/cases/cases_list_screen.dart';
+import 'package:client/screens/dashboard/action_required/action_requried_screen.dart';
 import 'package:client/screens/dashboard/billing_list/billing_list_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
@@ -441,6 +442,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/important-links': (context) => ImportantLinksScreen(),
             '/vac-search': (context) => VacSearchScreen(),
             '/chat-bots': (context) => ChatBotScreen(),
+            '/action-required': (context) => ActionRequiredScreen(),
           },
         );
       },

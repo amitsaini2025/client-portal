@@ -30,12 +30,18 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
   List<NotificationModel> notifications = [];
   bool isFetchingNotifications = false;
 
+  // Action Required state
+  int _actionRequiredCount = 0;
+  Map<String, dynamic>? _latestActionRequired;
+  bool _isFetchingActionRequired = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _checkUserStatus();
     _fetchNotifications();
+    _fetchActionRequired();
   }
 
   @override
@@ -56,12 +62,40 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
   void didPopNext() {
     _checkUserStatus();
     _fetchNotifications();
+    _fetchActionRequired();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _fetchNotifications();
+      _fetchActionRequired();
+    }
+  }
+
+  Future<void> _fetchActionRequired() async {
+    final bool isLoggedIn = await AuthService.isAuthenticated;
+    if (!isLoggedIn || !mounted || _isFetchingActionRequired) return;
+
+    setState(() => _isFetchingActionRequired = true);
+
+    try {
+      final data = await ApiService.getActionRequired();
+
+      if (!mounted) return;
+
+      if (data['success'] == true) {
+        setState(() {
+          _actionRequiredCount = data['data']['unread_count'] ?? 0;
+          _latestActionRequired = data['data']['latest_unread'];
+          _isFetchingActionRequired = false;
+        });
+      } else {
+        setState(() => _isFetchingActionRequired = false);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isFetchingActionRequired = false);
     }
   }
 
@@ -75,9 +109,9 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
       final data = await ApiService.getRecentUnreadNotifications();
 
       final newNotifications =
-          (data['data']['notifications'] as List)
-              .map((json) => NotificationModel.fromJson(json))
-              .toList();
+      (data['data']['notifications'] as List)
+          .map((json) => NotificationModel.fromJson(json))
+          .toList();
 
       if (!mounted) return;
 
@@ -222,6 +256,133 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
     }
   }
 
+  Widget _buildActionRequiredBanner() {
+    if (_actionRequiredCount == 0 && !_isFetchingActionRequired) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        borderRadius: BorderRadius.circular(14),
+        elevation: 2,
+        shadowColor: Colors.orange.withOpacity(0.3),
+        color: Colors.white,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: _isFetchingActionRequired
+              ? null
+              : () {
+            if (_latestActionRequired != null) {
+              final url =
+              (_latestActionRequired!['url'] as String? ?? '').trim();
+              final matterId =
+              _latestActionRequired!['client_matter_id'] as int?;
+              Navigator.pushNamed(context, '/action-required');
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFFF8F0), Color(0xFFFFEDD5)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border: Border.all(
+                color: const Color(0xFFFB923C).withOpacity(0.4),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFB923C).withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.assignment_late_rounded,
+                    color: Color(0xFFEA580C),
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _isFetchingActionRequired
+                      ? const Text(
+                    'Loading action required...',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF9A3412),
+                    ),
+                  )
+                      : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            'Action Required',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF9A3412),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEA580C),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '$_actionRequiredCount',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (_latestActionRequired != null) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          _latestActionRequired!['message'] as String? ??
+                              '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            color: Colors.orange.shade800,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFEA580C),
+                  size: 22,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -237,118 +398,118 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
             child: Column(
               children: [
                 const SizedBox(height: 12),
+                // Action Required Banner
                 notifications.isEmpty && !isFetchingNotifications
                     ? Center(
-                      child: Text(
-                        'No notifications available',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    )
+                  child: Text(
+                    'No notifications available',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
                     : SizedBox(
-                      height: 150,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: notifications.length,
-                        itemBuilder: (context, index) {
-                          final item = notifications[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6),
-                            child: Material(
-                              borderRadius: BorderRadius.circular(14),
-                              elevation: 1.5,
-                              shadowColor: Colors.black12,
-                              color: Colors.white,
-                              child: InkWell(
+                  height: 200,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: notifications.length,
+                    itemBuilder: (context, index) {
+                      final item = notifications[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Material(
+                          borderRadius: BorderRadius.circular(14),
+                          elevation: 1.5,
+                          shadowColor: Colors.black12,
+                          color: Colors.white,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () =>
+                                _handleNotificationTap(context, item),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14),
-                                onTap:
-                                    () => _handleNotificationTap(context, item),
-                                child: Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    gradient:
-                                        item.isRead
-                                            ? null
-                                            : const LinearGradient(
-                                              colors: [
-                                                Color(0xFFF5F7FA),
-                                                Color(0xFFE8EEF5),
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            ),
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 22,
-                                        backgroundColor:
-                                            item.isRead
-                                                ? const Color(0xFFE6F4F1)
-                                                : const Color(0xFFE8EEF5),
-                                        child: Text(
-                                          item.senderName[0].toUpperCase(),
-                                          style: const TextStyle(
-                                            color: Color(0xFF374151),
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              item.message,
-                                              style: TextStyle(
-                                                fontWeight:
-                                                    item.isRead
-                                                        ? FontWeight.w400
-                                                        : FontWeight.w600,
-                                                fontSize: 15.5,
-                                                color: Colors.grey.shade800,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              '${item.senderName} • ${_formatDate(item.createdAt)}',
-                                              style: TextStyle(
-                                                fontSize: 12.5,
-                                                color: Colors.grey.shade600,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Icon(
-                                        item.isRead
-                                            ? Icons.mark_email_read
-                                            : Icons.mark_email_unread,
-                                        color:
-                                            item.isRead
-                                                ? Colors.blueGrey.shade400
-                                                : Colors.blueGrey.shade600,
-                                        size: 20,
-                                      ),
-                                    ],
-                                  ),
+                                gradient: item.isRead
+                                    ? null
+                                    : const LinearGradient(
+                                  colors: [
+                                    Color(0xFFF5F7FA),
+                                    Color(0xFFE8EEF5),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
                                 ),
                               ),
+                              child: Row(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 22,
+                                    backgroundColor: item.isRead
+                                        ? const Color(0xFFE6F4F1)
+                                        : const Color(0xFFE8EEF5),
+                                    child: Text(
+                                      item.senderName[0].toUpperCase(),
+                                      style: const TextStyle(
+                                        color: Color(0xFF374151),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.message,
+                                          style: TextStyle(
+                                            fontWeight: item.isRead
+                                                ? FontWeight.w400
+                                                : FontWeight.w600,
+                                            fontSize: 15.5,
+                                            color: Colors.grey.shade800,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '${item.senderName} • ${_formatDate(item.createdAt)}',
+                                          style: TextStyle(
+                                            fontSize: 12.5,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Icon(
+                                    item.isRead
+                                        ? Icons.mark_email_read
+                                        : Icons.mark_email_unread,
+                                    color: item.isRead
+                                        ? Colors.blueGrey.shade400
+                                        : Colors.blueGrey.shade600,
+                                    size: 20,
+                                  ),
+                                ],
+                              ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                _buildActionRequiredBanner(),
+
                 MyFilesQuickActionsCard(
                   onViewWorkflow: () {
                     Navigator.pushNamed(
@@ -470,68 +631,6 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
 
     await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
   }
-
-  /*Future<void> _handleNotificationTap(
-    BuildContext context,
-    NotificationModel item,
-  ) async {
-    if (!item.isRead) {
-      await ApiService.markNotificationAsRead(notificationId: item.id);
-      item.isRead = true;
-    }
-
-    Widget? screen;
-
-    final type = item.notificationType.trim();
-    final url = item.url.trim();
-
-    switch (type) {
-      case "message":
-        screen = WorkflowMessagesScreen(matterID: item.clientMatterId);
-        break;
-
-      case "stage_change":
-      case "matter_discontinued":
-      case "matter_reopened":
-      case "checklist":
-      case "checklist_added":
-      case "document_approved":
-      case "document_rejected":
-      case "document_deleted":
-      case "document_downloaded":
-        screen = WorkflowStagesScreen(matterID: item.clientMatterId);
-        break;
-
-      case "detail_approved":
-      case "detail_rejected":
-        screen = PersonalInformationScreen();
-        break;
-
-      case "invoice_sent_to_client_app":
-        screen = BillingListScreen(matterID: item.clientMatterId);
-        break;
-
-      case "action_completed":
-        if (url == "/activities") {
-          screen = WorkflowStagesScreen(matterID: item.clientMatterId);
-        } else {
-          screen = NotificationDetailScreen(notificationId: item.id);
-        }
-        break;
-
-      case "lead_converted_to_client":
-        screen = NotificationDetailScreen(notificationId: item.id);
-        break;
-
-      default:
-        screen = NotificationDetailScreen(notificationId: item.id);
-        break;
-    }
-
-    if (screen != null && mounted) {
-      await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
-    }
-  }*/
 
   String _formatDate(DateTime dateTime) {
     return DateFormat('MMM dd, yyyy • hh:mm a').format(dateTime);
