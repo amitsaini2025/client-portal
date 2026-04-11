@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:client/services/api_service.dart';
 import 'package:flutter/material.dart';
 
@@ -17,41 +16,59 @@ class OccupationSearchScreen extends StatefulWidget {
 class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
   final TextEditingController _controller = TextEditingController();
 
-  List<Occupation> _results = [];
-  bool _loading = false;
+  List<Occupation> suggestions = [];
+  List<Occupation> selectedResults = [];
+  bool loading = false;
 
   Timer? _debounce;
 
+  // ----------------- SEARCH TRIGGER -----------------
   void _onSearchChanged(String value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (value.trim().isNotEmpty) {
-        _search();
+      if (value.trim().length >= 2) {
+        _searchSuggestions(value.trim());
       } else {
-        setState(() => _results = []);
+        setState(() => suggestions = []);
       }
     });
   }
 
-  Future<void> _search() async {
-    if (_controller.text.trim().isEmpty) return;
-
-    setState(() => _loading = true);
-
+  // ----------------- SEARCH SUGGESTIONS (Dropdown) -----------------
+  Future<void> _searchSuggestions(String query) async {
     try {
-      final Map<String, dynamic> response = await ApiService.occupationFinder(
-        _controller.text.trim(),
-      );
+      final response = await ApiService.occupationFinder(query);
 
-      final List list = response['data'] ?? [];
-      _results = list.map((e) => Occupation.fromJson(e)).toList();
+      final List list = response["data"] ?? [];
+      setState(() {
+        suggestions = list.map((e) => Occupation.fromJson(e)).toList();
+      });
     } catch (e) {
       debugPrint(e.toString());
-      _results = [];
+      setState(() => suggestions = []);
+    }
+  }
+
+  // ----------------- FETCH FULL RESULT -----------------
+  Future<void> _fetchOccupation(String title) async {
+    setState(() {
+      loading = true;
+      selectedResults = [];
+      suggestions.clear();
+    });
+
+    try {
+      final response = await ApiService.occupationFinder(title);
+      final List list = response["data"] ?? [];
+
+      selectedResults = list.map((e) => Occupation.fromJson(e)).toList();
+    } catch (e) {
+      debugPrint(e.toString());
+      selectedResults = [];
     }
 
-    setState(() => _loading = false);
+    setState(() => loading = false);
   }
 
   @override
@@ -61,83 +78,98 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
     super.dispose();
   }
 
+  // ----------------- UI -----------------
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /*appBar: AppBar(
-        backgroundColor: ThemeConfig.goldenYellow,
-        title: const Text(
-          "Occupation Search",
-          style: TextStyle(color: Colors.white),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),*/
       appBar: CommonAppBar(
         titleName: 'Occupation Search',
         matterID: AuthService.selectedMatterId,
       ),
-      body: Column(
-        children: [
-          _searchBar(),
-          Expanded(
-            child:
-                _loading
-                    ? const Center(child: CircularProgressIndicator())
-                    : _results.isEmpty
-                    ? const Center(
-                      child: Text(
-                        'No occupations found',
-                        style: TextStyle(color: Colors.black54),
-                      ),
-                    )
-                    : ListView.builder(
-                      itemCount: _results.length,
-                      itemBuilder: (context, index) {
-                        return OccupationCard(_results[index]);
-                      },
-                    ),
+      body: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _buildSearchField(),
+
+              if (suggestions.isNotEmpty) _buildSuggestionDropdown(),
+
+              if (loading) const SizedBox(height: 20),
+              if (loading) const CircularProgressIndicator(),
+
+              if (!loading && selectedResults.isNotEmpty)
+                ...selectedResults.map((e) => OccupationCard(e)),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _searchBar() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _controller,
-              onChanged: _onSearchChanged,
-              onSubmitted: (_) => _search(),
-              decoration: InputDecoration(
-                hintText: 'Search occupation',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _controller.clear();
-                    setState(() => _results = []);
-                  },
-                ),
-              ),
+  // ----------------- Search Field -----------------
+  Widget _buildSearchField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Search Occupation", style: TextStyle(fontSize: 14)),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _controller,
+          onChanged: _onSearchChanged,
+          decoration: InputDecoration(
+            hintText: "e.g. Software Engineer",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                _controller.clear();
+                setState(() {
+                  suggestions = [];
+                  selectedResults = [];
+                });
+              },
             ),
           ),
-          const SizedBox(width: 12),
-          ElevatedButton.icon(
-            onPressed: _search,
-            icon: const Icon(Icons.search),
-            label: const Text('Search'),
-          ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  // ----------------- Dropdown UI -----------------
+  Widget _buildSuggestionDropdown() {
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      constraints: const BoxConstraints(maxHeight: 300),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.white,
+      ),
+      child: ListView.builder(
+        itemCount: suggestions.length,
+        itemBuilder: (_, i) {
+          final item = suggestions[i];
+          return ListTile(
+            title: Text("${item.title} (${item.anzscoCode})"),
+            onTap: () {
+              _controller.text = item.title;
+              FocusScope.of(context).unfocus();
+              _fetchOccupation(item.title);
+            },
+          );
+        },
       ),
     );
   }
 }
+
+// ===================================================================
+// ------------------------- OCCUPATION CARD --------------------------
+// ===================================================================
 
 class OccupationCard extends StatefulWidget {
   final Occupation occupation;
@@ -214,31 +246,30 @@ class _OccupationCardState extends State<OccupationCard> {
 
             Wrap(
               spacing: 10,
-              children:
-                  occupation.occupationLists.map((e) {
-                    final isGreen = e == 'MLTSSL';
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            isGreen
-                                ? const Color(0xFF10B981)
-                                : const Color(0xFF6B7280),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        e,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    );
-                  }).toList(),
+              children: occupation.occupationLists.map((e) {
+                final isGreen = e == 'MLTSSL';
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                    isGreen
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFF6B7280),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Text(
+                    e,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
 
             const SizedBox(height: 14),
