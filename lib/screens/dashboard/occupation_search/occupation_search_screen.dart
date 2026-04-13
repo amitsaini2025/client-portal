@@ -22,7 +22,6 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
 
   Timer? _debounce;
 
-  // ----------------- SEARCH TRIGGER -----------------
   void _onSearchChanged(String value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
@@ -35,7 +34,6 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
     });
   }
 
-  // ----------------- SEARCH SUGGESTIONS (Dropdown) -----------------
   Future<void> _searchSuggestions(String query) async {
     try {
       final response = await ApiService.occupationFinder(query);
@@ -50,7 +48,6 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
     }
   }
 
-  // ----------------- FETCH FULL RESULT -----------------
   Future<void> _fetchOccupation(String title) async {
     setState(() {
       loading = true;
@@ -78,7 +75,6 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
     super.dispose();
   }
 
-  // ----------------- UI -----------------
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,7 +104,6 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
     );
   }
 
-  // ----------------- Search Field -----------------
   Widget _buildSearchField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,7 +134,6 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
     );
   }
 
-  // ----------------- Dropdown UI -----------------
   Widget _buildSuggestionDropdown() {
     return Container(
       margin: const EdgeInsets.only(top: 8),
@@ -166,10 +160,6 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
     );
   }
 }
-
-// ===================================================================
-// ------------------------- OCCUPATION CARD --------------------------
-// ===================================================================
 
 class OccupationCard extends StatefulWidget {
   final Occupation occupation;
