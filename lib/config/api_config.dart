@@ -53,7 +53,6 @@ class ApiConfig {
   static const String updateClientExperienceDetail = "/update-client-experience-detail";
   static const String updateClientOccupationDetail = "/update-client-occupation-detail";
   static const String updateClientTestScoreDetail = "/update-client-testscore-detail";
-  static const String searchOccupation = "/search-occupation";
 
   static const String registerFCMToken = "/fcm/register-token";
   static const String unregisterFCMToken = "/fcm/unregister-token";
@@ -67,6 +66,8 @@ class ApiConfig {
   static const String studentCalcResult = "/student-calc-result";
 
   static const String occupationFinder = "/occupation-finder";
+  static const String searchOccupation = "/search-occupation";
+  static const String occupationResult = "/occupation-result";
 
   static const String postCodeSearch = "/postcode-search";
   static const String postCodeResult = "/postcode-result";

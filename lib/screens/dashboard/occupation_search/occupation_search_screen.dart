@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'package:client/services/api_service.dart';
+
 import 'package:flutter/material.dart';
 
-import '../../../models/occupation.dart';
-import '../../../services/auth_service.dart';
-import '../../../widgets/common_app_bar.dart';
+import '../../../config/theme_config.dart';
+import '../../../services/api_service.dart';
 
 class OccupationSearchScreen extends StatefulWidget {
   const OccupationSearchScreen({super.key});
@@ -16,375 +15,221 @@ class OccupationSearchScreen extends StatefulWidget {
 class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
   final TextEditingController _controller = TextEditingController();
 
-  List<Occupation> suggestions = [];
-  List<Occupation> selectedResults = [];
-  bool loading = false;
+  List suggestions = [];
+  Map<String, dynamic>? details;
 
+  bool loading = false;
   Timer? _debounce;
 
   void _onSearchChanged(String value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
-    _debounce = Timer(const Duration(milliseconds: 500), () {
+    _debounce = Timer(const Duration(milliseconds: 400), () {
       if (value.trim().length >= 2) {
-        _searchSuggestions(value.trim());
+        _search(value);
       } else {
         setState(() => suggestions = []);
       }
     });
   }
 
-  Future<void> _searchSuggestions(String query) async {
-    try {
-      final response = await ApiService.occupationFinder(query);
-
-      final List list = response["data"] ?? [];
-      setState(() {
-        suggestions = list.map((e) => Occupation.fromJson(e)).toList();
-      });
-    } catch (e) {
-      debugPrint(e.toString());
-      setState(() => suggestions = []);
-    }
+  Future<void> _search(String query) async {
+    final res = await ApiService.searchOccupation(query);
+    setState(() {
+      suggestions = res['data'] ?? [];
+    });
   }
 
-  Future<void> _fetchOccupation(String title) async {
+  Future<void> _getDetails(String code) async {
     setState(() {
       loading = true;
-      selectedResults = [];
       suggestions.clear();
     });
 
-    try {
-      final response = await ApiService.occupationFinder(title);
-      final List list = response["data"] ?? [];
+    final res = await ApiService.getOccupationDetails(code);
 
-      selectedResults = list.map((e) => Occupation.fromJson(e)).toList();
-    } catch (e) {
-      debugPrint(e.toString());
-      selectedResults = [];
-    }
-
-    setState(() => loading = false);
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    _controller.dispose();
-    super.dispose();
+    setState(() {
+      details = res['data'];
+      loading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(
-        titleName: 'Occupation Search',
-        matterID: AuthService.selectedMatterId,
+      appBar: AppBar(
+        title: const Text('Occupation Search'),
+        backgroundColor: ThemeConfig.goldenYellow,
+        foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _buildSearchField(),
-
-              if (suggestions.isNotEmpty) _buildSuggestionDropdown(),
-
-              if (loading) const SizedBox(height: 20),
-              if (loading) const CircularProgressIndicator(),
-
-              if (!loading && selectedResults.isNotEmpty)
-                ...selectedResults.map((e) => OccupationCard(e)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("Search Occupation", style: TextStyle(fontSize: 14)),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _controller,
-          onChanged: _onSearchChanged,
-          decoration: InputDecoration(
-            hintText: "e.g. Software Engineer",
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: () {
-                _controller.clear();
-                setState(() {
-                  suggestions = [];
-                  selectedResults = [];
-                });
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSuggestionDropdown() {
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      constraints: const BoxConstraints(maxHeight: 300),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.white,
-      ),
-      child: ListView.builder(
-        itemCount: suggestions.length,
-        itemBuilder: (_, i) {
-          final item = suggestions[i];
-          return ListTile(
-            title: Text("${item.title} (${item.anzscoCode})"),
-            onTap: () {
-              _controller.text = item.title;
-              FocusScope.of(context).unfocus();
-              _fetchOccupation(item.title);
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-class OccupationCard extends StatefulWidget {
-  final Occupation occupation;
-
-  const OccupationCard(this.occupation, {super.key});
-
-  @override
-  State<OccupationCard> createState() => _OccupationCardState();
-}
-
-class _OccupationCardState extends State<OccupationCard> {
-  bool expanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final occupation = widget.occupation;
-
-    return Container(
-      margin: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 14,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              occupation.title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'ANZSCO:  ${occupation.anzscoCode}',
-              style: const TextStyle(
-                fontSize: 13,
-                color: Color(0xFF3B82F6),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 14),
-            const Divider(),
-
-            _rowWithBadge('SKILL LEVEL', 'LEVEL ${occupation.skillLevel}'),
-
-            const Divider(),
-
-            _row('ASSESSING AUTHORITY', occupation.assessingAuthority ?? "n/a"),
-
-            const Divider(),
-
-            _row('ASSESSMENT VALIDITY', '${occupation.validityYears} years'),
-
-            const SizedBox(height: 16),
-
-            const Text(
-              'ELIGIBLE VISA LISTS:',
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.black54,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            Wrap(
-              spacing: 10,
-              children: occupation.occupationLists.map((e) {
-                final isGreen = e == 'MLTSSL';
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                    isGreen
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFF6B7280),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Text(
-                    e,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-
-            const SizedBox(height: 14),
-
-            RichText(
-              text: TextSpan(
-                style: const TextStyle(fontSize: 13, color: Colors.black87),
-                children: [
-                  const TextSpan(
-                    text: 'Also known as: ',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  TextSpan(text: occupation.alternateTitles),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            GestureDetector(
-              onTap: () => setState(() => expanded = !expanded),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF3F4F6),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      expanded
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
-                      color: Colors.black54,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      expanded ? 'Less Information' : 'More Information',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+            TextField(
+              controller: _controller,
+              onChanged: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Search occupation',
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
 
-            if (expanded) ...[
-              const SizedBox(height: 14),
+            if (suggestions.isNotEmpty)
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
+                margin: const EdgeInsets.only(top: 6),
+                height: 180,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFB),
-                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  occupation.additionalInfo ?? "n/a",
-                  style: const TextStyle(fontSize: 13, color: Colors.black54),
+                child: ListView.builder(
+                  itemCount: suggestions.length,
+                  itemBuilder: (_, i) {
+                    final item = suggestions[i];
+                    return ListTile(
+                      dense: true,
+                      title: Text(
+                        item['occupation_title'],
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      onTap: () {
+                        _controller.text = item['occupation_title'];
+                        _getDetails(item['anzsco_code']);
+                      },
+                    );
+                  },
                 ),
               ),
-            ],
+
+            const SizedBox(height: 12),
+
+            if (loading) const CircularProgressIndicator(),
+
+            if (details != null && !loading)
+              Expanded(child: SingleChildScrollView(child: _buildTable())),
           ],
         ),
       ),
     );
   }
 
-  Widget _row(String title, String value) {
+  Widget _buildTable() {
+    final visas = details!['visa_options'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "${details!['anzsco_code']}: ${details!['occupation_title']}",
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          'Possible Visa Options',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+
+        Table(
+          border: TableBorder.all(color: Colors.grey.shade300, width: 0.5),
+          columnWidths: const {
+            0: FlexColumnWidth(2.5),
+            1: FlexColumnWidth(1),
+            2: FlexColumnWidth(1),
+            3: FlexColumnWidth(1),
+            4: FlexColumnWidth(1),
+            5: FlexColumnWidth(1),
+          },
+          children: [
+            _headerRow(),
+            ...visas.entries.map((e) => _row(e.value)).toList(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  TableRow _headerRow() {
+    return TableRow(
+      decoration: const BoxDecoration(color: Color(0xFFF1F5F9)),
+      children: [
+        _cell('Visa Type'),
+        _cell('Eligibility'),
+        _cell('MLTSSL'),
+        _cell('STSOL'),
+        _cell('ROL'),
+        _cell('CSOL'),
+      ],
+    );
+  }
+
+  TableRow _row(Map data) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(6),
+          child: Row(
+            children: [
+              Container(
+                width: 26,
+                height: 26,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF1E3A8A),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  data['visa_type'],
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  data['visa_name'],
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+        ),
+        _iconCell(data['eligibility']),
+        _iconCell(data['MLTSSL']),
+        _iconCell(data['STSOL']),
+        _iconCell(data['ROL']),
+        _iconCell(data['CSOL']),
+      ],
+    );
+  }
+
+  static const _green = Color(0xFF10B981);
+  static const _red = Color(0xFFEF4444);
+
+  Widget _iconCell(bool value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Colors.black54,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-          ),
-        ],
+      padding: const EdgeInsets.all(6),
+      child: Icon(
+        value ? Icons.check_circle : Icons.close,
+        size: 16,
+        color: value ? _green : _red,
       ),
     );
   }
 
-  Widget _rowWithBadge(String title, String value) {
+  static Widget _cell(String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Colors.black54,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFF8B5CF6),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 13,
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
+      padding: EdgeInsets.all(6),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
       ),
     );
   }
