@@ -40,6 +40,7 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
     });
   }
 
+  /// ✅ FIXED HERE (data is List → take first item)
   Future<void> _getDetails(String code) async {
     setState(() {
       loading = true;
@@ -49,9 +50,23 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
     final res = await ApiService.getOccupationDetails(code);
 
     setState(() {
-      details = res['data'];
+      final dataList = res['data'];
+
+      if (dataList is List && dataList.isNotEmpty) {
+        details = dataList.first;
+      } else {
+        details = null;
+      }
+
       loading = false;
     });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -146,7 +161,7 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
           },
           children: [
             _headerRow(),
-            ...visas.entries.map((e) => _row(e.value)).toList(),
+            ...visas.entries.map<TableRow>((e) => _row(e.value)).toList(),
           ],
         ),
       ],
@@ -185,7 +200,7 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
                 child: Text(
                   data['visa_type'],
                   style: const TextStyle(
-                    fontSize: 11,
+                    fontSize: 8,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -226,10 +241,10 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
 
   static Widget _cell(String text) {
     return Padding(
-      padding: EdgeInsets.all(6),
+      padding: const EdgeInsets.all(6),
       child: Text(
         text,
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
       ),
     );
   }
