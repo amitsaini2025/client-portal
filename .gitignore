@@ -46,3 +46,4 @@ app.*.map.json
 
 # Ignore Google service account JSON
 assets/hummr-d17f7-3e476ccd9405.json
+.env

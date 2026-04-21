@@ -133,6 +133,9 @@ class _BlogListScreenState extends State<BlogListScreen> {
                         ),
                       );
                     },
+                    headers: {
+                      "Access-Control-Allow-Origin": "*",
+                    },
                   ),
                 ),
                 if (blog.featured)

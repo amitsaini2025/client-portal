@@ -7,6 +7,7 @@ import 'package:client/screens/dashboard/billing_list/billing_list_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
 import 'package:client/screens/dashboard/chat_bot/chat_bot_screen.dart';
+import 'package:client/screens/dashboard/chat_bot/claude_chat_bot_screen.dart';
 import 'package:client/screens/dashboard/dashboard/dashboard_screen.dart';
 import 'package:client/screens/dashboard/english_requirement/english_requirement_screen.dart';
 import 'package:client/screens/dashboard/health_insurance/health_insurance_screen.dart';
@@ -40,6 +41,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
 import 'package:google_fonts/google_fonts.dart';
@@ -218,6 +220,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
+  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   if (!kIsWeb) {
     Stripe.publishableKey = StripeConfig.publishableKey;
@@ -442,6 +445,7 @@ class MyAppWithTheme extends StatelessWidget {
             '/important-links': (context) => ImportantLinksScreen(),
             '/vac-search': (context) => VacSearchScreen(),
             '/chat-bots': (context) => ChatBotScreen(),
+            '/claude-chat-bot': (context) => ClaudeChatBotScreen(),
             '/action-required': (context) => ActionRequiredScreen(),
           },
         );

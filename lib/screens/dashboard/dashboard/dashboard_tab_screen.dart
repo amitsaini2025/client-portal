@@ -370,12 +370,12 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/chat-bots');
+          Navigator.pushNamed(context, '/claude-chat-bot');
         },
         backgroundColor: ThemeConfig.goldenYellow,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         elevation: 6,
-        tooltip: 'Chatbot',
+        tooltip: 'Claude AI Assistant',
         child: const Icon(Icons.chat, size: 28, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
