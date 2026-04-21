@@ -1,8 +1,7 @@
-import 'dart:math';
-
 import 'package:client/widgets/webview/universal_webview_web.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../config/theme_config.dart';
@@ -35,8 +34,6 @@ class _UniversalWebViewState extends State<UniversalWebView>
   late AnimationController _animationController;
   late Animation<double> _progressAnimation;
 
-  double _targetProgress = 0;
-
   @override
   void initState() {
     super.initState();
@@ -67,7 +64,9 @@ class _UniversalWebViewState extends State<UniversalWebView>
             },
             onPageFinished: (_) {
               _updateProgress(100);
-              setState(() => _isLoading = false);
+              Future.delayed(const Duration(milliseconds: 400), () {
+                if (mounted) setState(() => _isLoading = false);
+              });
             },
           ),
         )
@@ -76,9 +75,8 @@ class _UniversalWebViewState extends State<UniversalWebView>
   }
 
   void _updateProgress(int newProgress) {
-    final newValue = (newProgress.clamp(0, 100)) / 100;
-
     _progress = newProgress;
+    final newValue = (newProgress.clamp(0, 100)) / 100;
 
     _progressAnimation = Tween<double>(
       begin: _progressAnimation.value,
@@ -96,28 +94,20 @@ class _UniversalWebViewState extends State<UniversalWebView>
     super.dispose();
   }
 
-  /*String get loadingText {
-    if (_progress < 40) return "Loading...";
-    if (_progress < 80) return "Preparing content...";
-    if (_progress < 100) return "Almost there...";
-    return "Done";
-  }*/
-
-  String loadingText = "Loading...";
-
   @override
   Widget build(BuildContext context) {
-    Widget webview;
-
+    // ✅ On web: show a branded fallback instead of a broken iframe
     if (kIsWeb) {
-      webview = UniversalWebViewWeb(
-        url: widget.url,
-        viewId: widget.viewId,
+      return Scaffold(
+        appBar: CommonAppBar(
+          titleName: widget.title,
+          matterID: AuthService.selectedMatterId,
+        ),
+        body: _WebFallbackView(url: widget.url, title: widget.title),
       );
-    } else {
-      webview = WebViewWidget(controller: _controller);
     }
 
+    // ✅ On Android/iOS: use the native WebView as before
     final double smoothValue = _progressAnimation.value;
     final double scale = 0.85 + (smoothValue * 0.35);
 
@@ -128,72 +118,162 @@ class _UniversalWebViewState extends State<UniversalWebView>
       ),
       body: Stack(
         children: [
-          Positioned.fill(child: webview),
-
-          /// 🔥 Smooth Loader
-          if (!kIsWeb && _isLoading)
+          Positioned.fill(
+            child: WebViewWidget(controller: _controller),
+          ),
+          if (_isLoading)
             Positioned.fill(
               child: AnimatedOpacity(
-                opacity: _isLoading ? 1 : 0,
+                opacity: 1.0,
                 duration: const Duration(milliseconds: 300),
                 child: Container(
                   color: Colors.white,
                   child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        /// 🎯 Smooth scaling logo + progress
-                        Transform.scale(
-                          scale: scale,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              SizedBox(
-                                height: 110,
-                                width: 110,
-                                child: CircularProgressIndicator(
-                                  value: smoothValue,
-                                  strokeWidth: 4,
-                                  color: ThemeConfig.successColor,
-                                  backgroundColor: Colors.grey.shade200,
-                                ),
-                              ),
-
-                              Image.asset(
-                                'assets/icons/app_icon.png',
-                                height: 60,
-                              ),
-                            ],
+                    child: Transform.scale(
+                      scale: scale,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox(
+                            height: 110,
+                            width: 110,
+                            child: CircularProgressIndicator(
+                              value: smoothValue,
+                              strokeWidth: 4,
+                              color: ThemeConfig.successColor,
+                              backgroundColor: Colors.grey.shade200,
+                            ),
                           ),
-                        ),
-
-                        /*const SizedBox(height: 24),
-
-                        Text(
-                          "${(smoothValue * 100).toInt()}%",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: ThemeConfig.successColor,
+                          Image.asset(
+                            'assets/icons/app_icon.png',
+                            height: 60,
                           ),
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        Text(
-                          loadingText,
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 13,
-                          ),
-                        ),*/
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// Shown on Flutter Web when the target URL blocks iframe embedding.
+/// Gives the user a clean branded screen with an "Open in Browser" button.
+class _WebFallbackView extends StatefulWidget {
+  final String url;
+  final String title;
+
+  const _WebFallbackView({required this.url, required this.title});
+
+  @override
+  State<_WebFallbackView> createState() => _WebFallbackViewState();
+}
+
+class _WebFallbackViewState extends State<_WebFallbackView> {
+  bool _launching = false;
+
+  Future<void> _openInBrowser() async {
+    setState(() => _launching = true);
+    try {
+      final uri = Uri.parse(widget.url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open the link.')),
+          );
+        }
+      }
+    } finally {
+      if (mounted) setState(() => _launching = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: ThemeConfig.successColor.withOpacity(0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.open_in_browser_rounded,
+                size: 56,
+                color: ThemeConfig.successColor,
+              ),
+            ),
+            const SizedBox(height: 28),
+            Text(
+              widget.title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'This page needs to open in your browser.\n'
+                  'Your session and data will be kept secure.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 36),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: _launching
+                    ? const SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+                    : const Icon(Icons.launch_rounded),
+                label: Text(_launching ? 'Opening...' : 'Open in Browser'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ThemeConfig.successColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onPressed: _launching ? null : _openInBrowser,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Go Back',
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
