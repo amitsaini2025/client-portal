@@ -1,13 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme_config.dart';
 
-final apiKey = dotenv.env['ANTHROPIC_API_KEY'];
+const apiKey = String.fromEnvironment('ANTHROPIC_API_KEY');
 const String _claudeApiUrl = 'https://api.anthropic.com/v1/messages';
 const String _claudeModel = 'claude-sonnet-4-6';
 
