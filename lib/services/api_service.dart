@@ -787,7 +787,7 @@ class ApiService {
     return await _makeRequest(
       '${ApiConfig.messagesList}/$messageId',
       _buildHeaders(),
-      {},
+      null,
       'GET',
     );
   }
