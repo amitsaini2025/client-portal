@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:pay/pay.dart';
@@ -106,7 +108,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
       await ApiService.updateInvoicePayment(
         billingInvoiceId: invoice.id!,
         clientMatterId: invoice.clientMatterId!,
-        paymentType: Platform.isIOS ? "apple_pay" : "google_pay",
+        paymentType: defaultTargetPlatform == TargetPlatform.iOS ? "apple_pay" : "google_pay",
         paymentToken: paymentToken,
         paymentStatus: "completed",
       );
@@ -157,18 +159,14 @@ class _BillingListScreenState extends State<BillingListScreen> {
         throw Exception('Missing Stripe client secret');
       }
 
-      await Stripe.instance.initPaymentSheet(
-        paymentSheetParameters: SetupPaymentSheetParameters(
-          paymentIntentClientSecret: clientSecret,
-          merchantDisplayName: StripeConfig.merchantDisplayName,
-          style:
-              Theme.of(context).brightness == Brightness.dark
-                  ? ThemeMode.dark
-                  : ThemeMode.light,
-        ),
+      await StripeService.presentPayment(
+        context: context,
+        clientSecret: clientSecret,
+        style:
+            Theme.of(context).brightness == Brightness.dark
+                ? ThemeMode.dark
+                : ThemeMode.light,
       );
-
-      await Stripe.instance.presentPaymentSheet();
 
       await ApiService.updateInvoicePayment(
         billingInvoiceId: invoice.id,
@@ -344,40 +342,42 @@ class _BillingListScreenState extends State<BillingListScreen> {
             ),
             if (!isPaid) ...[
               const SizedBox(height: 16),
-              Platform.isIOS
-                  ? ApplePayButton(
-                    paymentConfiguration: PaymentConfiguration.fromJsonString(
-                      applePayConfig,
-                    ),
-                    paymentItems: [
-                      PaymentItem(
-                        label: "Invoice ${invoice.invoiceNumber}",
-                        amount: invoice.totalAmount!.toString(),
-                        status: PaymentItemStatus.final_price,
+              if (!kIsWeb) ...[
+                defaultTargetPlatform == TargetPlatform.iOS
+                    ? ApplePayButton(
+                      paymentConfiguration: PaymentConfiguration.fromJsonString(
+                        applePayConfig,
                       ),
-                    ],
-                    width: double.infinity,
-                    height: 48,
-                    onPaymentResult:
-                        (result) => _onPaymentResult(result, invoice),
-                  )
-                  : GooglePayButton(
-                    paymentConfiguration: PaymentConfiguration.fromJsonString(
-                      googlePayConfig,
-                    ),
-                    paymentItems: [
-                      PaymentItem(
-                        label: "Invoice ${invoice.invoiceNumber}",
-                        amount: invoice.totalAmount!.toString(),
-                        status: PaymentItemStatus.final_price,
+                      paymentItems: [
+                        PaymentItem(
+                          label: "Invoice ${invoice.invoiceNumber}",
+                          amount: invoice.totalAmount!.toString(),
+                          status: PaymentItemStatus.final_price,
+                        ),
+                      ],
+                      width: double.infinity,
+                      height: 48,
+                      onPaymentResult:
+                          (result) => _onPaymentResult(result, invoice),
+                    )
+                    : GooglePayButton(
+                      paymentConfiguration: PaymentConfiguration.fromJsonString(
+                        googlePayConfig,
                       ),
-                    ],
-                    width: double.infinity,
-                    height: 48,
-                    onPaymentResult:
-                        (result) => _onPaymentResult(result, invoice),
-                  ),
-              const SizedBox(height: 12),
+                      paymentItems: [
+                        PaymentItem(
+                          label: "Invoice ${invoice.invoiceNumber}",
+                          amount: invoice.totalAmount!.toString(),
+                          status: PaymentItemStatus.final_price,
+                        ),
+                      ],
+                      width: double.infinity,
+                      height: 48,
+                      onPaymentResult:
+                          (result) => _onPaymentResult(result, invoice),
+                    ),
+                const SizedBox(height: 12),
+              ],
               SizedBox(
                 width: double.infinity,
                 height: 48,

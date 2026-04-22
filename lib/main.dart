@@ -220,8 +220,8 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = StripeConfig.publishableKey;
   if (!kIsWeb) {
-    Stripe.publishableKey = StripeConfig.publishableKey;
     Stripe.merchantIdentifier = StripeConfig.merchantIdentifier;
     await Stripe.instance.applySettings();
   }
@@ -240,7 +240,9 @@ void main() async {
     android: androidSettings,
     iOS: iosSettings,
   );
-  await flutterLocalNotificationsPlugin.initialize(initSettings);
+  if (!kIsWeb) {
+    await flutterLocalNotificationsPlugin.initialize(initSettings);
+  }
   if (!kIsWeb && Platform.isAndroid) {
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -512,7 +514,7 @@ class LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    if (!Platform.isWindows) {
+    if (!kIsWeb && !Platform.isWindows) {
       _setupNotifications();
     }
   }
@@ -628,7 +630,7 @@ class LoginPageState extends State<LoginPage> {
       }
 
       // Register FCM token after successful login
-      if (!Platform.isWindows) {
+      if (!kIsWeb && !Platform.isWindows) {
         final fcmService = FCMService();
         String? fcmToken = await fcmService.getToken();
         if (fcmToken != null) {

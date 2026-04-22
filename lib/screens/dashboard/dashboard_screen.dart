@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:client/config/theme_config.dart';
 import 'package:client/screens/workflow/workflow_stages_screen.dart';
 import 'package:client/services/api_service_bansal_immigration.dart';
@@ -61,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     _loadDashboardData();
     _loadRecentBlogs();
-    if (!Platform.isWindows) {
+    if (!kIsWeb && !Platform.isWindows) {
       _setupNotifications();
     }
     _loadUser();

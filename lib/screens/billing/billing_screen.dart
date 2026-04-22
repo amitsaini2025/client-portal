@@ -223,15 +223,14 @@ class _BillingScreenState extends State<BillingScreen> {
         );
       }
 
-      await StripeService.initPaymentSheet(
+      await StripeService.presentPayment(
+        context: context,
         clientSecret: clientSecret,
         style:
             Theme.of(context).brightness == Brightness.dark
                 ? ThemeMode.dark
                 : ThemeMode.light,
       );
-
-      await StripeService.presentPaymentSheet();
 
       if (!mounted) return;
       setState(() {

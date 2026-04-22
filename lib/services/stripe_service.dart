@@ -165,5 +165,129 @@ class StripeService {
   static int amountToMinorUnit(double amount) {
     return (amount * 100).round();
   }
+
+  /// Presents payment UI — web uses a CardFormField dialog, mobile uses PaymentSheet.
+  static Future<void> presentPayment({
+    required BuildContext context,
+    required String clientSecret,
+    ThemeMode style = ThemeMode.system,
+  }) async {
+    if (kIsWeb) {
+      final success = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => _StripeWebPaymentDialog(clientSecret: clientSecret),
+      );
+      if (success != true) {
+        throw const StripeException(
+          error: LocalizedErrorMessage(
+            code: FailureCode.Canceled,
+            message: 'Canceled',
+          ),
+        );
+      }
+    } else {
+      await initPaymentSheet(clientSecret: clientSecret, style: style);
+      await presentPaymentSheet();
+    }
+  }
 }
 
+class _StripeWebPaymentDialog extends StatefulWidget {
+  const _StripeWebPaymentDialog({required this.clientSecret});
+  final String clientSecret;
+
+  @override
+  State<_StripeWebPaymentDialog> createState() =>
+      _StripeWebPaymentDialogState();
+}
+
+class _StripeWebPaymentDialogState extends State<_StripeWebPaymentDialog> {
+  bool _cardComplete = false;
+  bool _isLoading = false;
+  String? _error;
+
+  Future<void> _pay() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      await Stripe.instance.confirmPayment(
+        paymentIntentClientSecret: widget.clientSecret,
+        data: const PaymentMethodParams.card(
+          paymentMethodData: PaymentMethodData(),
+        ),
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } on StripeException catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.error.localizedMessage ??
+              e.error.message ??
+              'Payment failed. Please try again.';
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _error = 'Payment failed. Please try again.';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Enter Card Details'),
+      content: SizedBox(
+        width: 420,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CardFormField(
+              onCardChanged: (card) {
+                setState(() {
+                  _cardComplete = card?.complete == true;
+                });
+              },
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                _error!,
+                style: const TextStyle(color: Colors.red, fontSize: 13),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isLoading ? null : () => Navigator.of(context).pop(false),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: (_cardComplete && !_isLoading) ? _pay : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF5E8B7E),
+            foregroundColor: Colors.white,
+          ),
+          child: _isLoading
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Text('Pay'),
+        ),
+      ],
+    );
+  }
+}

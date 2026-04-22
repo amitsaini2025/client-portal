@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:pay/pay.dart';
@@ -56,12 +58,12 @@ class _BookConfirmAppointmentScreenState
             ? await ApiService.recordPaymentWallet(
               appointmentId: appointmentId,
               paymentIntentId: paymentToken,
-              paymentType: Platform.isIOS ? "apple_pay" : "gpay",
+              paymentType: defaultTargetPlatform == TargetPlatform.iOS ? "apple_pay" : "gpay",
             )
             : await ApiService.recordPaymentWalletWithoutLogin(
               appointmentId: appointmentId,
               paymentIntentId: paymentToken,
-              paymentType: Platform.isIOS ? "apple_pay" : "gpay",
+              paymentType: defaultTargetPlatform == TargetPlatform.iOS ? "apple_pay" : "gpay",
             );
       }
 
@@ -189,14 +191,10 @@ class _BookConfirmAppointmentScreenState
           throw Exception('Missing Stripe client secret');
         }
 
-        await Stripe.instance.initPaymentSheet(
-          paymentSheetParameters: SetupPaymentSheetParameters(
-            paymentIntentClientSecret: clientSecret,
-            merchantDisplayName: StripeConfig.merchantDisplayName,
-          ),
+        await StripeService.presentPayment(
+          context: context,
+          clientSecret: clientSecret,
         );
-
-        await Stripe.instance.presentPaymentSheet();
 
         paymentMethodId = paymentIntent['id'];
       }
@@ -292,7 +290,7 @@ class _BookConfirmAppointmentScreenState
             const SizedBox(height: 30),
 
             // ================= WALLET BUTTON =================
-            if (price != 0) ...[
+            if (price != 0 && !kIsWeb) ...[
               Center(
                 child: SizedBox(
                   width: double.infinity,
