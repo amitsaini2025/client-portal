@@ -98,6 +98,8 @@ class ApiConfig {
 
   static const String actionRequired = "/action-required/unread";
 
+  static const String chatBot = "/chatbot";
+
   // API settings
   static const Duration timeout = Duration(seconds: 30);
   static const Duration refreshTokenThreshold = Duration(minutes: 5);

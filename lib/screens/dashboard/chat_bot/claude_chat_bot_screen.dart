@@ -1,30 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
+import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme_config.dart';
-
-const apiKey = String.fromEnvironment('ANTHROPIC_API_KEY');
-const String _claudeApiUrl = 'https://api.anthropic.com/v1/messages';
-const String _claudeModel = 'claude-sonnet-4-6';
-
-const String _systemPrompt = '''
-You are a helpful and professional assistant for Bansal Immigration.
-
-When a user asks about booking an appointment, scheduling a consultation, 
-meeting a consultant, talking to someone, getting help with their visa, 
-or anything related to appointments or consultations, always include 
-this booking link in your response:
-https://www.bansalimmigration.com.au/book-an-appointment
-
-Example: "You can book a consultation directly here: 
-https://www.bansalimmigration.com.au/book-an-appointment — 
-our team will be happy to assist you!"
-
-Be friendly, concise, and focused on immigration services.
-''';
+import '../../../services/api_service.dart';
 
 class ClaudeChatBotScreen extends StatefulWidget {
   const ClaudeChatBotScreen({super.key});
@@ -35,78 +15,60 @@ class ClaudeChatBotScreen extends StatefulWidget {
 
 class _ClaudeChatBotScreenState extends State<ClaudeChatBotScreen> {
   final TextEditingController _textController = TextEditingController();
-  final List<_ClaudeMessage> _messages = [];
-  final List<Map<String, String>> _conversationHistory = [];
+  final ScrollController _scrollController = ScrollController();
+
+  final List<_Message> _messages = [];
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _addBotMessage(
-      'Hello! I\'m your Bansal Immigration assistant. How can I help you today?',
+      "Hello! 👋 I'm your Bansal Immigration assistant. Send links, emails or phone numbers 😉",
     );
   }
 
   void _addBotMessage(String text) {
-    setState(() {
-      _messages.insert(0, _ClaudeMessage(text: text, isUser: false));
-    });
+    _messages.insert(0, _Message(text: text, isUser: false));
   }
 
   Future<void> _sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 
     setState(() {
-      _messages.insert(0, _ClaudeMessage(text: text, isUser: true));
+      _messages.insert(0, _Message(text: text, isUser: true));
       _isLoading = true;
     });
-    _textController.clear();
 
-    _conversationHistory.add({'role': 'user', 'content': text});
+    _textController.clear();
+    _scrollToBottom();
 
     try {
-      final response = await http.post(
-        Uri.parse(_claudeApiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey.toString(),
-          'anthropic-version': '2023-06-01',
-        },
-        body: jsonEncode({
-          'model': _claudeModel,
-          'max_tokens': 1024,
-          'system': _systemPrompt,
-          'messages': _conversationHistory,
-        }),
-      );
+      final response = await ApiService.sendChatBotMessage(text);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final reply = data['content'][0]['text'] as String;
-        _conversationHistory.add({'role': 'assistant', 'content': reply});
-        setState(() {
-          _isLoading = false;
-          _messages.insert(0, _ClaudeMessage(text: reply, isUser: false));
-        });
+      String reply;
+
+      if (response['success'] == true) {
+        reply =
+            response['data']?['content']?[0]?['text'] ??
+                'No response received.';
       } else {
-        final error = jsonDecode(response.body);
-        final errorMsg =
-            error['error']?['message'] ?? 'Unknown error occurred.';
-        setState(() {
-          _isLoading = false;
-          _messages.insert(
-            0,
-            _ClaudeMessage(text: 'Error: $errorMsg', isUser: false),
-          );
-        });
+        reply = response['message'] ?? 'Something went wrong.';
       }
+
+      setState(() {
+        _isLoading = false;
+        _messages.insert(0, _Message(text: reply, isUser: false));
+      });
+
+      _scrollToBottom();
     } catch (e) {
       setState(() {
         _isLoading = false;
         _messages.insert(
           0,
-          _ClaudeMessage(
-            text: 'Error: Could not connect to Claude. $e',
+          const _Message(
+            text: 'Network error. Please try again.',
             isUser: false,
           ),
         );
@@ -114,186 +76,229 @@ class _ClaudeChatBotScreenState extends State<ClaudeChatBotScreen> {
     }
   }
 
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.minScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  Widget _buildTextComposer() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      color: Colors.white,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _textController,
+              onSubmitted: _isLoading ? null : _sendMessage,
+              decoration: InputDecoration(
+                hintText: "Type your message...",
+                filled: true,
+                fillColor: Colors.grey.shade100,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          CircleAvatar(
+            backgroundColor: ThemeConfig.goldenYellow,
+            child: IconButton(
+              icon: const Icon(Icons.send, color: Colors.white),
+              onPressed:
+              _isLoading ? null : () => _sendMessage(_textController.text),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTypingIndicator() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          SizedBox(width: 8),
+          Text("Assistant is typing...", style: TextStyle(color: Colors.grey)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: Text(
-                  'C',
-                  style: TextStyle(
-                    color: ThemeConfig.goldenYellow,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Text(
-              'AI Assistant',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        foregroundColor: Colors.white,
+        title: const Text("Chatbot"),
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               reverse: true,
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(10),
               itemCount: _messages.length,
-              itemBuilder: (_, int index) => _messages[index],
+              itemBuilder: (_, index) => _messages[index],
             ),
           ),
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: ThemeConfig.goldenYellow,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    'Claude is thinking...',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          const Divider(height: 1.0),
-          Container(
-            decoration: BoxDecoration(color: Theme.of(context).cardColor),
-            child: _buildTextComposer(),
-          ),
+          if (_isLoading) _buildTypingIndicator(),
+          const Divider(height: 1),
+          _buildTextComposer(),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTextComposer() {
-    return IconTheme(
-      data: IconThemeData(color: Theme.of(context).hintColor),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Row(
-          children: [
-            Flexible(
-              child: TextField(
-                controller: _textController,
-                onSubmitted: _isLoading ? null : _sendMessage,
-                decoration: const InputDecoration.collapsed(
-                  hintText: 'Ask Claude anything...',
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: IconButton(
-                icon: const Icon(Icons.send),
-                onPressed:
-                _isLoading ? null : () => _sendMessage(_textController.text),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
 }
 
-class _ClaudeMessage extends StatelessWidget {
+class _Message extends StatelessWidget {
   final String text;
   final bool isUser;
 
-  const _ClaudeMessage({required this.text, required this.isUser});
+  const _Message({required this.text, required this.isUser});
 
-  Future<void> _openLink(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+  Future<void> _handleTap(String value) async {
+    Uri uri;
+
+    if (value.startsWith("http")) {
+      uri = Uri.parse(value);
+    } else if (value.contains("@")) {
+      uri = Uri.parse("mailto:$value");
+    } else {
+      uri = Uri.parse("tel:$value");
     }
+
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Widget _buildRichText() {
+    final RegExp regExp = RegExp(
+      r'((https?:\/\/[^\s]+)|(\+?\d{7,})|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}))',
+    );
+
+    final matches = regExp.allMatches(text);
+
+    if (matches.isEmpty) {
+      return Text(
+        text,
+        style: TextStyle(
+          color: isUser ? Colors.white : Colors.black87,
+          fontSize: 15,
+        ),
+      );
+    }
+
+    List<TextSpan> spans = [];
+    int start = 0;
+
+    for (final match in matches) {
+      if (match.start > start) {
+        spans.add(
+          TextSpan(
+            text: text.substring(start, match.start),
+            style: TextStyle(
+              color: isUser ? Colors.white : Colors.black87,
+            ),
+          ),
+        );
+      }
+
+      final matchText = match.group(0)!;
+
+      spans.add(
+        TextSpan(
+          text: matchText,
+          style: TextStyle(
+            color: isUser ? Colors.white70 : Colors.blue,
+            decoration: TextDecoration.underline,
+          ),
+          recognizer:
+          TapGestureRecognizer()
+            ..onTap = () => _handleTap(matchText),
+        ),
+      );
+
+      start = match.end;
+    }
+
+    if (start < text.length) {
+      spans.add(
+        TextSpan(
+          text: text.substring(start),
+          style: TextStyle(
+            color: isUser ? Colors.white : Colors.black87,
+          ),
+        ),
+      );
+    }
+
+    return SelectableText.rich(
+      TextSpan(children: spans),
+      style: const TextStyle(fontSize: 15),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final urlRegex = RegExp(r'(https?:\/\/[^\s]+)');
-    final match = urlRegex.firstMatch(text);
+    final radius = Radius.circular(16);
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment:
-        isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: [
-          if (!isUser)
-            Container(
-              margin: const EdgeInsets.only(right: 8.0),
-              child: const CircleAvatar(
-                backgroundColor: ThemeConfig.goldenYellow,
-                child: Text(
-                  'C',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onLongPress: () {
+        Clipboard.setData(ClipboardData(text: text));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Copied")),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 5),
+        child: Row(
+          mainAxisAlignment:
+          isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                  isUser
+                      ? ThemeConfig.goldenYellow
+                      : Colors.grey.shade200,
+                  borderRadius: BorderRadius.only(
+                    topLeft: radius,
+                    topRight: radius,
+                    bottomLeft: isUser ? radius : Radius.zero,
+                    bottomRight: isUser ? Radius.zero : radius,
                   ),
                 ),
+                child: _buildRichText(),
               ),
             ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment:
-              isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isUser ? 'You' : 'Claude',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: 5.0),
-                  child:
-                  match != null
-                      ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(text.replaceAll(match.group(0)!, '')),
-                      GestureDetector(
-                        onTap: () => _openLink(match.group(0)!),
-                        child: Text(
-                          match.group(0)!,
-                          style: const TextStyle(
-                            color: Colors.blue,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                      : Text(text),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

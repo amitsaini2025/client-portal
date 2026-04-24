@@ -1103,30 +1103,16 @@ class ApiService {
     return response;
   }
 
-
   static Future<Map<String, dynamic>> occupationSearch(String query) async {
-    String endpoint =
-        "${ApiConfig.searchOccupation}?q=$query&limit=20&page=1";
+    String endpoint = "${ApiConfig.searchOccupation}?q=$query&limit=20&page=1";
 
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      "GET",
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, "GET");
   }
 
-  static Future<Map<String, dynamic>> getOccupationDetails(
-      String code) async {
-    String endpoint =
-        "${ApiConfig.occupationResult}?occupation_code=$code";
+  static Future<Map<String, dynamic>> getOccupationDetails(String code) async {
+    String endpoint = "${ApiConfig.occupationResult}?occupation_code=$code";
 
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      "GET",
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, "GET");
   }
 
   static Future<Map<String, dynamic>> postcodeSearch(String query) async {
@@ -1484,13 +1470,18 @@ class ApiService {
     return await _makeRequest(url, _buildHeaders(), null, 'GET');
   }
 
-
   static Future<Map<String, dynamic>> getActionRequiredList({
     int page = 1,
     int limit = 20,
   }) async {
     final url = '${ApiConfig.actionRequired}?page=$page&limit=$limit';
     return await _makeRequest(url, _buildHeaders(), null, 'GET');
+  }
+
+  static Future<Map<String, dynamic>> sendChatBotMessage(String message) async {
+    final url = ApiConfig.chatBot;
+    final body = {"message": message};
+    return await _makeRequest(url, _buildHeaders(), body, 'POST');
   }
 
   // Generic methods for backward compatibility
