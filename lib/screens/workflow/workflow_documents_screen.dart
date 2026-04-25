@@ -65,14 +65,17 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
+        withData: true,
       );
 
-      if (result == null || result.files.single.path == null) return;
+      if (result == null || result.files.isEmpty) return;
 
-      final filePath = result.files.single.path!;
+      final pickedFile = result.files.single;
+      if (pickedFile.bytes == null) return;
 
       final response = await ApiService.uploadWorkflowChecklistDocument(
-        filePath: filePath,
+        fileBytes: pickedFile.bytes!,
+        fileName: pickedFile.name,
         allowedChecklistId: checklist.id,
         clientMatterId: AuthService.selectedMatterId ?? 0,
       );

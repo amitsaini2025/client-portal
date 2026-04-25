@@ -1,8 +1,10 @@
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import '../../services/api_service.dart';
-import '../../config/theme_config.dart'; // assuming you have ThemeConfig here
+import '../../config/theme_config.dart';
 
 class SendMessageScreen extends StatefulWidget {
   const SendMessageScreen({super.key});
@@ -16,7 +18,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
 
-  final List<XFile> _selectedImages = [];
+  final List<({Uint8List bytes, String name})> _selectedImageBytes = [];
   bool _isLoading = false;
 
   @override
@@ -35,9 +37,12 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
       );
 
       if (images.isNotEmpty) {
-        setState(() {
-          _selectedImages.addAll(images);
-        });
+        for (final img in images) {
+          final bytes = await img.readAsBytes();
+          setState(() {
+            _selectedImageBytes.add((bytes: bytes, name: img.name));
+          });
+        }
       }
     } catch (e) {
       _showErrorSnackBar('Error picking images: $e');
@@ -54,8 +59,9 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
       );
 
       if (image != null) {
+        final bytes = await image.readAsBytes();
         setState(() {
-          _selectedImages.add(image);
+          _selectedImageBytes.add((bytes: bytes, name: image.name));
         });
       }
     } catch (e) {
@@ -65,7 +71,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
 
   void _removeImage(int index) {
     setState(() {
-      _selectedImages.removeAt(index);
+      _selectedImageBytes.removeAt(index);
     });
   }
 
@@ -81,10 +87,10 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
     });
 
     try {
-      Map<String, dynamic> messageData = {
+      final messageData = {
         'subject': _subjectController.text.trim(),
         'message': _messageController.text.trim(),
-        'attachments': _selectedImages.map((image) => image.path).toList(),
+        'attachments_bytes': _selectedImageBytes,
       };
 
       final response = await ApiService.sendMessage(messageData);
@@ -138,14 +144,15 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                   _pickImages();
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt, color: Colors.white),
-                title: const Text('Take Photo', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _pickImageFromCamera();
-                },
-              ),
+              if (!kIsWeb)
+                ListTile(
+                  leading: const Icon(Icons.camera_alt, color: Colors.white),
+                  title: const Text('Take Photo', style: TextStyle(color: Colors.white)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _pickImageFromCamera();
+                  },
+                ),
             ],
           ),
         );
@@ -277,7 +284,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  if (_selectedImages.isEmpty)
+                  if (_selectedImageBytes.isEmpty)
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(32),
@@ -308,14 +315,14 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                         mainAxisSpacing: 8,
                         childAspectRatio: 1,
                       ),
-                      itemCount: _selectedImages.length,
+                      itemCount: _selectedImageBytes.length,
                       itemBuilder: (context, index) {
                         return Stack(
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                File(_selectedImages[index].path),
+                              child: Image.memory(
+                                _selectedImageBytes[index].bytes,
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: double.infinity,

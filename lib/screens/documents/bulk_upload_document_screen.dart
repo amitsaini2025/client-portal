@@ -1,6 +1,7 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -28,7 +29,7 @@ class BulkUploadDocumentScreen extends StatefulWidget {
 
 class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
   List<AllowedChecklist> _checklists = [];
-  Map<int, File?> _uploadedFiles = {};
+  Map<int, ({Uint8List bytes, String name})?> _uploadedFiles = {};
   bool _isLoading = false;
   bool _isUploading = false;
 
@@ -62,7 +63,6 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
     setState(() => _isLoading = false);
   }
 
-  // Bottom sheet picker
   Future<void> _openUploadOptions(int checklistId) async {
     showModalBottomSheet(
       context: context,
@@ -92,14 +92,15 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
                   await _pickFromGallery(checklistId);
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text("Camera"),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await _pickFromCamera(checklistId);
-                },
-              ),
+              if (!kIsWeb)
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text("Camera"),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await _pickFromCamera(checklistId);
+                  },
+                ),
             ],
           ),
         );
@@ -111,20 +112,25 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
+      withData: true,
     );
 
     if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        _uploadedFiles[checklistId] = File(result.files.first.path!);
-      });
+      final picked = result.files.first;
+      if (picked.bytes != null) {
+        setState(() {
+          _uploadedFiles[checklistId] = (bytes: picked.bytes!, name: picked.name);
+        });
+      }
     }
   }
 
   Future<void> _pickFromGallery(int checklistId) async {
     final image = await _imagePicker.pickImage(source: ImageSource.gallery);
     if (image != null) {
+      final bytes = await image.readAsBytes();
       setState(() {
-        _uploadedFiles[checklistId] = File(image.path);
+        _uploadedFiles[checklistId] = (bytes: bytes, name: image.name);
       });
     }
   }
@@ -132,33 +138,34 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
   Future<void> _pickFromCamera(int checklistId) async {
     final image = await _imagePicker.pickImage(source: ImageSource.camera);
     if (image != null) {
+      final bytes = await image.readAsBytes();
       setState(() {
-        _uploadedFiles[checklistId] = File(image.path);
+        _uploadedFiles[checklistId] = (bytes: bytes, name: image.name);
       });
     }
   }
 
   Future<void> _uploadAll() async {
-    final files = <File>[];
-    final ids = <int>[];
-
-    _uploadedFiles.forEach((id, file) {
-      if (file != null) {
-        files.add(file);
-        ids.add(id);
-      }
-    });
-
-    if (files.isEmpty) {
-      _showSnack("Please upload at least one document", isError: true);
-      return;
-    }
-
     setState(() => _isUploading = true);
 
     try {
+      final filesData = <({Uint8List bytes, String name})>[];
+      final ids = <int>[];
+      _uploadedFiles.forEach((id, fileData) {
+        if (fileData != null) {
+          filesData.add(fileData);
+          ids.add(id);
+        }
+      });
+
+      if (filesData.isEmpty) {
+        _showSnack("Please upload at least one document", isError: true);
+        setState(() => _isUploading = false);
+        return;
+      }
+
       final res = await ApiService.bulkUploadChecklistDocuments(
-        files: files,
+        filesData: filesData,
         allowedChecklistIds: ids,
         clientMatterId: widget.matterID ?? 0,
       );
@@ -186,7 +193,8 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
   }
 
   Widget _buildChecklistCard(AllowedChecklist checklist) {
-    final file = _uploadedFiles[checklist.id];
+    final fileData = _uploadedFiles[checklist.id];
+    final hasFile = fileData != null;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -235,7 +243,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
             ],
           ),
           const SizedBox(height: 14),
-          if (file != null)
+          if (hasFile)
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -253,7 +261,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      file.path.split('/').last,
+                      fileData.name,
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,

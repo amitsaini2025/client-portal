@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -145,7 +145,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
   final int _limit = 20;
   bool _hasMore = true;
 
-  List<File> _attachments = [];
+  List<({Uint8List bytes, String name})> _attachmentBytes = [];
 
   @override
   void initState() {
@@ -324,7 +324,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
-    if ((text.isEmpty && _attachments.isEmpty) || _isSending) return;
+    if ((text.isEmpty && _attachmentBytes.isEmpty) || _isSending) return;
 
     setState(() => _isSending = true);
 
@@ -335,7 +335,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       final responseJson = await ApiService.sendChatMessageWithAttachments(
         clientMatterId: clientMatterId,
         message: text,
-        attachments: _attachments,
+        attachmentBytes: _attachmentBytes,
       );
 
       final response = SendMessageResponse.fromJson(responseJson);
@@ -345,7 +345,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
         message.isRecipient = false;
         _handleIncomingMessage(response.data.message);
         _messageController.clear();
-        _attachments.clear();
+        _attachmentBytes.clear();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -361,11 +361,15 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: true,
         type: FileType.any,
+        withData: true,
       );
 
       if (result != null && result.files.isNotEmpty) {
         setState(() {
-          _attachments = result.files.map((f) => File(f.path!)).toList();
+          _attachmentBytes = result.files
+              .where((f) => f.bytes != null)
+              .map((f) => (bytes: f.bytes!, name: f.name))
+              .toList();
         });
       }
     } catch (e) {
@@ -475,17 +479,13 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                       minLines: 1,
                       maxLines: 4,
                     ),
-                    if (_attachments.isNotEmpty)
+                    if (_attachmentBytes.isNotEmpty)
                       SizedBox(
                         height: 40,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          itemCount: _attachments.length,
+                          itemCount: _attachmentBytes.length,
                           itemBuilder: (context, index) {
-                            final file = _attachments[index];
-                            final fileName = file.path
-                                .split('/')
-                                .last;
                             return Container(
                               margin: const EdgeInsets.only(right: 6, top: 4),
                               padding: const EdgeInsets.symmetric(
@@ -498,14 +498,14 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                               child: Row(
                                 children: [
                                   Text(
-                                    fileName,
+                                    _attachmentBytes[index].name,
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      setState(
-                                            () => _attachments.removeAt(index),
-                                      );
+                                      setState(() {
+                                        _attachmentBytes.removeAt(index);
+                                      });
                                     },
                                     child: const Icon(Icons.close, size: 16),
                                   ),

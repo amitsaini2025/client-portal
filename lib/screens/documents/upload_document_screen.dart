@@ -1,7 +1,9 @@
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:client/config/theme_config.dart';
 import '../../models/new/allowed_checklist.dart';
 import '../../services/api_service.dart';
@@ -18,9 +20,8 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
   final TextEditingController _titleController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  File? _selectedFile;
+  Uint8List? _selectedFileBytes;
   String? _selectedFileName;
-  String? _selectedFileType;
 
   List<AllowedChecklist> _checklists = [];
   int? _selectedChecklistId;
@@ -98,14 +99,15 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                   await _pickFromGallery();
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt, color: Colors.black),
-                title: const Text('Camera', style: TextStyle(color: Colors.black)),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  await _pickFromCamera();
-                },
-              ),
+              if (!kIsWeb)
+                ListTile(
+                  leading: const Icon(Icons.camera_alt, color: Colors.black),
+                  title: const Text('Camera', style: TextStyle(color: Colors.black)),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await _pickFromCamera();
+                  },
+                ),
             ],
           ),
         );
@@ -127,15 +129,17 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
           'gif'
         ],
         allowMultiple: false,
+        withData: true,
       );
 
       if (result != null && result.files.isNotEmpty) {
-        final file = File(result.files.first.path!);
-        setState(() {
-          _selectedFile = file;
-          _selectedFileName = result.files.first.name;
-          _selectedFileType = result.files.first.extension;
-        });
+        final picked = result.files.first;
+        if (picked.bytes != null) {
+          setState(() {
+            _selectedFileBytes = picked.bytes;
+            _selectedFileName = picked.name;
+          });
+        }
       }
     } catch (e) {
       _showErrorSnackBar('Error picking file: $e');
@@ -146,10 +150,10 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     try {
       final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
       if (image != null) {
+        final bytes = await image.readAsBytes();
         setState(() {
-          _selectedFile = File(image.path);
+          _selectedFileBytes = bytes;
           _selectedFileName = image.name;
-          _selectedFileType = image.name.split('.').last;
         });
       }
     } catch (e) {
@@ -161,10 +165,10 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     try {
       final XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
       if (image != null) {
+        final bytes = await image.readAsBytes();
         setState(() {
-          _selectedFile = File(image.path);
+          _selectedFileBytes = bytes;
           _selectedFileName = image.name;
-          _selectedFileType = image.name.split('.').last;
         });
       }
     } catch (e) {
@@ -174,7 +178,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
 
   Future<void> _uploadDocument() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedFile == null) {
+    if (_selectedFileBytes == null || _selectedFileName == null) {
       _showErrorSnackBar('Please select a file to upload');
       return;
     }
@@ -187,7 +191,8 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
 
     try {
       final response = await ApiService.uploadWorkflowChecklistDocument(
-        filePath: _selectedFile!.path,
+        fileBytes: _selectedFileBytes!,
+        fileName: _selectedFileName!,
         allowedChecklistId: _selectedChecklistId!,
         clientMatterId: AuthService.selectedMatterId!,
       );
@@ -295,7 +300,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                   .titleLarge
                   ?.copyWith(color: Colors.black)),
           const SizedBox(height: 16),
-          if (_selectedFile == null)
+          if (_selectedFileBytes == null)
             GestureDetector(
               onTap: _pickFile,
               child: Container(
@@ -331,9 +336,8 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 IconButton(
                   icon: const Icon(Icons.close, color: Colors.red),
                   onPressed: () => setState(() {
-                    _selectedFile = null;
+                    _selectedFileBytes = null;
                     _selectedFileName = null;
-                    _selectedFileType = null;
                   }),
                 ),
               ],

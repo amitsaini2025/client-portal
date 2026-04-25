@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:client/config/theme_config.dart';
 import 'package:client/widgets/common_app_bar.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -27,7 +26,8 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
 
   final ImagePicker _imagePicker = ImagePicker();
 
-  File? _selectedFile;
+  Uint8List? _selectedFileBytes;
+  String? _selectedFileName;
 
   @override
   void initState() {
@@ -91,22 +91,24 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                   await _pickFromFiles(stage, checklistId);
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.photo),
-                title: const Text("Gallery"),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await _pickFromGallery(stage, checklistId);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text("Camera"),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await _pickFromCamera(stage, checklistId);
-                },
-              ),
+              if (!kIsWeb)
+                ListTile(
+                  leading: const Icon(Icons.photo),
+                  title: const Text("Gallery"),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await _pickFromGallery(stage, checklistId);
+                  },
+                ),
+              if (!kIsWeb)
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text("Camera"),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await _pickFromCamera(stage, checklistId);
+                  },
+                ),
             ],
           ),
         );
@@ -118,10 +120,14 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
+      withData: true,
     );
 
     if (result != null && result.files.isNotEmpty) {
-      _selectedFile = File(result.files.first.path!);
+      final file = result.files.first;
+      if (file.bytes == null) return;
+      _selectedFileBytes = file.bytes;
+      _selectedFileName = file.name;
       await _uploadDocument(stage, checklistId);
     }
   }
@@ -130,7 +136,8 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     final image = await _imagePicker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      _selectedFile = File(image.path);
+      _selectedFileBytes = await image.readAsBytes();
+      _selectedFileName = image.name;
       await _uploadDocument(stage, checklistId);
     }
   }
@@ -139,17 +146,21 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     final image = await _imagePicker.pickImage(source: ImageSource.camera);
 
     if (image != null) {
-      _selectedFile = File(image.path);
+      _selectedFileBytes = await image.readAsBytes();
+      _selectedFileName = image.name;
       await _uploadDocument(stage, checklistId);
     }
   }
 
   Future<void> _uploadDocument(WorkflowStage stage, int checklistId) async {
-    if (_selectedFile == null) return;
+    if (_selectedFileBytes == null || _selectedFileName == null) return;
     _showUploadingDialog();
     try {
+      final fileBytes = _selectedFileBytes!;
+      final fileName = _selectedFileName!;
       final response = await ApiService.uploadWorkflowChecklistDocument(
-        filePath: _selectedFile!.path,
+        fileBytes: fileBytes,
+        fileName: fileName,
         allowedChecklistId: checklistId,
         clientMatterId: widget.matterID ?? 0,
       );

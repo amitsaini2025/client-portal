@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,6 +14,10 @@ import 'auth_service.dart';
 class ApiService {
   static String? _authToken;
   static const Duration _timeout = Duration(seconds: 30);
+
+  static String _sanitizeFileName(String fileName) {
+    return fileName.replaceAll(RegExp(r'[^a-zA-Z0-9\-_ .\$\(\),&+]'), '_');
+  }
 
   // Initialize auth token from AuthService
   static Future<void> initializeAuthToken() async {
@@ -451,14 +456,13 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> uploadWorkflowChecklistDocument({
-    required String filePath,
+    required Uint8List fileBytes,
+    required String fileName,
     required int allowedChecklistId,
     required int clientMatterId,
   }) async {
     final headers = _buildHeaders();
-    headers.remove(
-      'Content-Type',
-    ); // Let http package set multipart content type
+    headers.remove('Content-Type');
 
     final request = http.MultipartRequest(
       'POST',
@@ -470,8 +474,9 @@ class ApiService {
     request.headers.addAll(headers);
     request.fields['client_matter_id'] = clientMatterId.toString();
     request.fields['allowed_checklist_id'] = allowedChecklistId.toString();
-
-    request.files.add(await http.MultipartFile.fromPath('file', filePath));
+    request.files.add(
+      http.MultipartFile.fromBytes('file', fileBytes, filename: _sanitizeFileName(fileName)),
+    );
 
     try {
       final streamedResponse = await request.send().timeout(_timeout);
@@ -510,7 +515,7 @@ class ApiService {
   }*/
 
   static Future<Map<String, dynamic>> bulkUploadChecklistDocuments({
-    required List<File> files,
+    required List<({Uint8List bytes, String name})> filesData,
     required List<int> allowedChecklistIds,
     required int clientMatterId,
   }) async {
@@ -529,9 +534,9 @@ class ApiService {
     request.fields['client_matter_id'] = clientMatterId.toString();
     request.fields['allowed_checklist_ids'] = allowedChecklistIds.join(',');
 
-    for (var file in files) {
+    for (var fileData in filesData) {
       request.files.add(
-        await http.MultipartFile.fromPath('files[]', file.path),
+        http.MultipartFile.fromBytes('files[]', fileData.bytes, filename: _sanitizeFileName(fileData.name)),
       );
     }
 
@@ -574,11 +579,11 @@ class ApiService {
     String title,
     String description, {
     int? caseId,
+    Uint8List? fileBytes,
+    String? fileName,
   }) async {
     final headers = _buildHeaders();
-    headers.remove(
-      'Content-Type',
-    ); // Let http package set multipart content type
+    headers.remove('Content-Type');
 
     final request = http.MultipartRequest(
       'POST',
@@ -592,7 +597,15 @@ class ApiService {
       request.fields['case_id'] = caseId.toString();
     }
 
-    request.files.add(await http.MultipartFile.fromPath('document', filePath));
+    if (fileBytes != null && fileName != null) {
+      request.files.add(
+        http.MultipartFile.fromBytes('document', fileBytes, filename: _sanitizeFileName(fileName)),
+      );
+    } else if (!kIsWeb) {
+      request.files.add(await http.MultipartFile.fromPath('document', filePath));
+    } else {
+      throw Exception('File bytes and file name are required on web platform');
+    }
 
     try {
       final streamedResponse = await request.send().timeout(_timeout);
@@ -636,15 +649,15 @@ class ApiService {
   static Future<Map<String, dynamic>> sendMessage(
     Map<String, dynamic> data,
   ) async {
-    // Check if there are attachments
     final attachments = data['attachments'] as List<String>?;
+    final attachmentsBytes = data['attachments_bytes'] as List<({Uint8List bytes, String name})>?;
 
-    if (attachments != null && attachments.isNotEmpty) {
-      // Send with file attachments using multipart
+    final hasAttachments = (attachments != null && attachments.isNotEmpty) ||
+        (attachmentsBytes != null && attachmentsBytes.isNotEmpty);
+
+    if (hasAttachments) {
       final headers = _buildHeaders();
-      headers.remove(
-        'Content-Type',
-      ); // Let http package set multipart content type
+      headers.remove('Content-Type');
 
       final request = http.MultipartRequest(
         'POST',
@@ -655,12 +668,10 @@ class ApiService {
       request.fields['subject'] = data['subject'] ?? '';
       request.fields['message'] = data['message'] ?? '';
 
-      // Add file attachments
-      for (int i = 0; i < attachments.length; i++) {
-        final file = File(attachments[i]);
-        if (await file.exists()) {
+      if (attachmentsBytes != null && attachmentsBytes.isNotEmpty) {
+        for (var fileData in attachmentsBytes) {
           request.files.add(
-            await http.MultipartFile.fromPath('attachments[]', attachments[i]),
+            http.MultipartFile.fromBytes('attachments[]', fileData.bytes, filename: _sanitizeFileName(fileData.name)),
           );
         }
       }
@@ -674,7 +685,6 @@ class ApiService {
         throw Exception('Message send failed: ${e.toString()}');
       }
     } else {
-      // Send without attachments using regular JSON
       return await _makeRequest(
         ApiConfig.clientMessagesEndpoint,
         _buildHeaders(),
@@ -816,7 +826,7 @@ class ApiService {
   static Future<Map<String, dynamic>> sendChatMessageWithAttachments({
     required int clientMatterId,
     required String message,
-    List<File>? attachments,
+    List<({Uint8List bytes, String name})>? attachmentBytes,
   }) async {
     try {
       var uri = Uri.parse(ApiConfig.getEndpoint(ApiConfig.messagesSend));
@@ -827,15 +837,10 @@ class ApiService {
       request.fields['client_matter_id'] = clientMatterId.toString();
       request.fields['message'] = message;
 
-      if (attachments != null && attachments.isNotEmpty) {
-        for (var file in attachments) {
-          final fileName = file.path.split('/').last;
+      if (attachmentBytes != null && attachmentBytes.isNotEmpty) {
+        for (var fileData in attachmentBytes) {
           request.files.add(
-            await http.MultipartFile.fromPath(
-              'attachments[]',
-              file.path,
-              filename: fileName,
-            ),
+            http.MultipartFile.fromBytes('attachments[]', fileData.bytes, filename: _sanitizeFileName(fileData.name)),
           );
         }
       }
