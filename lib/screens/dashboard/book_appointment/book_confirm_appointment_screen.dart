@@ -191,10 +191,14 @@ class _BookConfirmAppointmentScreenState
           throw Exception('Missing Stripe client secret');
         }
 
-        await StripeService.presentPayment(
-          context: context,
-          clientSecret: clientSecret,
-        );
+        if (kIsWeb) {
+          await _handleStripeWebPayment(clientSecret);
+        } else {
+          await StripeService.presentPayment(
+            context: context,
+            clientSecret: clientSecret,
+          );
+        }
 
         paymentMethodId = paymentIntent['id'];
       }
@@ -236,6 +240,43 @@ class _BookConfirmAppointmentScreenState
         isProcessingPayment = false;
       });
     }
+  }
+
+  // ADD THIS METHOD (same as Billing screen)
+  Future<void> _handleStripeWebPayment(String clientSecret) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Enter Card Details"),
+          content: const CardField(),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  await Stripe.instance.confirmPayment(
+                    paymentIntentClientSecret: clientSecret,
+                    data: const PaymentMethodParams.card(
+                      paymentMethodData: PaymentMethodData(),
+                    ),
+                  );
+
+                  Navigator.pop(context);
+                } catch (e) {
+                  Navigator.pop(context);
+                  throw Exception(e.toString());
+                }
+              },
+              child: const Text("Pay"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _row(String label, String value) {
