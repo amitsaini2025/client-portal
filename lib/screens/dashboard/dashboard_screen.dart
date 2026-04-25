@@ -123,7 +123,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() => _isLoadingBlogs = true);
 
     try {
-      final response = await ApiServiceBansalImmigration.getFeaturedBlogs(
+      final response = await ApiService.getFeaturedBlogs(
         page: 1,
         perPage: 5,
       );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../models/blog.dart';
+import '../../../services/api_service.dart';
 
 class BlogListScreen extends StatefulWidget {
   const BlogListScreen({Key? key}) : super(key: key);
@@ -37,7 +38,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await ApiServiceBansalImmigration.getFeaturedBlogs(
+      final response = await ApiService.getFeaturedBlogs(
         page: _currentPage,
         perPage: 10,
       );

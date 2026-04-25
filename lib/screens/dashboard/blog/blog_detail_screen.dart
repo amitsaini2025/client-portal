@@ -6,6 +6,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../config/theme_config.dart';
+import '../../../services/api_service.dart';
 
 class BlogDetailScreen extends StatefulWidget {
   final int blogId;
@@ -30,7 +31,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
     setState(() => isLoading = true);
 
     try {
-      final response = await ApiServiceBansalImmigration.getBlogDetail(
+      final response = await ApiService.getBlogDetail(
         blogId: widget.blogId,
       );
 

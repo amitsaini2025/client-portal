@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/api_config.dart';
+import '../config/api_config_bansal_immigration.dart';
 import '../utils/navigation_service.dart';
 import 'auth_service.dart';
 
@@ -1053,14 +1054,33 @@ class ApiService {
     return response;
   }
 
+
   static Future<Map<String, dynamic>> getFeaturedBlogs({
     int page = 1,
     int perPage = 10,
   }) async {
     final endpoint =
-        "${ApiConfig.blogListEndpoint}?page=$page&per_page=$perPage&featured=1";
+        "${ApiConfig.blogListEndpoint}?page=$page&per_page=$perPage";
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
+  }
 
-    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
+  static Future<Map<String, dynamic>> getBlogDetail({
+    required int blogId,
+  }) async {
+    final endpoint =
+        "${ApiConfig.blogDetailEndpoint}/$blogId";
+
+    return await _makeRequest(
+      endpoint,
+      _buildHeaders(),
+      null,
+      'GET',
+    );
   }
 
   static Future<Map<String, dynamic>> getPRPoints() async {

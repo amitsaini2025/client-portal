@@ -58,6 +58,7 @@ class ApiConfig {
   static const String unregisterFCMToken = "/fcm/unregister-token";
 
   static const String blogListEndpoint = "/blogs/list";
+  static const String blogDetailEndpoint = "/blogs/detail";
 
   static const String prPointsCalcList = "/pr-point-calc-lists";
   static const String prPointCalcResult = "/pr-point-calc-result";

@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:client/services/api_service_bansal_immigration.dart';
 import 'package:client/services/stripe_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -121,10 +120,7 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
     setState(() => _isLoadingBlogs = true);
 
     try {
-      final response = await ApiServiceBansalImmigration.getFeaturedBlogs(
-        page: 1,
-        perPage: 5,
-      );
+      final response = await ApiService.getFeaturedBlogs(page: 1, perPage: 5);
       if (response['success'] == true) {
         final List list = response['data'];
         _blogs = list.map((e) => Blog.fromJson(e)).toList();
@@ -456,7 +452,10 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
                             image: DecorationImage(
-                              image: NetworkImage(blog.image),
+                              image: NetworkImage(
+                                blog.image,
+                                headers: {"Access-Control-Allow-Origin": "*"},
+                              ),
                               fit: BoxFit.cover,
                             ),
                           ),
