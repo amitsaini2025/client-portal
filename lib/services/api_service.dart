@@ -760,25 +760,19 @@ class ApiService {
 
   static Future<Map<String, dynamic>> getWorkflowMessages({
     required int clientMatterId,
-    required int clientMatterStageId,
     int page = 1,
     int limit = 20,
-    String type = 'all',
-    String messageType = 'all',
   }) async {
-    final params = {
+    final url = Uri.parse(ApiConfig.messagesList).replace(queryParameters: {
       'client_matter_id': clientMatterId.toString(),
-      'client_matter_stage_id': clientMatterStageId.toString(),
       'page': page.toString(),
       'limit': limit.toString(),
-      'type': type,
-      'message_type': messageType,
-    };
+    });
 
     return await _makeRequest(
-      ApiConfig.messagesList,
+      url.toString(),
       _buildHeaders(),
-      params,
+      null,
       'GET',
     );
   }

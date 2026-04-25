@@ -255,7 +255,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
     try {
       final response = await ApiService.getWorkflowMessages(
         clientMatterId: widget.matterID ?? 0,
-        clientMatterStageId: AuthService.clientMatterStageId ?? 0,
         page: _currentPage,
         limit: _limit,
       );
@@ -297,7 +296,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
     try {
       final response = await ApiService.getWorkflowMessages(
         clientMatterId: AuthService.selectedMatterId!,
-        clientMatterStageId: AuthService.clientMatterStageId ?? 0,
         page: _currentPage,
         limit: _limit,
       );
