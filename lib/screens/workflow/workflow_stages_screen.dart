@@ -234,6 +234,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
         context,
         '/workflow-view-documents-by-checklist',
         arguments: {
+          'matter_id': widget.matterID,
           'stageId': stage.id,
           'stageName': stage.stageName,
           'checklistId': checklistId,
