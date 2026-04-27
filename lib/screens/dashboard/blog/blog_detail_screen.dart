@@ -99,9 +99,6 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
                               child: const CircularProgressIndicator(),
                             );
                           },
-                          headers: {
-                            "Access-Control-Allow-Origin": "*",
-                          },
                         ),
                       ),
                     ),

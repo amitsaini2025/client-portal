@@ -454,7 +454,6 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                             image: DecorationImage(
                               image: NetworkImage(
                                 blog.image,
-                                headers: {"Access-Control-Allow-Origin": "*"},
                               ),
                               fit: BoxFit.cover,
                             ),
