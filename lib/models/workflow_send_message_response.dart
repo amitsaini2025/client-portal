@@ -1,5 +1,7 @@
 
 
+import 'package:client/models/workflow_message.dart';
+
 class SendMessageResponse {
   final bool success;
   final String message;
@@ -73,6 +75,8 @@ class MessageDetail {
   bool? isRead;
   String? readAt;
 
+  List<Attachment> attachments;
+
   MessageDetail({
     required this.id,
     required this.message,
@@ -85,6 +89,7 @@ class MessageDetail {
     required this.sentAt,
     required this.clientMatterId,
     required this.recipientCount,
+    required this.attachments,
     this.isRead,
     this.readAt,
   });
@@ -98,18 +103,26 @@ class MessageDetail {
       senderShortname: json['sender_shortname'] ?? '',
       isSender: json['is_sender'] as bool? ?? false,
       isRecipient: json['is_recipient'] as bool? ?? false,
-      recipientIds:
-      (json['recipient_ids'] as List<dynamic>?)
+
+      recipientIds: (json['recipient_ids'] as List<dynamic>?)
           ?.map((e) => Recipient.fromJson(e))
           .toList() ??
           [],
+
       sentAt: DateTime.parse(
         json['sent_at'] ?? DateTime.now().toIso8601String(),
       ),
+
       clientMatterId: int.tryParse(json['client_matter_id'].toString()) ?? 0,
       recipientCount: int.tryParse(json['recipient_count'].toString()) ?? 0,
-      isRead: json['is_read'] as bool?, // handle null properly
+
+      isRead: json['is_read'] as bool?,
       readAt: json['read_at'] as String?,
+
+      attachments: (json['attachments'] as List<dynamic>?)
+          ?.map((e) => Attachment.fromJson(e))
+          .toList() ??
+          [],
     );
   }
 
@@ -128,6 +141,8 @@ class MessageDetail {
       'recipient_count': recipientCount,
       'is_read': isRead,
       'read_at': readAt,
+
+      'attachments': attachments.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -156,6 +171,42 @@ class Recipient {
       'recipient_id': recipientId,
       'recipient': recipient,
       'recipient_shortname': recipientShortname,
+    };
+  }
+}
+
+class Attachment {
+  final int id;
+  final String type;
+  final String filename;
+  final String url;
+  final int size;
+
+  Attachment({
+    required this.id,
+    required this.type,
+    required this.filename,
+    required this.url,
+    required this.size,
+  });
+
+  factory Attachment.fromJson(Map<String, dynamic> json) {
+    return Attachment(
+      id: int.tryParse(json['id'].toString()) ?? 0,
+      type: json['type'] ?? '',
+      filename: json['filename'] ?? '',
+      url: json['url'] ?? '',
+      size: int.tryParse(json['size'].toString()) ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type,
+      'filename': filename,
+      'url': url,
+      'size': size,
     };
   }
 }
