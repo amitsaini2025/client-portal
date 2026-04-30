@@ -4,6 +4,7 @@ import 'package:client/services/stripe_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../../../utils/responsive_utils.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../fcm_service.dart';
@@ -277,7 +278,10 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                     ]);
                   },
                   child: SingleChildScrollView(
-                    child: Container(
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+                        child: Container(
                       color: Colors.white,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -285,7 +289,7 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                           _buildRecentUpdatesSection(),
                           const SizedBox(height: 24),
                           Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: AppResponsive.pagePadding(context),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
@@ -360,6 +364,8 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                           ),
                         ],
                       ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -379,20 +385,52 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
   }
 
   Widget _buildRecentUpdatesSection() {
+    final double blogCardWidth = AppResponsive.value<double>(
+      context,
+      mobile: 260,
+      tablet: 300,
+      desktop: 340,
+    );
+    final double blogSectionHeight = AppResponsive.value<double>(
+      context,
+      mobile: 140,
+      tablet: 165,
+      desktop: 220,
+    );
+
+    final isDesktop = AppResponsive.isDesktop(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
+          padding: AppResponsive.horizontalPadding(context).copyWith(top: isDesktop ? 24 : 8),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text(
-                "Recent updates",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Recent updates",
+                    style: TextStyle(
+                      fontSize: isDesktop ? 20 : 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  if (isDesktop) ...[
+                    const SizedBox(height: 4),
+                    Container(
+                      width: 28,
+                      height: 3,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9B000),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ],
+                ],
               ),
               const Spacer(),
               TextButton(
@@ -404,14 +442,14 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 140,
+          height: blogSectionHeight,
           child:
               _isLoadingBlogs
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: _blogs.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: AppResponsive.horizontalPadding(context),
                     itemBuilder: (context, index) {
                       final blog = _blogs[index];
 
@@ -445,7 +483,7 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                           }
                         },
                         child: Container(
-                          width: 260,
+                          width: blogCardWidth,
                           margin: EdgeInsets.only(
                             right: index == _blogs.length - 1 ? 0 : 16,
                           ),
