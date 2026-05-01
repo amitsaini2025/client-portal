@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:client/config/theme_config.dart'; // ✅ Import theme
 import '../../models/new/document_category.dart';
 import '../../services/api_service.dart';
+import '../../utils/responsive_utils.dart';
 
 class DocumentManagementScreen extends StatefulWidget {
   const DocumentManagementScreen({super.key});
@@ -111,7 +112,10 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
           ],
         ),
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
         children: [
           if (_categories.isNotEmpty)
             SizedBox(
@@ -152,6 +156,8 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
             ),
           Expanded(child: _buildBody(currentType)),
         ],
+          ),
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:client/config/theme_config.dart';
 import '../../models/new/recent_activity.dart';
 import '../../services/api_service.dart';
+import '../../utils/responsive_utils.dart';
 
 class RecentActivityScreen extends StatefulWidget {
   const RecentActivityScreen({super.key});
@@ -67,10 +68,13 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: AppResponsive.pagePadding(context),
             child: TextField(
               onChanged: (value) {
                 setState(() {
@@ -102,6 +106,8 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
           ),
           Expanded(child: _buildActivityList()),
         ],
+          ),
+        ),
       ),
     );
   }
@@ -159,7 +165,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
       onRefresh: _loadActivities,
       color: ThemeConfig.goldenYellow,
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: AppResponsive.pagePadding(context),
         itemCount: _activities.length,
         itemBuilder: (context, index) {
           final activity = _activities[index];

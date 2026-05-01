@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/recent_case.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/responsive_utils.dart';
 
 class RecentCasesScreen extends StatefulWidget {
   const RecentCasesScreen({Key? key}) : super(key: key);
@@ -101,7 +102,10 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
         title: const Text("Recent Cases"),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
-      body: _cases.isEmpty && _isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: _cases.isEmpty && _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
         onRefresh: () async {
@@ -114,6 +118,7 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
         },
         child: ListView.builder(
           controller: _scrollController,
+          padding: AppResponsive.pagePadding(context),
           itemCount: _cases.length + (_isLoading ? 1 : 0),
           itemBuilder: (context, index) {
             if (index < _cases.length) {
@@ -125,6 +130,8 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
               );
             }
           },
+        ),
+      ),
         ),
       ),
     );

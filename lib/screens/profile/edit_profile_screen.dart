@@ -1,5 +1,6 @@
 import 'package:client/config/theme_config.dart';
 import 'package:client/services/api_service.dart';
+import 'package:client/utils/responsive_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -208,17 +209,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         foregroundColor: Colors.white,
       ),
       body: SafeArea(
-        child: _isLoading
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: AppResponsive.maxFormWidth),
+            child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _loadError != null
             ? _ErrorState(message: _loadError!, onRetry: _fetchProfile)
             : GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 20,
-            ),
+            padding: AppResponsive.pagePadding(context),
             child: Form(
               key: _formKey,
               child: Column(
@@ -298,6 +299,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ],
               ),
             ),
+          ),
+        ),
           ),
         ),
       ),

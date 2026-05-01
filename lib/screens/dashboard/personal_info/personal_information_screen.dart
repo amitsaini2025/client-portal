@@ -3,6 +3,7 @@ import 'package:client/screens/dashboard/personal_info/test_score/test_score_wid
 import 'package:flutter/material.dart';
 import 'package:client/config/theme_config.dart';
 import 'package:client/services/api_service.dart';
+import 'package:client/utils/responsive_utils.dart';
 
 import 'package:client/screens/dashboard/personal_info/basic/basic_personal_information_widget.dart';
 import 'package:client/screens/dashboard/personal_info/travel/travel_document_widget.dart';
@@ -154,8 +155,11 @@ class _PersonalInformationScreenState
                     ),
                   ),
                 )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              : Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+                    child: SingleChildScrollView(
+                  padding: AppResponsive.pagePadding(context),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -197,6 +201,8 @@ class _PersonalInformationScreenState
                       ),
                       const SizedBox(height: 24),
                     ],
+                  ),
+                    ),
                   ),
                 ),
     );

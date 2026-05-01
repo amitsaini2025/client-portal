@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../models/visa_search/visa_model.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 import 'visa_estimate_screen.dart';
 
@@ -91,13 +92,16 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
         titleName: "VAC Search",
         matterID: AuthService.selectedMatterId,
       ),
-      body: GestureDetector(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
           setState(() => suggestions = []);
         },
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: AppResponsive.pagePadding(context),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -111,6 +115,8 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
                   child: Center(child: CircularProgressIndicator()),
                 ),
             ],
+          ),
+        ),
           ),
         ),
       ),

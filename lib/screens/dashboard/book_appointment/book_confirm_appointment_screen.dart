@@ -12,6 +12,7 @@ import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/stripe_service.dart';
 import '../../../utils/payment_config.dart';
+import '../../../utils/responsive_utils.dart';
 import 'book_appointment_success_screen.dart';
 
 class BookConfirmAppointmentScreen extends StatefulWidget {
@@ -311,8 +312,11 @@ class _BookConfirmAppointmentScreenState
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: SingleChildScrollView(
+        padding: AppResponsive.pagePadding(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -427,6 +431,8 @@ class _BookConfirmAppointmentScreenState
               ),
             ),
           ],
+        ),
+          ),
         ),
       ),
     );

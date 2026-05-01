@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
 class StudentFundCalculatorScreen extends StatefulWidget {
@@ -64,10 +65,10 @@ class _StudentFundCalculatorScreenState
       body: loading || data == null
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: AppResponsive.pagePadding(context),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
+            constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
             child: Card(
               elevation: 3,
               shape: RoundedRectangleBorder(

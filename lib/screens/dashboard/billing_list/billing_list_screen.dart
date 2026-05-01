@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
+import '../../../utils/responsive_utils.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:pay/pay.dart';
 
@@ -246,7 +247,10 @@ class _BillingListScreenState extends State<BillingListScreen> {
         titleName: 'Billing & Invoices',
         matterID: AuthService.selectedMatterId,
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
         children: [
           _buildSummary(),
           Expanded(
@@ -254,7 +258,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.all(16),
+              padding: AppResponsive.pagePadding(context),
               itemCount: _invoices.length,
               itemBuilder: (context, index) {
                 return _buildInvoiceCard(_invoices[index]);
@@ -262,13 +266,15 @@ class _BillingListScreenState extends State<BillingListScreen> {
             ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildSummary() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: AppResponsive.horizontalPadding(context).copyWith(top: 16, bottom: 8),
       child: Row(
         children: [
           Expanded(

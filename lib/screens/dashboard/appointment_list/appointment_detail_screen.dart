@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/responsive_utils.dart';
 
 class AppointmentDetailScreen extends StatefulWidget {
   final int appointmentId;
@@ -53,11 +54,16 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: isLoading
           ? const Center(child: CircularProgressIndicator())
           : error != null
           ? Center(child: Text(error!))
           : _buildBody(),
+        ),
+      ),
     );
   }
 
@@ -65,7 +71,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     final d = data!;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppResponsive.pagePadding(context),
       child: Column(
         children: [
           _InfoCard(

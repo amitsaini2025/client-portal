@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/responsive_utils.dart';
 
 class OccupationSearchScreen extends StatefulWidget {
   const OccupationSearchScreen({super.key});
@@ -77,8 +78,11 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Padding(
+        padding: AppResponsive.pagePadding(context),
         child: Column(
           children: [
             TextField(
@@ -127,6 +131,8 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
             if (details != null && !loading)
               Expanded(child: SingleChildScrollView(child: _buildTable())),
           ],
+        ),
+          ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/theme_config.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../workflow/workflow_screen.dart';
 import 'my_files_quick_action_card.dart';
 
@@ -20,8 +21,11 @@ class MyFilesScreen extends StatelessWidget {
         elevation: 0,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Padding(
+        padding: AppResponsive.pagePadding(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -53,6 +57,8 @@ class MyFilesScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
           ],
+        ),
+          ),
         ),
       ),
     );

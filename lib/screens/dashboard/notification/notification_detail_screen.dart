@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import '../../../models/notification/notification.dart';
+import '../../../utils/responsive_utils.dart';
 
 class NotificationDetailScreen extends StatefulWidget {
   final int notificationId;
@@ -112,7 +113,10 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: isLoading
           ? const Center(child: CircularProgressIndicator())
           : error != null
           ? Center(
@@ -125,7 +129,7 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
         ),
       )
           : SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: AppResponsive.pagePadding(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -191,6 +195,8 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
                 notification!.url,
               ),
           ],
+        ),
+      ),
         ),
       ),
     );

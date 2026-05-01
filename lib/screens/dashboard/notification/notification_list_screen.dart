@@ -1,6 +1,7 @@
 import 'package:client/screens/dashboard/notification/notification_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../utils/responsive_utils.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../models/notification/notification.dart';
@@ -118,7 +119,10 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 2,
       ),
-      body: RefreshIndicator(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: RefreshIndicator(
         onRefresh: _refresh,
         child:
             isLoading && notifications.isEmpty
@@ -148,10 +152,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
                     final item = notifications[index];
                     return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 6,
-                      ),
+                      padding: AppResponsive.horizontalPadding(context).copyWith(top: 6, bottom: 6),
                       child: Material(
                         borderRadius: BorderRadius.circular(14),
                         elevation: 1.5,
@@ -243,6 +244,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     );
                   },
                 ),
+          ),
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../services/api_service.dart';
 import '../../config/theme_config.dart';
+import '../../utils/responsive_utils.dart';
 
 class SendMessageScreen extends StatefulWidget {
   const SendMessageScreen({super.key});
@@ -196,8 +197,11 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: SingleChildScrollView(
+        padding: AppResponsive.pagePadding(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -383,6 +387,8 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             ),
             const SizedBox(height: 20),
           ],
+        ),
+          ),
         ),
       ),
     );

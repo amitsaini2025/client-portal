@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../config/theme_config.dart';
 import '../../../../services/auth_service.dart';
 import '../../../../utils/constants.dart';
+import '../../../../utils/responsive_utils.dart';
 import '../../../../widgets/common_app_bar.dart';
 import '../../../../widgets/webview/universal_webview.dart';
 
@@ -24,8 +25,11 @@ class StudentVisaOSHCScreen extends StatelessWidget {
         titleName: 'Student Visa - OSHC',
         matterID: AuthService.selectedMatterId,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Padding(
+        padding: AppResponsive.pagePadding(context),
         child: Column(
           children: [
 
@@ -40,6 +44,8 @@ class StudentVisaOSHCScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
           ],
+        ),
+          ),
         ),
       ),
     );

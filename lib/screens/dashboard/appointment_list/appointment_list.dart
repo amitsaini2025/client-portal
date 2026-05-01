@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../config/theme_config.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../services/api_service.dart';
 import '../book_appointment/book_confirm_screen.dart';
 import 'appointment_detail_screen.dart';
@@ -167,12 +168,15 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: isLoading
           ? const Center(child: CircularProgressIndicator())
           : error != null
           ? Center(child: Text(error!))
           : ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: AppResponsive.pagePadding(context),
         itemCount: appointments.length,
         itemBuilder: (context, index) {
           final item = appointments[index];
@@ -182,6 +186,8 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
             onCancel: () => showCancelDialog(item['id']),
           );
         },
+      ),
+        ),
       ),
     );
   }

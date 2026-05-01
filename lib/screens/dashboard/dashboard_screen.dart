@@ -21,6 +21,7 @@ import '../../models/task.dart';
 import '../../models/upcoming_deadline_summary.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/responsive_utils.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/dashboard/quick_actions_card.dart';
@@ -328,7 +329,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onRefresh: () async {
                   await Future.wait([_loadDashboardData(), _loadRecentBlogs()]);
                 },
-                child: SingleChildScrollView(
+                child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+                  child: SingleChildScrollView(
                   child: Container(
                     color: Colors.white,
                     child: Column(
@@ -337,7 +341,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         _buildRecentUpdatesSection(),
                         const SizedBox(height: 24),
                         Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: AppResponsive.pagePadding(context),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
@@ -449,7 +453,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
+                  ),
                 ),
+              ),
               ),
     );
   }

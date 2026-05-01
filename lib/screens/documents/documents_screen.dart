@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import '../../config/theme_config.dart';
+import '../../utils/responsive_utils.dart';
 import '../../models/new/document.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
@@ -292,7 +293,10 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       )
           : _isLoading
           ? const Center(child: LoadingWidget())
-          : Column(
+          : Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
         children: [
           if (_isUploading || _uploadStatus != null)
             UploadProgress(
@@ -303,20 +307,52 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           Expanded(
             child: _documents.isEmpty
                 ? _buildEmptyState()
-                : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _documents.length,
-              itemBuilder: (context, index) {
-                final doc = _documents[index];
-                return DocumentCard(
-                  document: doc,
-                  onTap: () {},
-                  onDelete: () => _deleteDocument(doc),
+                : LayoutBuilder(
+              builder: (context, constraints) {
+                final cols = AppResponsive.gridColumns(
+                  context,
+                  mobile: 1,
+                  tablet: 2,
+                  desktop: 3,
+                );
+                if (cols == 1) {
+                  return ListView.builder(
+                    padding: AppResponsive.pagePadding(context),
+                    itemCount: _documents.length,
+                    itemBuilder: (context, index) {
+                      final doc = _documents[index];
+                      return DocumentCard(
+                        document: doc,
+                        onTap: () {},
+                        onDelete: () => _deleteDocument(doc),
+                      );
+                    },
+                  );
+                }
+                return GridView.builder(
+                  padding: AppResponsive.pagePadding(context),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: cols,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 2.2,
+                  ),
+                  itemCount: _documents.length,
+                  itemBuilder: (context, index) {
+                    final doc = _documents[index];
+                    return DocumentCard(
+                      document: doc,
+                      onTap: () {},
+                      onDelete: () => _deleteDocument(doc),
+                    );
+                  },
                 );
               },
             ),
           ),
         ],
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: ThemeConfig.goldenYellow,

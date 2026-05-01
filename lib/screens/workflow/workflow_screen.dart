@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../config/theme_config.dart';
 import '../../services/api_service.dart';
+import '../../utils/responsive_utils.dart';
 import 'workflow_documents_screen.dart';
 import 'workflow_stages_screen.dart';
 
@@ -114,15 +115,20 @@ class _WorkflowScreenState extends State<WorkflowScreen>
           ],
         ),
       ),
-      body: Container(
-        color: ThemeConfig.navyBlue,
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            WorkflowStagesScreen(matterID: AuthService.selectedMatterId ?? 0),
-            const WorkflowDocumentsScreen(),
-            WorkflowMessagesScreen(matterID: AuthService.selectedMatterId ?? 0),
-          ],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Container(
+            color: ThemeConfig.navyBlue,
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                WorkflowStagesScreen(matterID: AuthService.selectedMatterId ?? 0),
+                const WorkflowDocumentsScreen(),
+                WorkflowMessagesScreen(matterID: AuthService.selectedMatterId ?? 0),
+              ],
+            ),
+          ),
         ),
       ),
     );

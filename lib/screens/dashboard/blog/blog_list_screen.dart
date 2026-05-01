@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../models/blog.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/responsive_utils.dart';
 
 class BlogListScreen extends StatefulWidget {
   const BlogListScreen({Key? key}) : super(key: key);
@@ -221,26 +222,51 @@ class _BlogListScreenState extends State<BlogListScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body:
-          _blogs.isEmpty && _isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: _blogs.isEmpty && _isLoading
               ? const Center(child: CircularProgressIndicator())
               : RefreshIndicator(
                 onRefresh: _onRefresh,
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: _blogs.length + (_isLoading ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index < _blogs.length) {
-                      return _buildBlogCard(_blogs[index]);
-                    } else {
-                      return const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(child: CircularProgressIndicator()),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final cols = AppResponsive.gridColumns(
+                      context,
+                      mobile: 1,
+                      tablet: 2,
+                      desktop: 3,
+                    );
+                    if (cols == 1) {
+                      return ListView.builder(
+                        controller: _scrollController,
+                        itemCount: _blogs.length + (_isLoading ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index < _blogs.length) return _buildBlogCard(_blogs[index]);
+                          return const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        },
                       );
                     }
+                    return GridView.builder(
+                      controller: _scrollController,
+                      padding: AppResponsive.pagePadding(context),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: cols,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.5,
+                      ),
+                      itemCount: _blogs.length,
+                      itemBuilder: (context, index) => _buildBlogCard(_blogs[index]),
+                    );
                   },
                 ),
               ),
+        ),
+      ),
     );
   }
 }

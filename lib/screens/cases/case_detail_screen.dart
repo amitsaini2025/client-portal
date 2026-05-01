@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/case.dart';
+import '../../utils/responsive_utils.dart';
 import '../../models/document.dart';
 import '../../models/task.dart';
 import '../../models/note.dart';
@@ -198,11 +199,14 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
           ),
         ],
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
         children: [
           // Case header with progress
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: AppResponsive.pagePadding(context),
             color: Theme.of(context).cardColor,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,13 +304,15 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
             ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildOverviewTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppResponsive.pagePadding(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -410,7 +416,7 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
 
   Widget _buildDocumentsTab() {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: AppResponsive.pagePadding(context),
       itemCount: _documents.length,
       itemBuilder: (context, index) {
         final document = _documents[index];

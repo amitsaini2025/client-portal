@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../config/theme_config.dart';
 import '../../models/new/task.dart';
 import '../../services/api_service.dart';
+import '../../utils/responsive_utils.dart';
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({super.key});
@@ -145,15 +146,20 @@ class _TasksScreenState extends State<TasksScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [_buildSearchAndFilters(), Expanded(child: _buildTaskList())],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
+            children: [_buildSearchAndFilters(), Expanded(child: _buildTaskList())],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildSearchAndFilters() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppResponsive.pagePadding(context),
       child: Column(
         children: [
           TextField(
@@ -310,12 +316,32 @@ class _TasksScreenState extends State<TasksScreen> {
     return RefreshIndicator(
       color: ThemeConfig.goldenYellow,
       onRefresh: _loadTasks,
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: _filteredTasks.length,
-        itemBuilder: (context, index) {
-          final task = _filteredTasks[index];
-          return _buildTaskCard(task);
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final cols = AppResponsive.gridColumns(
+            context,
+            mobile: 1,
+            tablet: 2,
+            desktop: 3,
+          );
+          if (cols == 1) {
+            return ListView.builder(
+              padding: AppResponsive.horizontalPadding(context),
+              itemCount: _filteredTasks.length,
+              itemBuilder: (context, index) => _buildTaskCard(_filteredTasks[index]),
+            );
+          }
+          return GridView.builder(
+            padding: AppResponsive.pagePadding(context),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: cols,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 2.5,
+            ),
+            itemCount: _filteredTasks.length,
+            itemBuilder: (context, index) => _buildTaskCard(_filteredTasks[index]),
+          );
         },
       ),
     );

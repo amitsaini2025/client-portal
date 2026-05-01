@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/appointment.dart';
+import '../../utils/responsive_utils.dart';
 import 'book_appointment_screen.dart';
 
 class AppointmentsScreen extends StatefulWidget {
@@ -175,11 +176,14 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
         children: [
           // Search and Filter Bar
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: AppResponsive.pagePadding(context),
             child: Column(
               children: [
                 // Search Bar
@@ -288,17 +292,41 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                           )
                         : RefreshIndicator(
                             onRefresh: _loadAppointments,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              itemCount: _filteredAppointments.length,
-                              itemBuilder: (context, index) {
-                                final appointment = _filteredAppointments[index];
-                                return _buildAppointmentCard(appointment);
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final cols = AppResponsive.gridColumns(
+                                  context,
+                                  mobile: 1,
+                                  tablet: 2,
+                                  desktop: 3,
+                                );
+                                if (cols == 1) {
+                                  return ListView.builder(
+                                    padding: AppResponsive.horizontalPadding(context),
+                                    itemCount: _filteredAppointments.length,
+                                    itemBuilder: (context, index) =>
+                                        _buildAppointmentCard(_filteredAppointments[index]),
+                                  );
+                                }
+                                return GridView.builder(
+                                  padding: AppResponsive.pagePadding(context),
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: cols,
+                                    crossAxisSpacing: 16,
+                                    mainAxisSpacing: 16,
+                                    childAspectRatio: 1.8,
+                                  ),
+                                  itemCount: _filteredAppointments.length,
+                                  itemBuilder: (context, index) =>
+                                      _buildAppointmentCard(_filteredAppointments[index]),
+                                );
                               },
                             ),
                           ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

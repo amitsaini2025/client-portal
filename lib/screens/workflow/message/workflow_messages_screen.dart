@@ -13,6 +13,7 @@ import '../../../models/workflow_message.dart' hide Attachment;
 import '../../../models/workflow_send_message_response.dart' hide Recipient;
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../utils/revert_socket_service.dart';
 import '../../../widgets/common_app_bar.dart';
 
@@ -445,8 +446,10 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
         matterID: AuthService.selectedMatterId,
       ),
       backgroundColor: const Color(0xFFF5F5F5),
-      body:
-          _isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: _isLoading
               ? Center(
                 child: CircularProgressIndicator(
                   color: ThemeConfig.goldenYellow,
@@ -465,6 +468,8 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                   _buildMessageInput(),
                 ],
               ),
+        ),
+      ),
     );
   }
 

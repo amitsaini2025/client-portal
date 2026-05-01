@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../config/theme_config.dart';
+import '../../utils/responsive_utils.dart';
 
 class MattersScreen extends StatefulWidget {
   const MattersScreen({super.key});
@@ -101,8 +102,11 @@ class _MattersScreenState extends State<MattersScreen> {
             final List matters = snapshot.data!['data']['matters'];
             final selectedMatterId = AuthService.selectedMatterId;
 
-            return ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+                child: ListView.builder(
+              padding: AppResponsive.pagePadding(context).copyWith(top: 12, bottom: 12),
               itemCount: matters.length,
               itemBuilder: (context, index) {
                 final matter = matters[index];
@@ -154,6 +158,8 @@ class _MattersScreenState extends State<MattersScreen> {
                   ),
                 );
               },
+                ),
+              ),
             );
           }
         },

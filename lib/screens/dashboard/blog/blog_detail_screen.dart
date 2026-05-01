@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/responsive_utils.dart';
 
 class BlogDetailScreen extends StatefulWidget {
   final int blogId;
@@ -57,8 +58,10 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body:
-          isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: isLoading
               ? const Center(child: CircularProgressIndicator())
               : blog == null
               ? const Center(child: Text('Blog not found'))
@@ -107,7 +110,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
 
                     // Blog Info
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: AppResponsive.horizontalPadding(context),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -193,6 +196,8 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
                   ],
                 ),
               ),
+        ),
+      ),
     );
   }
 }

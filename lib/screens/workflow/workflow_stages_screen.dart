@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../models/workflow_stage.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/responsive_utils.dart';
 import '../../widgets/workflow/workflow_progress_widget.dart';
 
 class WorkflowStagesScreen extends StatefulWidget {
@@ -266,8 +267,10 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
       ),*/
-      body:
-          _isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: _isLoading
               ? const Center(
                 child: CircularProgressIndicator(color: ThemeConfig.navyBlue),
               )
@@ -280,7 +283,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                 onRefresh: _loadWorkflowData,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(16),
+                  padding: AppResponsive.pagePadding(context),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -300,6 +303,8 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                   ),
                 ),
               ),
+        ),
+      ),
     );
   }
 

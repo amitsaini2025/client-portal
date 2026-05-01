@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../config/stripe_config.dart';
 import '../../models/invoice.dart';
 import '../../services/stripe_service.dart';
+import '../../utils/responsive_utils.dart';
 
 class BillingScreen extends StatefulWidget {
   const BillingScreen({super.key});
@@ -318,63 +319,79 @@ class _BillingScreenState extends State<BillingScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
         children: [
           // Summary Cards
           Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Row(
+            padding: AppResponsive.pagePadding(context),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth >= 600;
+                final summaryCards = [
+                  _buildSummaryCard(
+                    'Total Amount',
+                    '\$${NumberFormat('#,##0.00').format(totalAmount)}',
+                    Icons.account_balance_wallet,
+                    Colors.blue,
+                  ),
+                  _buildSummaryCard(
+                    'Paid',
+                    '\$${NumberFormat('#,##0.00').format(paidAmount)}',
+                    Icons.check_circle,
+                    Colors.green,
+                  ),
+                  _buildSummaryCard(
+                    'Pending',
+                    '\$${NumberFormat('#,##0.00').format(pendingAmount)}',
+                    Icons.schedule,
+                    Colors.orange,
+                  ),
+                  _buildSummaryCard(
+                    'Overdue',
+                    '\$${NumberFormat('#,##0.00').format(_invoices.where((i) => i.status == 'overdue').fold(0.0, (sum, i) => sum + (i.totalAmount ?? 0.0)))}',
+                    Icons.warning,
+                    Colors.red,
+                  ),
+                ];
+                if (isWide) {
+                  return Row(
+                    children: summaryCards
+                        .map((c) => Expanded(child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 6),
+                              child: c,
+                            )))
+                        .toList(),
+                  );
+                }
+                return Column(
                   children: [
-                    Expanded(
-                      child: _buildSummaryCard(
-                        'Total Amount',
-                        '\$${NumberFormat('#,##0.00').format(totalAmount)}',
-                        Icons.account_balance_wallet,
-                        Colors.blue,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(child: summaryCards[0]),
+                        const SizedBox(width: 12),
+                        Expanded(child: summaryCards[1]),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildSummaryCard(
-                        'Paid',
-                        '\$${NumberFormat('#,##0.00').format(paidAmount)}',
-                        Icons.check_circle,
-                        Colors.green,
-                      ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(child: summaryCards[2]),
+                        const SizedBox(width: 12),
+                        Expanded(child: summaryCards[3]),
+                      ],
                     ),
                   ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildSummaryCard(
-                        'Pending',
-                        '\$${NumberFormat('#,##0.00').format(pendingAmount)}',
-                        Icons.schedule,
-                        Colors.orange,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildSummaryCard(
-                        'Overdue',
-                        '\$${NumberFormat('#,##0.00').format(_invoices.where((i) => i.status == 'overdue').fold(0.0, (sum, i) => sum + (i.totalAmount ?? 0.0)))}',
-                        Icons.warning,
-                        Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                );
+              },
             ),
           ),
 
           // Search and Filter Bar
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: AppResponsive.horizontalPadding(context),
             child: Column(
               children: [
                 // Search Bar
@@ -471,7 +488,7 @@ class _BillingScreenState extends State<BillingScreen> {
                     : RefreshIndicator(
                       onRefresh: _loadInvoices,
                       child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: AppResponsive.horizontalPadding(context),
                         itemCount: _filteredInvoices.length,
                         itemBuilder: (context, index) {
                           final invoice = _filteredInvoices[index];
@@ -481,6 +498,8 @@ class _BillingScreenState extends State<BillingScreen> {
                     ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

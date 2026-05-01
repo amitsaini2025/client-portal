@@ -3,6 +3,7 @@ import 'package:client/screens/dashboard/english_requirement/english_requirement
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 import 'english_requirement_specified_test_scores_screen.dart';
 
@@ -42,8 +43,11 @@ class EnglishRequirementScreen extends StatelessWidget {
         titleName: "English Requirements",
         matterID: AuthService.selectedMatterId,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Padding(
+        padding: AppResponsive.pagePadding(context),
         child: Column(
           children: links
               .map(
@@ -53,6 +57,8 @@ class EnglishRequirementScreen extends StatelessWidget {
             ),
           )
               .toList(),
+        ),
+          ),
         ),
       ),
     );

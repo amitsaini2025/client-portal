@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/chat_bot_service.dart';
 import '../../../config/theme_config.dart';
+import '../../../utils/responsive_utils.dart';
 
 class ChatBotScreen extends StatefulWidget {
   const ChatBotScreen({super.key});
@@ -122,7 +123,10 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
         title: const Text("Chatbot", style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
         children: [
           Expanded(
             child: ListView.builder(
@@ -138,6 +142,8 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
             child: _buildTextComposer(),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

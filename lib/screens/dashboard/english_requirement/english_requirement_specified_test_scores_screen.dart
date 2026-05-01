@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
 class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
@@ -29,7 +30,12 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
         titleName: "English Requirement for Specified Test Scores",
         matterID: AuthService.selectedMatterId,
       ),
-      body: const EnglishLanguageRequirementsWidget(),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: const EnglishLanguageRequirementsWidget(),
+        ),
+      ),
     );
   }
 

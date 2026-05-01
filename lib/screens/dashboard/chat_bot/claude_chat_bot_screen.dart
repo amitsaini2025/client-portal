@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/responsive_utils.dart';
 
 class ClaudeChatBotScreen extends StatefulWidget {
   const ClaudeChatBotScreen({super.key});
@@ -152,21 +153,26 @@ class _ClaudeChatBotScreenState extends State<ClaudeChatBotScreen> {
         foregroundColor: Colors.white,
         title: const Text("Chatbot"),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              reverse: true,
-              padding: const EdgeInsets.all(10),
-              itemCount: _messages.length,
-              itemBuilder: (_, index) => _messages[index],
-            ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  reverse: true,
+                  padding: const EdgeInsets.all(10),
+                  itemCount: _messages.length,
+                  itemBuilder: (_, index) => _messages[index],
+                ),
+              ),
+              if (_isLoading) _buildTypingIndicator(),
+              const Divider(height: 1),
+              _buildTextComposer(),
+            ],
           ),
-          if (_isLoading) _buildTypingIndicator(),
-          const Divider(height: 1),
-          _buildTextComposer(),
-        ],
+        ),
       ),
     );
   }

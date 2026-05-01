@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
 class EnglishRequirementForStudentVisaScreen extends StatefulWidget {
@@ -121,12 +122,15 @@ class _EnglishRequirementForStudentVisaScreenState
         titleName: "English Requirement For Student Visa",
         matterID: AuthService.selectedMatterId,
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
         children: [
           const SizedBox(height: 10),
 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: AppResponsive.horizontalPadding(context),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
@@ -169,7 +173,7 @@ class _EnglishRequirementForStudentVisaScreenState
 
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: AppResponsive.horizontalPadding(context),
               itemCount: filteredData.length,
               itemBuilder: (context, index) {
                 final item = filteredData[index];
@@ -178,6 +182,8 @@ class _EnglishRequirementForStudentVisaScreenState
             ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

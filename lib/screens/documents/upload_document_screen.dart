@@ -8,6 +8,7 @@ import 'package:client/config/theme_config.dart';
 import '../../models/new/allowed_checklist.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/responsive_utils.dart';
 
 class UploadDocumentScreen extends StatefulWidget {
   const UploadDocumentScreen({super.key});
@@ -237,12 +238,15 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: _isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: _isLoading
           ? const Center(
         child: CircularProgressIndicator(color: ThemeConfig.goldenYellow),
       )
           : SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: AppResponsive.pagePadding(context),
         child: Form(
           key: _formKey,
           child: Column(
@@ -277,6 +281,8 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 ),
               ),
             ],
+          ),
+        ),
           ),
         ),
       ),

@@ -4,6 +4,7 @@ import '../../../config/theme_config.dart';
 import '../../../models/workflow_message_detail_response.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 
 class WorkflowMessageDetailScreen extends StatefulWidget {
   final int messageId;
@@ -91,7 +92,10 @@ class _WorkflowMessageDetailScreenState
         backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: _isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: _isLoading
           ? Center(
         child: CircularProgressIndicator(
             color: ThemeConfig.goldenYellow),
@@ -101,12 +105,14 @@ class _WorkflowMessageDetailScreenState
           : _message == null
           ? _buildEmptyWidget()
           : _buildContent(),
+        ),
+      ),
     );
   }
 
   Widget _buildContent() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: AppResponsive.pagePadding(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

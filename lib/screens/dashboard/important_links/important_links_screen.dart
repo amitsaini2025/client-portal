@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/auth_service.dart';
 import '../../../utils/constants.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 import '../../../widgets/webview/universal_webview.dart';
 
@@ -57,18 +58,37 @@ class ImportantLinksScreen extends StatelessWidget {
         titleName: 'Important Links',
         matterID: AuthService.selectedMatterId,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children:
-              links
-                  .map(
-                    (link) => Padding(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Padding(
+            padding: AppResponsive.pagePadding(context),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final cols = AppResponsive.gridColumns(context, mobile: 1, tablet: 2, desktop: 3);
+                if (cols == 1) {
+                  return Column(
+                    children: links.map((link) => Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: _linkTile(context, link),
-                    ),
-                  )
-                  .toList(),
+                    )).toList(),
+                  );
+                }
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: cols,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 3.5,
+                  ),
+                  itemCount: links.length,
+                  itemBuilder: (context, index) => _linkTile(context, links[index]),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

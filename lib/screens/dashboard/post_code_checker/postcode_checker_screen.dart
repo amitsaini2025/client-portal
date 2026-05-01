@@ -5,6 +5,7 @@ import '../../../config/theme_config.dart';
 import '../../../models/post_code_checker/postcode_result.dart';
 import '../../../models/post_code_checker/postcode_search_item.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
 class PostcodeCheckerScreen extends StatefulWidget {
@@ -69,10 +70,13 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
         titleName: 'Postcode Checker Tool',
         matterID: AuthService.selectedMatterId,
       ),
-      body: SingleChildScrollView(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppResponsive.pagePadding(context),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -86,6 +90,8 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
               /*const SizedBox(height: 24),
               _buildInfoBox(),*/
             ],
+          ),
+        ),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../config/theme_config.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../models/action_required.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
@@ -208,8 +209,10 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body:
-          _isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _items.isEmpty
               ? const Center(child: Text("No action required"))
@@ -217,7 +220,7 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
                 onRefresh: _onRefresh,
                 child: ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
+                  padding: AppResponsive.pagePadding(context),
                   itemCount: _items.length + (_isFetchingMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == _items.length) {
@@ -299,6 +302,8 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
                   },
                 ),
               ),
+        ),
+      ),
     );
   }
 }

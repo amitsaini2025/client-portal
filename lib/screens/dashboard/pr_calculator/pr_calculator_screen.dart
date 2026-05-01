@@ -4,6 +4,7 @@ import '../../../services/api_service.dart';
 import 'package:client/models/pr_points_response.dart';
 
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
 class PRCalculatorScreen extends StatefulWidget {
@@ -73,10 +74,10 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
       body: loading || data == null
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: AppResponsive.pagePadding(context),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 700),
+            constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
             child: Card(
               elevation: 2,
               shape: RoundedRectangleBorder(

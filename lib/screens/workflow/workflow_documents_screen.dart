@@ -7,6 +7,7 @@ import '../../config/theme_config.dart';
 import '../../models/workflow_checklist.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/responsive_utils.dart';
 
 class WorkflowDocumentsScreen extends StatefulWidget {
   final int? stageId;
@@ -119,7 +120,12 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: content,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: content,
+        ),
+      ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -174,7 +180,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
     return RefreshIndicator(
       onRefresh: _loadChecklistData,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: AppResponsive.pagePadding(context),
         children: [
           _buildSummaryCard(),
           const SizedBox(height: 16),

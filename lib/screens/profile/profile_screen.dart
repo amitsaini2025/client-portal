@@ -2,6 +2,7 @@ import 'package:client/config/theme_config.dart';
 import 'package:flutter/material.dart';
 import 'package:client/services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/responsive_utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -118,7 +119,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 14),
             Text(
               "${data["first_name"] ?? ""} ${data["last_name"] ?? ""}",
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headlineSmall
+                  ?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: ThemeConfig.navyBlue,
                 letterSpacing: 0.5,
@@ -127,7 +132,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 6),
             Text(
               data["email"] ?? "",
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(
                 color: Colors.black54,
                 fontStyle: FontStyle.italic,
               ),
@@ -215,68 +224,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: SafeArea(
         child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: _isLoading
-                ? const CircularProgressIndicator(
-              color: ThemeConfig.goldenYellow,
-            )
-                : _errorMessage != null
-                ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline,
-                    color: Colors.redAccent, size: 48),
-                const SizedBox(height: 12),
-                Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Colors.redAccent, fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: _fetchProfile,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Retry"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeConfig.goldenYellow,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+                maxWidth: AppResponsive.maxFormWidth),
+            child: Padding(
+              padding: AppResponsive.pagePadding(context),
+              child: _isLoading
+                  ? const CircularProgressIndicator(
+                color: ThemeConfig.goldenYellow,
+              )
+                  : _errorMessage != null
+                  ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline,
+                      color: Colors.redAccent, size: 48),
+                  const SizedBox(height: 12),
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(
+                        color: Colors.redAccent, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: _fetchProfile,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text("Retry"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ThemeConfig.goldenYellow,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            )
-                : SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildProfileCard(context),
-                  const SizedBox(height: 30),
-
-                  _elegantButton(
-                    label: "Personal Information",
-                    icon: Icons.person_outline,
-                    onTap: _openPersonalInformation,
-                    color: ThemeConfig.navyBlue,
-                  ),
-
-                  _elegantButton(
-                    label: "Edit Information",
-                    icon: Icons.edit,
-                    onTap:
-                    _isLoading ? null : _openEditProfile,
-                    color: ThemeConfig.goldenYellow,
-                  ),
-
-                  _elegantButton(
-                    label: "Logout",
-                    icon: Icons.logout,
-                    onTap: () => _handleLogout(context),
-                    color: Colors.redAccent,
-                  ),
                 ],
+              )
+                  : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildProfileCard(context),
+                    const SizedBox(height: 30),
+
+                    _elegantButton(
+                      label: "Personal Information",
+                      icon: Icons.person_outline,
+                      onTap: _openPersonalInformation,
+                      color: ThemeConfig.navyBlue,
+                    ),
+
+                    _elegantButton(
+                      label: "Edit Information",
+                      icon: Icons.edit,
+                      onTap:
+                      _isLoading ? null : _openEditProfile,
+                      color: ThemeConfig.goldenYellow,
+                    ),
+
+                    _elegantButton(
+                      label: "Logout",
+                      icon: Icons.logout,
+                      onTap: () => _handleLogout(context),
+                      color: Colors.redAccent,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

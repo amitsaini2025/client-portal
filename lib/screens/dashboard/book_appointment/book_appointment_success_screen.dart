@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../../utils/responsive_utils.dart';
 
 class BookAppointmentSuccessScreen extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -18,7 +19,9 @@ class BookAppointmentSuccessScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: Center(
-        child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: SingleChildScrollView(
           child: Column(
             children: [
               const SizedBox(height: 40),
@@ -135,6 +138,7 @@ class BookAppointmentSuccessScreen extends StatelessWidget {
               const SizedBox(height: 40),
             ],
           ),
+        ),
         ),
       ),
     );

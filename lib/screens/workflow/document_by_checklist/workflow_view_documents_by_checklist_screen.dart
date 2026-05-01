@@ -5,6 +5,7 @@ import '../../../config/theme_config.dart';
 import '../../../models/new/allowed_checklist.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 
 class WorkflowViewDocumentsByChecklistScreen extends StatefulWidget {
   final int matterId;
@@ -209,19 +210,23 @@ class _WorkflowViewDocumentsByChecklistScreenState
         ),
       ),
 
-      body:
-          _isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _checklists.isEmpty
               ? const Center(child: Text("No documents uploaded"))
               : ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: AppResponsive.pagePadding(context),
                 itemCount: _checklists.length,
                 itemBuilder: (context, index) {
                   final doc = _checklists[index];
                   return buildDocumentCard(doc);
                 },
               ),
+        ),
+      ),
     );
   }
 }

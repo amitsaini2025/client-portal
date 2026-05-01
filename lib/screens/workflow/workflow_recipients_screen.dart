@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
+import '../../utils/responsive_utils.dart';
 
 class WorkflowRecipientsScreen extends StatefulWidget {
   final int clientMatterId;
@@ -59,7 +60,10 @@ class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      body: _isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
           ? _buildErrorWidget(_error!, _loadChatRecipients)
@@ -68,12 +72,14 @@ class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
         child: _recipients.isEmpty
             ? _buildEmptyWidget()
             : ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: AppResponsive.pagePadding(context),
           itemCount: _recipients.length,
           itemBuilder: (context, index) {
             final recipient = _recipients[index];
             return _buildRecipientCard(recipient);
           },
+        ),
+      ),
         ),
       ),
     );

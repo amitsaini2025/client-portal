@@ -4,6 +4,7 @@ import '../../../config/theme_config.dart';
 import '../../../models/visa_search/visa_model.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
 class VisaEstimateScreen extends StatefulWidget {
@@ -242,8 +243,11 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
         titleName: "Visa Estimate",
         matterID: AuthService.selectedMatterId,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(14),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: SingleChildScrollView(
+        padding: AppResponsive.pagePadding(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -349,6 +353,8 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
               ),
             ),
           ],
+        ),
+          ),
         ),
       ),
     );

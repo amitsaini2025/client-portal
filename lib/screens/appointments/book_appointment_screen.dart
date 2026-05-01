@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../services/api_service.dart';
 import '../../models/case.dart';
 import '../../config/theme_config.dart';
+import '../../utils/responsive_utils.dart';
 
 class BookAppointmentScreen extends StatefulWidget {
   const BookAppointmentScreen({super.key});
@@ -151,10 +152,13 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: _isLoading
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.white))
           : SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: AppResponsive.pagePadding(context),
         child: Form(
           key: _formKey,
           child: Column(
@@ -285,6 +289,8 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 ),
               ),
             ],
+          ),
+        ),
           ),
         ),
       ),

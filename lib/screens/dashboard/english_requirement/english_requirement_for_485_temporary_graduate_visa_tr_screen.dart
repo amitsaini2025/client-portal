@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
 class EnglishRequirementFor485TemporaryGraduateVisaTRScreen
@@ -59,7 +60,10 @@ class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
         titleName: "English Requirement for 485 Temporary Graduate Visa (TR)",
         matterID: AuthService.selectedMatterId,
       ),
-      body: Column(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Column(
         children: [
           const SizedBox(height: 12),
 
@@ -77,12 +81,14 @@ class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
 
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: AppResponsive.horizontalPadding(context),
               itemCount: filtered.length,
               itemBuilder: (_, i) => _buildCard(filtered[i]),
             ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:client/screens/dashboard/health_insurance/temporary_graduate_hea
 import 'package:client/screens/dashboard/health_insurance/tourist_visa_ovhcs_screen/tourist_visa_ovhcs_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
 class HealthInsuranceScreen extends StatelessWidget {
@@ -23,10 +24,13 @@ class HealthInsuranceScreen extends StatelessWidget {
         titleName: 'Health Insurance',
         matterID: AuthService.selectedMatterId,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          child: Padding(
+        padding: AppResponsive.pagePadding(context),
         child: GridView.count(
-          crossAxisCount: 2,
+          crossAxisCount: AppResponsive.gridColumns(context, mobile: 2, tablet: 3, desktop: 4),
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
           childAspectRatio: 2.2,
@@ -53,6 +57,8 @@ class HealthInsuranceScreen extends StatelessWidget {
               screen: const TemporaryGraduateOVHCScreen(),
             ),
           ],
+        ),
+          ),
         ),
       ),
     );
