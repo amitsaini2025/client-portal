@@ -220,53 +220,88 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   Stripe.publishableKey = StripeConfig.publishableKey;
-  if (!kIsWeb) {
+
+  // Stripe only for mobile
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     Stripe.merchantIdentifier = StripeConfig.merchantIdentifier;
     await Stripe.instance.applySettings();
   }
+
   await initializeFirebaseSafely();
-  if (!kIsWeb) {
+
+  // Firebase background handler (ONLY Android)
+  if (!kIsWeb && Platform.isAndroid) {
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
-  const AndroidInitializationSettings androidSettings =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-  const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-    requestAlertPermission: true,
-    requestBadgePermission: true,
-    requestSoundPermission: true,
-  );
-  const InitializationSettings initSettings = InitializationSettings(
-    android: androidSettings,
-    iOS: iosSettings,
-  );
-  if (!kIsWeb) {
-    await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  // ✅ Setup local notifications safely
+  await setupNotifications();
+
+  // ✅ Request permission ONLY on supported platforms
+  if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
+    try {
+      await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    } catch (e) {
+      debugPrint("Notification permission error: $e");
+    }
   }
-  if (!kIsWeb && Platform.isAndroid) {
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.createNotificationChannel(defaultChannel);
-  }
-  if (!kIsWeb) {
-    await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+
+  // ✅ Foreground messages (safe for all, but guard anyway)
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     FirebaseMessaging.onMessage.listen(_showForegroundNotification);
   }
+
   await AuthService.initialize();
+
   final prefs = await SharedPreferences.getInstance();
   final isFirstLaunch = prefs.getBool('first_launch') ?? true;
+
   if (isFirstLaunch) {
     await AuthService.clearAllData();
     await prefs.setBool('first_launch', false);
   }
+
   await ApiService.initializeAuthToken();
+
   runApp(MyAppWithTheme());
+}
+
+Future<void> setupNotifications() async {
+  if (kIsWeb) return;
+
+  const AndroidInitializationSettings androidSettings =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const DarwinInitializationSettings darwinSettings =
+  DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
+
+  const InitializationSettings initSettings = InitializationSettings(
+    android: androidSettings,
+    iOS: darwinSettings,
+    macOS: darwinSettings,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  // ✅ Android only channel
+  if (Platform.isAndroid) {
+    final androidPlugin =
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+
+    await androidPlugin?.createNotificationChannel(defaultChannel);
+  }
 }
 
 Future<void> initializeFirebaseSafely() async {

@@ -27,6 +27,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
     with RouteAware, WidgetsBindingObserver {
   bool _isBlocked = false;
   bool _isLoading = true;
+  bool _isNavigating = false;
 
   List<NotificationModel> notifications = [];
   bool isFetchingNotifications = false;
@@ -730,76 +731,83 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
     BuildContext context,
     NotificationModel item,
   ) async {
-    if (!item.isRead) {
-      await ApiService.markNotificationAsRead(notificationId: item.id);
-      item.isRead = true;
-    }
-    final Map<String, dynamic> matters = await ApiService.getMatters();
-    final int matterId = item.clientMatterId;
-    String? matterName;
-    if (matters["data"]["matters"] != null) {
-      for (var m in matters["data"]["matters"]) {
-        if (m["matter_id"] == matterId) {
-          matterName = m["matter_name"] ?? "";
-          break;
+    if (_isNavigating) return;
+    _isNavigating = true;
+
+    try{
+      if (!item.isRead) {
+        await ApiService.markNotificationAsRead(notificationId: item.id);
+        item.isRead = true;
+      }
+      final Map<String, dynamic> matters = await ApiService.getMatters();
+      final int matterId = item.clientMatterId;
+      String? matterName;
+      if (matters["data"]["matters"] != null) {
+        for (var m in matters["data"]["matters"]) {
+          if (m["matter_id"] == matterId) {
+            matterName = m["matter_name"] ?? "";
+            break;
+          }
         }
       }
-    }
-    matterName ??= "Unknown";
+      matterName ??= "Unknown";
 
-    await AuthService.selectMatter(matterId: matterId, matterName: matterName);
+      await AuthService.selectMatter(matterId: matterId, matterName: matterName);
 
-    Widget? screen;
+      Widget? screen;
 
-    final type = item.notificationType.trim();
-    final url = item.url.trim();
+      final type = item.notificationType.trim();
+      final url = item.url.trim();
 
-    switch (type) {
-      case "message":
-        screen = WorkflowMessagesScreen(matterID: matterId);
-        break;
+      switch (type) {
+        case "message":
+          screen = WorkflowMessagesScreen(matterID: matterId);
+          break;
 
-      case "stage_change":
-      case "matter_discontinued":
-      case "matter_reopened":
-      case "checklist":
-      case "checklist_added":
-      case "document_approved":
-      case "document_rejected":
-      case "document_deleted":
-      case "document_downloaded":
-        screen = WorkflowStagesScreen(matterID: matterId);
-        break;
-
-      case "detail_approved":
-      case "detail_rejected":
-        screen = PersonalInformationScreen();
-        break;
-
-      case "invoice_sent_to_client_app":
-        screen = BillingListScreen(matterID: matterId);
-        break;
-
-      case "action_completed":
-        if (url == "/activities") {
+        case "stage_change":
+        case "matter_discontinued":
+        case "matter_reopened":
+        case "checklist":
+        case "checklist_added":
+        case "document_approved":
+        case "document_rejected":
+        case "document_deleted":
+        case "document_downloaded":
           screen = WorkflowStagesScreen(matterID: matterId);
-        } else {
+          break;
+
+        case "detail_approved":
+        case "detail_rejected":
+          screen = PersonalInformationScreen();
+          break;
+
+        case "invoice_sent_to_client_app":
+          screen = BillingListScreen(matterID: matterId);
+          break;
+
+        case "action_completed":
+          if (url == "/activities") {
+            screen = WorkflowStagesScreen(matterID: matterId);
+          } else {
+            screen = NotificationDetailScreen(notificationId: item.id);
+          }
+          break;
+
+        case "lead_converted_to_client":
           screen = NotificationDetailScreen(notificationId: item.id);
-        }
-        break;
+          break;
 
-      case "lead_converted_to_client":
-        screen = NotificationDetailScreen(notificationId: item.id);
-        break;
+        default:
+          screen = NotificationDetailScreen(notificationId: item.id);
+          break;
+      }
 
-      default:
-        screen = NotificationDetailScreen(notificationId: item.id);
-        break;
+      if (!mounted) return;
+
+      await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
+    }finally{
+      _isNavigating = false;
     }
-
-    if (!mounted) return;
-
-    await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
   }
 
   String _formatDate(DateTime dateTime) {
