@@ -4,7 +4,6 @@ import 'package:client/services/stripe_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../../utils/responsive_utils.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../fcm_service.dart';
@@ -20,6 +19,7 @@ import '../../../models/recent_activity.dart';
 import '../../../models/upcoming_deadline_summary.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common/error_widget.dart';
 import '../../../widgets/common/loading_widget.dart';
 import '../../../widgets/dashboard/quick_actions_card.dart';
@@ -280,90 +280,93 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                   child: SingleChildScrollView(
                     child: Center(
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+                        constraints: const BoxConstraints(
+                          maxWidth: AppResponsive.maxContentWidth,
+                        ),
                         child: Container(
-                      color: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildRecentUpdatesSection(),
-                          const SizedBox(height: 24),
-                          Padding(
-                            padding: AppResponsive.pagePadding(context),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                QuickActionsCard(
-                                  onBookAppointment: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) =>
-                                                const BookLocationScreen(),
-                                      ),
-                                    );
-                                  },
-                                  onHealthInsurance: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/health-insurance',
-                                    );
-                                  },
-                                  onUpcomingDeadlines: () {
-                                    Navigator.pushNamed(context, '/tasks');
-                                  },
-                                  onPRCalculator: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/pr-calculator',
-                                    );
-                                  },
-                                  onStudentFundCalculator: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/student-fund-calculator',
-                                    );
-                                  },
-                                  onOccupationSearch: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/occupation-search',
-                                    );
-                                  },
-                                  onPostCodeChecker: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/post-code-checker',
-                                    );
-                                  },
-                                  onImportantLinks:
-                                      () => {
+                          color: Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildRecentUpdatesSection(),
+                              const SizedBox(height: 24),
+                              Padding(
+                                padding: AppResponsive.pagePadding(context),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    QuickActionsCard(
+                                      onBookAppointment: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    const BookLocationScreen(),
+                                          ),
+                                        );
+                                      },
+                                      onHealthInsurance: () {
                                         Navigator.pushNamed(
                                           context,
-                                          '/important-links',
-                                        ),
+                                          '/health-insurance',
+                                        );
                                       },
-                                  onEnglishRequirement:
-                                      () => {
+                                      onUpcomingDeadlines: () {
+                                        Navigator.pushNamed(context, '/tasks');
+                                      },
+                                      onPRCalculator: () {
                                         Navigator.pushNamed(
                                           context,
-                                          '/english-requirements',
-                                        ),
+                                          '/pr-calculator',
+                                        );
                                       },
-                                  onVACSearch:
-                                      () => {
+                                      onStudentFundCalculator: () {
                                         Navigator.pushNamed(
                                           context,
-                                          '/vac-search',
-                                        ),
+                                          '/student-fund-calculator',
+                                        );
                                       },
+                                      onOccupationSearch: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/occupation-search',
+                                        );
+                                      },
+                                      onPostCodeChecker: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/post-code-checker',
+                                        );
+                                      },
+                                      onImportantLinks:
+                                          () => {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/important-links',
+                                            ),
+                                          },
+                                      onEnglishRequirement:
+                                          () => {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/english-requirements',
+                                            ),
+                                          },
+                                      onVACSearch:
+                                          () => {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/vac-search',
+                                            ),
+                                          },
+                                    ),
+                                    const SizedBox(height: 24),
+                                  ],
                                 ),
-                                const SizedBox(height: 24),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
                         ),
                       ),
                     ),
@@ -404,7 +407,9 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: AppResponsive.horizontalPadding(context).copyWith(top: isDesktop ? 24 : 8),
+          padding: AppResponsive.horizontalPadding(
+            context,
+          ).copyWith(top: isDesktop ? 24 : 8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -434,7 +439,28 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
               ),
               const Spacer(),
               TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/blogs'),
+                onPressed:
+                    () => {
+                      if (AuthService.isAuthenticated)
+                        Navigator.pushNamed(context, '/blogs')
+                      else
+                        {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            barrierColor: Colors.black.withOpacity(0.4),
+                            builder: (context) {
+                              return BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                                child: LoginSignupDialog(
+                                  parentContext: context,
+                                  onCancel: () {},
+                                ),
+                              );
+                            },
+                          ),
+                        },
+                    },
                 child: const Text("View all"),
               ),
             ],
@@ -490,11 +516,8 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
                             image: DecorationImage(
-                              image: NetworkImage(
-                                blog.image,
-                              ),
+                              image: NetworkImage(blog.image),
                               fit: BoxFit.cover,
-                              alignment: Alignment.center,
                             ),
                           ),
                           child: ClipRRect(
@@ -693,7 +716,24 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/recent-activity');
+                  if (AuthService.isAuthenticated) {
+                    Navigator.pushNamed(context, '/recent-activity');
+                  } else {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      barrierColor: Colors.black.withOpacity(0.4),
+                      builder: (context) {
+                        return BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                          child: LoginSignupDialog(
+                            parentContext: context,
+                            onCancel: () {},
+                          ),
+                        );
+                      },
+                    );
+                  }
                 },
                 child: const Text(
                   'View All',

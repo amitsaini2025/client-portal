@@ -281,7 +281,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                     crossAxisCount: cols,
                     crossAxisSpacing: 20,
                     mainAxisSpacing: 20,
-                    childAspectRatio: 1.1, // ✅ FIXED
+                    childAspectRatio: 1.1,
                   ),
                   itemCount:
                   _blogs.length + (_isLoading ? 1 : 0),
