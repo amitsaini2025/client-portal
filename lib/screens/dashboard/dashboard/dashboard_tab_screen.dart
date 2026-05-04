@@ -494,6 +494,7 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                                 blog.image,
                               ),
                               fit: BoxFit.cover,
+                              alignment: Alignment.center,
                             ),
                           ),
                           child: ClipRRect(

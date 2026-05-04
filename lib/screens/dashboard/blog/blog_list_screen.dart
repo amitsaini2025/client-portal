@@ -74,7 +74,6 @@ class _BlogListScreenState extends State<BlogListScreen> {
 
   Widget _buildBlogCard(Blog blog) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -82,7 +81,6 @@ class _BlogListScreenState extends State<BlogListScreen> {
           BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12),
         ],
       ),
-
       child: GestureDetector(
         onTap: () {
           Navigator.pushNamed(
@@ -95,20 +93,20 @@ class _BlogListScreenState extends State<BlogListScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
-                  ),
-                  child: Image.network(
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+              child: Stack(
+                children: [
+                  Image.network(
                     blog.image,
-                    height: 180,
+                    height: 160,
                     width: double.infinity,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        height: 180,
+                        height: 160,
                         width: double.infinity,
                         color: Colors.grey[300],
                         child: Icon(
@@ -121,90 +119,102 @@ class _BlogListScreenState extends State<BlogListScreen> {
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return Container(
-                        height: 180,
+                        height: 160,
                         width: double.infinity,
                         color: Colors.grey[200],
                         child: Center(
                           child: CircularProgressIndicator(
                             value:
-                                loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
+                            loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                                : null,
                           ),
                         ),
                       );
                     },
                   ),
-                ),
-                if (blog.featured)
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade100,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.star, size: 14, color: Colors.orange),
-                          SizedBox(width: 4),
-                          Text(
-                            "Featured",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                  if (blog.featured)
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade100,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.star, size: 12, color: Colors.orange),
+                            SizedBox(width: 4),
+                            Text(
+                              "Featured",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    blog.date,
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    blog.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    blog.description,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text(
-                        "By ${blog.author}",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
                 ],
+              ),
+            ),
+
+            // Content (FIXED)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      blog.date,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+
+                    Text(
+                      blog.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    Text(
+                      blog.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    Text(
+                      "By ${blog.author}",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -224,47 +234,68 @@ class _BlogListScreenState extends State<BlogListScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
+          ),
           child: _blogs.isEmpty && _isLoading
               ? const Center(child: CircularProgressIndicator())
               : RefreshIndicator(
-                onRefresh: _onRefresh,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final cols = AppResponsive.gridColumns(
-                      context,
-                      mobile: 1,
-                      tablet: 2,
-                      desktop: 3,
-                    );
-                    if (cols == 1) {
-                      return ListView.builder(
-                        controller: _scrollController,
-                        itemCount: _blogs.length + (_isLoading ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index < _blogs.length) return _buildBlogCard(_blogs[index]);
-                          return const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(child: CircularProgressIndicator()),
-                          );
-                        },
+            onRefresh: _onRefresh,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final cols = AppResponsive.gridColumns(
+                  context,
+                  mobile: 1,
+                  tablet: 2,
+                  desktop: 3,
+                );
+
+                if (cols == 1) {
+                  return ListView.builder(
+                    controller: _scrollController,
+                    itemCount:
+                    _blogs.length + (_isLoading ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index < _blogs.length) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          child: _buildBlogCard(_blogs[index]),
+                        );
+                      }
+                      return const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(
+                            child: CircularProgressIndicator()),
                       );
+                    },
+                  );
+                }
+
+                return GridView.builder(
+                  controller: _scrollController,
+                  padding:
+                  AppResponsive.pagePadding(context),
+                  gridDelegate:
+                  SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: cols,
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                    childAspectRatio: 1.1, // ✅ FIXED
+                  ),
+                  itemCount:
+                  _blogs.length + (_isLoading ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index < _blogs.length) {
+                      return _buildBlogCard(_blogs[index]);
                     }
-                    return GridView.builder(
-                      controller: _scrollController,
-                      padding: AppResponsive.pagePadding(context),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: cols,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 1.5,
-                      ),
-                      itemCount: _blogs.length,
-                      itemBuilder: (context, index) => _buildBlogCard(_blogs[index]),
-                    );
+                    return const Center(
+                        child: CircularProgressIndicator());
                   },
-                ),
-              ),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );
