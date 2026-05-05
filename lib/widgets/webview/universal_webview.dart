@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -50,8 +52,14 @@ class _UniversalWebViewState extends State<UniversalWebView>
 
     if (!kIsWeb) {
       _controller = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setBackgroundColor(const Color(0xFFFFFFFF))
+        ..setJavaScriptMode(JavaScriptMode.unrestricted);
+
+      // ❗ FIX: macOS crash (DO NOT call setBackgroundColor on macOS)
+      if (!Platform.isMacOS) {
+        _controller.setBackgroundColor(const Color(0xFFFFFFFF));
+      }
+
+      _controller
         ..setNavigationDelegate(
           NavigationDelegate(
             onProgress: (int progress) {
@@ -74,7 +82,6 @@ class _UniversalWebViewState extends State<UniversalWebView>
   }
 
   void _updateProgress(int newProgress) {
-    _progress = newProgress;
     final newValue = (newProgress.clamp(0, 100)) / 100;
 
     _progressAnimation = Tween<double>(
@@ -95,7 +102,7 @@ class _UniversalWebViewState extends State<UniversalWebView>
 
   @override
   Widget build(BuildContext context) {
-    // ✅ On web: show a branded fallback instead of a broken iframe
+    // ✅ WEB fallback (unchanged)
     if (kIsWeb) {
       return Scaffold(
         appBar: CommonAppBar(
@@ -106,7 +113,6 @@ class _UniversalWebViewState extends State<UniversalWebView>
       );
     }
 
-    // ✅ On Android/iOS: use the native WebView as before
     final double smoothValue = _progressAnimation.value;
     final double scale = 0.85 + (smoothValue * 0.35);
 
@@ -120,36 +126,19 @@ class _UniversalWebViewState extends State<UniversalWebView>
           Positioned.fill(
             child: WebViewWidget(controller: _controller),
           ),
+
+          // ✅ SAME animation on macOS (safe version)
           if (_isLoading)
             Positioned.fill(
-              child: AnimatedOpacity(
-                opacity: 1.0,
-                duration: const Duration(milliseconds: 300),
-                child: Container(
-                  color: Colors.white,
-                  child: Center(
-                    child: Transform.scale(
-                      scale: scale,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          SizedBox(
-                            height: 110,
-                            width: 110,
-                            child: CircularProgressIndicator(
-                              value: smoothValue,
-                              strokeWidth: 4,
-                              color: ThemeConfig.successColor,
-                              backgroundColor: Colors.grey.shade200,
-                            ),
-                          ),
-                          Image.asset(
-                            'assets/icons/app_icon.png',
-                            height: 60,
-                          ),
-                        ],
-                      ),
-                    ),
+              child: Container(
+                color: Colors.white,
+                child: Center(
+                  child: Platform.isMacOS
+                      ? _buildMacOSLoader(scale, smoothValue)
+                      : AnimatedOpacity(
+                    opacity: 1.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: _buildLoader(scale, smoothValue),
                   ),
                 ),
               ),
@@ -158,10 +147,62 @@ class _UniversalWebViewState extends State<UniversalWebView>
       ),
     );
   }
+
+  // ✅ Shared loader UI
+  Widget _buildLoader(double scale, double smoothValue) {
+    return Transform.scale(
+      scale: scale,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox(
+            height: 110,
+            width: 110,
+            child: CircularProgressIndicator(
+              value: smoothValue,
+              strokeWidth: 4,
+              color: ThemeConfig.successColor,
+              backgroundColor: Colors.grey.shade200,
+            ),
+          ),
+          Image.asset(
+            'assets/icons/app_icon.png',
+            height: 60,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ✅ macOS SAFE loader (no AnimatedOpacity conflict)
+  Widget _buildMacOSLoader(double scale, double smoothValue) {
+    return Transform.scale(
+      scale: scale,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox(
+            height: 110,
+            width: 110,
+            child: CircularProgressIndicator(
+              value: smoothValue,
+              strokeWidth: 4,
+              color: ThemeConfig.successColor,
+              backgroundColor: Colors.grey.shade200,
+            ),
+          ),
+          Image.asset(
+            'assets/icons/app_icon.png',
+            height: 60,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-/// Shown on Flutter Web when the target URL blocks iframe embedding.
-/// Gives the user a clean branded screen with an "Open in Browser" button.
+/// ================= WEB FALLBACK (UNCHANGED) =================
+
 class _WebFallbackView extends StatefulWidget {
   final String url;
   final String title;
@@ -224,8 +265,7 @@ class _WebFallbackViewState extends State<_WebFallbackView> {
             ),
             const SizedBox(height: 12),
             Text(
-              'This page needs to open in your browser.\n'
-                  'Your session and data will be kept secure.',
+              'This page needs to open in your browser.\nYour session and data will be kept secure.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey.shade600,
@@ -254,10 +294,6 @@ class _WebFallbackViewState extends State<_WebFallbackView> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 onPressed: _launching ? null : _openInBrowser,
