@@ -91,6 +91,84 @@ class StripeService {
     return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
+  static final Uri _checkoutSessionUri = Uri.parse('${ApiConfig.baseUrl}/payments/create-checkout-session');
+
+  static Future<Map<String, dynamic>> createCheckoutSession({
+    required dynamic amount,
+    required String currency,
+    required String serviceName,
+    required String customerEmail,
+  }) async {
+    final authToken = await AuthManager.getAuthToken();
+
+    final Map<String, dynamic> payload = {
+      'amount': amount,
+      'currency': currency,
+      'service_name': serviceName,
+      'customer_email': customerEmail,
+    };
+
+    final response = await http
+        .post(
+      _checkoutSessionUri,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        if (authToken != null) 'Authorization': 'Bearer $authToken',
+      },
+      body: jsonEncode(payload),
+    )
+        .timeout(
+      StripeConfig.paymentTimeout,
+      onTimeout: () {
+        throw Exception('Checkout session request timed out.');
+      },
+    );
+
+    debugPrint('STATUS: ${response.statusCode}');
+    debugPrint('BODY: ${response.body}');
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('Unable to create checkout session.');
+    }
+
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+
+  static final Uri _verifyCheckoutSessionUri = Uri.parse('${ApiConfig.baseUrl}/payments/checkout-session');
+
+  static Future<Map<String, dynamic>> verifyCheckoutSession({
+    required String sessionId,
+  }) async {
+    final authToken = await AuthManager.getAuthToken();
+
+    final response = await http
+        .get(
+      Uri.parse('${ApiConfig.baseUrl}/payments/checkout-session/$sessionId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        if (authToken != null) 'Authorization': 'Bearer $authToken',
+      },
+    )
+        .timeout(
+      StripeConfig.paymentTimeout,
+      onTimeout: () {
+        throw Exception('Verification request timed out.');
+      },
+    );
+
+    debugPrint('VERIFY STATUS: ${response.statusCode}');
+    debugPrint('VERIFY BODY: ${response.body}');
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('Unable to verify payment.');
+    }
+
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
 
   /*static Future<Map<String, dynamic>> createPaymentIntent({
     required int amountInMinorUnit,
