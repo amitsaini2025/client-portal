@@ -378,7 +378,10 @@ class MyAppWithTheme extends StatelessWidget {
             '/register': (context) => const RegisterScreen(),
             '/forgot-password': (context) => const ForgotPasswordScreen(),
             '/reset-password': (context) => const ResetPasswordScreen(),
-            '/matters': (context) => const MattersScreen(),
+            '/matters': (context) {
+              final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+              return MattersScreen(isFromFiles: args?['from_my_files'] ?? false,);
+            },
             '/dashboard': (context) {
               final args = ModalRoute.of(context)?.settings.arguments;
               return DashboardScreen(matterId: args as String?);
@@ -515,7 +518,7 @@ class AuthWrapper extends StatelessWidget {
               if (cpStatus == 2) {
                 return DashboardScreen(matterId: null);
               } else {
-                return const MattersScreen();
+                return const MattersScreen(isFromFiles: false,);
               }
             }
           } else {

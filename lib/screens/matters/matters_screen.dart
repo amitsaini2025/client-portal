@@ -5,7 +5,8 @@ import '../../config/theme_config.dart';
 import '../../utils/responsive_utils.dart';
 
 class MattersScreen extends StatefulWidget {
-  const MattersScreen({super.key});
+  final bool? isFromFiles;
+  const MattersScreen({super.key, required this.isFromFiles});
 
   @override
   State<MattersScreen> createState() => _MattersScreenState();
@@ -38,13 +39,16 @@ class _MattersScreenState extends State<MattersScreen> {
       arguments: AuthService.selectedMatterId.toString(),
     );*/
 
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/dashboard',
-          (route) => false,
-      arguments: AuthService.selectedMatterId.toString(),
-    );
-
+    if (widget.isFromFiles == true) {
+      Navigator.pop(context);
+    } else {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/dashboard',
+            (route) => false,
+        arguments: AuthService.selectedMatterId.toString(),
+      );
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -58,6 +62,9 @@ class _MattersScreenState extends State<MattersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments as Map?;
+    final bool fromMyFiles = args?['fromMyFiles'] == true;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(

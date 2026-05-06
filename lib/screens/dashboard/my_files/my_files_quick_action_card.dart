@@ -157,7 +157,13 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      Navigator.pushNamed(context, '/matters');
+                      Navigator.pushNamed(
+                        context,
+                        '/matters',
+                        arguments: {
+                          'from_my_files': true,
+                        },
+                      );
                     },
                     child: const Text("Yes"),
                   ),
