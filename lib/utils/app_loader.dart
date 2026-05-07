@@ -1,9 +1,11 @@
 import 'dart:io';
+
+import 'package:flutter/foundation.dart'; // ✅ replaces dart:io
 import 'package:flutter/material.dart';
 import '../config/theme_config.dart';
 
 class AppLoader extends StatelessWidget {
-  final double size;        // 👈 main control
+  final double size;
   final double scale;
   final double? value;
   final bool isOverlay;
@@ -46,7 +48,7 @@ class AppLoader extends StatelessWidget {
       ),
     );
 
-    if (!Platform.isMacOS && animate) {
+    if (!kIsWeb && !Platform.isMacOS && animate) {
       loader = AnimatedOpacity(
         opacity: 1.0,
         duration: const Duration(milliseconds: 300),
