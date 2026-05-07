@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/workflow_stage.dart';
+import '../../utils/app_loader.dart';
 
 class WorkflowProgressCard extends StatelessWidget {
   final WorkflowStagesResponse? workflowResponse;
@@ -200,7 +201,7 @@ class WorkflowProgressCard extends StatelessWidget {
       child: Column(
         children: const [
           SizedBox(height: 4),
-          CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF9B000)), strokeWidth: 2),
+          AppLoader(),
           SizedBox(height: 8),
           Text('Loading workflow progress...', style: TextStyle(color: Colors.white70, fontSize: 10)),
         ],

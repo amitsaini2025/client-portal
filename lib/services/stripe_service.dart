@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/stripe_config.dart';
+import '../utils/app_loader.dart';
 
 class AuthManager {
   static Future<void> saveAuthToken(String token) async {
@@ -358,10 +359,7 @@ class _StripeWebPaymentDialogState extends State<_StripeWebPaymentDialog> {
               ? const SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
+                  child: AppLoader(),
                 )
               : const Text('Pay'),
         ),

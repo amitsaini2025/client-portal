@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../config/theme_config.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 
 class MattersScreen extends StatefulWidget {
@@ -88,7 +89,7 @@ class _MattersScreenState extends State<MattersScreen> {
         future: _mattersFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: AppLoader());
           } else if (snapshot.hasError) {
             return Center(
               child: Text(

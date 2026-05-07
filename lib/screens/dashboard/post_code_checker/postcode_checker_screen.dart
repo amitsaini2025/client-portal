@@ -5,6 +5,7 @@ import '../../../config/theme_config.dart';
 import '../../../models/post_code_checker/postcode_result.dart';
 import '../../../models/post_code_checker/postcode_search_item.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
@@ -85,7 +86,7 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
               _buildSearchField(),
               if (suggestions.isNotEmpty) _buildSuggestions(),
               const SizedBox(height: 16),
-              if (loading) const Center(child: CircularProgressIndicator()),
+              if (loading) const Center(child: AppLoader()),
               if (result != null) _buildResultCard(),
               /*const SizedBox(height: 24),
               _buildInfoBox(),*/

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../config/theme_config.dart';
@@ -172,7 +173,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: AppLoader())
           : error != null
           ? Center(child: Text(error!))
           : ListView.builder(

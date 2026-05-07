@@ -1,3 +1,4 @@
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/api_service.dart';
@@ -156,7 +157,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.white))
+          ? const Center(child: AppLoader())
           : SingleChildScrollView(
         padding: AppResponsive.pagePadding(context),
         child: Form(
@@ -250,10 +251,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                       ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
+                    child: AppLoader(),
                   )
                       : const Icon(Icons.event_available),
                   label: Text(_isSaving ? 'Booking...' : 'Book Appointment'),

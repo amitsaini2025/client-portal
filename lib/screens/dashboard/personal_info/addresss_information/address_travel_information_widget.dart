@@ -11,6 +11,7 @@ import '../../../../models/personal_information/address.dart';
 import '../../../../models/personal_information/basic_information_post/country/country_model.dart';
 import '../../../../models/personal_information/travel.dart';
 import '../../../../services/api_service.dart';
+import '../../../../utils/app_loader.dart';
 
 class AddressAndTravelInformationWidget extends StatefulWidget {
   final List<Address> addresses;
@@ -677,7 +678,7 @@ class _AddressAndTravelInformationWidgetState
                 loadingBuilder:
                     (context) => const Padding(
                       padding: EdgeInsets.all(8),
-                      child: CircularProgressIndicator(),
+                      child: AppLoader(),
                     ),
               ),
             ),

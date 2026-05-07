@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import '../../../models/notification/notification.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 
 class NotificationDetailScreen extends StatefulWidget {
@@ -117,7 +118,7 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: AppLoader())
           : error != null
           ? Center(
         child: Text(

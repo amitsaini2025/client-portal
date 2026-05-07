@@ -14,6 +14,7 @@ import 'package:client/screens/dashboard/personal_info/occupation_skills/occupat
 
 import '../../../models/personal_information/basic_information_post/visa_types/visa_type.dart';
 import '../../../models/personal_information/client_personal_detail_response.dart';
+import '../../../utils/app_loader.dart';
 
 class PersonalInformationScreen extends StatefulWidget {
   const PersonalInformationScreen({super.key});
@@ -115,10 +116,7 @@ class _PersonalInformationScreenState
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(
-                    color: ThemeConfig.goldenYellow,
-                    strokeWidth: 3,
-                  ),
+                  AppLoader(),
                   const SizedBox(height: 16),
                   Text(
                     'Loading personal information...',

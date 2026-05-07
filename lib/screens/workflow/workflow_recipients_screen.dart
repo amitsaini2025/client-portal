@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 
 class WorkflowRecipientsScreen extends StatefulWidget {
@@ -64,7 +65,7 @@ class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: AppLoader())
           : _error != null
           ? _buildErrorWidget(_error!, _loadChatRecipients)
           : RefreshIndicator(

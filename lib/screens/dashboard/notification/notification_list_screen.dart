@@ -6,6 +6,7 @@ import '../../../config/theme_config.dart';
 import '../../../models/notification/notification.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../workflow/message/workflow_messages_screen.dart';
 import '../../workflow/workflow_stages_screen.dart';
@@ -129,7 +130,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             onRefresh: _refresh,
             child:
                 isLoading && notifications.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const Center(child: AppLoader())
                     : notifications.isEmpty
                     ? Center(
                       child: Text(
@@ -149,7 +150,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                         if (index == notifications.length) {
                           return const Padding(
                             padding: EdgeInsets.all(16),
-                            child: Center(child: CircularProgressIndicator()),
+                            child: Center(child: AppLoader()),
                           );
                         }
 

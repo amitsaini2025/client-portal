@@ -1,3 +1,4 @@
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/appointment.dart';
@@ -231,7 +232,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           // Appointments List
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: AppLoader())
                 : _errorMessage != null
                     ? Center(
                         child: Column(

@@ -4,6 +4,8 @@ import 'package:client/utils/responsive_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../utils/app_loader.dart';
+
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
@@ -213,7 +215,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: AppResponsive.maxFormWidth),
             child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(child: AppLoader())
             : _loadError != null
             ? _ErrorState(message: _loadError!, onRetry: _fetchProfile)
             : GestureDetector(
@@ -268,13 +270,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ? const SizedBox(
                         height: 18,
                         width: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor:
-                          AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
+                        child: AppLoader(),
                       )
                           : const Icon(Icons.save),
                       label: Text(

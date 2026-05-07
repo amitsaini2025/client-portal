@@ -7,6 +7,7 @@ import '../../config/theme_config.dart';
 import '../../models/workflow_checklist.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 
 class WorkflowDocumentsScreen extends StatefulWidget {
@@ -165,7 +166,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
 
   Widget _buildContent() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: AppLoader());
     }
 
     if (_errorMessage != null) {
@@ -304,7 +305,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
                     ? const SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: AppLoader(),
                 )
                     : const Icon(Icons.upload_file),
                 label:

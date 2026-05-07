@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:client/services/api_service_bansal_immigration.dart';
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:http/http.dart' as http;
@@ -62,7 +63,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: AppLoader())
               : blog == null
               ? const Center(child: Text('Blog not found'))
               : SingleChildScrollView(
@@ -99,7 +100,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
                               height: double.infinity,
                               color: Colors.grey[200],
                               alignment: Alignment.center,
-                              child: const CircularProgressIndicator(),
+                              child: const AppLoader(),
                             );
                           },
                         ),

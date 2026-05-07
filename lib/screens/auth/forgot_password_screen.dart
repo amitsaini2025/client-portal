@@ -1,3 +1,4 @@
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/theme_config.dart';
@@ -182,12 +183,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   ? const SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
-                                    ),
+                                    child: AppLoader(),
                                   )
                                   : const Text(
                                     'Send Code',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
@@ -63,7 +64,7 @@ class _StudentFundCalculatorScreenState
         matterID: AuthService.selectedMatterId,
       ),
       body: loading || data == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: AppLoader())
           : SingleChildScrollView(
         padding: AppResponsive.pagePadding(context),
         child: Center(
@@ -291,7 +292,7 @@ class _StudentFundCalculatorScreenState
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(child: AppLoader()),
     );
 
     try {

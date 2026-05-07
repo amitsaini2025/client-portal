@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../config/theme_config.dart';
 import '../../models/new/task.dart';
 import '../../services/api_service.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 
 class TasksScreen extends StatefulWidget {
@@ -252,7 +253,7 @@ class _TasksScreenState extends State<TasksScreen> {
   Widget _buildTaskList() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: ThemeConfig.goldenYellow),
+        child: AppLoader(),
       );
     }
 

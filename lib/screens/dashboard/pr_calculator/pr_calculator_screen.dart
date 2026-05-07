@@ -4,6 +4,7 @@ import '../../../services/api_service.dart';
 import 'package:client/models/pr_points_response.dart';
 
 import '../../../services/auth_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 
@@ -72,7 +73,7 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
         matterID: AuthService.selectedMatterId,
       ),
       body: loading || data == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: AppLoader())
           : SingleChildScrollView(
         padding: AppResponsive.pagePadding(context),
         child: Center(
@@ -429,7 +430,7 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(child: AppLoader()),
     );
 
     try {

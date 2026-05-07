@@ -1,3 +1,4 @@
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -213,7 +214,7 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: AppLoader())
               : _items.isEmpty
               ? const Center(child: Text("No action required"))
               : RefreshIndicator(
@@ -227,7 +228,7 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.all(16),
-                          child: CircularProgressIndicator(),
+                          child: AppLoader(),
                         ),
                       );
                     }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../models/visa_search/visa_model.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
 import 'visa_estimate_screen.dart';
@@ -112,7 +113,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
               if (loading)
                 const Padding(
                   padding: EdgeInsets.only(top: 20),
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: AppLoader()),
                 ),
             ],
           ),

@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../config/theme_config.dart';
 import '../../models/new/allowed_checklist.dart';
 import '../../services/api_service.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 import '../../services/auth_service.dart';
 
@@ -317,7 +318,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: AppLoader())
           : Column(
         children: [
           const SizedBox(height: 10),
@@ -340,9 +341,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
                   backgroundColor: ThemeConfig.goldenYellow,
                 ),
                 child: _isUploading
-                    ? const CircularProgressIndicator(
-                  color: Colors.white,
-                )
+                    ? const AppLoader()
                     : const Text(
                   "Upload Documents",
                   style: TextStyle(fontWeight: FontWeight.bold),

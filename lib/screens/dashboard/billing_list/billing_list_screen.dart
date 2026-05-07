@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
@@ -255,7 +256,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
           _buildSummary(),
           Expanded(
             child: _isInitialLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: AppLoader())
                 : ListView.builder(
               controller: _scrollController,
               padding: AppResponsive.pagePadding(context),
@@ -413,7 +414,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
                   onPressed:
                   isProcessing ? null : () => _handleStripePayment(invoice),
                   child: isProcessing
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const AppLoader()
                       : const Text("Pay with Stripe"),
                 ),
               ),

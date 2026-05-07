@@ -1,4 +1,5 @@
 import 'package:client/services/api_service_bansal_immigration.dart';
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 
 import '../../../config/theme_config.dart';
@@ -123,13 +124,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                         width: double.infinity,
                         color: Colors.grey[200],
                         child: Center(
-                          child: CircularProgressIndicator(
-                            value:
-                            loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
+                          child: AppLoader(),
                         ),
                       );
                     },
@@ -238,7 +233,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
             maxWidth: AppResponsive.maxContentWidth,
           ),
           child: _blogs.isEmpty && _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: AppLoader())
               : RefreshIndicator(
             onRefresh: _onRefresh,
             child: LayoutBuilder(
@@ -266,7 +261,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                       return const Padding(
                         padding: EdgeInsets.all(16),
                         child: Center(
-                            child: CircularProgressIndicator()),
+                            child: AppLoader()),
                       );
                     },
                   );
@@ -290,7 +285,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                       return _buildBlogCard(_blogs[index]);
                     }
                     return const Center(
-                        child: CircularProgressIndicator());
+                        child: AppLoader());
                   },
                 );
               },

@@ -13,6 +13,7 @@ import '../../../models/workflow_message.dart' hide Attachment;
 import '../../../models/workflow_send_message_response.dart' hide Recipient;
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../utils/revert_socket_service.dart';
 import '../../../widgets/common_app_bar.dart';
@@ -448,26 +449,25 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       backgroundColor: const Color(0xFFF5F5F5),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: _isLoading
-              ? Center(
-                child: CircularProgressIndicator(
-                  color: ThemeConfig.goldenYellow,
-                ),
-              )
-              : _error != null
-              ? _buildErrorWidget(_error!)
-              : Column(
-                children: [
-                  Expanded(
-                    child:
-                        _messages.isEmpty
-                            ? _buildEmptyWidget()
-                            : _buildMessageList(),
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
+          ),
+          child:
+              _isLoading
+                  ? Center(child: AppLoader())
+                  : _error != null
+                  ? _buildErrorWidget(_error!)
+                  : Column(
+                    children: [
+                      Expanded(
+                        child:
+                            _messages.isEmpty
+                                ? _buildEmptyWidget()
+                                : _buildMessageList(),
+                      ),
+                      _buildMessageInput(),
+                    ],
                   ),
-                  _buildMessageInput(),
-                ],
-              ),
         ),
       ),
     );
@@ -554,10 +554,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                       ? const SizedBox(
                         width: 18,
                         height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
+                        child: AppLoader(size: 20),
                       )
                       : IconButton(
                         icon: const Icon(
@@ -586,7 +583,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
           if (index >= _messages.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
-              child: Center(child: CircularProgressIndicator()),
+              child: Center(child: AppLoader()),
             );
           }
 

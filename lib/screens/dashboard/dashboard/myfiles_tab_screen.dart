@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:client/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 
 import '../../../main.dart';
@@ -517,7 +518,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: AppLoader());
     }
 
     final isDesktop = AppResponsive.isDesktop(context);

@@ -1,3 +1,4 @@
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
@@ -58,7 +59,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: AppLoader())
           : error != null
           ? Center(child: Text(error!))
           : _buildBody(),

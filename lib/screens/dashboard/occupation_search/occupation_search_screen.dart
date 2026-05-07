@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 
 class OccupationSearchScreen extends StatefulWidget {
@@ -126,7 +127,7 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
 
             const SizedBox(height: 12),
 
-            if (loading) const CircularProgressIndicator(),
+            if (loading) const AppLoader(),
 
             if (details != null && !loading)
               Expanded(child: SingleChildScrollView(child: _buildTable())),

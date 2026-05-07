@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../models/appointment/appointment_variable_list.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/cache_helper.dart';
 import 'book_details_screen.dart';
 import 'booking_widget.dart';
@@ -81,7 +82,7 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
       title: 'Select Your Service',
       child:
           isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: AppLoader())
               : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

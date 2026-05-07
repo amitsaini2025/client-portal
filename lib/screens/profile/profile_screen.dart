@@ -2,6 +2,7 @@ import 'package:client/config/theme_config.dart';
 import 'package:flutter/material.dart';
 import 'package:client/services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -230,9 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Padding(
               padding: AppResponsive.pagePadding(context),
               child: _isLoading
-                  ? const CircularProgressIndicator(
-                color: ThemeConfig.goldenYellow,
-              )
+                  ? const AppLoader()
                   : _errorMessage != null
                   ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,

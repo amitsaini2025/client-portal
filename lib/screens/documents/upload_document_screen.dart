@@ -1,13 +1,15 @@
 import 'dart:typed_data';
 
+import 'package:client/config/theme_config.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:client/config/theme_config.dart';
+
 import '../../models/new/allowed_checklist.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 
 class UploadDocumentScreen extends StatefulWidget {
@@ -86,7 +88,10 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.folder, color: Colors.black),
-                title: const Text('My Files', style: TextStyle(color: Colors.black)),
+                title: const Text(
+                  'My Files',
+                  style: TextStyle(color: Colors.black),
+                ),
                 onTap: () async {
                   Navigator.of(context).pop();
                   await _pickFromFiles();
@@ -94,7 +99,10 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.photo, color: Colors.black),
-                title: const Text('Gallery', style: TextStyle(color: Colors.black)),
+                title: const Text(
+                  'Gallery',
+                  style: TextStyle(color: Colors.black),
+                ),
                 onTap: () async {
                   Navigator.of(context).pop();
                   await _pickFromGallery();
@@ -103,7 +111,10 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
               if (!kIsWeb)
                 ListTile(
                   leading: const Icon(Icons.camera_alt, color: Colors.black),
-                  title: const Text('Camera', style: TextStyle(color: Colors.black)),
+                  title: const Text(
+                    'Camera',
+                    style: TextStyle(color: Colors.black),
+                  ),
                   onTap: () async {
                     Navigator.of(context).pop();
                     await _pickFromCamera();
@@ -120,15 +131,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: [
-          'pdf',
-          'doc',
-          'docx',
-          'jpg',
-          'jpeg',
-          'png',
-          'gif'
-        ],
+        allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'gif'],
         allowMultiple: false,
         withData: true,
       );
@@ -149,7 +152,9 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
 
   Future<void> _pickFromGallery() async {
     try {
-      final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+      );
       if (image != null) {
         final bytes = await image.readAsBytes();
         setState(() {
@@ -164,7 +169,9 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
 
   Future<void> _pickFromCamera() async {
     try {
-      final XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+      );
       if (image != null) {
         final bytes = await image.readAsBytes();
         setState(() {
@@ -240,50 +247,53 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: _isLoading
-          ? const Center(
-        child: CircularProgressIndicator(color: ThemeConfig.goldenYellow),
-      )
-          : SingleChildScrollView(
-        padding: AppResponsive.pagePadding(context),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              _buildFilePicker(),
-              const SizedBox(height: 24),
-              _buildDocumentDetails(context),
-              const SizedBox(height: 24),
-              SizedBox(
-                height: 56,
-                child: ElevatedButton.icon(
-                  onPressed: _isUploading ? null : _uploadDocument,
-                  icon: _isUploading
-                      ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white),
-                  )
-                      : const Icon(Icons.upload),
-                  label: Text(
-                    _isUploading ? 'Uploading...' : 'Upload Document',
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeConfig.goldenYellow,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
+          ),
+          child:
+              _isLoading
+                  ? const Center(child: AppLoader())
+                  : SingleChildScrollView(
+                    padding: AppResponsive.pagePadding(context),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          _buildFilePicker(),
+                          const SizedBox(height: 24),
+                          _buildDocumentDetails(context),
+                          const SizedBox(height: 24),
+                          SizedBox(
+                            height: 56,
+                            child: ElevatedButton.icon(
+                              onPressed: _isUploading ? null : _uploadDocument,
+                              icon:
+                                  _isUploading
+                                      ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: AppLoader(),
+                                      )
+                                      : const Icon(Icons.upload),
+                              label: Text(
+                                _isUploading
+                                    ? 'Uploading...'
+                                    : 'Upload Document',
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ThemeConfig.goldenYellow,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                minimumSize: const Size(double.infinity, 50),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    minimumSize: const Size(double.infinity, 50),
                   ),
-                ),
-              ),
-            ],
-          ),
-        ),
-          ),
         ),
       ),
     );
@@ -300,11 +310,12 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Select Document',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(color: Colors.black)),
+          Text(
+            'Select Document',
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: Colors.black),
+          ),
           const SizedBox(height: 16),
           if (_selectedFileBytes == null)
             GestureDetector(
@@ -320,11 +331,16 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 ),
                 child: Column(
                   children: [
-                    const Icon(Icons.cloud_upload_outlined,
-                        size: 48, color: Colors.black),
+                    const Icon(
+                      Icons.cloud_upload_outlined,
+                      size: 48,
+                      color: Colors.black,
+                    ),
                     const SizedBox(height: 12),
-                    Text('Tap to select a file',
-                        style: TextStyle(color: ThemeConfig.goldenYellow)),
+                    Text(
+                      'Tap to select a file',
+                      style: TextStyle(color: ThemeConfig.goldenYellow),
+                    ),
                   ],
                 ),
               ),
@@ -335,16 +351,18 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 const Icon(Icons.attach_file, color: Colors.green),
                 const SizedBox(width: 12),
                 Expanded(
-                    child: Text(
-                      _selectedFileName ?? '',
-                      style: const TextStyle(color: Colors.black),
-                    )),
+                  child: Text(
+                    _selectedFileName ?? '',
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
                 IconButton(
                   icon: const Icon(Icons.close, color: Colors.red),
-                  onPressed: () => setState(() {
-                    _selectedFileBytes = null;
-                    _selectedFileName = null;
-                  }),
+                  onPressed:
+                      () => setState(() {
+                        _selectedFileBytes = null;
+                        _selectedFileName = null;
+                      }),
                 ),
               ],
             ),
@@ -364,11 +382,12 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Document Details',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(color: Colors.black)),
+          Text(
+            'Document Details',
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: Colors.black),
+          ),
           const SizedBox(height: 20),
           TextFormField(
             controller: _titleController,
@@ -381,13 +400,15 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide:
-                BorderSide(color: ThemeConfig.goldenYellow, width: 2),
+                borderSide: BorderSide(
+                  color: ThemeConfig.goldenYellow,
+                  width: 2,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Title required' : null,
+            validator:
+                (v) => v == null || v.trim().isEmpty ? 'Title required' : null,
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<int>(
@@ -400,23 +421,29 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide:
-                BorderSide(color: ThemeConfig.goldenYellow, width: 2),
+                borderSide: BorderSide(
+                  color: ThemeConfig.goldenYellow,
+                  width: 2,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
             dropdownColor: Colors.white,
             style: const TextStyle(color: Colors.black),
-            items: _checklists
-                .map((c) => DropdownMenuItem<int>(
-              value: c.id,
-              child: Text(c.checklistName,
-                  style: const TextStyle(color: Colors.black)),
-            ))
-                .toList(),
+            items:
+                _checklists
+                    .map(
+                      (c) => DropdownMenuItem<int>(
+                        value: c.id,
+                        child: Text(
+                          c.checklistName,
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    )
+                    .toList(),
             onChanged: (v) => setState(() => _selectedChecklistId = v),
-            validator: (v) =>
-            v == null ? 'Please select a checklist' : null,
+            validator: (v) => v == null ? 'Please select a checklist' : null,
           ),
         ],
       ),

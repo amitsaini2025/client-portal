@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/recent_case.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 
 class RecentCasesScreen extends StatefulWidget {
@@ -106,7 +107,7 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: _cases.isEmpty && _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: AppLoader())
           : RefreshIndicator(
         onRefresh: () async {
           setState(() {
@@ -126,7 +127,7 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
             } else {
               return const Padding(
                 padding: EdgeInsets.all(16),
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: AppLoader()),
               );
             }
           },

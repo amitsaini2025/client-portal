@@ -1,3 +1,4 @@
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:client/config/theme_config.dart';
@@ -160,9 +161,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 40),
-                    child: CircularProgressIndicator(
-                      color: ThemeConfig.goldenYellow,
-                    ),
+                    child: AppLoader(),
                   ),
                 )
               else if (error != null)
@@ -185,7 +184,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                             if (isFetchingMore)
                               const Padding(
                                 padding: EdgeInsets.all(16),
-                                child: CircularProgressIndicator(color: ThemeConfig.goldenYellow),
+                                child: AppLoader(),
                               ),
                           ],
                         );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:client/config/theme_config.dart'; // ✅ Import theme
 import '../../models/new/document_category.dart';
 import '../../services/api_service.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 
 class DocumentManagementScreen extends StatefulWidget {
@@ -163,7 +164,7 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
   }
 
   Widget _buildBody(String type) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Colors.white));
+    if (_isLoading) return const Center(child: AppLoader());
     if (_errorMessage != null) return _buildError(type);
     if (_documents.isEmpty) return _buildEmpty();
 

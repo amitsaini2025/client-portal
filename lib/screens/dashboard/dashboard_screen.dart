@@ -21,6 +21,7 @@ import '../../models/task.dart';
 import '../../models/upcoming_deadline_summary.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../widgets/common/loading_widget.dart';
@@ -489,7 +490,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           height: 140,
           child:
               _isLoadingBlogs
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(child: AppLoader())
                   : ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: _blogs.length,

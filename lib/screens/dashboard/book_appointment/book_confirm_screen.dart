@@ -8,6 +8,7 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/app_loader.dart';
 import 'booking_widget.dart';
 
 class BookConfirmScreen extends StatefulWidget {
@@ -310,7 +311,7 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
             const TimezoneBanner(),
             const SizedBox(height: 20),
             if (isLoading)
-              const Center(child: CircularProgressIndicator())
+              const Center(child: AppLoader())
             else if (error != null)
               Text(error!, style: const TextStyle(color: Colors.red))
             else
@@ -365,9 +366,7 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
                         ),
                         child:
                             isSubmitting
-                                ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
+                                ? const AppLoader()
                                 : Text(
                                   isAdd
                                       ? 'Review & Confirm'
@@ -639,7 +638,7 @@ class _CalendarSectionState extends State<CalendarSection> {
         ),
         const SizedBox(height: 16),
         loadingSlots
-            ? const CircularProgressIndicator()
+            ? const AppLoader()
             : GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),

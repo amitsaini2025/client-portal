@@ -5,6 +5,7 @@ import '../../../config/theme_config.dart';
 import '../../../models/new/allowed_checklist.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 
 class WorkflowViewDocumentsByChecklistScreen extends StatefulWidget {
@@ -214,7 +215,7 @@ class _WorkflowViewDocumentsByChecklistScreenState
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: AppLoader())
               : _checklists.isEmpty
               ? const Center(child: Text("No documents uploaded"))
               : ListView.builder(

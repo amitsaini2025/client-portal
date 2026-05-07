@@ -1,3 +1,4 @@
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
 import 'package:intl/intl.dart';
@@ -439,7 +440,7 @@ class _BillingScreenState extends State<BillingScreen> {
           Expanded(
             child:
                 _isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const Center(child: AppLoader())
                     : _errorMessage != null
                     ? Center(
                       child: Column(
@@ -742,7 +743,7 @@ class _BillingScreenState extends State<BillingScreen> {
                     const SizedBox(
                       height: 18,
                       width: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: AppLoader(),
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -870,10 +871,7 @@ class _BillingScreenState extends State<BillingScreen> {
                                         const SizedBox(
                                           height: 18,
                                           width: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
+                                          child: AppLoader(),
                                         ),
                                         const SizedBox(width: 12),
                                         const Text('Processing...'),

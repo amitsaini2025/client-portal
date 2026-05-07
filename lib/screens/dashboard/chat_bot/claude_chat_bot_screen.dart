@@ -1,10 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 
 class ClaudeChatBotScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _ClaudeChatBotScreenState extends State<ClaudeChatBotScreen> {
       if (response['success'] == true) {
         reply =
             response['data']?['content']?[0]?['text'] ??
-                'No response received.';
+            'No response received.';
       } else {
         reply = response['message'] ?? 'Something went wrong.';
       }
@@ -120,7 +121,7 @@ class _ClaudeChatBotScreenState extends State<ClaudeChatBotScreen> {
             child: IconButton(
               icon: const Icon(Icons.send, color: Colors.white),
               onPressed:
-              _isLoading ? null : () => _sendMessage(_textController.text),
+                  _isLoading ? null : () => _sendMessage(_textController.text),
             ),
           ),
         ],
@@ -133,11 +134,7 @@ class _ClaudeChatBotScreenState extends State<ClaudeChatBotScreen> {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          SizedBox(
-            width: 14,
-            height: 14,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          SizedBox(width: 14, height: 14, child: AppLoader(size: 20)),
           SizedBox(width: 8),
           Text("Assistant is typing...", style: TextStyle(color: Colors.grey)),
         ],
@@ -155,7 +152,9 @@ class _ClaudeChatBotScreenState extends State<ClaudeChatBotScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
+          ),
           child: Column(
             children: [
               Expanded(
@@ -223,9 +222,7 @@ class _Message extends StatelessWidget {
         spans.add(
           TextSpan(
             text: text.substring(start, match.start),
-            style: TextStyle(
-              color: isUser ? Colors.white : Colors.black87,
-            ),
+            style: TextStyle(color: isUser ? Colors.white : Colors.black87),
           ),
         );
       }
@@ -240,8 +237,7 @@ class _Message extends StatelessWidget {
             decoration: TextDecoration.underline,
           ),
           recognizer:
-          TapGestureRecognizer()
-            ..onTap = () => _handleTap(matchText),
+              TapGestureRecognizer()..onTap = () => _handleTap(matchText),
         ),
       );
 
@@ -252,9 +248,7 @@ class _Message extends StatelessWidget {
       spans.add(
         TextSpan(
           text: text.substring(start),
-          style: TextStyle(
-            color: isUser ? Colors.white : Colors.black87,
-          ),
+          style: TextStyle(color: isUser ? Colors.white : Colors.black87),
         ),
       );
     }
@@ -272,15 +266,15 @@ class _Message extends StatelessWidget {
     return GestureDetector(
       onLongPress: () {
         Clipboard.setData(ClipboardData(text: text));
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Copied")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Copied")));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
           mainAxisAlignment:
-          isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+              isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
             Flexible(
               child: Container(
@@ -290,9 +284,7 @@ class _Message extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color:
-                  isUser
-                      ? ThemeConfig.goldenYellow
-                      : Colors.grey.shade200,
+                      isUser ? ThemeConfig.goldenYellow : Colors.grey.shade200,
                   borderRadius: BorderRadius.only(
                     topLeft: radius,
                     topRight: radius,

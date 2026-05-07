@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../config/theme_config.dart';
 import '../../../../models/personal_information/test_score.dart';
+import '../../../../utils/app_loader.dart';
 
 class TestScoresWidget extends StatefulWidget {
   final List<TestScore> testScores;
@@ -55,7 +56,7 @@ class _TestScoresWidgetState extends State<TestScoresWidget> {
         if (isLoading)
           Container(
             color: Colors.black.withOpacity(0.3),
-            child: const Center(child: CircularProgressIndicator()),
+            child: const Center(child: AppLoader()),
           ),
       ],
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:client/config/theme_config.dart';
 import '../../models/new/recent_activity.dart';
 import '../../services/api_service.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 
 class RecentActivityScreen extends StatefulWidget {
@@ -115,7 +116,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
   Widget _buildActivityList() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: ThemeConfig.goldenYellow),
+        child: AppLoader(),
       );
     }
 

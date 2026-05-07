@@ -35,6 +35,7 @@ import 'package:client/screens/workflow/message/workflow_messages_screen.dart';
 import 'package:client/screens/workflow/workflow_documents_screen.dart';
 import 'package:client/screens/workflow/workflow_screen.dart';
 import 'package:client/screens/workflow/workflow_stages_screen.dart';
+import 'package:client/utils/app_loader.dart';
 import 'package:client/utils/navigation_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -503,7 +504,7 @@ class AuthWrapper extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(child: AppLoader()),
           );
         }
 
@@ -802,7 +803,7 @@ class LoginPageState extends State<LoginPage> {
                   ),
                   child:
                       _isLoading
-                          ? CircularProgressIndicator(color: Colors.white)
+                          ? AppLoader()
                           : Text('Login'),
                 ),
               ),
@@ -1281,7 +1282,7 @@ class _DashboardScaffoldState extends State<DashboardScaffold> {
                                 'Error loading data: ${snapshot.error}',
                               );
                             }
-                            return Center(child: CircularProgressIndicator());
+                            return Center(child: AppLoader());
                           },
                         ),
                       ] else if (_selectedIndex == 1) ...[
@@ -1297,7 +1298,7 @@ class _DashboardScaffoldState extends State<DashboardScaffold> {
                                 'Error loading data: ${snapshot.error}',
                               );
                             }
-                            return Center(child: CircularProgressIndicator());
+                            return Center(child: AppLoader());
                           },
                         ),
                       ] else if (_selectedIndex == 2) ...[
@@ -2153,7 +2154,7 @@ class AppointmentsPageState extends State<AppointmentsPage> {
           ),
           SizedBox(height: 16),
           if (isLoading)
-            Center(child: CircularProgressIndicator())
+            Center(child: AppLoader())
           else if (appointments.isEmpty)
             Center(
               child: Column(
@@ -2613,7 +2614,7 @@ class CreateAppointmentPageState extends State<CreateAppointmentPage> {
                   ),
                   child:
                       _isLoading
-                          ? CircularProgressIndicator(color: Colors.white)
+                          ? AppLoader()
                           : Text(
                             'Schedule Appointment',
                             style: GoogleFonts.inter(
@@ -2740,7 +2741,7 @@ class MessagesPageState extends State<MessagesPage> {
           ),
           SizedBox(height: 16),
           if (isLoading)
-            Center(child: CircularProgressIndicator())
+            Center(child: AppLoader())
           else if (messages.isEmpty)
             Center(
               child: Column(
@@ -3086,10 +3087,7 @@ class MessagesPageState extends State<MessagesPage> {
                           ? SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
+                            child: AppLoader(),
                           )
                           : Text('Send Message'),
                 ),
@@ -3614,7 +3612,7 @@ class AppointmentSchedulerState extends State<AppointmentScheduler> {
         ),
         const SizedBox(height: 8),
         if (isLoading)
-          Center(child: CircularProgressIndicator())
+          Center(child: AppLoader())
         else if (upcomingAppointments.isEmpty)
           Container(
             padding: const EdgeInsets.all(16),

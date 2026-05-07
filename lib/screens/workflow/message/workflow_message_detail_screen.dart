@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../../config/theme_config.dart';
 import '../../../models/workflow_message_detail_response.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 
 class WorkflowMessageDetailScreen extends StatefulWidget {
   final int messageId;
 
-  const WorkflowMessageDetailScreen({
-    super.key,
-    required this.messageId,
-  });
+  const WorkflowMessageDetailScreen({super.key, required this.messageId});
 
   @override
   State<WorkflowMessageDetailScreen> createState() =>
@@ -85,26 +84,27 @@ class _WorkflowMessageDetailScreenState
         title: const Text(
           "Message info",
           style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18),
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: _isLoading
-          ? Center(
-        child: CircularProgressIndicator(
-            color: ThemeConfig.goldenYellow),
-      )
-          : _error != null
-          ? _buildErrorWidget()
-          : _message == null
-          ? _buildEmptyWidget()
-          : _buildContent(),
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
+          ),
+          child:
+              _isLoading
+                  ? Center(child: AppLoader())
+                  : _error != null
+                  ? _buildErrorWidget()
+                  : _message == null
+                  ? _buildEmptyWidget()
+                  : _buildContent(),
         ),
       ),
     );
@@ -122,9 +122,10 @@ class _WorkflowMessageDetailScreenState
             icon: Icons.done_all,
             iconColor: Colors.blue,
             title: "Read",
-            time: _message!.recipients.any((r) => r.isRead)
-                ? "Some recipients have read this message"
-                : "No one has read this message yet",
+            time:
+                _message!.recipients.any((r) => r.isRead)
+                    ? "Some recipients have read this message"
+                    : "No one has read this message yet",
           ),
           /*const Divider(height: 32),
           _buildStatusTile(
@@ -144,8 +145,7 @@ class _WorkflowMessageDetailScreenState
       alignment: Alignment.centerRight,
       child: Container(
         constraints: const BoxConstraints(maxWidth: 320),
-        padding:
-        const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -154,50 +154,49 @@ class _WorkflowMessageDetailScreenState
               color: Colors.black.withOpacity(0.05),
               blurRadius: 4,
               offset: const Offset(2, 2),
-            )
+            ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             if (_message!.attachments.isNotEmpty) ...[
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: _message!.attachments.map((attachment) {
-                  if (attachment.type == "image") {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        attachment.url,
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        headers: {
-                          "Authorization":
-                          "Bearer ${AuthService.currentToken}",
-                        },
-                      ),
-                    );
-                  } else {
-                    return Container(
-                      width: 120,
-                      height: 60,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        attachment.filename,
-                        textAlign: TextAlign.center,
-                        style:
-                        const TextStyle(fontSize: 12),
-                      ),
-                    );
-                  }
-                }).toList(),
+                children:
+                    _message!.attachments.map((attachment) {
+                      if (attachment.type == "image") {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            attachment.url,
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                            headers: {
+                              "Authorization":
+                                  "Bearer ${AuthService.currentToken}",
+                            },
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          width: 120,
+                          height: 60,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            attachment.filename,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        );
+                      }
+                    }).toList(),
               ),
               const SizedBox(height: 10),
             ],
@@ -205,10 +204,7 @@ class _WorkflowMessageDetailScreenState
             if (_message!.message.isNotEmpty)
               Text(
                 _message!.message,
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Colors.black87,
-                ),
+                style: const TextStyle(fontSize: 15, color: Colors.black87),
               ),
 
             const SizedBox(height: 6),
@@ -218,9 +214,7 @@ class _WorkflowMessageDetailScreenState
               children: [
                 Text(
                   _formatTime(_message!.sentAt),
-                  style: const TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey),
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
                 ),
                 const SizedBox(width: 4),
                 Icon(
@@ -228,12 +222,13 @@ class _WorkflowMessageDetailScreenState
                       ? Icons.done_all
                       : Icons.done,
                   size: 16,
-                  color: _message!.recipients.any((r) => r.isRead)
-                      ? Colors.blue
-                      : Colors.grey,
+                  color:
+                      _message!.recipients.any((r) => r.isRead)
+                          ? Colors.blue
+                          : Colors.grey,
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -253,20 +248,19 @@ class _WorkflowMessageDetailScreenState
         const SizedBox(width: 12),
         Expanded(
           child: Column(
-            crossAxisAlignment:
-            CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight:
-                      FontWeight.w600)),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: 4),
               Text(
                 time,
-                style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey),
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
             ],
           ),
@@ -279,8 +273,7 @@ class _WorkflowMessageDetailScreenState
     return Center(
       child: Text(
         _error ?? "Error loading message",
-        style: const TextStyle(
-            color: Colors.red),
+        style: const TextStyle(color: Colors.red),
       ),
     );
   }
@@ -289,8 +282,7 @@ class _WorkflowMessageDetailScreenState
     return const Center(
       child: Text(
         "No message details available",
-        style:
-        TextStyle(color: Colors.grey),
+        style: TextStyle(color: Colors.grey),
       ),
     );
   }

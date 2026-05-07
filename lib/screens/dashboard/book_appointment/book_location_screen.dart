@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../models/appointment/appointment_variable_list.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/cache_helper.dart';
 import 'book_service_screen.dart';
 import 'booking_widget.dart';
@@ -164,7 +165,7 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
       child: isLoading
           ? SizedBox(
         height: MediaQuery.of(context).size.height / 2,
-        child: const Center(child: CircularProgressIndicator()),
+        child: const Center(child: AppLoader()),
       )
           : Column(
         crossAxisAlignment: CrossAxisAlignment.start,

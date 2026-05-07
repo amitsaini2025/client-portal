@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:client/utils/app_loader.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
@@ -500,8 +501,7 @@ class _BookConfirmAppointmentScreenState
                               onPaymentResult: _handleWalletPayment,
                             ),
                             if (isLoadingWallet)
-                              const CircularProgressIndicator(
-                                  color: Colors.white),
+                              const AppLoader(),
                           ],
                         ),
                       )
@@ -526,8 +526,7 @@ class _BookConfirmAppointmentScreenState
                               onPaymentResult: _handleWalletPayment,
                             ),
                             if (isLoadingWallet)
-                              const CircularProgressIndicator(
-                                  color: Colors.white),
+                              const AppLoader(),
                           ],
                         ),
                       ),
@@ -552,7 +551,7 @@ class _BookConfirmAppointmentScreenState
                         foregroundColor: Colors.white,
                       ),
                       child: (isLoading || isProcessingPayment)
-                          ? const CircularProgressIndicator(color: Colors.white)
+                          ? const AppLoader()
                           : Text(
                         price == 0
                             ? 'Submit'

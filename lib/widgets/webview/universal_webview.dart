@@ -7,6 +7,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../config/theme_config.dart';
 import '../../services/auth_service.dart';
+import '../../utils/app_loader.dart';
 import '../common_app_bar.dart';
 
 class UniversalWebView extends StatefulWidget {
@@ -158,12 +159,7 @@ class _UniversalWebViewState extends State<UniversalWebView>
           SizedBox(
             height: 110,
             width: 110,
-            child: CircularProgressIndicator(
-              value: smoothValue,
-              strokeWidth: 4,
-              color: ThemeConfig.successColor,
-              backgroundColor: Colors.grey.shade200,
-            ),
+            child: AppLoader(),
           ),
           Image.asset(
             'assets/icons/app_icon.png',

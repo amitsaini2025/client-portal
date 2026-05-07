@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../models/workflow_stage.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/workflow/workflow_progress_widget.dart';
 
@@ -204,7 +205,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
+                AppLoader(),
                 SizedBox(width: 20),
                 Text("Uploading document..."),
               ],
@@ -272,7 +273,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
           constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: _isLoading
               ? const Center(
-                child: CircularProgressIndicator(color: ThemeConfig.navyBlue),
+                child: AppLoader(),
               )
               : _error != null
               ? _buildErrorWidget(_error!, _loadWorkflowData)

@@ -19,6 +19,7 @@ import '../../../models/recent_activity.dart';
 import '../../../models/upcoming_deadline_summary.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common/error_widget.dart';
 import '../../../widgets/common/loading_widget.dart';
@@ -264,7 +265,7 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
       body: SafeArea(
         child:
             _isLoading
-                ? const LoadingWidget(message: 'Loading dashboard...')
+                ? const AppLoader()
                 : _errorMessage != null
                 ? CustomErrorWidget(
                   message: _errorMessage!,
@@ -471,7 +472,7 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
           height: blogSectionHeight,
           child:
               _isLoadingBlogs
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(child: AppLoader())
                   : ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: _blogs.length,
