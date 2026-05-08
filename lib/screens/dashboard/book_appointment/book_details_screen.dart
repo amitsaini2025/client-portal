@@ -32,21 +32,41 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   Future<void> _loadCachedData() async {
     services = await CacheHelper.loadData(
       'services',
-      (e) => ServiceTypeModel.fromJson(e),
+          (e) => ServiceTypeModel.fromJson(e),
     );
 
     final prefs = await SharedPreferences.getInstance();
+
     final cachedSelectedOptions = prefs.getString('selectedOptions');
+
     if (cachedSelectedOptions != null) {
       selectedOptions = Map<String, dynamic>.from(
         jsonDecode(cachedSelectedOptions),
       );
     }
 
+    print(selectedOptions);
+
+    final noeId = int.tryParse(
+      selectedOptions["noe_id"].toString(),
+    );
+
+    if (noeId == 6 || noeId == 7) {
+      services = services.where((service) {
+        return service.id == 2;
+      }).toList();
+    } else if (noeId == 8) {
+      services = services.where((service) {
+        return service.id == 2 || service.id == 3;
+      }).toList();
+    }
+
     if (selectedOptions.containsKey("service_id")) {
       final savedId = selectedOptions["service_id"];
 
-      selectedIndex = services.indexWhere((service) => service.id == savedId);
+      selectedIndex = services.indexWhere(
+            (service) => service.id == savedId,
+      );
 
       if (selectedIndex == -1) {
         selectedIndex = 0;

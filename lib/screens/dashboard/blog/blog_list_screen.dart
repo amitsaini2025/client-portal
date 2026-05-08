@@ -92,8 +92,8 @@ class _BlogListScreenState extends State<BlogListScreen> {
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // FIX
           children: [
-            // Image
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(16),
@@ -123,9 +123,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                         height: 160,
                         width: double.infinity,
                         color: Colors.grey[200],
-                        child: Center(
-                          child: AppLoader(),
-                        ),
+                        child: Center(child: AppLoader()),
                       );
                     },
                   ),
@@ -143,6 +141,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.star, size: 12, color: Colors.orange),
                             SizedBox(width: 4),
@@ -161,55 +160,49 @@ class _BlogListScreenState extends State<BlogListScreen> {
               ),
             ),
 
-            // Content (FIXED)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      blog.date,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey.shade600,
-                      ),
+            // FIXED: REMOVED Expanded (this caused crash)
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    blog.date,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
                     ),
-                    const SizedBox(height: 4),
-
-                    Text(
-                      blog.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    blog.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-
-                    const SizedBox(height: 6),
-
-                    Text(
-                      blog.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade700,
-                      ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    blog.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade700,
                     ),
-
-                    const Spacer(),
-
-                    Text(
-                      "By ${blog.author}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "By ${blog.author}",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -254,14 +247,15 @@ class _BlogListScreenState extends State<BlogListScreen> {
                       if (index < _blogs.length) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                           child: _buildBlogCard(_blogs[index]),
                         );
                       }
                       return const Padding(
                         padding: EdgeInsets.all(16),
-                        child: Center(
-                            child: AppLoader()),
+                        child: Center(child: AppLoader()),
                       );
                     },
                   );
@@ -269,8 +263,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
 
                 return GridView.builder(
                   controller: _scrollController,
-                  padding:
-                  AppResponsive.pagePadding(context),
+                  padding: AppResponsive.pagePadding(context),
                   gridDelegate:
                   SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: cols,
@@ -284,8 +277,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                     if (index < _blogs.length) {
                       return _buildBlogCard(_blogs[index]);
                     }
-                    return const Center(
-                        child: AppLoader());
+                    return const Center(child: AppLoader());
                   },
                 );
               },

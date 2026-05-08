@@ -46,9 +46,7 @@ class _BookConfirmAppointmentScreenState
           result['paymentMethodData']?['tokenizationData']?['token'] ??
               result.toString();
 
-      final appointmentResponse = AuthService.isAuthenticated
-          ? await _createAppointment()
-          : await _createAppointmentWithoutLogin();
+      final appointmentResponse = await _createAppointmentWithoutLogin();
 
       final appointmentId = appointmentResponse['data']['id'];
 
@@ -205,9 +203,7 @@ class _BookConfirmAppointmentScreenState
         paymentMethodId = paymentIntent['id'];
       }
 
-      final appointmentResponse = AuthService.isAuthenticated
-          ? await _createAppointment()
-          : await _createAppointmentWithoutLogin();
+      final appointmentResponse = await _createAppointmentWithoutLogin();
 
       final appointmentId = appointmentResponse['data']['id'];
 
@@ -345,9 +341,10 @@ class _BookConfirmAppointmentScreenState
 
   Future<void> _onPaymentSuccess(String? sessionId) async {
     try {
-      final appointmentResponse = AuthService.isAuthenticated
+      /*final appointmentResponse = AuthService.isAuthenticated
           ? await _createAppointment()
-          : await _createAppointmentWithoutLogin();
+          : await _createAppointmentWithoutLogin();*/
+      final appointmentResponse = await _createAppointmentWithoutLogin();
 
       final appointmentId = appointmentResponse['data']['id'];
 
@@ -551,7 +548,7 @@ class _BookConfirmAppointmentScreenState
                         foregroundColor: Colors.white,
                       ),
                       child: (isLoading || isProcessingPayment)
-                          ? const AppLoader()
+                          ? const AppLoader(size: 20,)
                           : Text(
                         price == 0
                             ? 'Submit'
