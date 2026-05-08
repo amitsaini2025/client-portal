@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import 'package:client/models/pr_points_response.dart';
@@ -16,6 +19,7 @@ class PRCalculatorScreen extends StatefulWidget {
 }
 
 class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
+  static const String _cacheKey = "pr_points_cache";
   PRData? data;
   bool loading = true;
 
@@ -35,16 +39,42 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
   }
 
   Future<void> _fetchPRPoints() async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      final cached = prefs.getString(_cacheKey);
+
+      if (cached != null) {
+        final cachedJson = jsonDecode(cached);
+        final parsed = PRPointsResponse.fromJson(cachedJson);
+        if (parsed.success) {
+          final map = <AdditionalPointItem, bool>{};
+          for (var i in parsed.data.additionalPoints) {
+            map[i] = false;
+          }
+          setState(() {
+            data = parsed.data;
+            additionalPoints = map;
+            loading = false;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Cache error: $e");
+    }
+
     try {
       final response = await ApiService.getPRPoints();
+      await prefs.setString(
+        _cacheKey,
+        jsonEncode(response),
+      );
       final parsed = PRPointsResponse.fromJson(response);
-
       if (parsed.success) {
         final map = <AdditionalPointItem, bool>{};
         for (var i in parsed.data.additionalPoints) {
           map[i] = false;
         }
-
+        if (!mounted) return;
         setState(() {
           data = parsed.data;
           additionalPoints = map;
@@ -52,8 +82,10 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
         });
       }
     } catch (e) {
-      debugPrint(e.toString());
-      setState(() => loading = false);
+      debugPrint("API error: $e");
+      if (data == null && mounted) {
+        setState(() => loading = false);
+      }
     }
   }
 
@@ -244,7 +276,9 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
                   color: Colors.grey[850])),
           const SizedBox(height: 4),
           DropdownButtonFormField<T>(
-            value: value,
+            value: items.any((e) => e.value == value?.value)
+                ? items.firstWhere((e) => e.value == value?.value)
+                : null,
             isExpanded: true,
             hint: const Text("Select", style: TextStyle(fontSize: 12)),
             items: items
