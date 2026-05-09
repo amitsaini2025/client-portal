@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
@@ -16,6 +19,7 @@ class StudentFundCalculatorScreen extends StatefulWidget {
 
 class _StudentFundCalculatorScreenState
     extends State<StudentFundCalculatorScreen> {
+  static const String _studentCalcCacheKey = "student_calc_lists_cache";
   bool loading = true;
   Map<String, dynamic>? data;
 
@@ -36,17 +40,41 @@ class _StudentFundCalculatorScreenState
   }
 
   Future<void> _loadLists() async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      final cached = prefs.getString(_studentCalcCacheKey);
+      if (cached != null) {
+        final cachedJson = jsonDecode(cached);
+        if (cachedJson['success'] == true) {
+          if (!mounted) return;
+          setState(() {
+            data = cachedJson['data'];
+            loading = false;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Cache error: $e");
+    }
+
     try {
       final res = await ApiService.getStudentCalcLists();
+      await prefs.setString(
+        _studentCalcCacheKey,
+        jsonEncode(res),
+      );
       if (res['success'] == true) {
+        if (!mounted) return;
         setState(() {
           data = res['data'];
           loading = false;
         });
       }
     } catch (e) {
-      debugPrint(e.toString());
-      setState(() => loading = false);
+      debugPrint("API error: $e");
+      if (data == null && mounted) {
+        setState(() => loading = false);
+      }
     }
   }
 
