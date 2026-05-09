@@ -103,7 +103,6 @@ class _UniversalWebViewState extends State<UniversalWebView>
 
   @override
   Widget build(BuildContext context) {
-    // ✅ WEB fallback (unchanged)
     if (kIsWeb) {
       return Scaffold(
         appBar: CommonAppBar(
@@ -128,7 +127,6 @@ class _UniversalWebViewState extends State<UniversalWebView>
             child: WebViewWidget(controller: _controller),
           ),
 
-          // ✅ SAME animation on macOS (safe version)
           if (_isLoading)
             Positioned.fill(
               child: Container(
@@ -149,7 +147,6 @@ class _UniversalWebViewState extends State<UniversalWebView>
     );
   }
 
-  // ✅ Shared loader UI
   Widget _buildLoader(double scale, double smoothValue) {
     return Transform.scale(
       scale: scale,
@@ -163,14 +160,13 @@ class _UniversalWebViewState extends State<UniversalWebView>
           ),
           Image.asset(
             'assets/icons/app_icon.png',
-            height: 60,
+            height: 40,
           ),
         ],
       ),
     );
   }
 
-  // ✅ macOS SAFE loader (no AnimatedOpacity conflict)
   Widget _buildMacOSLoader(double scale, double smoothValue) {
     return Transform.scale(
       scale: scale,
@@ -189,15 +185,13 @@ class _UniversalWebViewState extends State<UniversalWebView>
           ),
           Image.asset(
             'assets/icons/app_icon.png',
-            height: 60,
+            height: 40,
           ),
         ],
       ),
     );
   }
 }
-
-/// ================= WEB FALLBACK (UNCHANGED) =================
 
 class _WebFallbackView extends StatefulWidget {
   final String url;
