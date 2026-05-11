@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../models/visa_search/visa_model.dart';
 import '../../../services/api_service.dart';
@@ -17,12 +20,22 @@ class VacSearchScreen extends StatefulWidget {
 }
 
 class _VacSearchScreenState extends State<VacSearchScreen> {
+  static const String _visaCacheKey = "visa_list_cache";
+
   final TextEditingController _controller = TextEditingController();
 
   List<VisaModel> suggestions = [];
+  List<VisaModel> allVisas = [];
+
   bool loading = false;
 
   Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVisaList();
+  }
 
   @override
   void dispose() {
@@ -31,44 +44,88 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
     super.dispose();
   }
 
-  void _onSearchChanged(String value) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
+  Future<void> _loadVisaList() async {
+    final prefs = await SharedPreferences.getInstance();
 
-    _debounce = Timer(const Duration(milliseconds: 400), () {
-      final query = value.trim();
-
-      if (query.isEmpty) {
-        setState(() => suggestions = []);
-        return;
-      }
-
-      if (query.length >= 2) {
-        _searchSuggestions(query);
-      } else {
-        setState(() => suggestions = []);
-      }
-    });
-  }
-
-  Future<void> _searchSuggestions(String query) async {
     setState(() => loading = true);
 
     try {
-      final res = await ApiService.getVisaList(page: 1, q: query);
+      final cached = prefs.getString(_visaCacheKey);
+
+      if (cached != null) {
+        final cachedJson = jsonDecode(cached);
+
+        if (cachedJson['success'] == true) {
+          final List data = cachedJson['data']['data'];
+
+          allVisas = data
+              .map<VisaModel>((e) => VisaModel.fromJson(e))
+              .toList();
+
+          if (mounted) {
+            setState(() => loading = false);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Cache error: $e");
+    }
+
+    try {
+      final res = await ApiService.getVisaList(
+        limit: 160,
+      );
+
+      await prefs.setString(
+        _visaCacheKey,
+        jsonEncode(res),
+      );
 
       if (res['success'] == true) {
         final List data = res['data']['data'];
 
-        setState(() {
-          suggestions =
-              data.map((e) => VisaModel.fromJson(e)).take(6).toList();
-        });
+        allVisas = data
+            .map<VisaModel>((e) => VisaModel.fromJson(e))
+            .toList();
       }
-    } catch (_) {
-      setState(() => suggestions = []);
+    } catch (e) {
+      debugPrint("API error: $e");
     }
 
-    setState(() => loading = false);
+    if (mounted) {
+      setState(() => loading = false);
+    }
+  }
+
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+
+    final query = value.trim();
+
+    if (query.isEmpty) {
+      setState(() => suggestions = []);
+      return;
+    }
+
+    _debounce = Timer(
+      const Duration(milliseconds: 150),
+          () {
+        _searchSuggestions(query);
+      },
+    );
+  }
+
+  void _searchSuggestions(String query) {
+    final q = query.toLowerCase();
+
+    final results = allVisas.where((e) {
+      return e.label.toLowerCase().contains(q) ||
+          e.subclass.toLowerCase().contains(q);
+    }).take(6).toList();
+
+    setState(() {
+      suggestions = results;
+    });
   }
 
   Future<void> _navigateToEstimate(VisaModel item) async {
@@ -80,6 +137,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
     );
 
     _controller.clear();
+
     setState(() {
       suggestions = [];
     });
@@ -95,29 +153,35 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-          setState(() => suggestions = []);
-        },
-        child: Padding(
-          padding: AppResponsive.pagePadding(context),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _searchField(),
-
-              if (suggestions.isNotEmpty) _dropdown(),
-
-              if (loading)
-                const Padding(
-                  padding: EdgeInsets.only(top: 20),
-                  child: Center(child: AppLoader()),
-                ),
-            ],
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
           ),
-        ),
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+
+              setState(() => suggestions = []);
+            },
+            child: Padding(
+              padding: AppResponsive.pagePadding(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _searchField(),
+
+                  if (suggestions.isNotEmpty)
+                    _dropdown(),
+
+                  if (loading)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: Center(
+                        child: AppLoader(),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -135,6 +199,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
           icon: const Icon(Icons.clear),
           onPressed: () {
             _controller.clear();
+
             setState(() => suggestions = []);
           },
         ),
@@ -152,7 +217,9 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
       ),
       child: ListView.builder(
         shrinkWrap: true,
@@ -162,9 +229,12 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
 
           return ListTile(
             title: Text(item.label),
-            subtitle: Text("Subclass ${item.subclass}"),
+            subtitle: Text(
+              "Subclass ${item.subclass}",
+            ),
             onTap: () {
               _controller.text = item.label;
+
               FocusScope.of(context).unfocus();
 
               setState(() => suggestions = []);

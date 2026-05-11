@@ -1463,9 +1463,9 @@ class ApiService {
     return await _makeRequest(url, _buildHeaders(), null, 'GET');
   }*/
 
-  static Future<dynamic> getVisaList({int page = 1, String q = ""}) async {
+  static Future<dynamic> getVisaList({int limit = 160}) async {
     final url = ApiConfig.visaEstimateVisaList;
-    return await ApiService.get("$url?page=$page&q=$q");
+    return await ApiService.get("$url?limit=$limit");
   }
 
   static Future<Map<String, dynamic>> getVisaEstimate({
