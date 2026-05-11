@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:client/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:client/services/api_service.dart';
 
 import '../../../models/post_code_checker/postcode_result.dart';
 import '../../../models/post_code_checker/postcode_search_item.dart';
@@ -17,17 +16,13 @@ class PostcodeCheckerScreen extends StatefulWidget {
   const PostcodeCheckerScreen({super.key});
 
   @override
-  State<PostcodeCheckerScreen> createState() =>
-      _PostcodeCheckerScreenState();
+  State<PostcodeCheckerScreen> createState() => _PostcodeCheckerScreenState();
 }
 
-class _PostcodeCheckerScreenState
-    extends State<PostcodeCheckerScreen> {
-  static const String _postcodeCacheKey =
-      "postcode_all_cache";
+class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
+  static const String _postcodeCacheKey = "postcode_all_cache";
 
-  final TextEditingController _controller =
-  TextEditingController();
+  final TextEditingController _controller = TextEditingController();
 
   Timer? _debounce;
 
@@ -56,62 +51,32 @@ class _PostcodeCheckerScreenState
 
   Future<void> _loadPostcodes() async {
     final prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      loading = true;
-    });
-
     try {
-      final cached =
-      prefs.getString(_postcodeCacheKey);
-
+      final cached = prefs.getString(_postcodeCacheKey);
       if (cached != null) {
         final decoded = jsonDecode(cached);
-
-        final data = (decoded as List)
-            .map(
-              (e) => PostcodeSearchItem.fromJson(e),
-        )
-            .toList();
-
+        final data =
+            (decoded as List)
+                .map((e) => PostcodeSearchItem.fromJson(e))
+                .toList();
         allPostcodes = data;
-
-        if (mounted) {
-          setState(() {
-            loading = false;
-          });
-        }
       }
     } catch (e) {
       debugPrint("Cache error: $e");
     }
 
     try {
-      final response =
-      await ApiService.postcodeAll();
-
+      final response = await ApiService.postcodeAll();
       if (response['success']) {
-        final data = (response['data'] as List)
-            .map(
-              (e) => PostcodeSearchItem.fromJson(e),
-        )
-            .toList();
-
+        final data =
+            (response['data'] as List)
+                .map((e) => PostcodeSearchItem.fromJson(e))
+                .toList();
         allPostcodes = data;
-
-        await prefs.setString(
-          _postcodeCacheKey,
-          jsonEncode(response['data']),
-        );
+        await prefs.setString(_postcodeCacheKey, jsonEncode(response['data']));
       }
     } catch (e) {
       debugPrint("API error: $e");
-    }
-
-    if (mounted) {
-      setState(() {
-        loading = false;
-      });
     }
   }
 
@@ -128,28 +93,23 @@ class _PostcodeCheckerScreenState
       return;
     }
 
-    _debounce = Timer(
-      const Duration(milliseconds: 100),
-          () {
-        _searchSuggestions(query);
-      },
-    );
+    _debounce = Timer(const Duration(milliseconds: 100), () {
+      _searchSuggestions(query);
+    });
   }
 
   void _searchSuggestions(String query) {
     final q = query.toLowerCase();
 
-    final results = allPostcodes.where((e) {
-      return e.suburb
-          .toLowerCase()
-          .contains(q) ||
-          e.postcode
-              .toLowerCase()
-              .contains(q) ||
-          e.state
-              .toLowerCase()
-              .contains(q);
-    }).take(8).toList();
+    final results =
+        allPostcodes
+            .where((e) {
+              return e.suburb.toLowerCase().contains(q) ||
+                  e.postcode.toLowerCase().contains(q) ||
+                  e.state.toLowerCase().contains(q);
+            })
+            .take(8)
+            .toList();
 
     if (mounted) {
       setState(() {
@@ -166,16 +126,11 @@ class _PostcodeCheckerScreenState
     });
 
     try {
-      final response =
-      await ApiService.postcodeResult(
-        postcode,
-      );
+      final response = await ApiService.postcodeResult(postcode);
 
       if (response['success']) {
         setState(() {
-          result = PostcodeResult.fromJson(
-            response['data'],
-          );
+          result = PostcodeResult.fromJson(response['data']);
 
           loading = false;
         });
@@ -203,8 +158,7 @@ class _PostcodeCheckerScreenState
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(
-            maxWidth:
-            AppResponsive.maxContentWidth,
+            maxWidth: AppResponsive.maxContentWidth,
           ),
           child: GestureDetector(
             onTap: () {
@@ -215,17 +169,11 @@ class _PostcodeCheckerScreenState
               });
             },
             child: SingleChildScrollView(
-              keyboardDismissBehavior:
-              ScrollViewKeyboardDismissBehavior
-                  .onDrag,
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: Padding(
-                padding:
-                AppResponsive.pagePadding(
-                  context,
-                ),
+                padding: AppResponsive.pagePadding(context),
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeader(),
 
@@ -233,18 +181,13 @@ class _PostcodeCheckerScreenState
 
                     _buildSearchField(),
 
-                    if (suggestions.isNotEmpty)
-                      _buildSuggestions(),
+                    if (suggestions.isNotEmpty) _buildSuggestions(),
 
                     const SizedBox(height: 16),
 
-                    if (loading)
-                      const Center(
-                        child: AppLoader(),
-                      ),
+                    if (loading) const Center(child: AppLoader()),
 
-                    if (result != null)
-                      _buildResultCard(),
+                    if (result != null) _buildResultCard(),
                   ],
                 ),
               ),
@@ -257,25 +200,18 @@ class _PostcodeCheckerScreenState
 
   Widget _buildHeader() {
     return const Column(
-      crossAxisAlignment:
-      CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           "Australian Postcode Checker",
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
         ),
 
         SizedBox(height: 8),
 
         Text(
           "Check if your Australian postcode qualifies for regional area points for skilled migration visas",
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.black54,
-          ),
+          style: TextStyle(fontSize: 14, color: Colors.black54),
         ),
       ],
     );
@@ -283,8 +219,7 @@ class _PostcodeCheckerScreenState
 
   Widget _buildSearchField() {
     return Column(
-      crossAxisAlignment:
-      CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           "Enter Australian Postcode or Suburb Name",
@@ -298,8 +233,7 @@ class _PostcodeCheckerScreenState
           onChanged: _onSearchChanged,
           decoration: InputDecoration(
             hintText: "e.g. Sydney or 2000",
-            prefixIcon:
-            const Icon(Icons.search),
+            prefixIcon: const Icon(Icons.search),
             suffixIcon: IconButton(
               icon: const Icon(Icons.clear),
               onPressed: () {
@@ -311,10 +245,7 @@ class _PostcodeCheckerScreenState
                 });
               },
             ),
-            border: OutlineInputBorder(
-              borderRadius:
-              BorderRadius.circular(10),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           ),
         ),
       ],
@@ -324,14 +255,10 @@ class _PostcodeCheckerScreenState
   Widget _buildSuggestions() {
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      constraints:
-      const BoxConstraints(maxHeight: 300),
+      constraints: const BoxConstraints(maxHeight: 300),
       decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.grey.shade300,
-        ),
-        borderRadius:
-        BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
         color: Colors.white,
       ),
       child: ListView.builder(
@@ -341,15 +268,11 @@ class _PostcodeCheckerScreenState
           final item = suggestions[i];
 
           return ListTile(
-            title: Text(
-              "${item.suburb} (${item.postcode}, ${item.state})",
-            ),
+            title: Text("${item.suburb} (${item.postcode}, ${item.state})"),
             onTap: () {
-              _controller.text =
-                  item.suburb;
+              _controller.text = item.suburb;
 
-              FocusScope.of(context)
-                  .unfocus();
+              FocusScope.of(context).unfocus();
 
               setState(() {
                 suggestions = [];
@@ -369,71 +292,42 @@ class _PostcodeCheckerScreenState
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.yellow.shade100,
-        borderRadius:
-        BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             "Postcode Result",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
 
           const SizedBox(height: 12),
 
-          _row(
-            "Postcode",
-            result!.postcode,
-          ),
+          _row("Postcode", result!.postcode),
 
-          _row(
-            "Area",
-            result!.area,
-          ),
+          _row("Area", result!.area),
 
-          _row(
-            "State",
-            result!.state,
-          ),
+          _row("State", result!.state),
 
-          _row(
-            "Regional Status",
-            result!.regionalStatus,
-          ),
+          _row("Regional Status", result!.regionalStatus),
 
-          _row(
-            "Category",
-            result!.category,
-          ),
+          _row("Category", result!.category),
         ],
       ),
     );
   }
 
-  Widget _row(
-      String label,
-      String value,
-      ) {
+  Widget _row(String label, String value) {
     return Padding(
-      padding:
-      const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.only(bottom: 6),
       child: RichText(
         text: TextSpan(
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 14,
-          ),
+          style: const TextStyle(color: Colors.black, fontSize: 14),
           children: [
             TextSpan(
               text: "$label: ",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             TextSpan(text: value),
           ],
