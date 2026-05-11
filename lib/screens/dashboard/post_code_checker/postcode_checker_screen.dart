@@ -22,22 +22,27 @@ class PostcodeCheckerScreen extends StatefulWidget {
 class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
   static const String _postcodeCacheKey = "postcode_all_cache";
 
+  // ── Tokens ─────────────────────────────────────────────────────────────────
+  static const _primary       = Color(0xFF1A56DB);
+  static const _accent        = Color(0xFF0E9F6E);
+  static const _accentLight   = Color(0xFFECFDF5);
+  static const _border        = Color(0xFFE5E7EB);
+  static const _textPrimary   = Color(0xFF111827);
+  static const _textSecondary = Color(0xFF6B7280);
+  static const _bg            = Color(0xFFF9FAFB);
+
   final TextEditingController _controller = TextEditingController();
 
   Timer? _debounce;
 
   List<PostcodeSearchItem> allPostcodes = [];
-
-  List<PostcodeSearchItem> suggestions = [];
-
-  PostcodeResult? result;
-
-  bool loading = false;
+  List<PostcodeSearchItem> suggestions  = [];
+  PostcodeResult?          result;
+  bool                     loading      = false;
 
   @override
   void initState() {
     super.initState();
-
     _loadPostcodes();
   }
 
@@ -45,9 +50,10 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
   void dispose() {
     _debounce?.cancel();
     _controller.dispose();
-
     super.dispose();
   }
+
+  // ── Unchanged logic ────────────────────────────────────────────────────────
 
   Future<void> _loadPostcodes() async {
     final prefs = await SharedPreferences.getInstance();
@@ -55,24 +61,18 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
       final cached = prefs.getString(_postcodeCacheKey);
       if (cached != null) {
         final decoded = jsonDecode(cached);
-        final data =
-            (decoded as List)
-                .map((e) => PostcodeSearchItem.fromJson(e))
-                .toList();
-        allPostcodes = data;
+        allPostcodes =
+            (decoded as List).map((e) => PostcodeSearchItem.fromJson(e)).toList();
       }
     } catch (e) {
       debugPrint("Cache error: $e");
     }
-
     try {
       final response = await ApiService.postcodeAll();
       if (response['success']) {
-        final data =
-            (response['data'] as List)
-                .map((e) => PostcodeSearchItem.fromJson(e))
-                .toList();
-        allPostcodes = data;
+        allPostcodes = (response['data'] as List)
+            .map((e) => PostcodeSearchItem.fromJson(e))
+            .toList();
         await prefs.setString(_postcodeCacheKey, jsonEncode(response['data']));
       }
     } catch (e) {
@@ -82,40 +82,27 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
 
   void _onSearchChanged(String value) {
     _debounce?.cancel();
-
     final query = value.trim();
-
     if (query.isEmpty) {
-      setState(() {
-        suggestions = [];
-      });
-
+      setState(() => suggestions = []);
       return;
     }
-
-    _debounce = Timer(const Duration(milliseconds: 100), () {
-      _searchSuggestions(query);
-    });
+    _debounce = Timer(
+      const Duration(milliseconds: 100),
+          () => _searchSuggestions(query),
+    );
   }
 
   void _searchSuggestions(String query) {
     final q = query.toLowerCase();
-
-    final results =
-        allPostcodes
-            .where((e) {
-              return e.suburb.toLowerCase().contains(q) ||
-                  e.postcode.toLowerCase().contains(q) ||
-                  e.state.toLowerCase().contains(q);
-            })
-            .take(8)
-            .toList();
-
-    if (mounted) {
-      setState(() {
-        suggestions = results;
-      });
-    }
+    final results = allPostcodes
+        .where((e) =>
+    e.suburb.toLowerCase().contains(q) ||
+        e.postcode.toLowerCase().contains(q) ||
+        e.state.toLowerCase().contains(q))
+        .take(8)
+        .toList();
+    if (mounted) setState(() => suggestions = results);
   }
 
   Future<void> _fetchResult(String postcode) async {
@@ -124,72 +111,59 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
       suggestions.clear();
       result = null;
     });
-
     try {
       final response = await ApiService.postcodeResult(postcode);
-
       if (response['success']) {
         setState(() {
-          result = PostcodeResult.fromJson(response['data']);
-
+          result  = PostcodeResult.fromJson(response['data']);
           loading = false;
         });
       } else {
-        setState(() {
-          loading = false;
-        });
+        setState(() => loading = false);
       }
     } catch (e) {
       debugPrint("Result error: $e");
-
-      setState(() {
-        loading = false;
-      });
+      setState(() => loading = false);
     }
   }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: _bg,
       appBar: CommonAppBar(
         titleName: 'Postcode Checker Tool',
         matterID: AuthService.selectedMatterId,
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
-          ),
+          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: GestureDetector(
             onTap: () {
               FocusScope.of(context).unfocus();
-
-              setState(() {
-                suggestions = [];
-              });
+              setState(() => suggestions = []);
             },
             child: SingleChildScrollView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: Padding(
-                padding: AppResponsive.pagePadding(context),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(),
-
-                    const SizedBox(height: 24),
-
-                    _buildSearchField(),
-
-                    if (suggestions.isNotEmpty) _buildSuggestions(),
-
-                    const SizedBox(height: 16),
-
-                    if (loading) const Center(child: AppLoader()),
-
-                    if (result != null) _buildResultCard(),
-                  ],
-                ),
+              padding: AppResponsive.pagePadding(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 20),
+                  _buildSearchField(),
+                  if (suggestions.isNotEmpty) _buildSuggestions(),
+                  const SizedBox(height: 12),
+                  if (loading)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32),
+                      child: Center(child: AppLoader()),
+                    ),
+                  if (result != null) _buildResultCard(),
+                  const SizedBox(height: 32),
+                ],
               ),
             ),
           ),
@@ -198,141 +172,248 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
     );
   }
 
+  // ── Header ─────────────────────────────────────────────────────────────────
+
   Widget _buildHeader() {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Australian Postcode Checker",
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            const Icon(Icons.location_on_rounded, color: _primary, size: 20),
+            const SizedBox(width: 8),
+            const Text(
+              'Australian Postcode Checker',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: _textPrimary,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ],
         ),
-
-        SizedBox(height: 8),
-
-        Text(
-          "Check if your Australian postcode qualifies for regional area points for skilled migration visas",
-          style: TextStyle(fontSize: 14, color: Colors.black54),
+        const SizedBox(height: 6),
+        const Text(
+          'Check if your postcode qualifies for regional area points for skilled migration visas.',
+          style: TextStyle(fontSize: 13.5, color: _textSecondary, height: 1.5),
         ),
+        const SizedBox(height: 16),
+        const Divider(color: _border),
       ],
     );
   }
+
+  // ── Search field ───────────────────────────────────────────────────────────
 
   Widget _buildSearchField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Enter Australian Postcode or Suburb Name",
-          style: TextStyle(fontSize: 14),
+          'Enter Postcode or Suburb',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: _textPrimary,
+          ),
         ),
-
         const SizedBox(height: 8),
-
         TextField(
           controller: _controller,
           onChanged: _onSearchChanged,
+          style: const TextStyle(fontSize: 14, color: _textPrimary),
           decoration: InputDecoration(
-            hintText: "e.g. Sydney or 2000",
-            prefixIcon: const Icon(Icons.search),
+            hintText: 'e.g. Sydney or 2000',
+            hintStyle: const TextStyle(color: _textSecondary, fontSize: 14),
+            prefixIcon: const Icon(Icons.search_rounded, color: _primary, size: 20),
             suffixIcon: IconButton(
-              icon: const Icon(Icons.clear),
+              icon: const Icon(Icons.close_rounded, color: _textSecondary, size: 18),
               onPressed: () {
                 _controller.clear();
-
                 setState(() {
                   suggestions = [];
-                  result = null;
+                  result      = null;
                 });
               },
             ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: _border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: _primary, width: 1.5),
+            ),
           ),
         ),
       ],
     );
   }
 
+  // ── Suggestions ────────────────────────────────────────────────────────────
+
   Widget _buildSuggestions() {
     return Container(
-      margin: const EdgeInsets.only(top: 8),
+      margin: const EdgeInsets.only(top: 4),
       constraints: const BoxConstraints(maxHeight: 300),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
         color: Colors.white,
+        border: Border.all(color: _border),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.07),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: suggestions.length,
-        itemBuilder: (_, i) {
-          final item = suggestions[i];
-
-          return ListTile(
-            title: Text("${item.suburb} (${item.postcode}, ${item.state})"),
-            onTap: () {
-              _controller.text = item.suburb;
-
-              FocusScope.of(context).unfocus();
-
-              setState(() {
-                suggestions = [];
-              });
-
-              _fetchResult(item.postcode);
-            },
-          );
-        },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: ListView.separated(
+          shrinkWrap: true,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          itemCount: suggestions.length,
+          separatorBuilder: (_, __) => const Divider(
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+            color: _border,
+          ),
+          itemBuilder: (_, i) {
+            final item = suggestions[i];
+            return InkWell(
+              onTap: () {
+                _controller.text = item.suburb;
+                FocusScope.of(context).unfocus();
+                setState(() => suggestions = []);
+                _fetchResult(item.postcode);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, color: _primary, size: 16),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        '${item.suburb}  ·  ${item.postcode}, ${item.state}',
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          color: _textPrimary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right_rounded,
+                        color: _textSecondary, size: 17),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 
+  // ── Result card ────────────────────────────────────────────────────────────
+
   Widget _buildResultCard() {
     return Container(
-      margin: const EdgeInsets.only(top: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.yellow.shade100,
+        color: Colors.white,
+        border: Border.all(color: _border),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Postcode Result",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              const Icon(Icons.check_circle_outline_rounded,
+                  color: _accent, size: 18),
+              const SizedBox(width: 8),
+              const Text(
+                'Result',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: _textPrimary,
+                ),
+              ),
+            ],
           ),
-
-          const SizedBox(height: 12),
-
-          _row("Postcode", result!.postcode),
-
-          _row("Area", result!.area),
-
-          _row("State", result!.state),
-
-          _row("Regional Status", result!.regionalStatus),
-
-          _row("Category", result!.category),
+          const SizedBox(height: 14),
+          const Divider(height: 1, color: _border),
+          const SizedBox(height: 4),
+          _resultRow('Postcode',        result!.postcode),
+          _resultRow('Area',            result!.area),
+          _resultRow('State',           result!.state),
+          _resultRow('Regional Status', result!.regionalStatus, highlight: true),
+          _resultRow('Category',        result!.category,       last: true),
         ],
       ),
     );
   }
 
-  Widget _row(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: RichText(
-        text: TextSpan(
-          style: const TextStyle(color: Colors.black, fontSize: 14),
-          children: [
-            TextSpan(
-              text: "$label: ",
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            TextSpan(text: value),
-          ],
+  Widget _resultRow(
+      String label,
+      String value, {
+        bool highlight = false,
+        bool last = false,
+      }) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 9),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 130,
+                child: Text(
+                  label,
+                  style: const TextStyle(fontSize: 13, color: _textSecondary),
+                ),
+              ),
+              Expanded(
+                child: highlight
+                    ? Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: _accentLight,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: _accent,
+                    ),
+                  ),
+                )
+                    : Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                    color: _textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+        if (!last) const Divider(height: 1, color: _border),
+      ],
     );
   }
 }
