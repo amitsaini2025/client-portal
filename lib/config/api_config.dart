@@ -70,6 +70,7 @@ class ApiConfig {
   static const String searchOccupation = "/search-occupation";
   static const String occupationResult = "/occupation-result";
 
+  static const String postCodeAll = "/postcode-all";
   static const String postCodeSearch = "/postcode-search";
   static const String postCodeResult = "/postcode-result";
 

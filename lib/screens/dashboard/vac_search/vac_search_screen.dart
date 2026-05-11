@@ -108,7 +108,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
     }
 
     _debounce = Timer(
-      const Duration(milliseconds: 150),
+      const Duration(milliseconds: 100),
           () {
         _searchSuggestions(query);
       },

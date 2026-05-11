@@ -1090,7 +1090,6 @@ class ApiService {
 
   static Future<Map<String, dynamic>> getPRPoints() async {
     final endpoint = ApiConfig.prPointsCalcList;
-
     return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
@@ -1098,7 +1097,6 @@ class ApiService {
     required Map<String, dynamic> payload,
   }) async {
     final endpoint = ApiConfig.prPointCalcResult;
-
     return await _makeRequest(endpoint, _buildHeaders(), payload, 'POST');
   }
 
@@ -1111,15 +1109,12 @@ class ApiService {
     required Map<String, dynamic> payload,
   }) async {
     final endpoint = ApiConfig.studentCalcResult;
-
     return await _makeRequest(endpoint, _buildHeaders(), payload, 'POST');
   }
 
   static Future<Map<String, dynamic>> occupationFinder(String query) async {
     String endpoint = "${ApiConfig.occupationFinder}/?q=$query";
-
-    final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
-    return response;
+    return await _makeRequest(endpoint, _buildHeaders(), null, "GET");
   }
 
   static Future<Map<String, dynamic>> occupationSearch(String query) async {
@@ -1131,6 +1126,11 @@ class ApiService {
   static Future<Map<String, dynamic>> getOccupationDetails(String code) async {
     String endpoint = "${ApiConfig.occupationResult}?occupation_code=$code";
 
+    return await _makeRequest(endpoint, _buildHeaders(), null, "GET");
+  }
+
+  static Future<Map<String, dynamic>> postcodeAll() async {
+    String endpoint = ApiConfig.postCodeAll;
     return await _makeRequest(endpoint, _buildHeaders(), null, "GET");
   }
 
