@@ -22,7 +22,6 @@ class PostcodeCheckerScreen extends StatefulWidget {
 class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
   static const String _postcodeCacheKey = "postcode_all_cache";
 
-  // ── Tokens ─────────────────────────────────────────────────────────────────
   static const _primary       = Color(0xFF1A56DB);
   static const _accent        = Color(0xFF0E9F6E);
   static const _accentLight   = Color(0xFFECFDF5);
@@ -53,16 +52,22 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
     super.dispose();
   }
 
-  // ── Unchanged logic ────────────────────────────────────────────────────────
-
   Future<void> _loadPostcodes() async {
     final prefs = await SharedPreferences.getInstance();
+
+    setState(() => loading = true);
+
     try {
       final cached = prefs.getString(_postcodeCacheKey);
       if (cached != null) {
         final decoded = jsonDecode(cached);
+
         allPostcodes =
             (decoded as List).map((e) => PostcodeSearchItem.fromJson(e)).toList();
+
+        if (mounted) {
+          setState(() => loading = false);
+        }
       }
     } catch (e) {
       debugPrint("Cache error: $e");
@@ -77,6 +82,10 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
       }
     } catch (e) {
       debugPrint("API error: $e");
+    }
+
+    if (mounted) {
+      setState(() => loading = false);
     }
   }
 
@@ -127,8 +136,6 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
     }
   }
 
-  // ── Build ──────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,8 +179,6 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
     );
   }
 
-  // ── Header ─────────────────────────────────────────────────────────────────
-
   Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,8 +208,6 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
       ],
     );
   }
-
-  // ── Search field ───────────────────────────────────────────────────────────
 
   Widget _buildSearchField() {
     return Column(
@@ -253,8 +256,6 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
       ],
     );
   }
-
-  // ── Suggestions ────────────────────────────────────────────────────────────
 
   Widget _buildSuggestions() {
     return Container(
@@ -320,8 +321,6 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
       ),
     );
   }
-
-  // ── Result card ────────────────────────────────────────────────────────────
 
   Widget _buildResultCard() {
     return Container(

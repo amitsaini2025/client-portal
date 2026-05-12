@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
@@ -17,51 +19,19 @@ class OccupationSearchScreen extends StatefulWidget {
 class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
   final TextEditingController _controller = TextEditingController();
 
-  List suggestions = [];
+  static const String _cacheKey = "occupation_cache_v1";
+
+  List<Map<String, dynamic>> allOccupations = [];
+  List<Map<String, dynamic>> suggestions = [];
   Map<String, dynamic>? details;
 
   bool loading = false;
   Timer? _debounce;
 
-  void _onSearchChanged(String value) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-
-    _debounce = Timer(const Duration(milliseconds: 400), () {
-      if (value.trim().length >= 2) {
-        _search(value);
-      } else {
-        setState(() => suggestions = []);
-      }
-    });
-  }
-
-  Future<void> _search(String query) async {
-    final res = await ApiService.searchOccupation(query);
-    setState(() {
-      suggestions = res['data'] ?? [];
-    });
-  }
-
-  /// ✅ FIXED HERE (data is List → take first item)
-  Future<void> _getDetails(String code) async {
-    setState(() {
-      loading = true;
-      suggestions.clear();
-    });
-
-    final res = await ApiService.getOccupationDetails(code);
-
-    setState(() {
-      final dataList = res['data'];
-
-      if (dataList is List && dataList.isNotEmpty) {
-        details = dataList.first;
-      } else {
-        details = null;
-      }
-
-      loading = false;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _loadOccupations();
   }
 
   @override
@@ -69,6 +39,105 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
     _debounce?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadOccupations() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() => loading = true);
+
+    try {
+      final cached = prefs.getString(_cacheKey);
+
+      if (cached != null) {
+        final decoded = jsonDecode(cached);
+
+        final List data = decoded['data'] ?? decoded ?? [];
+
+        allOccupations =
+            data.map((e) => Map<String, dynamic>.from(e)).toList();
+
+        if (mounted) {
+          setState(() => loading = false);
+        }
+      }
+    } catch (e) {
+      debugPrint("Cache error: $e");
+    }
+
+    try {
+      final res = await ApiService.getAllOccupations();
+
+      final List data = res['data'] ?? [];
+
+      allOccupations =
+          data.map((e) => Map<String, dynamic>.from(e)).toList();
+
+      await SharedPreferences.getInstance().then(
+            (p) => p.setString(_cacheKey, jsonEncode(res)),
+      );
+    } catch (e) {
+      debugPrint("API error: $e");
+    }
+
+    setState(() {
+      loading = false;
+    });
+  }
+
+  void _onSearchChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 100), () {
+      final query = value.trim().toLowerCase();
+
+      if (query.isEmpty) {
+        setState(() {
+          suggestions = [];
+          details = null;
+        });
+        return;
+      }
+
+      if (allOccupations.isEmpty) return;
+
+      final results = allOccupations.where((item) {
+        final title =
+        (item['occupation_title'] ?? '').toString().toLowerCase();
+        final code =
+        (item['anzsco_code'] ?? '').toString().toLowerCase();
+
+        return title.contains(query) || code.contains(query);
+      }).take(8).toList();
+
+      setState(() {
+        suggestions = results;
+      });
+    });
+  }
+
+  Future<void> _getDetails(String code) async {
+    setState(() {
+      loading = true;
+      suggestions.clear();
+      details = null;
+    });
+
+    try {
+      final res = await ApiService.getOccupationDetails(code);
+
+      final dataList = res['data'];
+
+      if (dataList is List && dataList.isNotEmpty) {
+        details = dataList.first;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
@@ -81,58 +150,61 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          constraints:
+          const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
           child: Padding(
-        padding: AppResponsive.pagePadding(context),
-        child: Column(
-          children: [
-            TextField(
-              controller: _controller,
-              onChanged: _onSearchChanged,
-              decoration: InputDecoration(
-                hintText: 'Search occupation',
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+            padding: AppResponsive.pagePadding(context),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _controller,
+                  onChanged: _onSearchChanged,
+                  decoration: InputDecoration(
+                    hintText: 'Search occupation',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            if (suggestions.isNotEmpty)
-              Container(
-                margin: const EdgeInsets.only(top: 6),
-                height: 180,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: ListView.builder(
-                  itemCount: suggestions.length,
-                  itemBuilder: (_, i) {
-                    final item = suggestions[i];
-                    return ListTile(
-                      dense: true,
-                      title: Text(
-                        item['occupation_title'],
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                      onTap: () {
-                        _controller.text = item['occupation_title'];
-                        _getDetails(item['anzsco_code']);
+                const SizedBox(height: 10),
+
+                if (loading) const AppLoader(),
+
+                if (suggestions.isNotEmpty)
+                  Container(
+                    height: 220,
+                    margin: const EdgeInsets.only(top: 6),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ListView.builder(
+                      itemCount: suggestions.length,
+                      itemBuilder: (_, i) {
+                        final item = suggestions[i];
+
+                        return ListTile(
+                          dense: true,
+                          title: Text(item['occupation_title'] ?? ''),
+                          subtitle: Text(item['anzsco_code'] ?? ''),
+                          onTap: () {
+                            _controller.text =
+                                item['occupation_title'] ?? '';
+                            FocusScope.of(context).unfocus();
+                            _getDetails(item['anzsco_code']);
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
-              ),
+                    ),
+                  ),
 
-            const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-            if (loading) const AppLoader(),
-
-            if (details != null && !loading)
-              Expanded(child: SingleChildScrollView(child: _buildTable())),
-          ],
-        ),
+                if (details != null && !loading)
+                  Expanded(child: SingleChildScrollView(child: _buildTable())),
+              ],
+            ),
           ),
         ),
       ),

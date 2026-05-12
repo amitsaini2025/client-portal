@@ -1059,6 +1059,11 @@ class ApiService {
     return response;
   }
 
+  static Future<Map<String, dynamic>> getAllOccupations() async {
+    String endpoint = ApiConfig.occupationAll;
+    final response = await _makeRequest(endpoint, _buildHeaders(), null, "GET");
+    return response;
+  }
 
   static Future<Map<String, dynamic>> getFeaturedBlogs({
     int page = 1,
