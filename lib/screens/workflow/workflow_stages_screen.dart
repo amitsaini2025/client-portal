@@ -76,42 +76,45 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
+      useSafeArea: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.folder),
-                title: const Text("My Files"),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await _pickFromFiles(stage, checklistId);
-                },
-              ),
-              if (!kIsWeb)
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
                 ListTile(
-                  leading: const Icon(Icons.photo),
-                  title: const Text("Gallery"),
+                  leading: const Icon(Icons.folder),
+                  title: const Text("My Files"),
                   onTap: () async {
                     Navigator.pop(context);
-                    await _pickFromGallery(stage, checklistId);
+                    await _pickFromFiles(stage, checklistId);
                   },
                 ),
-              if (!kIsWeb)
-                ListTile(
-                  leading: const Icon(Icons.camera_alt),
-                  title: const Text("Camera"),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    await _pickFromCamera(stage, checklistId);
-                  },
-                ),
-            ],
+                if (!kIsWeb)
+                  ListTile(
+                    leading: const Icon(Icons.photo),
+                    title: const Text("Gallery"),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      await _pickFromGallery(stage, checklistId);
+                    },
+                  ),
+                if (!kIsWeb)
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text("Camera"),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      await _pickFromCamera(stage, checklistId);
+                    },
+                  ),
+              ],
+            ),
           ),
         );
       },
@@ -199,16 +202,34 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return const Dialog(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AppLoader(),
-                SizedBox(width: 20),
-                Text("Uploading document..."),
-              ],
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 48,
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 320, minWidth: 200),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  SizedBox(width: 24, height: 24, child: AppLoader(size: 20)),
+                  SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      "Uploading document...",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -270,40 +291,41 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
       ),*/
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: _isLoading
-              ? const Center(
-                child: AppLoader(),
-              )
-              : _error != null
-              ? _buildErrorWidget(_error!, _loadWorkflowData)
-              : _workflowResponse == null
-              ? const Center(child: Text('No workflow data available'))
-              : RefreshIndicator(
-                color: ThemeConfig.goldenYellow,
-                onRefresh: _loadWorkflowData,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: AppResponsive.pagePadding(context),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_workflowResponse!.caseSummary != null)
-                        _buildCaseSummary(_workflowResponse!.caseSummary!),
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
+          ),
+          child:
+              _isLoading
+                  ? const Center(child: AppLoader())
+                  : _error != null
+                  ? _buildErrorWidget(_error!, _loadWorkflowData)
+                  : _workflowResponse == null
+                  ? const Center(child: Text('No workflow data available'))
+                  : RefreshIndicator(
+                    color: ThemeConfig.goldenYellow,
+                    onRefresh: _loadWorkflowData,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: AppResponsive.pagePadding(context),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_workflowResponse!.caseSummary != null)
+                            _buildCaseSummary(_workflowResponse!.caseSummary!),
 
-                      const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
-                      WorkflowProgressWidget(
-                        workflowResponse: _workflowResponse!,
-                        onStageTap: _showStageDetails,
-                        onChecklistPlusTap: _openUploadOptions,
-                        onChecklistViewTap: _onViewTap,
-                        onBulkUploadTap: _onBulkUploadTap,
+                          WorkflowProgressWidget(
+                            workflowResponse: _workflowResponse!,
+                            onStageTap: _showStageDetails,
+                            onChecklistPlusTap: _openUploadOptions,
+                            onChecklistViewTap: _onViewTap,
+                            onBulkUploadTap: _onBulkUploadTap,
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
         ),
       ),
     );

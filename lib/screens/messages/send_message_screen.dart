@@ -134,6 +134,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
     showModalBottomSheet(
       backgroundColor: ThemeConfig.navyBlue,
       context: context,
+      useSafeArea: true,
       builder: (BuildContext context) {
         return SafeArea(
           child: Wrap(

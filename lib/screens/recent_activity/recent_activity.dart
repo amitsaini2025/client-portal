@@ -219,12 +219,13 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white, // ✅ White bottom sheet
+      useSafeArea: true,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return DraggableScrollableSheet(
+        return SafeArea(child: DraggableScrollableSheet(
           initialChildSize: 0.5,
           minChildSize: 0.3,
           maxChildSize: 0.8,
@@ -263,7 +264,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
               ),
             );
           },
-        );
+        ));
       },
     );
   }

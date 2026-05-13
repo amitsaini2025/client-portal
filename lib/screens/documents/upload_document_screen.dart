@@ -76,51 +76,54 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
   Future<void> _pickFile() async {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.folder, color: Colors.black),
-                title: const Text(
-                  'My Files',
-                  style: TextStyle(color: Colors.black),
-                ),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  await _pickFromFiles();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo, color: Colors.black),
-                title: const Text(
-                  'Gallery',
-                  style: TextStyle(color: Colors.black),
-                ),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  await _pickFromGallery();
-                },
-              ),
-              if (!kIsWeb)
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
                 ListTile(
-                  leading: const Icon(Icons.camera_alt, color: Colors.black),
+                  leading: const Icon(Icons.folder, color: Colors.black),
                   title: const Text(
-                    'Camera',
+                    'My Files',
                     style: TextStyle(color: Colors.black),
                   ),
                   onTap: () async {
                     Navigator.of(context).pop();
-                    await _pickFromCamera();
+                    await _pickFromFiles();
                   },
                 ),
-            ],
+                ListTile(
+                  leading: const Icon(Icons.photo, color: Colors.black),
+                  title: const Text(
+                    'Gallery',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await _pickFromGallery();
+                  },
+                ),
+                if (!kIsWeb)
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt, color: Colors.black),
+                    title: const Text(
+                      'Camera',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      await _pickFromCamera();
+                    },
+                  ),
+              ],
+            ),
           ),
         );
       },
@@ -272,7 +275,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                                       ? const SizedBox(
                                         width: 20,
                                         height: 20,
-                                        child: AppLoader(),
+                                        child: AppLoader(size: 20),
                                       )
                                       : const Icon(Icons.upload),
                               label: Text(

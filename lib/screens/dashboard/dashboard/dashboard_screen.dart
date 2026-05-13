@@ -301,7 +301,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
             ),
-            bottomNavigationBar: _buildBottomNav(),
+            bottomNavigationBar: SafeArea(
+              child: _buildBottomNav(),
+            ),
           );
         },
       ),

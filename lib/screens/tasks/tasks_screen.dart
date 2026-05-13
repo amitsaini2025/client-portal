@@ -149,9 +149,14 @@ class _TasksScreenState extends State<TasksScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
+          ),
           child: Column(
-            children: [_buildSearchAndFilters(), Expanded(child: _buildTaskList())],
+            children: [
+              _buildSearchAndFilters(),
+              Expanded(child: _buildTaskList()),
+            ],
           ),
         ),
       ),
@@ -252,9 +257,7 @@ class _TasksScreenState extends State<TasksScreen> {
 
   Widget _buildTaskList() {
     if (_isLoading) {
-      return const Center(
-        child: AppLoader(),
-      );
+      return const Center(child: AppLoader());
     }
 
     if (_errorMessage != null) {
@@ -329,7 +332,8 @@ class _TasksScreenState extends State<TasksScreen> {
             return ListView.builder(
               padding: AppResponsive.horizontalPadding(context),
               itemCount: _filteredTasks.length,
-              itemBuilder: (context, index) => _buildTaskCard(_filteredTasks[index]),
+              itemBuilder:
+                  (context, index) => _buildTaskCard(_filteredTasks[index]),
             );
           }
           return GridView.builder(
@@ -341,7 +345,8 @@ class _TasksScreenState extends State<TasksScreen> {
               childAspectRatio: 2.5,
             ),
             itemCount: _filteredTasks.length,
-            itemBuilder: (context, index) => _buildTaskCard(_filteredTasks[index]),
+            itemBuilder:
+                (context, index) => _buildTaskCard(_filteredTasks[index]),
           );
         },
       ),
@@ -414,56 +419,59 @@ class _TasksScreenState extends State<TasksScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: ThemeConfig.navyBlue,
       builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          minChildSize: 0.4,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) {
-            return Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: ListView(
-                controller: scrollController,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[400],
-                        borderRadius: BorderRadius.circular(2),
+        return SafeArea(
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.6,
+            minChildSize: 0.4,
+            maxChildSize: 0.9,
+            builder: (context, scrollController) {
+              return Container(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: ListView(
+                  controller: scrollController,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    task.title ?? 'Untitled Task',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 20,
+                    const SizedBox(height: 20),
+                    Text(
+                      task.title ?? 'Untitled Task',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(Icons.schedule, 'Due Date', task.dueDate),
-                  _buildDetailRow(
-                    Icons.priority_high,
-                    'Priority',
-                    _getPriorityText(task.priority ?? 'unknown'),
-                  ),
-                  _buildDetailRow(
-                    Icons.info,
-                    'Status',
-                    _getStatusText(task.status ?? 'unknown'),
-                  ),
-                ],
-              ),
-            );
-          },
+                    const SizedBox(height: 16),
+                    _buildDetailRow(Icons.schedule, 'Due Date', task.dueDate),
+                    _buildDetailRow(
+                      Icons.priority_high,
+                      'Priority',
+                      _getPriorityText(task.priority ?? 'unknown'),
+                    ),
+                    _buildDetailRow(
+                      Icons.info,
+                      'Status',
+                      _getStatusText(task.status ?? 'unknown'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         );
       },
     );

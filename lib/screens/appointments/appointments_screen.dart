@@ -520,6 +520,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
   void _showAppointmentDetails(Appointment appointment) {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       isScrollControlled: true,
       builder: (BuildContext context) {
         return DraggableScrollableSheet(
@@ -527,7 +528,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           minChildSize: 0.4,
           maxChildSize: 0.9,
           builder: (context, scrollController) {
-            return Container(
+            return SafeArea(child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,
@@ -547,7 +548,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   Text(
                     appointment.title ?? 'Untitled Appointment',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -555,16 +556,16 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
-                  _buildDetailRow(Icons.calendar_today, 'Date', 
-                    appointment.date != null ? DateFormat('EEEE, MMMM d, y').format(appointment.date!) : 'No date'),
+
+                  _buildDetailRow(Icons.calendar_today, 'Date',
+                      appointment.date != null ? DateFormat('EEEE, MMMM d, y').format(appointment.date!) : 'No date'),
                   _buildDetailRow(Icons.access_time, 'Time', appointment.time ?? 'No time'),
                   _buildDetailRow(Icons.info, 'Status', _getStatusText(appointment.status ?? 'unknown')),
-                  _buildDetailRow(Icons.schedule, 'Created', 
-                    DateFormat('MMM d, y').format(appointment.createdAt)),
-                  
+                  _buildDetailRow(Icons.schedule, 'Created',
+                      DateFormat('MMM d, y').format(appointment.createdAt)),
+
                   const SizedBox(height: 24),
-                  
+
                   if (appointment.status == 'confirmed' && appointment.date != null && _isUpcoming(appointment.date!))
                     SizedBox(
                       width: double.infinity,
@@ -584,14 +585,13 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                         ),
                       ),
                     ),
-                  
+
                   if (appointment.status == 'pending' || appointment.status == 'confirmed')
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: () {
                           Navigator.of(context).pop();
-                          // TODO: Implement cancel functionality
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Cancel functionality not implemented yet')),
                           );
@@ -606,7 +606,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                     ),
                 ],
               ),
-            );
+            ));
           },
         );
       },

@@ -322,183 +322,193 @@ class _BillingScreenState extends State<BillingScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
+          ),
           child: Column(
-        children: [
-          // Summary Cards
-          Container(
-            padding: AppResponsive.pagePadding(context),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide = constraints.maxWidth >= 600;
-                final summaryCards = [
-                  _buildSummaryCard(
-                    'Total Amount',
-                    '\$${NumberFormat('#,##0.00').format(totalAmount)}',
-                    Icons.account_balance_wallet,
-                    Colors.blue,
-                  ),
-                  _buildSummaryCard(
-                    'Paid',
-                    '\$${NumberFormat('#,##0.00').format(paidAmount)}',
-                    Icons.check_circle,
-                    Colors.green,
-                  ),
-                  _buildSummaryCard(
-                    'Pending',
-                    '\$${NumberFormat('#,##0.00').format(pendingAmount)}',
-                    Icons.schedule,
-                    Colors.orange,
-                  ),
-                  _buildSummaryCard(
-                    'Overdue',
-                    '\$${NumberFormat('#,##0.00').format(_invoices.where((i) => i.status == 'overdue').fold(0.0, (sum, i) => sum + (i.totalAmount ?? 0.0)))}',
-                    Icons.warning,
-                    Colors.red,
-                  ),
-                ];
-                if (isWide) {
-                  return Row(
-                    children: summaryCards
-                        .map((c) => Expanded(child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 6),
-                              child: c,
-                            )))
-                        .toList(),
-                  );
-                }
-                return Column(
-                  children: [
-                    Row(
+            children: [
+              // Summary Cards
+              Container(
+                padding: AppResponsive.pagePadding(context),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isWide = constraints.maxWidth >= 600;
+                    final summaryCards = [
+                      _buildSummaryCard(
+                        'Total Amount',
+                        '\$${NumberFormat('#,##0.00').format(totalAmount)}',
+                        Icons.account_balance_wallet,
+                        Colors.blue,
+                      ),
+                      _buildSummaryCard(
+                        'Paid',
+                        '\$${NumberFormat('#,##0.00').format(paidAmount)}',
+                        Icons.check_circle,
+                        Colors.green,
+                      ),
+                      _buildSummaryCard(
+                        'Pending',
+                        '\$${NumberFormat('#,##0.00').format(pendingAmount)}',
+                        Icons.schedule,
+                        Colors.orange,
+                      ),
+                      _buildSummaryCard(
+                        'Overdue',
+                        '\$${NumberFormat('#,##0.00').format(_invoices.where((i) => i.status == 'overdue').fold(0.0, (sum, i) => sum + (i.totalAmount ?? 0.0)))}',
+                        Icons.warning,
+                        Colors.red,
+                      ),
+                    ];
+                    if (isWide) {
+                      return Row(
+                        children:
+                            summaryCards
+                                .map(
+                                  (c) => Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                      ),
+                                      child: c,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                      );
+                    }
+                    return Column(
                       children: [
-                        Expanded(child: summaryCards[0]),
-                        const SizedBox(width: 12),
-                        Expanded(child: summaryCards[1]),
+                        Row(
+                          children: [
+                            Expanded(child: summaryCards[0]),
+                            const SizedBox(width: 12),
+                            Expanded(child: summaryCards[1]),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(child: summaryCards[2]),
+                            const SizedBox(width: 12),
+                            Expanded(child: summaryCards[3]),
+                          ],
+                        ),
                       ],
+                    );
+                  },
+                ),
+              ),
+
+              // Search and Filter Bar
+              Container(
+                padding: AppResponsive.horizontalPadding(context),
+                child: Column(
+                  children: [
+                    // Search Bar
+                    TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Search invoices...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).cardColor,
+                      ),
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(child: summaryCards[2]),
-                        const SizedBox(width: 12),
-                        Expanded(child: summaryCards[3]),
-                      ],
+
+                    // Status Filter
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildFilterChip('All', 'all'),
+                          const SizedBox(width: 8),
+                          _buildFilterChip('Paid', 'paid'),
+                          const SizedBox(width: 8),
+                          _buildFilterChip('Pending', 'pending'),
+                          const SizedBox(width: 8),
+                          _buildFilterChip('Overdue', 'overdue'),
+                          const SizedBox(width: 8),
+                          _buildFilterChip('Draft', 'draft'),
+                        ],
+                      ),
                     ),
                   ],
-                );
-              },
-            ),
-          ),
-
-          // Search and Filter Bar
-          Container(
-            padding: AppResponsive.horizontalPadding(context),
-            child: Column(
-              children: [
-                // Search Bar
-                TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      _searchQuery = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Search invoices...',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).cardColor,
-                  ),
                 ),
-                const SizedBox(height: 12),
+              ),
+              const SizedBox(height: 16),
 
-                // Status Filter
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildFilterChip('All', 'all'),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('Paid', 'paid'),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('Pending', 'pending'),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('Overdue', 'overdue'),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('Draft', 'draft'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Invoices List
-          Expanded(
-            child:
-                _isLoading
-                    ? const Center(child: AppLoader())
-                    : _errorMessage != null
-                    ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            size: 64,
-                            color: Colors.red[300],
+              // Invoices List
+              Expanded(
+                child:
+                    _isLoading
+                        ? const Center(child: AppLoader())
+                        : _errorMessage != null
+                        ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.error_outline,
+                                size: 64,
+                                color: Colors.red[300],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                _errorMessage!,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: _loadInvoices,
+                                child: const Text('Retry'),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _errorMessage!,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                            textAlign: TextAlign.center,
+                        )
+                        : _filteredInvoices.isEmpty
+                        ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.receipt_long,
+                                size: 64,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                _searchQuery.isNotEmpty ||
+                                        _statusFilter != 'all'
+                                    ? 'No invoices match your search'
+                                    : 'No invoices found',
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(color: Colors.grey[600]),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: _loadInvoices,
-                            child: const Text('Retry'),
+                        )
+                        : RefreshIndicator(
+                          onRefresh: _loadInvoices,
+                          child: ListView.builder(
+                            padding: AppResponsive.horizontalPadding(context),
+                            itemCount: _filteredInvoices.length,
+                            itemBuilder: (context, index) {
+                              final invoice = _filteredInvoices[index];
+                              return _buildInvoiceCard(invoice);
+                            },
                           ),
-                        ],
-                      ),
-                    )
-                    : _filteredInvoices.isEmpty
-                    ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.receipt_long,
-                            size: 64,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _searchQuery.isNotEmpty || _statusFilter != 'all'
-                                ? 'No invoices match your search'
-                                : 'No invoices found',
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                    )
-                    : RefreshIndicator(
-                      onRefresh: _loadInvoices,
-                      child: ListView.builder(
-                        padding: AppResponsive.horizontalPadding(context),
-                        itemCount: _filteredInvoices.length,
-                        itemBuilder: (context, index) {
-                          final invoice = _filteredInvoices[index];
-                          return _buildInvoiceCard(invoice);
-                        },
-                      ),
-                    ),
-          ),
-        ],
+                        ),
+              ),
+            ],
           ),
         ),
       ),
@@ -740,11 +750,7 @@ class _BillingScreenState extends State<BillingScreen> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: AppLoader(),
-                    ),
+                    const SizedBox(height: 18, width: 18, child: AppLoader()),
                     const SizedBox(width: 8),
                     Text(
                       'Processing payment...',
@@ -767,157 +773,162 @@ class _BillingScreenState extends State<BillingScreen> {
   void _showInvoiceDetails(Invoice invoice) {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       isScrollControlled: true,
       builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) {
-            return Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
+        return SafeArea(
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.7,
+            minChildSize: 0.5,
+            maxChildSize: 0.9,
+            builder: (context, scrollController) {
+              return Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  Text(
-                    invoice.invoiceNumber ?? 'INV-${invoice.id}',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+                    Text(
+                      invoice.invoiceNumber ?? 'INV-${invoice.id}',
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w600),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    invoice.notes ?? 'No description',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(
-                        context,
-                      ).textTheme.bodyLarge?.color?.withValues(alpha: 0.7),
+                    const SizedBox(height: 8),
+                    Text(
+                      invoice.notes ?? 'No description',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodyLarge?.color?.withValues(alpha: 0.7),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  _buildDetailRow(
-                    Icons.attach_money,
-                    'Amount',
-                    '\$${NumberFormat('#,##0.00').format(invoice.totalAmount ?? 0.0)}',
-                  ),
-                  _buildDetailRow(
-                    Icons.info,
-                    'Status',
-                    _getStatusText(invoice.status ?? 'draft'),
-                  ),
-                  _buildDetailRow(
-                    Icons.calendar_today,
-                    'Due Date',
-                    invoice.dueDate != null
-                        ? DateFormat('EEEE, MMMM d, y').format(invoice.dueDate!)
-                        : 'No due date',
-                  ),
-                  _buildDetailRow(
-                    Icons.schedule,
-                    'Created',
-                    DateFormat('MMM d, y').format(invoice.createdAt),
-                  ),
+                    _buildDetailRow(
+                      Icons.attach_money,
+                      'Amount',
+                      '\$${NumberFormat('#,##0.00').format(invoice.totalAmount ?? 0.0)}',
+                    ),
+                    _buildDetailRow(
+                      Icons.info,
+                      'Status',
+                      _getStatusText(invoice.status ?? 'draft'),
+                    ),
+                    _buildDetailRow(
+                      Icons.calendar_today,
+                      'Due Date',
+                      invoice.dueDate != null
+                          ? DateFormat(
+                            'EEEE, MMMM d, y',
+                          ).format(invoice.dueDate!)
+                          : 'No due date',
+                    ),
+                    _buildDetailRow(
+                      Icons.schedule,
+                      'Created',
+                      DateFormat('MMM d, y').format(invoice.createdAt),
+                    ),
 
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                  if (invoice.status == 'pending' ||
-                      invoice.status == 'overdue')
+                    if (invoice.status == 'pending' ||
+                        invoice.status == 'overdue')
+                      SizedBox(
+                        width: double.infinity,
+                        child: Builder(
+                          builder: (_) {
+                            final processing = _isProcessingInvoice(invoice.id);
+                            return ElevatedButton(
+                              onPressed:
+                                  processing
+                                      ? null
+                                      : () {
+                                        Navigator.of(context).pop();
+                                        _handlePayInvoice(invoice);
+                                      },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: Colors.green
+                                    .withValues(alpha: 0.6),
+                              ),
+                              child:
+                                  processing
+                                      ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const SizedBox(
+                                            height: 18,
+                                            width: 18,
+                                            child: AppLoader(),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          const Text('Processing...'),
+                                        ],
+                                      )
+                                      : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: const [
+                                          Icon(Icons.payment),
+                                          SizedBox(width: 8),
+                                          Text('Pay Now'),
+                                        ],
+                                      ),
+                            );
+                          },
+                        ),
+                      ),
+
                     SizedBox(
                       width: double.infinity,
-                      child: Builder(
-                        builder: (_) {
-                          final processing = _isProcessingInvoice(invoice.id);
-                          return ElevatedButton(
-                            onPressed:
-                                processing
-                                    ? null
-                                    : () {
-                                      Navigator.of(context).pop();
-                                      _handlePayInvoice(invoice);
-                                    },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                              disabledBackgroundColor: Colors.green.withValues(
-                                alpha: 0.6,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          // TODO: Implement download functionality
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Download functionality not implemented yet',
                               ),
                             ),
-                            child:
-                                processing
-                                    ? Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const SizedBox(
-                                          height: 18,
-                                          width: 18,
-                                          child: AppLoader(),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        const Text('Processing...'),
-                                      ],
-                                    )
-                                    : Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: const [
-                                        Icon(Icons.payment),
-                                        SizedBox(width: 8),
-                                        Text('Pay Now'),
-                                      ],
-                                    ),
                           );
                         },
-                      ),
-                    ),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        // TODO: Implement download functionality
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Download functionality not implemented yet',
-                            ),
+                        icon: const Icon(Icons.download),
+                        label: const Text('Download Invoice'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Theme.of(context).primaryColor,
+                          side: BorderSide(
+                            color: Theme.of(context).primaryColor,
                           ),
-                        );
-                      },
-                      icon: const Icon(Icons.download),
-                      label: const Text('Download Invoice'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
+                  ],
+                ),
+              );
+            },
+          ),
         );
       },
     );
