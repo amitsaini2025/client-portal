@@ -94,29 +94,27 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     ),
                   ),
 
-                  /*StaggeredGridTile.count(
-                    crossAxisCellCount: isWeb ? 4 : 4,
-                    mainAxisCellCount: isWeb ? 1.0 : 1.3,
-                    child: _horizontalTile(
-                      icon: Icons.description,
-                      label: 'Document Status',
-                      color: const Color(0xCCEF6C00),
-                      onTap: onDocumentStatus ?? () {},
-                      iconSize: iconSize - 6,
-                      fontSize: fontSize,
-                      padding: tilePadding - 2,
-                    ),
-                  ),*/
-                  /*_smallTile(
-                    icon: Icons.local_activity,
-                    label: 'Recent\nActivity',
-                    color: const Color(0xCCF9A825),
-                    onTap: onRecentActivity ?? () {},
+                  _smallTile(
+                    icon: Icons.folder_open,
+                    label: 'Document\nStatus',
+                    color: const Color(0xCCEF6C00),
+                    onTap: onDocumentStatus ?? () {},
                     context: context,
                     iconSize: iconSize - 6,
                     fontSize: fontSize - 1,
                     padding: tilePadding - 4,
-                  ),*/
+                  ),
+
+                  _smallTile(
+                    icon: Icons.event_available,
+                    label: 'Upcoming\nDeadlines',
+                    color: const Color(0xCC1565C0),
+                    onTap: onUpcomingDeadlines ?? () {},
+                    context: context,
+                    iconSize: iconSize - 6,
+                    fontSize: fontSize - 1,
+                    padding: tilePadding - 4,
+                  ),
 
                   _smallTile(
                     icon: Icons.message,
@@ -245,48 +243,6 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: fontSize,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _horizontalTile({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-    required double iconSize,
-    required double fontSize,
-    required double padding,
-  }) {
-    return Builder(
-      builder: (context) {
-        return InkWell(
-          onTap: () => _handleAuth(context, onTap),
-          borderRadius: BorderRadius.circular(_radius),
-          child: Container(
-            padding: EdgeInsets.all(padding),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(_radius),
-            ),
-            child: Row(
-              children: [
-                Icon(icon, size: iconSize, color: Colors.white),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: fontSize,
-                    ),
                   ),
                 ),
               ],

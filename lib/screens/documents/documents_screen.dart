@@ -21,8 +21,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   List<Document> _documents = [];
-  Summary? _summary;
-  Pagination? _pagination;
 
   bool _isUploading = false;
   double _uploadProgress = 0.0;
@@ -50,8 +48,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         final docsResponse = DocumentsResponse.fromJson(response);
         setState(() {
           _documents = docsResponse.data.documents;
-          _summary = docsResponse.data.summary;
-          _pagination = docsResponse.data.pagination;
           _isLoading = false;
         });
       } else {

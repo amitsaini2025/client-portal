@@ -63,9 +63,6 @@ class _MattersScreenState extends State<MattersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments as Map?;
-    final bool fromMyFiles = args?['fromMyFiles'] == true;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(

@@ -70,19 +70,6 @@ class _TasksScreenState extends State<TasksScreen> {
     }).toList();
   }
 
-  Color _getPriorityColor(String priority) {
-    switch (priority) {
-      case 'high':
-        return Colors.red;
-      case 'medium':
-        return Colors.orange;
-      case 'low':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
   String _getPriorityText(String priority) {
     switch (priority) {
       case 'high':
@@ -93,21 +80,6 @@ class _TasksScreenState extends State<TasksScreen> {
         return 'Low';
       default:
         return priority;
-    }
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'pending':
-        return ThemeConfig.goldenYellow;
-      case 'in_progress':
-        return Colors.blue;
-      case 'completed':
-        return Colors.green;
-      case 'cancelled':
-        return Colors.red;
-      default:
-        return Colors.grey;
     }
   }
 
@@ -124,11 +96,6 @@ class _TasksScreenState extends State<TasksScreen> {
       default:
         return status;
     }
-  }
-
-  bool _isDueSoon(DateTime dueDate) {
-    final daysUntilDue = dueDate.difference(DateTime.now()).inDays;
-    return daysUntilDue <= 3 && daysUntilDue >= 0;
   }
 
   @override

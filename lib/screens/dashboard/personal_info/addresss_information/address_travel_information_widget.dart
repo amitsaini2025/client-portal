@@ -34,7 +34,6 @@ class _AddressAndTravelInformationWidgetState
     extends State<AddressAndTravelInformationWidget> {
   bool isEditingAddress = false;
   bool isEditingTravel = false;
-  final Map<String, TextEditingController> _placeControllers = {};
 
   //final String googleApiKey = "AIzaSyATpl3gyx8FSoykbCx3otznCIWP_-8hk7c";
   final String googleApiKey = "AIzaSyATpl3gyx8FSoykbCx3otznCIWP_-8hk7c";

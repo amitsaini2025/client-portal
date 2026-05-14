@@ -146,7 +146,9 @@ class StripeService {
 
     final response = await http
         .get(
-      Uri.parse('${ApiConfig.baseUrl}/payments/checkout-session/$sessionId'),
+      _verifyCheckoutSessionUri.replace(
+        path: '${_verifyCheckoutSessionUri.path}/$sessionId',
+      ),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

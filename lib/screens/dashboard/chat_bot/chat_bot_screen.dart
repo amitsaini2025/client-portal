@@ -30,16 +30,6 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     });
   }
 
-  Future<void> _openLink(String url) async {
-    final Uri uri = Uri.parse(url);
-
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
   Future<void> _sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 
@@ -70,50 +60,6 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
       });
     }
   }
-
-  /*Future<void> _sendMessage(String text) async {
-    if (text.trim().isEmpty) return;
-
-    setState(() {
-      _messages.insert(0, ChatMessage(text: text, sender: 'user'));
-    });
-
-    _textController.clear();
-
-    try {
-      final response = await _chatbotService.detectIntent(text);
-      final fulfillmentText = response.queryResult?.fulfillmentText;
-
-      if (fulfillmentText != null && fulfillmentText.isNotEmpty) {
-        setState(() {
-          _messages.insert(
-            0,
-            ChatMessage(text: fulfillmentText, sender: 'bot'),
-          );
-        });
-
-        final urlRegex = RegExp(r'(https?:\/\/[^\s]+)');
-        final match = urlRegex.firstMatch(fulfillmentText);
-
-        if (match != null) {
-          final url = match.group(0);
-          if (url != null) {
-            _openLink(url);
-          }
-        }
-      }
-    } catch (e) {
-      setState(() {
-        _messages.insert(
-          0,
-          ChatMessage(
-            text: 'Error: Could not connect to the chatbot. $e',
-            sender: 'bot',
-          ),
-        );
-      });
-    }
-  }*/
 
   @override
   Widget build(BuildContext context) {

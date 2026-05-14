@@ -24,7 +24,6 @@ class CommonAppBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _CommonAppBarState extends State<CommonAppBar> {
   int _unreadNotificationCount = 0;
-  bool _isLoadingNotificationCount = false;
 
   String? _matterName;
   bool _isLoadingMatter = true;
@@ -38,8 +37,6 @@ class _CommonAppBarState extends State<CommonAppBar> {
 
   Future<void> _loadUnreadNotificationCount() async {
     if (!AuthService.isAuthenticated) return;
-
-    setState(() => _isLoadingNotificationCount = true);
 
     try {
       final response = await ApiService.getUnreadNotificationCount();
@@ -55,31 +52,32 @@ class _CommonAppBarState extends State<CommonAppBar> {
     } catch (e) {
       debugPrint("Unread count error: $e");
     }
-
-    if (mounted) setState(() => _isLoadingNotificationCount = false);
   }
 
   Future<void> _loadMatterName() async {
+    if (widget.matterID == null) {
+      if (mounted) {
+        setState(() {
+          _matterName = null;
+          _isLoadingMatter = false;
+        });
+      }
+      return;
+    }
+
     try {
       final response = await ApiService.getMatters();
       if (response['success'] == true && response['data'] != null) {
         final matters = response['data']['matters'] as List<dynamic>;
-        final matchedMatter = matters.firstWhere(
-          (m) => m['matter_id'].toString() == widget.matterID,
-          orElse: () => null,
+        final id = widget.matterID.toString();
+        final idx = matters.indexWhere(
+          (m) => m['matter_id'].toString() == id,
         );
 
         if (mounted) {
-          final matchedMatter = matters.firstWhere(
-            (m) => m['matter_id'] == widget.matterID,
-            orElse: () => {},
-          );
-
           setState(() {
             _matterName =
-                matchedMatter.isNotEmpty
-                    ? matchedMatter['matter_name'].toString()
-                    : 'Unknown Matter';
+                idx >= 0 ? matters[idx]['matter_name'].toString() : 'Unknown Matter';
             _isLoadingMatter = false;
           });
         }
@@ -119,25 +117,28 @@ class _CommonAppBarState extends State<CommonAppBar> {
             ),
           ),
           const SizedBox(height: 2),
-          Visibility(
-            visible: !_isLoadingMatter,
-            maintainSize: true,
-            maintainAnimation: true,
-            maintainState: true,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _matterName ?? '',
-                  style: const TextStyle(fontSize: 13, color: Colors.white),
-                ),
-                Text(
-                  "ID: ${widget.matterID ?? ''}",
-                  style: const TextStyle(fontSize: 11, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
+          if (widget.matterID != null)
+            Visibility(
+              visible: !_isLoadingMatter,
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _matterName ?? '',
+                    style: const TextStyle(fontSize: 13, color: Colors.white),
+                  ),
+                  Text(
+                    "ID: ${widget.matterID}",
+                    style: const TextStyle(fontSize: 11, color: Colors.white),
+                  ),
+                ],
+              ),
+            )
+          else
+            const SizedBox(height: 0),
         ],
       ),
       actions: [

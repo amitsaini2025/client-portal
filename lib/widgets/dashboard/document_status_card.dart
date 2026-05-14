@@ -17,7 +17,6 @@ class DocumentStatusCard extends StatelessWidget {
     final approvedDocs = documentStatusSummary?.approved ?? 0;
     final pendingDocs = documentStatusSummary?.pending ?? 0;
     final rejectedDocs = documentStatusSummary?.rejected ?? 0;
-    final totalDocs = documents.length;
 
     return Container(
       padding: const EdgeInsets.all(12),

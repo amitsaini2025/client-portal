@@ -86,31 +86,6 @@ class _BookConfirmAppointmentScreenState
     }
   }
 
-  Future<Map<String, dynamic>> _createAppointment() async {
-    final serviceId =
-        int.tryParse(widget.selectedOptions['service_id'].toString()) ?? 0;
-    final noeId =
-        int.tryParse(widget.selectedOptions['noe_id'].toString()) ?? 0;
-    final inPersonAddress =
-        int.tryParse(
-          widget.selectedOptions['inperson_address']?.toString() ?? '0',
-        ) ??
-            0;
-
-    final response = await ApiService.createAppointmentNew(
-      noeId: noeId,
-      serviceId: serviceId,
-      appointDate: widget.selectedOptions['appoint_date'],
-      appointTime: widget.selectedOptions['appoint_time'],
-      description: widget.selectedOptions['description'],
-      appointmentDetails: widget.selectedOptions['appointment_details'] ?? '',
-      preferredLanguage: widget.selectedOptions['preferred_language'] ?? '',
-      inPersonAddress: inPersonAddress,
-    );
-
-    return response;
-  }
-
   Future<Map<String, dynamic>> _createAppointmentWithoutLogin() async {
     final serviceId =
         int.tryParse(widget.selectedOptions['service_id'].toString()) ?? 0;
