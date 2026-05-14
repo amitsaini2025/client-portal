@@ -10,7 +10,6 @@ import '../../../services/auth_service.dart';
 import '../../workflow/message/workflow_messages_screen.dart';
 import '../../workflow/workflow_stages_screen.dart';
 import '../billing_list/billing_list_screen.dart';
-import '../notification/notification_detail_screen.dart';
 import '../personal_info/personal_information_screen.dart';
 
 class ActionRequiredScreen extends StatefulWidget {
@@ -138,7 +137,6 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
     Widget? screen;
 
     final type = item.notificationType.trim();
-    final url = item.url.trim();
 
     switch (type) {
       case "message":
@@ -175,7 +173,7 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
         break;
     }
 
-    if (!mounted) return;
+    if (!context.mounted) return;
 
     await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
   }
@@ -244,10 +242,10 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color:
+                                    color:
                                 item.isRead
                                     ? Colors.grey.shade200
-                                    : ThemeConfig.goldenYellow.withOpacity(0.3),
+                                    : ThemeConfig.goldenYellow.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
