@@ -30,7 +30,6 @@ class _UniversalWebViewState extends State<UniversalWebView>
     with SingleTickerProviderStateMixin {
   late final WebViewController _controller;
 
-  int _progress = 0;
   bool _isLoading = true;
 
   late AnimationController _animationController;

@@ -14,6 +14,8 @@ class ReverbSocketService {
   static Timer? _reconnectTimer;
   static bool _isConnected = false;
 
+  static bool get isConnected => _isConnected;
+
   static Function(dynamic message)? onMessageReceived;
 
   static const String _host = "revapi.bansalcrm.com";
@@ -22,8 +24,7 @@ class ReverbSocketService {
 
   static const String _appKey = "145cd98cfea9f69732ae6755ac889bcc";
 
-  // WebSocket URL as you requested
-  static String get _url => "$_scheme://$_host/app/$_appKey";
+  static String get _url => "$_scheme://$_host:$_port/app/$_appKey";
 
   // Auth URL
   static String get _authUrl => "${ApiConfig.baseUrl}/broadcasting/auth";

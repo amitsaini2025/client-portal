@@ -1,7 +1,4 @@
 
-
-import 'package:client/models/workflow_message.dart';
-
 class SendMessageResponse {
   final bool success;
   final String message;

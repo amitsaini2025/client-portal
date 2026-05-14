@@ -1479,7 +1479,8 @@ class ApiService {
       final expiryDate = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
       final threshold = DateTime.now().add(ApiConfig.refreshTokenThreshold);
 
-      return DateTime.now().isAfter(expiryDate);
+      // Token is expired, or will expire within the threshold window
+      return threshold.isAfter(expiryDate);
     } catch (e) {
       return true;
     }

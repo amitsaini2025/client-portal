@@ -2,7 +2,6 @@ import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/theme_config.dart';
-import '../../models/client.dart';
 import '../../services/auth_service.dart';
 import '../../utils/secure_storage_service.dart';
 
@@ -21,8 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
-  bool _biometricAvailable = false;
-  bool _biometricEnabled = false;
 
   String? _errorMessage;
   String? _successMessage;
@@ -30,8 +27,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _checkBiometricAvailability();
-    _checkBiometricStatus();
     _loadSavedCredentials();
   }
 
@@ -90,20 +85,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _checkBiometricAvailability() async {
-    final available = await AuthService.isBiometricAvailable();
-    setState(() {
-      _biometricAvailable = available;
-    });
-  }
-
-  Future<void> _checkBiometricStatus() async {
-    final enabled = await AuthService.isBiometricEnabled();
-    setState(() {
-      _biometricEnabled = enabled;
-    });
-  }
-
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -147,129 +128,6 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       setState(() {
         _errorMessage = 'An unexpected error occurred: ${e.toString()}';
-      });
-
-      _showErrorDialog(_errorMessage!);
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _authenticateWithBiometrics() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final authenticated = await AuthService.authenticateWithBiometrics();
-
-      if (authenticated) {
-        setState(() {
-          _successMessage = 'Biometric authentication successful!';
-        });
-      } else {
-        setState(() {
-          _errorMessage = 'Biometric authentication failed';
-        });
-
-        _showErrorDialog(_errorMessage!);
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Biometric authentication error: ${e.toString()}';
-      });
-
-      _showErrorDialog(_errorMessage!);
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _enableBiometric() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final enabled = await AuthService.enableBiometric();
-
-      if (enabled) {
-        setState(() {
-          _biometricEnabled = true;
-          _successMessage = 'Biometric authentication enabled!';
-        });
-      } else {
-        setState(() {
-          _errorMessage = 'Failed to enable biometric authentication';
-        });
-
-        _showErrorDialog(_errorMessage!);
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Error enabling biometric: ${e.toString()}';
-      });
-
-      _showErrorDialog(_errorMessage!);
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _testLogin() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-      _successMessage = null;
-    });
-
-    try {
-      await Future.delayed(const Duration(milliseconds: 800));
-
-      final mockClient = Client(
-        id: 1,
-        clientId: 'test_client_001',
-        name: 'Test Client',
-        email: 'test@example.com',
-        phone: '+1234567890',
-        city: 'Test City',
-        address: '123 Test Street',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        state: 'Test State',
-        country: 'Test Country',
-        postCode: '12345',
-        gender: 'Not Specified',
-        age: '25',
-        maritalStatus: 'Single',
-        phoneNumber1: '+1234567890',
-        phoneVerify: true,
-        emailVerify: true,
-        themeMode: 'light',
-      );
-
-      setState(() {
-        _successMessage = 'Test login successful! Navigating to dashboard...';
-      });
-
-      Future.delayed(const Duration(seconds: 1), () {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/dashboard',
-              (Route<dynamic> route) => false,
-        );
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Test login failed: ${e.toString()}';
       });
 
       _showErrorDialog(_errorMessage!);

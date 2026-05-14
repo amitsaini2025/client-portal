@@ -223,11 +223,11 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(_case!.status ?? ''),
+                        color: _getStatusColor(_case!.status),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        (_case!.status ?? '')
+                        _case!.status
                             .replaceAll('_', ' ')
                             .toUpperCase(),
                         style: const TextStyle(
