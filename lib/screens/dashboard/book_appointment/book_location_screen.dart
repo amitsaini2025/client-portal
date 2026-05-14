@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,9 +7,9 @@ import '../../../models/appointment/appointment_variable_list.dart';
 import '../../../services/api_service.dart';
 import '../../../utils/app_loader.dart';
 import '../../../utils/cache_helper.dart';
+import '../../dashboard/appointment_list/appointment_list.dart';
 import 'book_service_screen.dart';
 import 'booking_widget.dart';
-import '../../dashboard/appointment_list/appointment_list.dart';
 
 class BookLocationScreen extends StatefulWidget {
   const BookLocationScreen({super.key});
@@ -53,21 +54,26 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
         cachedServices != null &&
         cachedServiceCategories != null) {
       // Load from cache
-      locations = (jsonDecode(cachedLocations) as List)
-          .map((e) => LocationModel.fromJson(e))
-          .toList();
-      meetingTypes = (jsonDecode(cachedMeetingTypes) as List)
-          .map((e) => MeetingTypeModel.fromJson(e))
-          .toList();
-      languages = (jsonDecode(cachedLanguages) as List)
-          .map((e) => LanguageModel.fromJson(e))
-          .toList();
-      services = (jsonDecode(cachedServices) as List)
-          .map((e) => ServiceTypeModel.fromJson(e))
-          .toList();
-      serviceCategories = (jsonDecode(cachedServiceCategories) as List)
-          .map((e) => SimpleServiceModel.fromJson(e))
-          .toList();
+      locations =
+          (jsonDecode(cachedLocations) as List)
+              .map((e) => LocationModel.fromJson(e))
+              .toList();
+      meetingTypes =
+          (jsonDecode(cachedMeetingTypes) as List)
+              .map((e) => MeetingTypeModel.fromJson(e))
+              .toList();
+      languages =
+          (jsonDecode(cachedLanguages) as List)
+              .map((e) => LanguageModel.fromJson(e))
+              .toList();
+      services =
+          (jsonDecode(cachedServices) as List)
+              .map((e) => ServiceTypeModel.fromJson(e))
+              .toList();
+      serviceCategories =
+          (jsonDecode(cachedServiceCategories) as List)
+              .map((e) => SimpleServiceModel.fromJson(e))
+              .toList();
 
       selectedLocation = locations.first;
       selectedMeeting = meetingTypes.first;
@@ -81,21 +87,26 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
       final response = await ApiService.getAppointmentVariableLists();
       final data = response['data'];
 
-      locations = (data['location'] as List)
-          .map((e) => LocationModel.fromJson(e))
-          .toList();
-      meetingTypes = (data['meeting_type'] as List)
-          .map((e) => MeetingTypeModel.fromJson(e))
-          .toList();
-      languages = (data['preferred_language'] as List)
-          .map((e) => LanguageModel.fromJson(e))
-          .toList();
-      services = (data['service_type'] as List)
-          .map((e) => ServiceTypeModel.fromJson(e))
-          .toList();
-      serviceCategories = (data['select_your_service'] as List)
-          .map((e) => SimpleServiceModel.fromJson(e))
-          .toList();
+      locations =
+          (data['location'] as List)
+              .map((e) => LocationModel.fromJson(e))
+              .toList();
+      meetingTypes =
+          (data['meeting_type'] as List)
+              .map((e) => MeetingTypeModel.fromJson(e))
+              .toList();
+      languages =
+          (data['preferred_language'] as List)
+              .map((e) => LanguageModel.fromJson(e))
+              .toList();
+      services =
+          (data['service_type'] as List)
+              .map((e) => ServiceTypeModel.fromJson(e))
+              .toList();
+      serviceCategories =
+          (data['select_your_service'] as List)
+              .map((e) => SimpleServiceModel.fromJson(e))
+              .toList();
 
       selectedLocation = locations.first;
       selectedMeeting = meetingTypes.first;
@@ -105,7 +116,10 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
       await CacheHelper.saveData(key: 'meetingTypes', data: meetingTypes);
       await CacheHelper.saveData(key: 'languages', data: languages);
       await CacheHelper.saveData(key: 'services', data: services);
-      await CacheHelper.saveData(key: 'serviceCategories', data: serviceCategories);
+      await CacheHelper.saveData(
+        key: 'serviceCategories',
+        data: serviceCategories,
+      );
 
       setState(() => isLoading = false);
     } catch (e) {
@@ -130,11 +144,12 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
   Widget _cardWidth(BuildContext context, Widget child) {
     final width = MediaQuery.of(context).size.width;
     return SizedBox(
-      width: width > 900
-          ? 320
-          : width > 600
-          ? 280
-          : width - 100,
+      width:
+          width > 900
+              ? 320
+              : width > 600
+              ? 280
+              : width - 100,
       child: child,
     );
   }
@@ -145,131 +160,165 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
       title: 'Choose Your Preferred Location',
       activeStep: 1,
       actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AppointmentListScreen()),
-            );
-          },
-          child: const Text(
-            'See All',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+            ),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AppointmentListScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.history_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+              label: const Text(
+                'My Booking\nHistory',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  height: 1.2,
+                ),
+              ),
             ),
           ),
         ),
       ],
-      child: isLoading
-          ? SizedBox(
-        height: MediaQuery.of(context).size.height / 2,
-        child: const Center(child: AppLoader()),
-      )
-          : Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Select Office Location',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: locations
-                .map(
-                  (location) => _cardWidth(
-                context,
-                SelectionCard(
-                  title: location.name,
-                  subtitle: location.fullAddress,
-                  isSelected: selectedLocation?.id == location.id,
-                  onTap: () => setState(
-                        () => selectedLocation = location,
+      child:
+          isLoading
+              ? SizedBox(
+                height: MediaQuery.of(context).size.height / 2,
+                child: const Center(child: AppLoader()),
+              )
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Select Office Location',
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
-                ),
-              ),
-            )
-                .toList(),
-          ),
-          const SizedBox(height: 32),
-          const Text(
-            'Meeting Type',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: meetingTypes
-                .map(
-                  (meeting) => _cardWidth(
-                context,
-                SelectionCard(
-                  icon: _iconFromString(meeting.icon),
-                  title: meeting.name,
-                  subtitle: meeting.description,
-                  isSelected: selectedMeeting?.id == meeting.id,
-                  onTap: () => setState(
-                        () => selectedMeeting = meeting,
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children:
+                        locations
+                            .map(
+                              (location) => _cardWidth(
+                                context,
+                                SelectionCard(
+                                  title: location.name,
+                                  subtitle: location.fullAddress,
+                                  isSelected:
+                                      selectedLocation?.id == location.id,
+                                  onTap:
+                                      () => setState(
+                                        () => selectedLocation = location,
+                                      ),
+                                ),
+                              ),
+                            )
+                            .toList(),
                   ),
-                ),
-              ),
-            )
-                .toList(),
-          ),
-          const SizedBox(height: 32),
-          const Text(
-            'Preferred Language',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: languages
-                .map(
-                  (lang) => _cardWidth(
-                context,
-                SelectionCard(
-                  title: "${lang.flag} ${lang.name}",
-                  isSelected: selectedLanguage?.id == lang.id,
-                  onTap: () => setState(
-                        () => selectedLanguage = lang,
+                  const SizedBox(height: 32),
+                  const Text(
+                    'Meeting Type',
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
-                ),
-              ),
-            )
-                .toList(),
-          ),
-          const SizedBox(height: 40),
-          NextButton(
-            onTap: () async {
-              Map<String, dynamic> selectedOptions = {
-                'location_name': selectedLocation?.name.toString(),
-                'meeting_type': selectedMeeting?.name.toString(),
-                'inperson_address': selectedLocation?.id.toString(),
-                'appointment_details': selectedMeeting?.id.toString(),
-                'preferred_language': selectedLanguage?.id.toString(),
-              };
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setString(
-                'selectedOptions',
-                jsonEncode(selectedOptions),
-              );
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children:
+                        meetingTypes
+                            .map(
+                              (meeting) => _cardWidth(
+                                context,
+                                SelectionCard(
+                                  icon: _iconFromString(meeting.icon),
+                                  title: meeting.name,
+                                  subtitle: meeting.description,
+                                  isSelected: selectedMeeting?.id == meeting.id,
+                                  onTap:
+                                      () => setState(
+                                        () => selectedMeeting = meeting,
+                                      ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                  ),
+                  const SizedBox(height: 32),
+                  const Text(
+                    'Preferred Language',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children:
+                        languages
+                            .map(
+                              (lang) => _cardWidth(
+                                context,
+                                SelectionCard(
+                                  title: "${lang.flag} ${lang.name}",
+                                  isSelected: selectedLanguage?.id == lang.id,
+                                  onTap:
+                                      () => setState(
+                                        () => selectedLanguage = lang,
+                                      ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                  ),
+                  const SizedBox(height: 40),
+                  NextButton(
+                    onTap: () async {
+                      Map<String, dynamic> selectedOptions = {
+                        'location_name': selectedLocation?.name.toString(),
+                        'meeting_type': selectedMeeting?.name.toString(),
+                        'inperson_address': selectedLocation?.id.toString(),
+                        'appointment_details': selectedMeeting?.id.toString(),
+                        'preferred_language': selectedLanguage?.id.toString(),
+                      };
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setString(
+                        'selectedOptions',
+                        jsonEncode(selectedOptions),
+                      );
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => BookServiceScreen(),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => BookServiceScreen()),
+                      );
+                    },
+                  ),
+                ],
+              ),
     );
   }
 }

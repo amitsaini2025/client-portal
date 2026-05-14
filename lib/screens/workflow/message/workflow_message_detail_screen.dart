@@ -1,5 +1,11 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../models/workflow_message_detail_response.dart';
@@ -11,7 +17,10 @@ import '../../../utils/responsive_utils.dart';
 class WorkflowMessageDetailScreen extends StatefulWidget {
   final int messageId;
 
-  const WorkflowMessageDetailScreen({super.key, required this.messageId});
+  const WorkflowMessageDetailScreen({
+    super.key,
+    required this.messageId,
+  });
 
   @override
   State<WorkflowMessageDetailScreen> createState() =>
@@ -58,6 +67,45 @@ class _WorkflowMessageDetailScreenState
     }
   }
 
+  Future<void> _downloadFile(String url, String filename) async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Download started...')),
+      );
+
+      await FileDownloader.downloadFile(
+        url: url,
+        name: filename,
+        headers: {
+          "Authorization": "Bearer ${AuthService.currentToken}",
+        },
+        onProgress: (fileName, progress) {
+          debugPrint('$fileName: $progress% downloaded');
+        },
+        onDownloadCompleted: (filePath) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Saved: $filePath')),
+            );
+          }
+        },
+        onDownloadError: (errorMessage) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Download failed: $errorMessage')),
+            );
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
+  }
+
   String _formatTime(String dateTimeStr) {
     try {
       final dt = DateTime.parse(dateTimeStr).toLocal();
@@ -79,32 +127,32 @@ class _WorkflowMessageDetailScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: ThemeConfig.goldenYellow,
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
-          "Message info",
+          "Message Info",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
-        backgroundColor: ThemeConfig.goldenYellow,
-        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(
             maxWidth: AppResponsive.maxContentWidth,
           ),
-          child:
-              _isLoading
-                  ? Center(child: AppLoader())
-                  : _error != null
-                  ? _buildErrorWidget()
-                  : _message == null
-                  ? _buildEmptyWidget()
-                  : _buildContent(),
+          child: _isLoading
+              ? Center(child: AppLoader())
+              : _error != null
+              ? _buildErrorWidget()
+              : _message == null
+              ? _buildEmptyWidget()
+              : _buildContent(),
         ),
       ),
     );
@@ -121,20 +169,11 @@ class _WorkflowMessageDetailScreenState
           _buildStatusTile(
             icon: Icons.done_all,
             iconColor: Colors.blue,
-            title: "Read",
-            time:
-                _message!.recipients.any((r) => r.isRead)
-                    ? "Some recipients have read this message"
-                    : "No one has read this message yet",
+            title: "Read Status",
+            time: _message!.recipients.any((r) => r.isRead)
+                ? "Some recipients have read this message"
+                : "No one has read this message yet",
           ),
-          /*const Divider(height: 32),
-          _buildStatusTile(
-            icon: Icons.done,
-            iconColor: Colors.grey,
-            title: "Delivered",
-            time:
-            "${_message!.recipientCount} recipients received this message",
-          ),*/
         ],
       ),
     );
@@ -144,16 +183,16 @@ class _WorkflowMessageDetailScreenState
     return Align(
       alignment: Alignment.centerRight,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 320),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        constraints: const BoxConstraints(maxWidth: 340),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(2, 2),
+              blurRadius: 8,
+              offset: const Offset(2, 4),
             ),
           ],
         ),
@@ -162,53 +201,120 @@ class _WorkflowMessageDetailScreenState
           children: [
             if (_message!.attachments.isNotEmpty) ...[
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children:
-                    _message!.attachments.map((attachment) {
-                      if (attachment.type == "image") {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
+                spacing: 10,
+                runSpacing: 10,
+                children: _message!.attachments.map((attachment) {
+                  if (attachment.type == "image") {
+                    return Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
                           child: Image.network(
                             attachment.url,
-                            width: 120,
-                            height: 120,
+                            width: 130,
+                            height: 130,
                             fit: BoxFit.cover,
                             headers: {
                               "Authorization":
-                                  "Bearer ${AuthService.currentToken}",
+                              "Bearer ${AuthService.currentToken}",
                             },
                           ),
-                        );
-                      } else {
-                        return Container(
-                          width: 120,
-                          height: 60,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(8),
+                        ),
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              shape: BoxShape.circle,
+                            ),
+                            child: IconButton(
+                              constraints: const BoxConstraints(),
+                              padding: const EdgeInsets.all(6),
+                              icon: const Icon(
+                                Icons.download_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                              onPressed: () {
+                                _downloadFile(
+                                  attachment.url,
+                                  attachment.filename,
+                                );
+                              },
+                            ),
                           ),
-                          child: Text(
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Container(
+                      width: 130,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.insert_drive_file_rounded,
+                            size: 34,
+                            color: Colors.blueGrey,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
                             attachment.filename,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 12),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        );
-                      }
-                    }).toList(),
+                          const SizedBox(height: 10),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () {
+                              _downloadFile(
+                                attachment.url,
+                                attachment.filename,
+                              );
+                            },
+                            icon: const Icon(Icons.download, size: 16),
+                            label: const Text(
+                              "Download",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                }).toList(),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 14),
             ],
-
             if (_message!.message.isNotEmpty)
               Text(
                 _message!.message,
-                style: const TextStyle(fontSize: 15, color: Colors.black87),
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.black87,
+                  height: 1.4,
+                ),
               ),
-
-            const SizedBox(height: 6),
-
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -222,10 +328,9 @@ class _WorkflowMessageDetailScreenState
                       ? Icons.done_all
                       : Icons.done,
                   size: 16,
-                  color:
-                      _message!.recipients.any((r) => r.isRead)
-                          ? Colors.blue
-                          : Colors.grey,
+                  color: _message!.recipients.any((r) => r.isRead)
+                      ? Colors.blue
+                      : Colors.grey,
                 ),
               ],
             ),
@@ -241,39 +346,61 @@ class _WorkflowMessageDetailScreenState
     required String title,
     required String time,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: iconColor),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                time,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(1, 3),
           ),
-        ),
-      ],
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 24),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  time,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildErrorWidget() {
     return Center(
-      child: Text(
-        _error ?? "Error loading message",
-        style: const TextStyle(color: Colors.red),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(
+          _error ?? "Error loading message",
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.red, fontSize: 14),
+        ),
       ),
     );
   }
@@ -282,7 +409,7 @@ class _WorkflowMessageDetailScreenState
     return const Center(
       child: Text(
         "No message details available",
-        style: TextStyle(color: Colors.grey),
+        style: TextStyle(color: Colors.grey, fontSize: 14),
       ),
     );
   }

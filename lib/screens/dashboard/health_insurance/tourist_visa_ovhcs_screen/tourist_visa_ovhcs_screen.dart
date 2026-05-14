@@ -47,6 +47,14 @@ class TouristVisaOVHCScreen extends StatelessWidget {
               url:
               UrlConstants.touristVisa.allianzOVHC,
             ),
+            const SizedBox(height: 16),
+            _providerTile(
+              context,
+              title: "Nib / IMAN",
+              color: Colors.orange,
+              url:
+              UrlConstants.temporaryGraduate.nibIMAN,
+            ),
           ],
         ),
           ),
