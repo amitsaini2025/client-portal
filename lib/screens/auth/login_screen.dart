@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../config/theme_config.dart';
 import '../../models/client.dart';
 import '../../services/auth_service.dart';
-import '../../services/stripe_service.dart';
 import '../../utils/secure_storage_service.dart';
 
 class LoginScreen extends StatefulWidget {

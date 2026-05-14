@@ -22,7 +22,6 @@ import '../../../services/auth_service.dart';
 import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common/error_widget.dart';
-import '../../../widgets/common/loading_widget.dart';
 import '../../../widgets/dashboard/quick_actions_card.dart';
 import '../../../widgets/dialog/login_signup_dialog.dart';
 import '../book_appointment/book_location_screen.dart';

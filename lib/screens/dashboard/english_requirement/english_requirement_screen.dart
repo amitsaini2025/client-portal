@@ -1,7 +1,6 @@
 import 'package:client/screens/dashboard/english_requirement/english_requirement_for_student_visa_screen.dart';
 import 'package:client/screens/dashboard/english_requirement/english_requirement_for_485_temporary_graduate_visa_tr_screen.dart';
 import 'package:flutter/material.dart';
-import '../../../config/theme_config.dart';
 import '../../../services/auth_service.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';

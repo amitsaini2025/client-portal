@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../config/theme_config.dart';
 import '../../../../services/auth_service.dart';
 import '../../../../utils/constants.dart';
 import '../../../../utils/responsive_utils.dart';

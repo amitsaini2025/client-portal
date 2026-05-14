@@ -1,13 +1,10 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/api_config.dart';
-import '../config/api_config_bansal_immigration.dart';
 import '../utils/navigation_service.dart';
 import 'auth_service.dart';
 

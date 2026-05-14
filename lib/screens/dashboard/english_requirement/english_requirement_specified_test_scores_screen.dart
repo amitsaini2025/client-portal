@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/theme_config.dart';
 import '../../../services/auth_service.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
@@ -10,22 +9,8 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final testData = _testData();
-
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      /*appBar: AppBar(
-        title: const Text(
-          "English Requirement for Specified Test Scores",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: ThemeConfig.white,
-          ),
-        ),
-        backgroundColor: ThemeConfig.goldenYellow,
-        iconTheme: const IconThemeData(color: ThemeConfig.white),
-        centerTitle: true,
-      ),*/
       appBar: CommonAppBar(
         titleName: "English Requirement for Specified Test Scores",
         matterID: AuthService.selectedMatterId,
@@ -37,122 +22,6 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget _buildCard(Map<String, dynamic> data) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 14),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "${data["item"]}. ${data["testName"]}",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            const SizedBox(height: 10),
-            _scoreRow("Score Level 1", data["col2"]),
-            const Divider(),
-            _scoreRow("Score Level 2", data["col3"]),
-            const Divider(),
-            _scoreRow("Score Level 3", data["col4"]),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _scoreRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 4,
-            child: Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-          ),
-          Expanded(
-            flex: 6,
-            child: Text(value, style: const TextStyle(fontSize: 13)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<Map<String, dynamic>> _testData() {
-    return [
-      {
-        "item": "1",
-        "testName": "C1 Advanced",
-        "col2": "Overall band score of 161",
-        "col3": "Not accepted",
-        "col4": "Not accepted",
-      },
-      {
-        "item": "2",
-        "testName": "CELPIP General",
-        "col2": "Overall band score of 7",
-        "col3": "Overall band score of 6",
-        "col4": "Overall band score of 5",
-      },
-      {
-        "item": "3",
-        "testName": "IELTS Academic",
-        "col2": "Average band score of 6.0",
-        "col3": "Average band score of 5.5",
-        "col4": "Average band score of 5.0",
-      },
-      {
-        "item": "4",
-        "testName": "IELTS General Training",
-        "col2": "Average band score of 6.0",
-        "col3": "Average band score of 5.5",
-        "col4": "Average band score of 5.0",
-      },
-      {
-        "item": "5",
-        "testName": "LanguageCert Academic",
-        "col2": "Overall band score of 61",
-        "col3": "Overall band score of 54",
-        "col4": "Overall band score of 46",
-      },
-      {
-        "item": "6",
-        "testName": "MET",
-        "col2": "Overall band score of 53",
-        "col3": "Overall band score of 49",
-        "col4": "Overall band score of 44",
-      },
-      {
-        "item": "7",
-        "testName": "OET",
-        "col2": "Overall band score of 1210",
-        "col3": "Overall band score of 1090",
-        "col4": "Overall band score of 1020",
-      },
-      {
-        "item": "8",
-        "testName": "PTE Academic",
-        "col2": "Overall band score of 47",
-        "col3": "Overall band score of 39",
-        "col4": "Overall band score of 31",
-      },
-      {
-        "item": "9",
-        "testName": "TOEFL iBT",
-        "col2": "Total band score of 67",
-        "col3": "Total band score of 51",
-        "col4": "Total band score of 37",
-      },
-    ];
   }
 }
 
@@ -483,34 +352,6 @@ class _EnglishLanguageRequirementsWidgetState
     }
 
     return filtered;
-  }
-
-  Widget _valueRow(IconData icon, String label, String? value) {
-    if (value == null || value.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Icon(icon, size: 14, color: Colors.indigo.shade300),
-          const SizedBox(width: 6),
-          Expanded(
-            flex: 3,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 5,
-            child: Text(value, style: const TextStyle(fontSize: 12)),
-          ),
-        ],
-      ),
-    );
   }
 
   List<Map<String, dynamic>> get tableDataAfterAug2025 => [

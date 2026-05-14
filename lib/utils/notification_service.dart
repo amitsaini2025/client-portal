@@ -1,7 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import '../services/api_service.dart';
-
 class NotificationService {
   static Future<void> init() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
