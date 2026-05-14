@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -44,8 +42,6 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         clientMatterId: AuthService.selectedMatterId ?? 0,
         stageId: widget.stageId,
       );
-      final responseJsonString = jsonEncode(response);
-      print('Workflow Allowed Checklist Response: $responseJsonString');
       if (response['success'] == true && response['data'] != null) {
         _checklistResponse = WorkflowChecklistResponse.fromJson(
           response['data'],
@@ -240,7 +236,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.1),
+                color: statusColor.withValues(alpha: 0.1),
                 border: Border.all(color: statusColor),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -353,7 +349,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
 
   Widget _buildChip(String label, String value, Color color) {
     return Chip(
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       side: BorderSide(color: color),
       label: Text(
         '$label: $value',

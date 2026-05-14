@@ -275,7 +275,7 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
                   color: Colors.grey[850])),
           const SizedBox(height: 4),
           DropdownButtonFormField<T>(
-            value: items.any((e) => e.value == value?.value)
+            initialValue: items.any((e) => e.value == value?.value)
                 ? items.firstWhere((e) => e.value == value?.value)
                 : null,
             isExpanded: true,
@@ -557,7 +557,7 @@ class _PRCalculatorScreenState extends State<PRCalculatorScreen> {
                       ],
                     ),
                   );
-                }).toList(),
+                }),
 
                 const SizedBox(height: 20),
 

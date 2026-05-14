@@ -56,17 +56,18 @@ class DocumentCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          document.name ?? 'Untitled Document',
+                          document.name.isEmpty
+                              ? 'Untitled Document'
+                              : document.name,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.w600),
                         ),
 
                         const SizedBox(height: 4),
 
-                        if (document.fileName != null &&
-                            document.fileName!.isNotEmpty)
+                        if (document.fileName.isNotEmpty)
                           Text(
-                            document.fileName!,
+                            document.fileName,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: Colors.grey.shade600),
                             maxLines: 2,
@@ -84,9 +85,9 @@ class DocumentCard extends StatelessWidget {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: _getStatusColor(
-                                  document.status,
-                                ).withOpacity(0.1),
+                                color: _getStatusColor(document.status).withValues(
+                                  alpha: 0.1,
+                                ),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -109,11 +110,11 @@ class DocumentCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              document.uploadedAt != null
-                                  ? DateFormat(
-                                    'MMM dd, yyyy',
-                                  ).format(DateTime.parse(document.uploadedAt))
-                                  : 'Unknown date',
+                              document.uploadedAt.isEmpty
+                                  ? 'Unknown date'
+                                  : DateFormat('MMM dd, yyyy').format(
+                                      DateTime.parse(document.uploadedAt),
+                                    ),
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(color: Colors.grey.shade500),
                             ),
@@ -187,12 +188,13 @@ class DocumentCard extends StatelessWidget {
               ),
 
               // Additional metadata
-              if (document.fileType != null || document.fileUrl != null)
+              if (document.fileType.isNotEmpty ||
+                  document.fileUrl.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 12),
                   child: Row(
                     children: [
-                      if (document.fileType != null) ...[
+                      if (document.fileType.isNotEmpty) ...[
                         Icon(
                           Icons.insert_drive_file,
                           size: 16,
@@ -200,16 +202,17 @@ class DocumentCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          document.fileType!.toUpperCase(),
+                          document.fileType.toUpperCase(),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: Colors.grey.shade500),
                         ),
                       ],
 
-                      if (document.fileType != null && document.fileUrl != null)
+                      if (document.fileType.isNotEmpty &&
+                          document.fileUrl.isNotEmpty)
                         const SizedBox(width: 16),
 
-                      if (document.fileUrl != null) ...[
+                      if (document.fileUrl.isNotEmpty) ...[
                         Icon(
                           Icons.folder,
                           size: 16,
@@ -218,7 +221,7 @@ class DocumentCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            document.fileUrl!,
+                            document.fileUrl,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: Colors.grey.shade500),
                             maxLines: 1,
@@ -236,8 +239,8 @@ class DocumentCard extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(String? status) {
-    switch (status?.toLowerCase()) {
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
       case 'approved':
         return Colors.green;
       case 'pending_review':
@@ -253,8 +256,8 @@ class DocumentCard extends StatelessWidget {
     }
   }
 
-  IconData _getDocumentIcon(String? status) {
-    switch (status?.toLowerCase()) {
+  IconData _getDocumentIcon(String status) {
+    switch (status.toLowerCase()) {
       case 'approved':
         return Icons.check_circle;
       case 'pending_review':
@@ -270,8 +273,8 @@ class DocumentCard extends StatelessWidget {
     }
   }
 
-  String _getStatusLabel(String? status) {
-    switch (status?.toLowerCase()) {
+  String _getStatusLabel(String status) {
+    switch (status.toLowerCase()) {
       case 'approved':
         return 'APPROVED';
       case 'pending_review':

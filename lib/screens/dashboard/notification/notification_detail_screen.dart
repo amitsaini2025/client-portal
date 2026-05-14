@@ -174,7 +174,7 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
             _buildInfoRow(
               Icons.person,
               "From",
-              notification!.senderName ?? "System",
+              notification!.senderName,
             ),
 
             _buildInfoRow(

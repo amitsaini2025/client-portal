@@ -393,7 +393,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _buildGenderField() {
     return DropdownButtonFormField<String>(
-      value: _selectedGender,
+      initialValue: _selectedGender,
       decoration: const InputDecoration(
         labelText: 'Gender',
         border: OutlineInputBorder(),
@@ -416,7 +416,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _buildMaritalStatusField() {
     return DropdownButtonFormField<String>(
-      value: _selectedMaritalStatus,
+      initialValue: _selectedMaritalStatus,
       decoration: const InputDecoration(
         labelText: 'Marital Status',
         border: OutlineInputBorder(),

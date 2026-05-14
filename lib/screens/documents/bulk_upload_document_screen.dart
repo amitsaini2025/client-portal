@@ -213,7 +213,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -240,7 +240,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(.1),
+                    color: Colors.red.withValues(alpha: .1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Text(

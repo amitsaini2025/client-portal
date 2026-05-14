@@ -246,7 +246,7 @@ class WorkflowProgressWidget extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: isCurrent ? primary.withOpacity(0.1) : Colors.grey.shade50,
+                color: isCurrent ? primary.withValues(alpha: 0.1) : Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isCurrent ? primary : Colors.grey.shade300,

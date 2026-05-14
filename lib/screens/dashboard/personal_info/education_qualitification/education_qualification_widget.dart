@@ -387,13 +387,13 @@ class _EducationalQualificationsWidgetState
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
             spreadRadius: 0,
@@ -405,10 +405,10 @@ class _EducationalQualificationsWidgetState
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: ThemeConfig.primaryColor.withOpacity(0.12),
+              color: ThemeConfig.primaryColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: ThemeConfig.primaryColor.withOpacity(0.2),
+                color: ThemeConfig.primaryColor.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -435,14 +435,14 @@ class _EducationalQualificationsWidgetState
                 decoration: BoxDecoration(
                   color:
                       isEditing
-                          ? ThemeConfig.successColor.withOpacity(0.12)
-                          : ThemeConfig.primaryColor.withOpacity(0.12),
+                          ? ThemeConfig.successColor.withValues(alpha: 0.12)
+                          : ThemeConfig.primaryColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color:
                         isEditing
-                            ? ThemeConfig.successColor.withOpacity(0.25)
-                            : ThemeConfig.primaryColor.withOpacity(0.25),
+                            ? ThemeConfig.successColor.withValues(alpha: 0.25)
+                            : ThemeConfig.primaryColor.withValues(alpha: 0.25),
                     width: 1,
                   ),
                 ),
@@ -467,10 +467,10 @@ class _EducationalQualificationsWidgetState
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: ThemeConfig.successColor.withOpacity(0.12),
+                    color: ThemeConfig.successColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: ThemeConfig.successColor.withOpacity(0.25),
+                      color: ThemeConfig.successColor.withValues(alpha: 0.25),
                       width: 1,
                     ),
                   ),
@@ -503,13 +503,13 @@ class _EducationalQualificationsWidgetState
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
             spreadRadius: 0,
@@ -649,7 +649,7 @@ class _EducationalQualificationsWidgetState
               child:
                   enabled
                       ? DropdownButtonFormField<String>(
-                        value: value.isEmpty ? null : value,
+                        initialValue: value.isEmpty ? null : value,
                         isExpanded: true,
                         style: GoogleFonts.inter(
                           fontSize: 14,

@@ -1622,7 +1622,7 @@ class ClientFormPageState extends State<ClientFormPage> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       decoration: InputDecoration(labelText: 'Gender *'),
-                      value: gender.isNotEmpty ? gender : null,
+                      initialValue: gender.isNotEmpty ? gender : null,
                       items:
                           ['Male', 'Female', 'Other']
                               .map(
@@ -1668,7 +1668,7 @@ class ClientFormPageState extends State<ClientFormPage> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(labelText: 'Marital Status'),
-                value: maritalStatus.isNotEmpty ? maritalStatus : null,
+                initialValue: maritalStatus.isNotEmpty ? maritalStatus : null,
                 items:
                     ['Never Married', 'Married', 'Divorced', 'Widowed']
                         .map((s) => DropdownMenuItem(value: s, child: Text(s)))
@@ -1687,7 +1687,7 @@ class ClientFormPageState extends State<ClientFormPage> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       decoration: InputDecoration(labelText: 'Contact Type *'),
-                      value: contactType1,
+                      initialValue: contactType1,
                       items:
                           ['Not In Use', 'Personal', 'Secondary']
                               .map(
@@ -1715,7 +1715,7 @@ class ClientFormPageState extends State<ClientFormPage> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       decoration: InputDecoration(labelText: 'Contact Type *'),
-                      value: contactType2,
+                      initialValue: contactType2,
                       items:
                           ['Not In Use', 'Personal', 'Secondary']
                               .map(
@@ -1743,7 +1743,7 @@ class ClientFormPageState extends State<ClientFormPage> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       decoration: InputDecoration(labelText: 'Contact Type *'),
-                      value: contactType3,
+                      initialValue: contactType3,
                       items:
                           ['Not In Use', 'Personal', 'Secondary']
                               .map(
@@ -1770,7 +1770,7 @@ class ClientFormPageState extends State<ClientFormPage> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       decoration: InputDecoration(labelText: 'Email Type *'),
-                      value: emailType,
+                      initialValue: emailType,
                       items:
                           ['Personal', 'Secondary']
                               .map(
@@ -1928,7 +1928,7 @@ class ClientFormPageState extends State<ClientFormPage> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(labelText: 'Skill Assessment'),
-                value: skillAssessment.isNotEmpty ? skillAssessment : null,
+                initialValue: skillAssessment.isNotEmpty ? skillAssessment : null,
                 items:
                     ['Select', 'Yes', 'No']
                         .map((s) => DropdownMenuItem(value: s, child: Text(s)))
@@ -2568,7 +2568,7 @@ class CreateAppointmentPageState extends State<CreateAppointmentPage> {
                   labelText: 'Duration (minutes)',
                   border: OutlineInputBorder(),
                 ),
-                value: _duration,
+                initialValue: _duration,
                 items:
                     [30, 45, 60, 90, 120].map((duration) {
                       return DropdownMenuItem(
@@ -3127,31 +3127,25 @@ class _DocumentUploaderState extends State<DocumentUploader> {
 
   Future<void> _fetchDocuments() async {
     try {
-      final data = await ApiService.getClientDocuments();
+      final response = await ApiService.getClientDocuments();
       final List<Map<String, String>> newDocuments = [];
 
-      if (data is List) {
-        final dataList = data as List;
-        for (final doc in dataList) {
-          newDocuments.add({
-            'name': (doc['title'] ?? '').toString(),
-            'status': (doc['status'] ?? 'pending').toString(),
-            'date': (doc['created_at'] ?? '-').toString(),
-            'file_type': (doc['file_type'] ?? '').toString(),
-            'file_size': (doc['file_size'] ?? '').toString(),
-          });
-        }
-      } else if (data is Map && data['data'] != null) {
-        final dataList = data['data'] as List?;
-        if (dataList != null) {
-          for (final doc in dataList) {
-            newDocuments.add({
-              'name': (doc['title'] ?? '').toString(),
-              'status': (doc['status'] ?? 'pending').toString(),
-              'date': (doc['created_at'] ?? '-').toString(),
-              'file_type': (doc['file_type'] ?? '').toString(),
-              'file_size': (doc['file_size'] ?? '').toString(),
-            });
+      if (response['success'] == true) {
+        final data = response['data'];
+        if (data is Map<String, dynamic>) {
+          final raw = data['documents'];
+          if (raw is List) {
+            for (final item in raw) {
+              if (item is! Map) continue;
+              final doc = Map<String, dynamic>.from(item);
+              newDocuments.add({
+                'name': (doc['title'] ?? '').toString(),
+                'status': (doc['status'] ?? 'pending').toString(),
+                'date': (doc['created_at'] ?? '-').toString(),
+                'file_type': (doc['file_type'] ?? '').toString(),
+                'file_size': (doc['file_size'] ?? '').toString(),
+              });
+            }
           }
         }
       }

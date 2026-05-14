@@ -183,7 +183,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
+        side: BorderSide(color: ThemeConfig.goldenYellow.withValues(alpha: 0.5)),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),

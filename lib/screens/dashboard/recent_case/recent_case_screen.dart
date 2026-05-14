@@ -5,7 +5,7 @@ import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 
 class RecentCasesScreen extends StatefulWidget {
-  const RecentCasesScreen({Key? key}) : super(key: key);
+  const RecentCasesScreen({super.key});
 
   @override
   State<RecentCasesScreen> createState() => _RecentCasesScreenState();

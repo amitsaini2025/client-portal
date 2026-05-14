@@ -70,17 +70,17 @@ class _AddressAndTravelInformationWidgetState
           widget.addresses.map((a) {
             return {
               "id": (a.id == null || a.id == 0) ? null : a.id,
-              "search_address": a.searchAddress ?? "",
+              "search_address": a.searchAddress,
               "address_line_1": a.addressLine1 ?? "",
               "address_line_2": a.addressLine2,
-              "suburb": a.suburb ?? "",
-              "state": a.state ?? "",
+              "suburb": a.suburb,
+              "state": a.state,
               "postcode": a.postcode?.toString() ?? "",
-              "country": a.country ?? "",
+              "country": a.country,
               "regional_code": a.regionalCode,
               "start_date": a.startDate ?? "",
               "end_date": a.endDate,
-              "is_current": a.isCurrent ?? false,
+              "is_current": a.isCurrent,
             };
           }).toList();
 
@@ -139,11 +139,11 @@ class _AddressAndTravelInformationWidgetState
       final travelsPayload =
           widget.travels.map((t) {
             return {
-              "id": (t.id == null || t.id == 0) ? null : t.id,
-              "country_visited": t.countryVisited ?? "",
-              "arrival_date": t.arrivalDate ?? "",
-              "departure_date": t.departureDate ?? "",
-              "purpose": t.purpose ?? "",
+              "id": t.id == 0 ? null : t.id,
+              "country_visited": t.countryVisited,
+              "arrival_date": t.arrivalDate,
+              "departure_date": t.departureDate,
+              "purpose": t.purpose,
             };
           }).toList();
 
@@ -209,7 +209,7 @@ class _AddressAndTravelInformationWidgetState
     }
 
     final res = await ApiService.deleteClientTabDetail(
-      id: t.id!,
+      id: t.id,
       type: "travel",
     );
 
@@ -222,13 +222,14 @@ class _AddressAndTravelInformationWidgetState
   }
 
   Future<void> _deleteAddress(Address address) async {
-    if (address.id == 0) {
-      setState(() => widget.travels.remove(address));
+    final id = address.id;
+    if (id == null || id == 0) {
+      setState(() => widget.addresses.remove(address));
       return;
     }
 
     final res = await ApiService.deleteClientTabDetail(
-      id: address.id!,
+      id: id,
       type: "address",
     );
 
@@ -812,7 +813,10 @@ class _AddressAndTravelInformationWidgetState
               child:
                   editable
                       ? DropdownButtonFormField<String>(
-                        value: selected!.isEmpty ? null : selected,
+                        initialValue:
+                            selected == null || selected.isEmpty
+                                ? null
+                                : selected,
                         isExpanded: true,
                         style: GoogleFonts.inter(
                           fontSize: 14,
@@ -1064,13 +1068,13 @@ class _AddressAndTravelInformationWidgetState
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
             spreadRadius: 0,
@@ -1082,10 +1086,10 @@ class _AddressAndTravelInformationWidgetState
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: ThemeConfig.primaryColor.withOpacity(0.12),
+              color: ThemeConfig.primaryColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: ThemeConfig.primaryColor.withOpacity(0.2),
+                color: ThemeConfig.primaryColor.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -1112,14 +1116,14 @@ class _AddressAndTravelInformationWidgetState
                 decoration: BoxDecoration(
                   color:
                       isEditing
-                          ? ThemeConfig.successColor.withOpacity(0.12)
-                          : ThemeConfig.primaryColor.withOpacity(0.12),
+                          ? ThemeConfig.successColor.withValues(alpha: 0.12)
+                          : ThemeConfig.primaryColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color:
                         isEditing
-                            ? ThemeConfig.successColor.withOpacity(0.25)
-                            : ThemeConfig.primaryColor.withOpacity(0.25),
+                            ? ThemeConfig.successColor.withValues(alpha: 0.25)
+                            : ThemeConfig.primaryColor.withValues(alpha: 0.25),
                     width: 1,
                   ),
                 ),
@@ -1144,10 +1148,10 @@ class _AddressAndTravelInformationWidgetState
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: ThemeConfig.successColor.withOpacity(0.12),
+                    color: ThemeConfig.successColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: ThemeConfig.successColor.withOpacity(0.25),
+                      color: ThemeConfig.successColor.withValues(alpha: 0.25),
                       width: 1,
                     ),
                   ),
@@ -1180,13 +1184,13 @@ class _AddressAndTravelInformationWidgetState
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
             spreadRadius: 0,

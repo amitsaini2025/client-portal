@@ -214,7 +214,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
 
                     DropdownButtonFormField<int>(
                       dropdownColor: ThemeConfig.navyBlue,
-                      value: _selectedCaseId,
+                      initialValue: _selectedCaseId,
                       decoration: _inputDecoration(
                         label: 'Related Case (Optional)',
                         icon: Icons.folder,

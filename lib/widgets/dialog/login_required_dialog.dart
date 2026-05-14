@@ -43,7 +43,7 @@ class LoginRequiredDialog extends StatelessWidget {
       content: Text(
         message,
         style: TextStyle(
-          color: ThemeConfig.navyBlue.withOpacity(0.8),
+          color: ThemeConfig.navyBlue.withValues(alpha: 0.8),
         ),
       ),
       actionsAlignment: MainAxisAlignment.spaceBetween,

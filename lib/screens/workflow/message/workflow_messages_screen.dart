@@ -353,10 +353,10 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       );
 
       final response = SendMessageResponse.fromJson(responseJson);
-      if (response.success && response.data.message != null) {
-        MessageDetail message = response.data.message;
-        message.attachments =
-            message.attachments.map((file) {
+      if (response.success) {
+        final messageDetail = response.data.message;
+        messageDetail.attachments =
+            messageDetail.attachments.map((file) {
               return Attachment(
                 id: file.id,
                 filename: file.filename,
@@ -365,9 +365,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                 url: file.url,
               );
             }).toList();
-        message.isSender = true;
-        message.isRecipient = false;
-        _handleIncomingMessage(response.data.message);
+        messageDetail.isSender = true;
+        messageDetail.isRecipient = false;
+        _handleIncomingMessage(messageDetail);
         _messageController.clear();
         _attachmentBytes.clear();
       }
@@ -632,7 +632,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                       decoration: BoxDecoration(
                         color:
                             isSender
-                                ? ThemeConfig.navyBlue.withOpacity(0.9)
+                                ? ThemeConfig.navyBlue.withValues(alpha: 0.9)
                                 : Colors.white,
                         borderRadius: BorderRadius.only(
                           topLeft: const Radius.circular(16),
@@ -642,7 +642,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: Colors.black.withValues(alpha: 0.08),
                             blurRadius: 3,
                             offset: const Offset(1, 2),
                           ),
@@ -658,15 +658,15 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                               color: isSender ? Colors.white : Colors.black87,
                             ),
                           ),
-                          if (msg.attachments != null &&
-                              msg.attachments!.isNotEmpty)
+                          if (msg.attachments case final attachments?
+                              when attachments.isNotEmpty)
                             SizedBox(
                               height: 60,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemCount: msg.attachments!.length,
+                                itemCount: attachments.length,
                                 itemBuilder: (context, index) {
-                                  final attachment = msg.attachments![index];
+                                  final attachment = attachments[index];
                                   return Padding(
                                     padding: const EdgeInsets.only(right: 6),
                                     child: ClipRRect(

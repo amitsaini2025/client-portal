@@ -6,8 +6,7 @@
 
 import 'dart:ui_web' as ui;
 import 'package:flutter/material.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import 'package:web/web.dart';
 
 class UniversalWebViewWeb extends StatefulWidget {
   final String url;
@@ -36,7 +35,7 @@ class _UniversalWebViewWebState extends State<UniversalWebViewWeb> {
       ui.platformViewRegistry.registerViewFactory(
         widget.viewId,
             (int id) {
-          final iframe = html.IFrameElement()
+          final iframe = HTMLIFrameElement()
             ..src = widget.url
             ..style.border = 'none'
             ..style.width = '100%'

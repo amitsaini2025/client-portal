@@ -139,7 +139,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
         showDialog(
           context: context,
           barrierDismissible: false,
-          barrierColor: Colors.black.withOpacity(0.4),
+          barrierColor: Colors.black.withValues(alpha: 0.4),
           builder: (context) {
             return BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -191,7 +191,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.4),
+      barrierColor: Colors.black.withValues(alpha: 0.4),
       builder: (context) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -225,7 +225,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
       showDialog(
         context: parentContext,
         barrierDismissible: false,
-        barrierColor: Colors.black.withOpacity(0.4),
+        barrierColor: Colors.black.withValues(alpha: 0.4),
         builder: (context) {
           return BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -239,7 +239,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    DefaultTabController.of(parentContext)?.animateTo(0);
+                    DefaultTabController.of(parentContext).animateTo(0);
                   },
                   child: const Text("Cancel"),
                 ),
@@ -268,7 +268,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
       child: Material(
         borderRadius: BorderRadius.circular(14),
         elevation: 2,
-        shadowColor: Colors.orange.withOpacity(0.3),
+        shadowColor: Colors.orange.withValues(alpha: 0.3),
         color: Colors.white,
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
@@ -289,7 +289,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                 end: Alignment.bottomRight,
               ),
               border: Border.all(
-                color: const Color(0xFFFB923C).withOpacity(0.4),
+                color: const Color(0xFFFB923C).withValues(alpha: 0.4),
                 width: 1,
               ),
             ),
@@ -298,7 +298,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFB923C).withOpacity(0.15),
+                    color: const Color(0xFFFB923C).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(

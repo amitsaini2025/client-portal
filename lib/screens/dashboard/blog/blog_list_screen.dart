@@ -7,7 +7,7 @@ import '../../../services/api_service.dart';
 import '../../../utils/responsive_utils.dart';
 
 class BlogListScreen extends StatefulWidget {
-  const BlogListScreen({Key? key}) : super(key: key);
+  const BlogListScreen({super.key});
 
   @override
   State<BlogListScreen> createState() => _BlogListScreenState();
@@ -78,7 +78,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12),
         ],
       ),
       child: GestureDetector(

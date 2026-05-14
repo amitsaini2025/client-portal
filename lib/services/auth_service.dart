@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:client/services/stripe_service.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:local_auth/local_auth.dart';
@@ -93,8 +95,15 @@ class AuthService {
       if (cpStatus != null) {
         _cpStatus = int.tryParse(cpStatus);
       }
-    } catch (e) {
-      print('Error initializing AuthService: $e');
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log(
+          'Error initializing AuthService',
+          name: 'AuthService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
   }
 
@@ -114,8 +123,15 @@ class AuthService {
         key: _selectedMatterNameKey,
         value: matterName,
       );
-    } catch (e) {
-      print('Error saving selected matter: $e');
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log(
+          'Error saving selected matter',
+          name: 'AuthService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
   }
 
@@ -126,8 +142,15 @@ class AuthService {
     try {
       await _secureStorage.delete(key: _selectedMatterKey);
       await _secureStorage.delete(key: _selectedMatterNameKey);
-    } catch (e) {
-      print('Error clearing selected matter: $e');
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log(
+          'Error clearing selected matter',
+          name: 'AuthService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
   }
 
@@ -141,8 +164,15 @@ class AuthService {
         _selectedMatterId = int.tryParse(storedId);
         return true;
       }
-    } catch (e) {
-      print('Error checking matter selection: $e');
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log(
+          'Error checking matter selection',
+          name: 'AuthService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
     return false;
   }
@@ -155,8 +185,15 @@ class AuthService {
         key: _clientMatterStageKey,
         value: stageId.toString(),
       );
-    } catch (e) {
-      print('Error saving client matter stage id: $e');
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log(
+          'Error saving client matter stage id',
+          name: 'AuthService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
   }
 
@@ -165,8 +202,15 @@ class AuthService {
     _clientMatterStageId = null;
     try {
       await _secureStorage.delete(key: _clientMatterStageKey);
-    } catch (e) {
-      print('Error clearing client matter stage id: $e');
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log(
+          'Error clearing client matter stage id',
+          name: 'AuthService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
   }
 
@@ -178,8 +222,15 @@ class AuthService {
         key: _cpStatusKey,
         value: status.toString(),
       );
-    } catch (e) {
-      print('Error saving CP status: $e');
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log(
+          'Error saving CP status',
+          name: 'AuthService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
   }
 
@@ -360,8 +411,15 @@ class AuthService {
               await ApiService.unregisterFcmToken(fcmToken);
             }
             await ApiService.logout();
-          } catch (e) {
-            print('Logout API call failed: $e');
+          } catch (e, st) {
+            if (kDebugMode) {
+              developer.log(
+                'Logout API call failed',
+                name: 'AuthService',
+                error: e,
+                stackTrace: st,
+              );
+            }
           }
         }
       }
@@ -387,8 +445,15 @@ class AuthService {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
-    } catch (e) {
-      print('Error during logout: $e');
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log(
+          'Error during logout',
+          name: 'AuthService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
   }
 
@@ -411,8 +476,15 @@ class AuthService {
         _currentClient = Client.fromJson(data);
         _currentUserId = data['id'];
       }
-    } catch (e) {
-      print('Error loading user data: $e');
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log(
+          'Error loading user data',
+          name: 'AuthService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
   }
 

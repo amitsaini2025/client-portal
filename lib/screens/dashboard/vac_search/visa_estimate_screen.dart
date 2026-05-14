@@ -211,7 +211,7 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
         return ChoiceChip(
           label: Text(paymentMethods[index]),
           selected: selectedPaymentIndex == index,
-          selectedColor: ThemeConfig.goldenYellow.withOpacity(0.3),
+          selectedColor: ThemeConfig.goldenYellow.withValues(alpha: 0.3),
           backgroundColor: Colors.white,
           side: const BorderSide(color: Colors.black),
           onSelected: (val) {

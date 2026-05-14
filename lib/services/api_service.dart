@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -204,9 +205,16 @@ class ApiService {
           'POST',
         );
       }
-    } catch (e) {
+    } catch (e, st) {
       // Continue with local logout even if API call fails
-      print('Logout API call failed: $e');
+      if (kDebugMode) {
+        developer.log(
+          'Logout API call failed',
+          name: 'ApiService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     } finally {
       clearAuth();
     }
@@ -220,8 +228,15 @@ class ApiService {
       await _makeRequest(ApiConfig.unregisterFCMToken, _buildHeaders(), {
         "token": fcmToken,
       }, 'POST');
-    } catch (e) {
-      print('FCM unregister failed: $e');
+    } catch (e, st) {
+      if (kDebugMode) {
+        developer.log(
+          'FCM unregister failed',
+          name: 'ApiService',
+          error: e,
+          stackTrace: st,
+        );
+      }
     }
   }
 
@@ -834,7 +849,9 @@ class ApiService {
       "gender": gender,
       "marital_status": maritalStatus,
     }, "POST");
-    print("UPDATE RESPONSE: $response");
+    if (kDebugMode) {
+      developer.log('updateClientBasicDetail ok', name: 'ApiService');
+    }
     return response;
   }
 
@@ -847,7 +864,9 @@ class ApiService {
       "phones": phones,
     }, "POST");
 
-    print("UPDATE PHONE RESPONSE: $response");
+    if (kDebugMode) {
+      developer.log('updateClientPhoneDetail ok', name: 'ApiService');
+    }
     return response;
   }
 

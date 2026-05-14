@@ -113,7 +113,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: ThemeConfig.goldenYellow.withOpacity(0.9),
+        backgroundColor: ThemeConfig.goldenYellow.withValues(alpha: 0.9),
         title: const Text(
           "Notifications",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),

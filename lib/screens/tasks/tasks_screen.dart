@@ -58,10 +58,10 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 
   List<Task> get _filteredTasks {
+    final q = _searchQuery.toLowerCase();
     return _tasks.where((task) {
       final matchesSearch =
-          (task.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
-              false);
+          task.title.toLowerCase().contains(q);
       final matchesStatus =
           _statusFilter == 'all' || task.status == _statusFilter;
       final matchesPriority =
@@ -339,7 +339,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: ThemeConfig.goldenYellow.withOpacity(0.15),
+                      color: ThemeConfig.goldenYellow.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -351,7 +351,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      task.title ?? 'Untitled Task',
+                      task.title,
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -415,7 +415,7 @@ class _TasksScreenState extends State<TasksScreen> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      task.title ?? 'Untitled Task',
+                      task.title,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -427,12 +427,12 @@ class _TasksScreenState extends State<TasksScreen> {
                     _buildDetailRow(
                       Icons.priority_high,
                       'Priority',
-                      _getPriorityText(task.priority ?? 'unknown'),
+                      _getPriorityText(task.priority),
                     ),
                     _buildDetailRow(
                       Icons.info,
                       'Status',
-                      _getStatusText(task.status ?? 'unknown'),
+                      _getStatusText(task.status),
                     ),
                   ],
                 ),

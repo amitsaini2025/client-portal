@@ -102,8 +102,8 @@ class _BillingListScreenState extends State<BillingListScreen> {
   void _onPaymentResult(Map<String, dynamic> result, Invoice invoice) async {
     try {
       await ApiService.updateInvoicePayment(
-        billingInvoiceId: invoice.id!,
-        clientMatterId: invoice.clientMatterId!,
+        billingInvoiceId: invoice.id,
+        clientMatterId: invoice.clientMatterId,
         paymentType:
             defaultTargetPlatform == TargetPlatform.iOS
                 ? "apple_pay"
@@ -142,8 +142,8 @@ class _BillingListScreenState extends State<BillingListScreen> {
         currency: StripeConfig.defaultCurrency.toLowerCase(),
         description: 'Payment for invoice ${invoice.invoiceNumber}',
         metadata: {
-          'invoice_id': invoice.id!.toString(),
-          'client_matter_id': invoice.clientMatterId!.toString(),
+          'invoice_id': invoice.id.toString(),
+          'client_matter_id': invoice.clientMatterId.toString(),
         },
       );
 
@@ -386,7 +386,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
                       paymentItems: [
                         PaymentItem(
                           label: "Invoice ${invoice.invoiceNumber}",
-                          amount: invoice.totalAmount!.toString(),
+                          amount: invoice.totalAmount?.toString() ?? '0',
                           status: PaymentItemStatus.final_price,
                         ),
                       ],
@@ -401,7 +401,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
                       paymentItems: [
                         PaymentItem(
                           label: "Invoice ${invoice.invoiceNumber}",
-                          amount: invoice.totalAmount!.toString(),
+                          amount: invoice.totalAmount?.toString() ?? '0',
                           status: PaymentItemStatus.final_price,
                         ),
                       ],
@@ -439,8 +439,8 @@ class _BillingListScreenState extends State<BillingListScreen> {
       decoration: BoxDecoration(
         color:
             isPaid
-                ? Colors.green.withOpacity(0.1)
-                : Colors.orange.withOpacity(0.1),
+                ? Colors.green.withValues(alpha: 0.1)
+                : Colors.orange.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(

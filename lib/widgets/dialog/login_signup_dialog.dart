@@ -30,7 +30,7 @@ class LoginSignupDialog extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -44,7 +44,7 @@ class LoginSignupDialog extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: ThemeConfig.goldenYellow.withOpacity(0.2),
+                color: ThemeConfig.goldenYellow.withValues(alpha: 0.2),
               ),
               padding: const EdgeInsets.all(16),
               child: Icon(Icons.lock_outline, size: 36, color: ThemeConfig.goldenYellow),
@@ -69,7 +69,7 @@ class LoginSignupDialog extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
-                color: ThemeConfig.navyBlue.withOpacity(0.8),
+                color: ThemeConfig.navyBlue.withValues(alpha: 0.8),
               ),
             ),
             const SizedBox(height: 24),
@@ -122,7 +122,7 @@ class LoginSignupDialog extends StatelessWidget {
               width: double.infinity,
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: ThemeConfig.navyBlue.withOpacity(0.3)),
+                  side: BorderSide(color: ThemeConfig.navyBlue.withValues(alpha: 0.3)),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -134,7 +134,7 @@ class LoginSignupDialog extends StatelessWidget {
                 },
                 child: Text(
                   "Cancel",
-                  style: TextStyle(color: ThemeConfig.navyBlue.withOpacity(0.7)),
+                  style: TextStyle(color: ThemeConfig.navyBlue.withValues(alpha: 0.7)),
                 ),
               ),
             ),

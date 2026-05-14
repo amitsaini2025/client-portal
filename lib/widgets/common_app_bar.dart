@@ -136,9 +136,7 @@ class _CommonAppBarState extends State<CommonAppBar> {
                   ),
                 ],
               ),
-            )
-          else
-            const SizedBox(height: 0),
+            ),
         ],
       ),
       actions: [

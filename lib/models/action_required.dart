@@ -40,13 +40,13 @@ class ActionRequiredModel {
   }) : isRead = seen == 1;
 
   factory ActionRequiredModel.fromJson(Map<String, dynamic> json) {
-    int _toInt(dynamic value) {
+    int parseInt(dynamic value) {
       if (value is int) return value;
       if (value is String) return int.tryParse(value) ?? 0;
       return 0;
     }
 
-    DateTime _toDate(dynamic value) {
+    DateTime parseDate(dynamic value) {
       if (value == null) return DateTime.now();
       try {
         final formatted = value.toString().replaceFirst(' ', 'T');
@@ -57,24 +57,24 @@ class ActionRequiredModel {
     }
 
     return ActionRequiredModel(
-      id: _toInt(json['id']),
+      id: parseInt(json['id']),
       type: json['type']?.toString() ?? '',
-      clientId: _toInt(json['client_id']),
-      clientMatterId: _toInt(json['client_matter_id']),
+      clientId: parseInt(json['client_id']),
+      clientMatterId: parseInt(json['client_matter_id']),
       checklistId: json['checklist_id'] != null
-          ? _toInt(json['checklist_id'])
+          ? parseInt(json['checklist_id'])
           : null,
-      senderId: _toInt(json['sender_id']),
-      receiverId: _toInt(json['receiver_id']),
-      moduleId: _toInt(json['module_id']),
+      senderId: parseInt(json['sender_id']),
+      receiverId: parseInt(json['receiver_id']),
+      moduleId: parseInt(json['module_id']),
       url: json['url']?.toString() ?? '',
       notificationType: json['notification_type']?.toString() ?? '',
       message: json['message']?.toString() ?? '',
-      senderStatus: _toInt(json['sender_status']),
-      receiverStatus: _toInt(json['receiver_status']),
-      seen: _toInt(json['seen']),
-      createdAt: _toDate(json['created_at']),
-      updatedAt: _toDate(json['updated_at']),
+      senderStatus: parseInt(json['sender_status']),
+      receiverStatus: parseInt(json['receiver_status']),
+      seen: parseInt(json['seen']),
+      createdAt: parseDate(json['created_at']),
+      updatedAt: parseDate(json['updated_at']),
       senderName: json['sender_name']?.toString() ?? 'Unknown',
     );
   }

@@ -112,7 +112,7 @@ class _WorkflowViewDocumentsByChecklistScreenState
         boxShadow: [
           BoxShadow(
             blurRadius: 10,
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             offset: const Offset(0, 4),
           ),
         ],
@@ -127,7 +127,7 @@ class _WorkflowViewDocumentsByChecklistScreenState
           height: 48,
           width: 48,
           decoration: BoxDecoration(
-            color: fileColor.withOpacity(0.12),
+            color: fileColor.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(getFileIcon(doc.fileUrl), color: fileColor, size: 26),
@@ -158,7 +158,7 @@ class _WorkflowViewDocumentsByChecklistScreenState
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -182,7 +182,7 @@ class _WorkflowViewDocumentsByChecklistScreenState
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.12),
+              color: Colors.green.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.open_in_new, color: Colors.green, size: 22),

@@ -495,10 +495,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: ThemeConfig.goldenYellow.withOpacity(0.1),
+                        color: ThemeConfig.goldenYellow.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: ThemeConfig.goldenYellow.withOpacity(0.3),
+                          color: ThemeConfig.goldenYellow.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(

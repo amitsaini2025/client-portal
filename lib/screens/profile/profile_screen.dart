@@ -83,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
         border: Border.all(
-          color: ThemeConfig.goldenYellow.withOpacity(0.3),
+          color: ThemeConfig.goldenYellow.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -98,7 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 gradient: LinearGradient(
                   colors: [
                     ThemeConfig.goldenYellow,
-                    ThemeConfig.goldenYellow.withOpacity(0.6),
+                    ThemeConfig.goldenYellow.withValues(alpha: 0.6),
                   ],
                 ),
               ),
@@ -163,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: ThemeConfig.goldenYellow.withOpacity(0.15),
+              color: ThemeConfig.goldenYellow.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.all(8),
@@ -312,12 +312,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: color.withOpacity(0.4),
+          color: color.withValues(alpha: 0.4),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),

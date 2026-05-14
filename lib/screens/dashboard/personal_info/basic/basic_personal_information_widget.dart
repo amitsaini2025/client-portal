@@ -290,7 +290,9 @@ class _BasicPersonalInformationWidgetState
       for (var p in phoneList) {
         phoneControllers.add(
           TextEditingController(
-            text: "${p.countryCode ?? '+'} ${p.phone ?? ''}".trim(),
+            text:
+                "${p.countryCode.isEmpty ? '+' : p.countryCode} ${p.phone}"
+                    .trim(),
           ),
         );
       }
@@ -299,7 +301,7 @@ class _BasicPersonalInformationWidgetState
     if (widget.emails != null) {
       emailList.addAll(widget.emails!);
       for (var e in emailList) {
-        emailControllers.add(TextEditingController(text: e.email ?? ""));
+        emailControllers.add(TextEditingController(text: e.email));
       }
     }
   }
@@ -312,7 +314,7 @@ class _BasicPersonalInformationWidgetState
     if (!input.startsWith('+')) {
       input = '+$input';
     } else {
-      input = '+' + input.substring(1).replaceAll('+', '');
+      input = '+${input.substring(1).replaceAll('+', '')}';
     }
 
     String matchedCode = '+';
@@ -414,7 +416,7 @@ class _BasicPersonalInformationWidgetState
       payload.add({
         "id": phoneList[i].id == 0 ? null : phoneList[i].id,
         "phone": number,
-        "type": phoneList[i].type ?? "Other",
+        "type": phoneList[i].type,
         "country_code": countryCode,
         "extension": phoneList[i].extension,
       });
@@ -462,7 +464,7 @@ class _BasicPersonalInformationWidgetState
       payload.add({
         "id": emailList[i].id == 0 ? null : emailList[i].id,
         "email": emailText,
-        "type": emailList[i].type ?? "Other",
+        "type": emailList[i].type,
       });
     }
 
@@ -637,7 +639,7 @@ class _BasicPersonalInformationWidgetState
                         Expanded(
                           child: _buildTypeDropdown(
                             context,
-                            phone.type ?? "Other",
+                            phone.type,
                             isEditingPhones,
                             (value) => setState(() => phone.type = value!),
                           ),
@@ -697,9 +699,9 @@ class _BasicPersonalInformationWidgetState
                     const SizedBox(height: 8),
                     _buildTextFieldPhone(
                       context,
-                      phone.type ?? 'Phone Number',
+                      phone.type.isEmpty ? 'Phone Number' : phone.type,
                       phoneControllers[index],
-                      type: phone.type ?? 'Other',
+                      type: phone.type.isEmpty ? 'Other' : phone.type,
                     ),
                   ]),
                 );
@@ -745,7 +747,7 @@ class _BasicPersonalInformationWidgetState
                         Expanded(
                           child: _buildTypeDropdown(
                             context,
-                            email.type ?? 'Other',
+                            email.type,
                             isEditingEmails,
                             (v) => setState(() => email.type = v!),
                           ),
@@ -805,9 +807,9 @@ class _BasicPersonalInformationWidgetState
                     const SizedBox(height: 8),
                     _buildTextFieldEmail(
                       context,
-                      email.type ?? 'Email Address',
+                      email.type.isEmpty ? 'Email Address' : email.type,
                       emailControllers[index],
-                      type: email.type ?? 'Other',
+                      type: email.type.isEmpty ? 'Other' : email.type,
                     ),
                   ]),
                 );
@@ -846,7 +848,7 @@ class _BasicPersonalInformationWidgetState
             SizedBox(
               width: double.infinity,
               child: DropdownButtonFormField<String>(
-                value: value,
+                initialValue: value,
                 items:
                     typeOptions
                         .map(
@@ -1236,7 +1238,7 @@ class _BasicPersonalInformationWidgetState
             SizedBox(
               width: double.infinity,
               child: DropdownButtonFormField<String>(
-                value: value.isNotEmpty ? value : null,
+                initialValue: value.isNotEmpty ? value : null,
                 items:
                     options
                         .map(
@@ -1452,13 +1454,13 @@ class _BasicPersonalInformationWidgetState
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
             spreadRadius: 0,
@@ -1470,10 +1472,10 @@ class _BasicPersonalInformationWidgetState
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: ThemeConfig.primaryColor.withOpacity(0.12),
+              color: ThemeConfig.primaryColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: ThemeConfig.primaryColor.withOpacity(0.2),
+                color: ThemeConfig.primaryColor.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -1507,10 +1509,10 @@ class _BasicPersonalInformationWidgetState
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: ThemeConfig.successColor.withOpacity(0.12),
+                    color: ThemeConfig.successColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: ThemeConfig.successColor.withOpacity(0.25),
+                      color: ThemeConfig.successColor.withValues(alpha: 0.25),
                       width: 1,
                     ),
                   ),
@@ -1535,15 +1537,17 @@ class _BasicPersonalInformationWidgetState
                       setState(() => isEditingBasic = true);
                     }
                   } else if (isEmail) {
-                    if (isEditingEmails)
+                    if (isEditingEmails) {
                       _saveEmails();
-                    else
+                    } else {
                       setState(() => isEditingEmails = true);
+                    }
                   } else {
-                    if (isEditingPhones)
+                    if (isEditingPhones) {
                       _savePhones();
-                    else
+                    } else {
                       setState(() => isEditingPhones = true);
+                    }
                   }
                 },
                 borderRadius: BorderRadius.circular(10),
@@ -1552,14 +1556,14 @@ class _BasicPersonalInformationWidgetState
                   decoration: BoxDecoration(
                     color:
                         editing
-                            ? ThemeConfig.successColor.withOpacity(0.12)
-                            : ThemeConfig.primaryColor.withOpacity(0.12),
+                            ? ThemeConfig.successColor.withValues(alpha: 0.12)
+                            : ThemeConfig.primaryColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color:
                           editing
-                              ? ThemeConfig.successColor.withOpacity(0.25)
-                              : ThemeConfig.primaryColor.withOpacity(0.25),
+                              ? ThemeConfig.successColor.withValues(alpha: 0.25)
+                              : ThemeConfig.primaryColor.withValues(alpha: 0.25),
                       width: 1,
                     ),
                   ),
@@ -1594,13 +1598,13 @@ class _BasicPersonalInformationWidgetState
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
             spreadRadius: 0,

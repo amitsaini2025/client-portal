@@ -213,7 +213,7 @@ class _StudentFundCalculatorScreenState
         Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: 4),
         DropdownButtonFormField<Map<String, dynamic>>(
-          value: value,
+          initialValue: value,
           isExpanded: true,
           hint: const Text("Select"),
           items: list

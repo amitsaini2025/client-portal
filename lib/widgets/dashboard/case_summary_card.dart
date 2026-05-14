@@ -80,16 +80,16 @@ class CaseSummaryCard extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  Icon(Icons.folder_open, size: 40, color: Colors.grey.withOpacity(0.5)),
+                  Icon(Icons.folder_open, size: 40, color: Colors.grey.withValues(alpha: 0.5)),
                   const SizedBox(height: 12),
                   Text(
                     'No cases yet',
-                    style: TextStyle(color: Colors.grey.withOpacity(0.7), fontSize: 12, fontWeight: FontWeight.w600),
+                    style: TextStyle(color: Colors.grey.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Your cases will appear here once they are created',
-                    style: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 11),
+                    style: TextStyle(color: Colors.grey.withValues(alpha: 0.5), fontSize: 11),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -107,16 +107,16 @@ class CaseSummaryCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Column(
           children: [
             Icon(icon, color: color, size: 18),
             const SizedBox(height: 4),
             Text(value, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
-            Text(label, style: TextStyle(color: color.withOpacity(0.8), fontSize: 10), textAlign: TextAlign.center),
+            Text(label, style: TextStyle(color: color.withValues(alpha: 0.8), fontSize: 10), textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -141,7 +141,7 @@ class CaseSummaryCard extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(Icons.folder, color: statusColor, size: 16),
@@ -160,7 +160,7 @@ class CaseSummaryCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   caseItem.caseNumber.toString(),
-                  style: TextStyle(color: Colors.grey.withOpacity(0.7), fontSize: 10),
+                  style: TextStyle(color: Colors.grey.withValues(alpha: 0.7), fontSize: 10),
                 ),
               ],
             ),
@@ -168,7 +168,7 @@ class CaseSummaryCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(

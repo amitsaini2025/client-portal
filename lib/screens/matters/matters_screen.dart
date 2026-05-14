@@ -57,8 +57,6 @@ class _MattersScreenState extends State<MattersScreen> {
         backgroundColor: ThemeConfig.navyBlue,
       ),
     );
-
-    print('Selected Matter ID: ${AuthService.selectedMatterId}');
   }
 
   @override
@@ -136,7 +134,7 @@ class _MattersScreenState extends State<MattersScreen> {
                           : BorderSide.none,
                     ),
                     color: isSelected
-                        ? ThemeConfig.goldenYellow.withOpacity(0.3)
+                        ? ThemeConfig.goldenYellow.withValues(alpha: 0.3)
                         : Colors.white,
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
@@ -158,7 +156,7 @@ class _MattersScreenState extends State<MattersScreen> {
                         color: ThemeConfig.navyBlue,
                       )
                           : Icon(Icons.radio_button_unchecked,
-                          color: ThemeConfig.navyBlue.withOpacity(0.6)),
+                          color: ThemeConfig.navyBlue.withValues(alpha: 0.6)),
                     ),
                   ),
                 );

@@ -94,7 +94,7 @@ class _EnglishLanguageRequirementsWidgetState
               border: Border.all(color: Colors.indigo.shade100),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.indigo.withOpacity(0.05),
+                  color: Colors.indigo.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),

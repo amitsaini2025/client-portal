@@ -164,7 +164,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -181,7 +181,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               labelColor: Colors.white,
               unselectedLabelColor: Colors.black87,
               splashFactory: NoSplash.splashFactory,
-              overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+              overlayColor: const WidgetStatePropertyAll(Colors.transparent),
               labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
               tabs: const [
                 Tab(

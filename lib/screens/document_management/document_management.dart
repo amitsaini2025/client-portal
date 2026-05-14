@@ -74,7 +74,7 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
 
     try {
       final response = await ApiService.getDocumentChecklist(type: type);
-      final docs = (response as List)
+      final docs = (response)
           .map((json) => DocumentChecklist.fromJson(json))
           .toList();
 
