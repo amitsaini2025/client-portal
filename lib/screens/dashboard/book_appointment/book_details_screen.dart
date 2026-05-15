@@ -119,10 +119,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                         title: service.name,
                         priceText: service.priceDisplay,
                         duration:
-                            '${service.duration} ${service.durationUnit} • ${service.startTime} - ${service.endTime} ${service.timeFormat}',
+                            '${service.duration} ${service.durationUnit}',
                         description: service.description,
                         availability:
-                            'Available: ${service.availableDays.join(', ')} • ${service.timeSlotDescription}',
+                            service.timeSlotDescription,
                         selected: selectedIndex == index,
                         onTap: () {
                           setState(() {
