@@ -583,7 +583,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
           if (index >= _messages.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
-              child: Center(child: AppLoader()),
+              child: Center(child: AppLoader(size: 20)),
             );
           }
 

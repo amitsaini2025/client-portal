@@ -75,49 +75,124 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
   Future<void> _openUploadOptions(WorkflowStage stage, int checklistId) async {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
       useSafeArea: true,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ListTile(
-                  leading: const Icon(Icons.folder),
-                  title: const Text("My Files"),
+                // Handle bar
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const Text(
+                  "Add Files",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildBottomSheetOption(
+                  icon: Icons.folder_open_rounded,
+                  label: "My Files",
+                  subtitle: "PDF, DOC, DOCX, JPG, PNG",
+                  color: const Color(0xFF5B8DEF),
                   onTap: () async {
                     Navigator.pop(context);
                     await _pickFromFiles(stage, checklistId);
                   },
                 ),
-                if (!kIsWeb)
-                  ListTile(
-                    leading: const Icon(Icons.photo),
-                    title: const Text("Gallery"),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      await _pickFromGallery(stage, checklistId);
-                    },
-                  ),
-                if (!kIsWeb)
-                  ListTile(
-                    leading: const Icon(Icons.camera_alt),
-                    title: const Text("Camera"),
+                const SizedBox(height: 10),
+                _buildBottomSheetOption(
+                  icon: Icons.photo_library_rounded,
+                  label: "Gallery",
+                  subtitle: "Pick from your photos",
+                  color: const Color(0xFF8B5CF6),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await _pickFromGallery(stage, checklistId);
+                  },
+                ),
+                if (!kIsWeb) ...[
+                  const SizedBox(height: 10),
+                  _buildBottomSheetOption(
+                    icon: Icons.camera_alt_rounded,
+                    label: "Camera",
+                    subtitle: "Take a new photo",
+                    color: const Color(0xFF10B981),
                     onTap: () async {
                       Navigator.pop(context);
                       await _pickFromCamera(stage, checklistId);
                     },
                   ),
+                ],
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildBottomSheetOption({
+    required IconData icon,
+    required String label,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: color.withOpacity(0.06),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 15)),
+                  const SizedBox(height: 2),
+                  Text(subtitle,
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.grey.shade500)),
+                ],
+              ),
+              const Spacer(),
+              Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -237,13 +312,13 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     );
   }
 
-  Future<void> _onBulkUploadTap(WorkflowStage stage) async {
+  Future<void> _onBulkUploadTap() async {
     await Navigator.pushNamed(
       context,
       '/bulk-upload-documents',
       arguments: {
         'matter_id': widget.matterID,
-        'stageId': stage.id,
+        'stageId': null,
         'allowedChecklistId': null,
       },
     );

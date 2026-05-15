@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../models/workflow_stage.dart';
 
 class WorkflowProgressWidget extends StatelessWidget {
@@ -6,7 +7,7 @@ class WorkflowProgressWidget extends StatelessWidget {
   final Function(WorkflowStage)? onStageTap;
   final Function(WorkflowStage stage, int checklistId)? onChecklistPlusTap;
   final Function(WorkflowStage stage, int checklistId)? onChecklistViewTap;
-  final Function(WorkflowStage stage)? onBulkUploadTap;
+  final Function()? onBulkUploadTap;
 
   const WorkflowProgressWidget({
     super.key,
@@ -14,7 +15,7 @@ class WorkflowProgressWidget extends StatelessWidget {
     this.onStageTap,
     this.onChecklistPlusTap,
     this.onChecklistViewTap,
-    this.onBulkUploadTap
+    this.onBulkUploadTap,
   });
 
   Color _getStageColor(WorkflowStage stage, BuildContext context) {
@@ -102,12 +103,12 @@ class WorkflowProgressWidget extends StatelessWidget {
   }
 
   Widget _buildStat(
-      BuildContext context,
-      String label,
-      String value,
-      Color color,
-      IconData icon,
-      ) {
+    BuildContext context,
+    String label,
+    String value,
+    Color color,
+    IconData icon,
+  ) {
     return Column(
       children: [
         Icon(icon, color: color, size: 32),
@@ -184,9 +185,39 @@ class WorkflowProgressWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'All Stages',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              'All Stages',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+
+            ElevatedButton.icon(
+              onPressed: () {
+                onBulkUploadTap?.call();
+              },
+              icon: const Icon(Icons.upload_file, size: 18),
+              label: const SizedBox(
+                width: 80,
+                child: Text(
+                  'Click to\nBulk Upload',
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         ...workflowResponse.workflowStages.asMap().entries.map((entry) {
@@ -200,10 +231,10 @@ class WorkflowProgressWidget extends StatelessWidget {
   }
 
   Widget _buildStageItem(
-      BuildContext context,
-      WorkflowStage stage,
-      bool isLast,
-      ) {
+    BuildContext context,
+    WorkflowStage stage,
+    bool isLast,
+  ) {
     final color = _getStageColor(stage, context);
     final icon = _getStageIcon(stage);
     final isCurrent = stage.isCurrentStage || stage.isActive;
@@ -217,15 +248,13 @@ class WorkflowProgressWidget extends StatelessWidget {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               child: Icon(
                 icon,
-                color: color == Colors.grey.shade300
-                    ? Colors.grey.shade600
-                    : Colors.white,
+                color:
+                    color == Colors.grey.shade300
+                        ? Colors.grey.shade600
+                        : Colors.white,
                 size: 24,
               ),
             ),
@@ -234,7 +263,9 @@ class WorkflowProgressWidget extends StatelessWidget {
                 width: 2,
                 height: 60,
                 color:
-                color == Colors.grey.shade300 ? Colors.grey.shade300 : color,
+                    color == Colors.grey.shade300
+                        ? Colors.grey.shade300
+                        : color,
               ),
           ],
         ),
@@ -246,7 +277,8 @@ class WorkflowProgressWidget extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: isCurrent ? primary.withOpacity(0.1) : Colors.grey.shade50,
+                color:
+                    isCurrent ? primary.withOpacity(0.1) : Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isCurrent ? primary : Colors.grey.shade300,
@@ -257,9 +289,10 @@ class WorkflowProgressWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    stage.stageName,
+                    '${stage.stageName} (${stage.allowedChecklistCount})',
                     style: TextStyle(
-                      fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
+                      //fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
+                      fontWeight: FontWeight.bold,
                       fontSize: 14,
                       color: isCurrent ? primary : Colors.black87,
                     ),
@@ -273,61 +306,22 @@ class WorkflowProgressWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),*/
-
                   if (stage.allowedChecklist.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween, // pushes button to end
-                          children: [
-                            Text(
-                              'Allowed Checklist (${stage.allowedChecklistCount}) :',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: isCurrent ? primary : Colors.black87,
-                              ),
-                            ),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                onBulkUploadTap?.call(stage);
-                              },
-                              icon: const Icon(Icons.upload_file, size: 18),
-                              label: const SizedBox(
-                                width: 80,
-                                child: Text(
-                                  'Click to\nBulk Upload',
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
                         ...stage.allowedChecklist.map(
-                              (item) => Padding(
+                          (item) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 2),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.check,
                                   size: 14,
-                                  color: Colors.black,
+                                  color:
+                                      item.noOfDocumentUploaded == 0
+                                          ? Colors.red
+                                          : Colors.green,
                                 ),
                                 const SizedBox(width: 6),
 
@@ -336,23 +330,25 @@ class WorkflowProgressWidget extends StatelessWidget {
                                     '${item.name} (${item.noOfDocumentUploaded})',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: isCurrent ? primary : Colors.black87,
+                                      color:
+                                          isCurrent ? primary : Colors.black87,
                                     ),
                                   ),
                                 ),
 
-                                IconButton(
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                  icon: const Icon(
-                                    Icons.remove_red_eye_outlined,
-                                    color: Colors.green,
-                                    size: 20,
+                                if (item.noOfDocumentUploaded > 0)
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    icon: const Icon(
+                                      Icons.remove_red_eye_outlined,
+                                      color: Colors.green,
+                                      size: 20,
+                                    ),
+                                    onPressed: () {
+                                      onChecklistViewTap?.call(stage, item.id);
+                                    },
                                   ),
-                                  onPressed: () {
-                                    onChecklistViewTap?.call(stage, item.id);
-                                  },
-                                ),
 
                                 IconButton(
                                   padding: EdgeInsets.zero,
@@ -386,10 +382,7 @@ class WorkflowProgressWidget extends StatelessWidget {
 class CompactWorkflowProgress extends StatelessWidget {
   final WorkflowStagesResponse workflowResponse;
 
-  const CompactWorkflowProgress({
-    super.key,
-    required this.workflowResponse,
-  });
+  const CompactWorkflowProgress({super.key, required this.workflowResponse});
 
   @override
   Widget build(BuildContext context) {
