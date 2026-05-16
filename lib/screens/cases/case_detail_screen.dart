@@ -9,7 +9,6 @@ import '../../widgets/common/loading_widget.dart';
 import '../../widgets/common/error_widget.dart';
 import '../../widgets/cases/progress_bar.dart';
 import '../../widgets/cases/timeline_widget.dart';
-import '../../widgets/cases/milestone_card.dart';
 
 class CaseDetailScreen extends StatefulWidget {
   final int caseId;

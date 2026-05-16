@@ -10,7 +10,6 @@ import '../../../services/auth_service.dart';
 import '../../workflow/message/workflow_messages_screen.dart';
 import '../../workflow/workflow_stages_screen.dart';
 import '../billing_list/billing_list_screen.dart';
-import '../notification/notification_detail_screen.dart';
 import '../personal_info/personal_information_screen.dart';
 
 class ActionRequiredScreen extends StatefulWidget {

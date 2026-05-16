@@ -1,10 +1,6 @@
-import 'dart:convert';
-
-import 'package:client/services/api_service_bansal_immigration.dart';
 import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';

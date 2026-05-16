@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme_config.dart';
 import '../../../utils/responsive_utils.dart';
-import 'book_location_screen.dart';
-import 'book_service_screen.dart';
-import 'book_details_screen.dart';
-import 'book_confirm_screen.dart';
 
 class ScaffoldWrapper extends StatelessWidget {
   final int activeStep;

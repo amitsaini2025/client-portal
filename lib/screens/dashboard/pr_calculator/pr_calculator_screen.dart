@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import 'package:client/models/pr_points_response.dart';
 

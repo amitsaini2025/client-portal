@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../models/case.dart';
 
 // Timeline event model
 class TimelineEvent {
