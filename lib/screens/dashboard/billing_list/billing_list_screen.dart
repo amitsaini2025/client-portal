@@ -192,8 +192,6 @@ class _BillingListScreenState extends State<BillingListScreen> {
     String clientSecret,
     Invoice invoice,
   ) async {
-    PaymentMethod? paymentMethod;
-
     await showDialog(
       context: context,
       builder: (context) {
@@ -208,7 +206,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  paymentMethod = await Stripe.instance.createPaymentMethod(
+                  await Stripe.instance.createPaymentMethod(
                     params: const PaymentMethodParams.card(
                       paymentMethodData: PaymentMethodData(),
                     ),
