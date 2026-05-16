@@ -223,8 +223,10 @@ class _AddressAndTravelInformationWidgetState
   }
 
   Future<void> _deleteAddress(Address address) async {
-    if (address.id == 0) {
-      setState(() => widget.travels.remove(address));
+    if (address.id == 0 || address.id == null) {
+      setState(() {
+        widget.addresses.remove(address);
+      });
       return;
     }
 
