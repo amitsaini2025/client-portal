@@ -17,7 +17,6 @@ class ReverbSocketService {
   static Function(dynamic message)? onMessageReceived;
 
   static const String _host = "revapi.bansalcrm.com";
-  static const int _port = 443;
   static const String _scheme = "wss";
 
   static const String _appKey = "145cd98cfea9f69732ae6755ac889bcc";
@@ -32,13 +31,18 @@ class ReverbSocketService {
     required String userId,
     required String token,
   }) async {
+    if (_isConnected) {
+      log("⚠️ Socket already connected");
+      return;
+    }
+
     try {
       log("🔌 Connecting to: $_url");
 
       _channel = WebSocketChannel.connect(Uri.parse(_url));
 
       _channel!.stream.listen(
-        (event) => _handleEvent(event, userId, token),
+            (event) => _handleEvent(event, userId, token),
         onDone: () {
           log("❌ Disconnected");
           _isConnected = false;
@@ -52,6 +56,7 @@ class ReverbSocketService {
       );
     } catch (e) {
       log("❌ Connect exception: $e");
+      _isConnected = false;
       _reconnect(userId, token);
     }
   }
@@ -157,7 +162,15 @@ class ReverbSocketService {
   }
 
   static void _reconnect(String userId, String token) {
-    if (_reconnectTimer != null) return;
+    if (_isConnected) {
+      log("⚠️ Already connected, skipping reconnect");
+      return;
+    }
+
+    if (_reconnectTimer != null) {
+      log("⏳ Reconnect already scheduled");
+      return;
+    }
 
     log("🔄 Reconnecting in 5s...");
 
