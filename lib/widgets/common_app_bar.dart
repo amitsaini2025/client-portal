@@ -62,24 +62,22 @@ class _CommonAppBarState extends State<CommonAppBar> {
   Future<void> _loadMatterName() async {
     try {
       final response = await ApiService.getMatters();
+
       if (response['success'] == true && response['data'] != null) {
         final matters = response['data']['matters'] as List<dynamic>;
-        final matchedMatter = matters.firstWhere(
-          (m) => m['matter_id'].toString() == widget.matterID,
-          orElse: () => null,
-        );
 
         if (mounted) {
           final matchedMatter = matters.firstWhere(
-            (m) => m['matter_id'] == widget.matterID,
+                (m) => m['matter_id'] == widget.matterID,
             orElse: () => {},
           );
 
           setState(() {
             _matterName =
-                matchedMatter.isNotEmpty
-                    ? matchedMatter['matter_name'].toString()
-                    : 'Unknown Matter';
+            matchedMatter.isNotEmpty
+                ? matchedMatter['matter_name'].toString()
+                : 'Unknown Matter';
+
             _isLoadingMatter = false;
           });
         }
@@ -93,6 +91,7 @@ class _CommonAppBarState extends State<CommonAppBar> {
       }
     } catch (e) {
       debugPrint("Error loading matter: $e");
+
       if (mounted) {
         setState(() {
           _matterName = 'Error';
