@@ -76,7 +76,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
   }
 
   Future<void> _fetchActionRequired() async {
-    final bool isLoggedIn = await AuthService.isAuthenticated;
+    final bool isLoggedIn = AuthService.isAuthenticated;
     if (!isLoggedIn || !mounted || _isFetchingActionRequired) return;
 
     setState(() => _isFetchingActionRequired = true);
@@ -102,7 +102,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
   }
 
   Future<void> _fetchNotifications() async {
-    final bool isLoggedIn = await AuthService.isAuthenticated;
+    final bool isLoggedIn = AuthService.isAuthenticated;
     if (!isLoggedIn || !mounted || isFetchingNotifications) return;
 
     setState(() => isFetchingNotifications = true);
@@ -132,7 +132,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
 
   Future<void> _checkUserStatus() async {
     try {
-      final bool isLoggedIn = await AuthService.isAuthenticated;
+      final bool isLoggedIn = AuthService.isAuthenticated;
       if (!isLoggedIn) {
         setState(() => _isLoading = false);
 
