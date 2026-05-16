@@ -1557,14 +1557,16 @@ class ApiService {
       if (exp == null) return true;
 
       final expiryDate = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
-      final threshold = DateTime.now().add(ApiConfig.refreshTokenThreshold);
 
-      return DateTime.now().isAfter(expiryDate);
+      final threshold = DateTime.now().add(
+        ApiConfig.refreshTokenThreshold,
+      );
+
+      return threshold.isAfter(expiryDate);
     } catch (e) {
       return true;
     }
   }
-
   // Clear authentication data
   static Future<void> clearAuth() async {
     clearAuthToken();
