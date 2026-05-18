@@ -156,7 +156,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: color.withOpacity(0.06),
+      color: color.withValues(alpha:0.06),
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
@@ -169,7 +169,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha:0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 22),

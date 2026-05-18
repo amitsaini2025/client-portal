@@ -527,8 +527,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
-                                    Colors.black.withOpacity(0.2),
-                                    Colors.black.withOpacity(0.7),
+                                    Colors.black.withValues(alpha:0.2),
+                                    Colors.black.withValues(alpha:0.7),
                                   ],
                                 ),
                               ),
@@ -578,7 +578,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           end: Alignment.bottomRight,
           colors: [
             Theme.of(context).primaryColor,
-            Theme.of(context).primaryColor.withOpacity(0.8),
+            Theme.of(context).primaryColor.withValues(alpha:0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(14),
@@ -592,7 +592,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: const Icon(Icons.person, color: Colors.white, size: 24),
@@ -613,7 +613,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Text(
                       'Here\'s what\'s happening with your cases',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha:0.9),
                       ),
                     ),
                   ],
@@ -657,7 +657,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha:0.2),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -675,7 +675,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha:0.9),
               ),
               textAlign: TextAlign.center,
               maxLines: 2,

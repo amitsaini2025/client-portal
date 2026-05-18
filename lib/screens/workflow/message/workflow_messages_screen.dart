@@ -632,7 +632,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                       decoration: BoxDecoration(
                         color:
                             isSender
-                                ? ThemeConfig.navyBlue.withOpacity(0.9)
+                                ? ThemeConfig.navyBlue.withValues(alpha:0.9)
                                 : Colors.white,
                         borderRadius: BorderRadius.only(
                           topLeft: const Radius.circular(16),
@@ -642,7 +642,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: Colors.black.withValues(alpha:0.08),
                             blurRadius: 3,
                             offset: const Offset(1, 2),
                           ),

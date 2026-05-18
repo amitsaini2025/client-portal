@@ -199,13 +199,13 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha:0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha:0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
             spreadRadius: 0,
@@ -217,10 +217,10 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: ThemeConfig.primaryColor.withOpacity(0.12),
+              color: ThemeConfig.primaryColor.withValues(alpha:0.12),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: ThemeConfig.primaryColor.withOpacity(0.2),
+                color: ThemeConfig.primaryColor.withValues(alpha:0.2),
                 width: 1,
               ),
             ),
@@ -246,10 +246,10 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: ThemeConfig.successColor.withOpacity(0.12),
+                    color: ThemeConfig.successColor.withValues(alpha:0.12),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: ThemeConfig.successColor.withOpacity(0.25),
+                      color: ThemeConfig.successColor.withValues(alpha:0.25),
                       width: 1,
                     ),
                   ),
@@ -272,14 +272,14 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                 decoration: BoxDecoration(
                   color:
                       isEditing
-                          ? ThemeConfig.successColor.withOpacity(0.12)
-                          : ThemeConfig.primaryColor.withOpacity(0.12),
+                          ? ThemeConfig.successColor.withValues(alpha:0.12)
+                          : ThemeConfig.primaryColor.withValues(alpha:0.12),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color:
                         isEditing
-                            ? ThemeConfig.successColor.withOpacity(0.25)
-                            : ThemeConfig.primaryColor.withOpacity(0.25),
+                            ? ThemeConfig.successColor.withValues(alpha:0.25)
+                            : ThemeConfig.primaryColor.withValues(alpha:0.25),
                     width: 1,
                   ),
                 ),
@@ -318,13 +318,13 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
         border: Border.all(color: borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha:0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha:0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
             spreadRadius: 0,
@@ -671,7 +671,7 @@ class _OccupationSkillsWidgetState extends State<OccupationSkillsWidget> {
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha:0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),

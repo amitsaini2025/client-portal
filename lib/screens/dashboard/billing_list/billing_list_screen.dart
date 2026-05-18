@@ -437,8 +437,8 @@ class _BillingListScreenState extends State<BillingListScreen> {
       decoration: BoxDecoration(
         color:
             isPaid
-                ? Colors.green.withOpacity(0.1)
-                : Colors.orange.withOpacity(0.1),
+                ? Colors.green.withValues(alpha:0.1)
+                : Colors.orange.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(

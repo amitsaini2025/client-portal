@@ -267,7 +267,7 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.07),
+            color: Colors.black.withValues(alpha:0.07),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

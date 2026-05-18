@@ -83,16 +83,16 @@ class DocumentStatusCard extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  Icon(Icons.description, size: 40, color: Colors.grey.withOpacity(0.5)),
+                  Icon(Icons.description, size: 40, color: Colors.grey.withValues(alpha:0.5)),
                   const SizedBox(height: 12),
                   Text(
                     'No documents yet',
-                    style: TextStyle(color: Colors.grey.withOpacity(0.7), fontSize: 12, fontWeight: FontWeight.w600),
+                    style: TextStyle(color: Colors.grey.withValues(alpha:0.7), fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Upload documents to get started',
-                    style: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 11),
+                    style: TextStyle(color: Colors.grey.withValues(alpha:0.5), fontSize: 11),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -110,16 +110,16 @@ class DocumentStatusCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha:0.1),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha:0.25)),
         ),
         child: Column(
           children: [
             Icon(icon, color: color, size: 18),
             const SizedBox(height: 4),
             Text(value, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
-            Text(label, style: TextStyle(color: color.withOpacity(0.8), fontSize: 10), textAlign: TextAlign.center),
+            Text(label, style: TextStyle(color: color.withValues(alpha:0.8), fontSize: 10), textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -145,7 +145,7 @@ class DocumentStatusCard extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(statusIcon, color: statusColor, size: 16),
@@ -165,7 +165,7 @@ class DocumentStatusCard extends StatelessWidget {
                 if (document.uploadedAt != null)
                   Text(
                     'Uploaded ${_getTimeAgo(document.uploadedAt!)}',
-                    style: TextStyle(color: Colors.grey.withOpacity(0.7), fontSize: 10),
+                    style: TextStyle(color: Colors.grey.withValues(alpha:0.7), fontSize: 10),
                   ),
               ],
             ),
@@ -173,7 +173,7 @@ class DocumentStatusCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(

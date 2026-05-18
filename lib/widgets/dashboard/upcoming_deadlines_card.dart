@@ -144,7 +144,7 @@ class UpcomingDeadlinesCard extends StatelessWidget {
                   Icon(
                     Icons.check_circle,
                     size: 48,
-                    color: Colors.green.withOpacity(0.7),
+                    color: Colors.green.withValues(alpha:0.7),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -162,7 +162,7 @@ class UpcomingDeadlinesCard extends StatelessWidget {
                           .textTheme
                           .bodyMedium
                           ?.color
-                          ?.withOpacity(0.7),
+                          ?.withValues(alpha:0.7),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -185,9 +185,9 @@ class UpcomingDeadlinesCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha:0.3)),
       ),
       child: Column(
         children: [
@@ -205,7 +205,7 @@ class UpcomingDeadlinesCard extends StatelessWidget {
             style: Theme.of(context)
                 .textTheme
                 .bodySmall
-                ?.copyWith(color: color.withOpacity(0.8)),
+                ?.copyWith(color: color.withValues(alpha:0.8)),
             textAlign: TextAlign.center,
           ),
         ],
@@ -222,9 +222,9 @@ class UpcomingDeadlinesCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha:0.3)),
       ),
       child: Row(
         children: [
@@ -232,7 +232,7 @@ class UpcomingDeadlinesCard extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha:0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(Icons.assignment, color: color, size: 20),
@@ -300,9 +300,9 @@ class UpcomingDeadlinesCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha:0.3)),
       ),
       child: Row(
         children: [
@@ -310,7 +310,7 @@ class UpcomingDeadlinesCard extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha:0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(Icons.schedule, color: color, size: 20),

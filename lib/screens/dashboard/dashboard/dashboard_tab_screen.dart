@@ -375,7 +375,7 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                           showDialog(
                             context: context,
                             barrierDismissible: false,
-                            barrierColor: Colors.black.withOpacity(0.4),
+                            barrierColor: Colors.black.withValues(alpha:0.4),
                             builder: (context) {
                               return BackdropFilter(
                                 filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -419,7 +419,7 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                             showDialog(
                               context: context,
                               barrierDismissible: false,
-                              barrierColor: Colors.black.withOpacity(0.4),
+                              barrierColor: Colors.black.withValues(alpha:0.4),
                               builder: (context) {
                                 return BackdropFilter(
                                   filter: ImageFilter.blur(
@@ -455,8 +455,8 @@ class _DashboardTabScreenState extends State<DashboardTabScreen> {
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
-                                    Colors.black.withOpacity(0.2),
-                                    Colors.black.withOpacity(0.7),
+                                    Colors.black.withValues(alpha:0.2),
+                                    Colors.black.withValues(alpha:0.7),
                                   ],
                                 ),
                               ),

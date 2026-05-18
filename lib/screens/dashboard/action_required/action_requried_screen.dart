@@ -246,7 +246,7 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
                             color:
                                 item.isRead
                                     ? Colors.grey.shade200
-                                    : ThemeConfig.goldenYellow.withOpacity(0.3),
+                                    : ThemeConfig.goldenYellow.withValues(alpha:0.3),
                           ),
                         ),
                         child: Row(

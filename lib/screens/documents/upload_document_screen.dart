@@ -308,7 +308,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
+        border: Border.all(color: ThemeConfig.goldenYellow.withValues(alpha:0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,10 +326,10 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
               child: Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: ThemeConfig.goldenYellow.withOpacity(0.1),
+                  color: ThemeConfig.goldenYellow.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: ThemeConfig.goldenYellow.withOpacity(0.5),
+                    color: ThemeConfig.goldenYellow.withValues(alpha:0.5),
                   ),
                 ),
                 child: Column(
@@ -380,7 +380,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
+        border: Border.all(color: ThemeConfig.goldenYellow.withValues(alpha:0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -245,9 +245,9 @@ class _CasesListScreenState extends State<CasesListScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ThemeConfig.navyBlue.withOpacity(0.6),
+        color: ThemeConfig.navyBlue.withValues(alpha:0.6),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
+        border: Border.all(color: ThemeConfig.goldenYellow.withValues(alpha:0.5)),
       ),
       child: Column(
         children: [
@@ -277,11 +277,11 @@ class _CasesListScreenState extends State<CasesListScreen> {
 
   Widget _buildCaseCard(Case caseItem) {
     return Card(
-      color: ThemeConfig.navyBlue.withOpacity(0.8),
+      color: ThemeConfig.navyBlue.withValues(alpha:0.8),
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: ThemeConfig.goldenYellow.withOpacity(0.4)),
+        side: BorderSide(color: ThemeConfig.goldenYellow.withValues(alpha:0.4)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -325,7 +325,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color:
-                      _getStatusColor(caseItem.status).withOpacity(0.2),
+                      _getStatusColor(caseItem.status).withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
@@ -427,9 +427,9 @@ class _CasesListScreenState extends State<CasesListScreen> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
-        color: ThemeConfig.navyBlue.withOpacity(0.7),
+        color: ThemeConfig.navyBlue.withValues(alpha:0.7),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.5)),
+        border: Border.all(color: ThemeConfig.goldenYellow.withValues(alpha:0.5)),
       ),
       child: Row(
         children: [

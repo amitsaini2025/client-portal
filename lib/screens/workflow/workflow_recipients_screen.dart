@@ -107,7 +107,7 @@ class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black12.withOpacity(0.08),
+              color: Colors.black12.withValues(alpha:0.08),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -240,7 +240,7 @@ class ChatDetailScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black12.withOpacity(0.08),
+                color: Colors.black12.withValues(alpha:0.08),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),

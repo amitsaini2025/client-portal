@@ -235,7 +235,7 @@ class _WebFallbackViewState extends State<_WebFallbackView> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: ThemeConfig.successColor.withOpacity(0.08),
+                color: ThemeConfig.successColor.withValues(alpha:0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(

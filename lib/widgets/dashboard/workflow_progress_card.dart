@@ -34,7 +34,7 @@ class WorkflowProgressCard extends StatelessWidget {
             colors: [Color(0xFF1A237E), Color(0xFF283593)],
           ),
           borderRadius: BorderRadius.circular(14),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 6, offset: const Offset(0, 2))],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.1), blurRadius: 6, offset: const Offset(0, 2))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +45,7 @@ class WorkflowProgressCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.timeline, color: Colors.white, size: 22),
@@ -83,16 +83,16 @@ class WorkflowProgressCard extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               margin: const EdgeInsets.only(top: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha:0.15),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                border: Border.all(color: Colors.white.withValues(alpha:0.2)),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF9B000).withOpacity(0.9),
+                      color: const Color(0xFFF9B000).withValues(alpha:0.9),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -175,9 +175,9 @@ class WorkflowProgressCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.15),
+          color: Colors.white.withValues(alpha:0.15),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          border: Border.all(color: Colors.white.withValues(alpha:0.2)),
         ),
         child: Column(
           children: [

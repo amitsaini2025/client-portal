@@ -164,9 +164,9 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
           padding: const EdgeInsets.only(right: 8),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha:0.15),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withValues(alpha:0.2)),
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(

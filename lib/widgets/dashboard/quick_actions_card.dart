@@ -41,7 +41,7 @@ class QuickActionsCard extends StatelessWidget {
       showDialog(
         context: context,
         barrierDismissible: false,
-        barrierColor: Colors.black.withOpacity(0.4),
+        barrierColor: Colors.black.withValues(alpha:0.4),
         builder: (context) {
           return BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),

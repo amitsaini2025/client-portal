@@ -230,7 +230,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
     required VoidCallback onTap,
   }) {
     return Material(
-      color: color.withOpacity(0.06),
+      color: color.withValues(alpha:0.06),
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
@@ -243,7 +243,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha:0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 22),
@@ -477,7 +477,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: _fileIconColor(file.fileName).withOpacity(0.10),
+                      color: _fileIconColor(file.fileName).withValues(alpha:0.10),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -583,7 +583,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
               child: Tooltip(
                 message: "Remove file",
                 child: Material(
-                  color: Colors.red.withOpacity(0.08),
+                  color: Colors.red.withValues(alpha:0.08),
                   borderRadius: BorderRadius.circular(10),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(10),
@@ -619,7 +619,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha:0.04),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
@@ -659,13 +659,13 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
         border: Border.all(
           color:
               isComplete
-                  ? ThemeConfig.goldenYellow.withOpacity(0.4)
+                  ? ThemeConfig.goldenYellow.withValues(alpha:0.4)
                   : Colors.grey.shade200,
           width: isComplete ? 1.5 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha:0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -682,7 +682,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: _fileIconColor(file.fileName).withOpacity(0.10),
+                    color: _fileIconColor(file.fileName).withValues(alpha:0.10),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -725,7 +725,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
                     margin: const EdgeInsets.only(right: 4),
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withOpacity(0.12),
+                      color: const Color(0xFF10B981).withValues(alpha:0.12),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -735,7 +735,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
                     ),
                   ),
                 Material(
-                  color: Colors.red.withOpacity(0.07),
+                  color: Colors.red.withValues(alpha:0.07),
                   borderRadius: BorderRadius.circular(10),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(10),
@@ -878,9 +878,9 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: ThemeConfig.goldenYellow.withOpacity(0.08),
+        color: ThemeConfig.goldenYellow.withValues(alpha:0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ThemeConfig.goldenYellow.withOpacity(0.3)),
+        border: Border.all(color: ThemeConfig.goldenYellow.withValues(alpha:0.3)),
       ),
       child: Row(
         children: [
@@ -943,7 +943,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
+                    color: Colors.white.withValues(alpha:0.25),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -1060,7 +1060,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
                           style: ElevatedButton.styleFrom(
                             backgroundColor: ThemeConfig.goldenYellow,
                             disabledBackgroundColor: ThemeConfig.goldenYellow
-                                .withOpacity(0.5),
+                                .withValues(alpha:0.5),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),

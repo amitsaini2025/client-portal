@@ -181,7 +181,7 @@ class _WorkflowMessageDetailScreenState
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha:0.05),
               blurRadius: 8,
               offset: const Offset(2, 4),
             ),
@@ -216,7 +216,7 @@ class _WorkflowMessageDetailScreenState
                           right: 6,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.6),
+                              color: Colors.black.withValues(alpha:0.6),
                               shape: BoxShape.circle,
                             ),
                             child: IconButton(
@@ -344,7 +344,7 @@ class _WorkflowMessageDetailScreenState
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha:0.04),
             blurRadius: 6,
             offset: const Offset(1, 3),
           ),

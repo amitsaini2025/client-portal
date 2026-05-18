@@ -221,7 +221,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                 ),
                 prefixIcon: const Icon(Icons.subject, color: Colors.white),
                 filled: true,
-                fillColor: ThemeConfig.navyBlue.withOpacity(0.6),
+                fillColor: ThemeConfig.navyBlue.withValues(alpha:0.6),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: ThemeConfig.goldenYellow),
                   borderRadius: BorderRadius.circular(12),
@@ -245,7 +245,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                 ),
                 prefixIcon: const Icon(Icons.message, color: Colors.white),
                 filled: true,
-                fillColor: ThemeConfig.navyBlue.withOpacity(0.6),
+                fillColor: ThemeConfig.navyBlue.withValues(alpha:0.6),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: ThemeConfig.goldenYellow),
                   borderRadius: BorderRadius.circular(12),
@@ -261,7 +261,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: ThemeConfig.navyBlue.withOpacity(0.6),
+                color: ThemeConfig.navyBlue.withValues(alpha:0.6),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.white24),
               ),
@@ -295,7 +295,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(32),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: Colors.white24,
