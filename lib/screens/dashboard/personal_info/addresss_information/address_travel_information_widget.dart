@@ -69,18 +69,18 @@ class _AddressAndTravelInformationWidgetState
       final addressesPayload =
           widget.addresses.map((a) {
             return {
-              "id": (a.id == null || a.id == 0) ? null : a.id,
-              "search_address": a.searchAddress ?? "",
-              "address_line_1": a.addressLine1 ?? "",
+              "id": a.id,
+              "search_address": a.searchAddress,
+              "address_line_1": a.addressLine1,
               "address_line_2": a.addressLine2,
-              "suburb": a.suburb ?? "",
-              "state": a.state ?? "",
-              "postcode": a.postcode?.toString() ?? "",
-              "country": a.country ?? "",
+              "suburb": a.suburb,
+              "state": a.state,
+              "postcode": a.postcode?.toString(),
+              "country": a.country,
               "regional_code": a.regionalCode,
-              "start_date": a.startDate ?? "",
+              "start_date": a.startDate,
               "end_date": a.endDate,
-              "is_current": a.isCurrent ?? false,
+              "is_current": a.isCurrent,
             };
           }).toList();
 
@@ -139,11 +139,11 @@ class _AddressAndTravelInformationWidgetState
       final travelsPayload =
           widget.travels.map((t) {
             return {
-              "id": (t.id == null || t.id == 0) ? null : t.id,
-              "country_visited": t.countryVisited ?? "",
-              "arrival_date": t.arrivalDate ?? "",
-              "departure_date": t.departureDate ?? "",
-              "purpose": t.purpose ?? "",
+              "id": t.id,
+              "country_visited": t.countryVisited,
+              "arrival_date": t.arrivalDate,
+              "departure_date": t.departureDate,
+              "purpose": t.purpose,
             };
           }).toList();
 
@@ -209,7 +209,7 @@ class _AddressAndTravelInformationWidgetState
     }
 
     final res = await ApiService.deleteClientTabDetail(
-      id: t.id!,
+      id: t.id,
       type: "travel",
     );
 

@@ -70,10 +70,10 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         widget.passports.map((p) {
           return {
             "id": p.id == 0 ? null : p.id,
-            "passport_number": p.passportNumber ?? "",
-            "country": p.country ?? "",
-            "issue_date": p.issueDate ?? "",
-            "expiry_date": p.expiryDate ?? "",
+            "passport_number": p.passportNumber,
+            "country": p.country,
+            "issue_date": p.issueDate,
+            "expiry_date": p.expiryDate,
           };
         }).toList();
 
@@ -111,11 +111,11 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
         widget.visas.map((v) {
           return {
             "id": v.id == 0 ? null : v.id,
-            "visa_country": v.visaCountry ?? "",
-            "visa_type": v.visaType ?? "",
-            "visa_description": v.visaDescription ?? "",
-            "visa_grant_date": v.visaGrantDate ?? "",
-            "visa_expiry_date": v.visaExpiryDate ?? "",
+            "visa_country": v.visaCountry,
+            "visa_type": v.visaType,
+            "visa_description": v.visaDescription,
+            "visa_grant_date": v.visaGrantDate,
+            "visa_expiry_date": v.visaExpiryDate,
           };
         }).toList();
 

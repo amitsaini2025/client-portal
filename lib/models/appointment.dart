@@ -320,7 +320,7 @@ class Appointment {
       if (hour == 0) {
         return '12:${minute.toString().padLeft(2, '0')} AM';
       } else if (hour < 12) {
-        return '${hour}:${minute.toString().padLeft(2, '0')} AM';
+        return '$hour:${minute.toString().padLeft(2, '0')} AM';
       } else if (hour == 12) {
         return '12:${minute.toString().padLeft(2, '0')} PM';
       } else {
@@ -336,7 +336,7 @@ class Appointment {
     if (duration == null) return 'No duration set';
     
     if (duration! < 60) {
-      return '${duration} minutes';
+      return '$duration minutes';
     } else {
       final hours = duration! ~/ 60;
       final minutes = duration! % 60;

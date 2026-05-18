@@ -2,7 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:client/screens/auth/reset_password_screen.dart';
 import 'package:client/screens/cases/cases_list_screen.dart';
-import 'package:client/screens/dashboard/action_required/action_requried_screen.dart';
+import 'package:client/screens/dashboard/action_required/action_required_screen.dart';
 import 'package:client/screens/dashboard/billing_list/billing_list_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_detail_screen.dart';
 import 'package:client/screens/dashboard/blog/blog_list_screen.dart';
@@ -3141,7 +3141,7 @@ class _DocumentUploaderState extends State<DocumentUploader> {
             'file_size': (doc['file_size'] ?? '').toString(),
           });
         }
-      } else if (data is Map && data['data'] != null) {
+      } else if (data['data'] != null) {
         final dataList = data['data'] as List?;
         if (dataList != null) {
           for (final doc in dataList) {

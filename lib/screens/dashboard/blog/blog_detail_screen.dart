@@ -9,7 +9,10 @@ import '../../../utils/responsive_utils.dart';
 class BlogDetailScreen extends StatefulWidget {
   final int blogId;
 
-  const BlogDetailScreen({Key? key, required this.blogId}) : super(key: key);
+  const BlogDetailScreen({
+    super.key,
+    required this.blogId,
+  });
 
   @override
   State<BlogDetailScreen> createState() => _BlogDetailScreenState();

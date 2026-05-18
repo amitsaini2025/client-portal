@@ -56,7 +56,7 @@ class DocumentCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          document.name ?? 'Untitled Document',
+                          document.name,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.w600),
                         ),
@@ -64,9 +64,9 @@ class DocumentCard extends StatelessWidget {
                         const SizedBox(height: 4),
 
                         if (document.fileName != null &&
-                            document.fileName!.isNotEmpty)
+                            document.fileName.isNotEmpty)
                           Text(
-                            document.fileName!,
+                            document.fileName,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: Colors.grey.shade600),
                             maxLines: 2,
@@ -200,7 +200,7 @@ class DocumentCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          document.fileType!.toUpperCase(),
+                          document.fileType.toUpperCase(),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: Colors.grey.shade500),
                         ),
@@ -218,7 +218,7 @@ class DocumentCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            document.fileUrl!,
+                            document.fileUrl,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: Colors.grey.shade500),
                             maxLines: 1,

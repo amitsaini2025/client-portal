@@ -334,7 +334,7 @@ class UpcomingDeadlinesCard extends StatelessWidget {
                     Icon(Icons.calendar_today, size: 16, color: color),
                     const SizedBox(width: 4),
                     Text(
-                      '${DateFormat('MMM dd, yyyy').format(dueDate)}',
+                      DateFormat('MMM dd, yyyy').format(dueDate),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: color,
                         fontWeight: FontWeight.w600,

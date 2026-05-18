@@ -239,7 +239,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    DefaultTabController.of(parentContext)?.animateTo(0);
+                    DefaultTabController.of(parentContext).animateTo(0);
                   },
                   child: const Text("Cancel"),
                 ),

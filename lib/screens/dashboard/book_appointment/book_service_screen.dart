@@ -100,7 +100,7 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
                         },
                       ),
                     );
-                  }).toList(),
+                  }),
                   const SizedBox(height: 30),
 
                   Row(

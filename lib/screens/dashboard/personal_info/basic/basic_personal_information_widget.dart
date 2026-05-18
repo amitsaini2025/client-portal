@@ -1535,15 +1535,17 @@ class _BasicPersonalInformationWidgetState
                       setState(() => isEditingBasic = true);
                     }
                   } else if (isEmail) {
-                    if (isEditingEmails)
+                    if (isEditingEmails) {
                       _saveEmails();
-                    else
+                    } else {
                       setState(() => isEditingEmails = true);
+                    }
                   } else {
-                    if (isEditingPhones)
+                    if (isEditingPhones) {
                       _savePhones();
-                    else
+                    } else {
                       setState(() => isEditingPhones = true);
+                    }
                   }
                 },
                 borderRadius: BorderRadius.circular(10),
