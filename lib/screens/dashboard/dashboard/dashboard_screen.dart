@@ -181,7 +181,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               labelColor: Colors.white,
               unselectedLabelColor: Colors.black87,
               splashFactory: NoSplash.splashFactory,
-              overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+              overlayColor: const WidgetStatePropertyAll(Colors.transparent),
               labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
               tabs: const [
                 Tab(
