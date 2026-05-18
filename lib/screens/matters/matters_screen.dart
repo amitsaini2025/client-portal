@@ -3,6 +3,7 @@ import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../config/theme_config.dart';
 import '../../utils/app_loader.dart';
+import '../../utils/app_logger.dart';
 import '../../utils/responsive_utils.dart';
 
 class MattersScreen extends StatefulWidget {
@@ -58,7 +59,7 @@ class _MattersScreenState extends State<MattersScreen> {
       ),
     );
 
-    print('Selected Matter ID: ${AuthService.selectedMatterId}');
+    AppLogger.info('Selected Matter ID: ${AuthService.selectedMatterId}');
   }
 
   @override

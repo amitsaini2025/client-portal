@@ -8,6 +8,7 @@ import '../../models/workflow_checklist.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../utils/app_loader.dart';
+import '../../utils/app_logger.dart';
 import '../../utils/responsive_utils.dart';
 
 class WorkflowDocumentsScreen extends StatefulWidget {
@@ -45,7 +46,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         stageId: widget.stageId,
       );
       final responseJsonString = jsonEncode(response);
-      print('Workflow Allowed Checklist Response: $responseJsonString');
+      AppLogger.info('Workflow Allowed Checklist Response: $responseJsonString');
       if (response['success'] == true && response['data'] != null) {
         _checklistResponse = WorkflowChecklistResponse.fromJson(
           response['data'],

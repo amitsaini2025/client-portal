@@ -45,8 +45,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       );
     }
 
-    print(selectedOptions);
-
     final noeId = int.tryParse(
       selectedOptions["noe_id"].toString(),
     );

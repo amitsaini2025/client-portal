@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/api_config.dart';
+import '../utils/app_logger.dart';
 import '../utils/navigation_service.dart';
 import 'auth_service.dart';
 
@@ -208,7 +209,11 @@ class ApiService {
       }
     } catch (e) {
       // Continue with local logout even if API call fails
-      print('Logout API call failed: $e');
+      AppLogger.error(
+        'Logout API call failed: ',
+        e,
+        StackTrace.current,
+      );
     } finally {
       clearAuth();
     }
@@ -223,7 +228,11 @@ class ApiService {
         "token": fcmToken,
       }, 'POST');
     } catch (e) {
-      print('FCM unregister failed: $e');
+      AppLogger.error(
+        'FCM unregister failed: ',
+        e,
+        StackTrace.current,
+      );
     }
   }
 
@@ -288,7 +297,7 @@ class ApiService {
     final clientId = prefs.getString('user_id');
 
     if (clientId == null) {
-      debugPrint('FCM: Missing client ID');
+      AppLogger.info('FCM: Missing client ID');
       return false;
     }
 
@@ -308,17 +317,19 @@ class ApiService {
       await prefs.setBool('fcm_token_registered', success);
 
       if (success) {
-        debugPrint('FCM: Token registered successfully');
+        AppLogger.info('FCM: Token registered successfully');
       } else {
-        debugPrint(
-          'FCM: Failed to register token: ${response['message'] ?? 'Unknown error'}',
-        );
+        AppLogger.info('FCM: Failed to register token: ${response['message'] ?? 'Unknown error'}');
       }
 
       return success;
     } catch (e) {
       await prefs.setBool('fcm_token_registered', false);
-      debugPrint('FCM: Error registering token: $e');
+      AppLogger.error(
+        'FCM: Error registering token: : ',
+        e,
+        StackTrace.current,
+      );
       return false;
     }
   }
@@ -845,7 +856,7 @@ class ApiService {
       "gender": gender,
       "marital_status": maritalStatus,
     }, "POST");
-    print("UPDATE RESPONSE: $response");
+    AppLogger.info("UPDATE RESPONSE: $response");
     return response;
   }
 
@@ -858,7 +869,7 @@ class ApiService {
       "phones": phones,
     }, "POST");
 
-    print("UPDATE PHONE RESPONSE: $response");
+    AppLogger.info("UPDATE PHONE RESPONSE: $response");
     return response;
   }
 

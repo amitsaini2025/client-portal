@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../fcm_service.dart';
 import '../models/admin.dart';
 import '../models/client.dart';
+import '../utils/app_logger.dart';
 import 'api_service.dart';
 
 class AuthService {
@@ -94,7 +95,11 @@ class AuthService {
         _cpStatus = int.tryParse(cpStatus);
       }
     } catch (e) {
-      print('Error initializing AuthService: $e');
+      AppLogger.error(
+        'Error initializing AuthService: ',
+        e,
+        StackTrace.current,
+      );
     }
   }
 
@@ -115,7 +120,11 @@ class AuthService {
         value: matterName,
       );
     } catch (e) {
-      print('Error saving selected matter: $e');
+      AppLogger.error(
+        'Error saving selected matter: ',
+        e,
+        StackTrace.current,
+      );
     }
   }
 
@@ -127,7 +136,11 @@ class AuthService {
       await _secureStorage.delete(key: _selectedMatterKey);
       await _secureStorage.delete(key: _selectedMatterNameKey);
     } catch (e) {
-      print('Error clearing selected matter: $e');
+      AppLogger.error(
+        'Error clearing selected matter: ',
+        e,
+        StackTrace.current,
+      );
     }
   }
 
@@ -142,7 +155,11 @@ class AuthService {
         return true;
       }
     } catch (e) {
-      print('Error checking matter selection: $e');
+      AppLogger.error(
+        'Error checking matter selection: ',
+        e,
+        StackTrace.current,
+      );
     }
     return false;
   }
@@ -156,7 +173,11 @@ class AuthService {
         value: stageId.toString(),
       );
     } catch (e) {
-      print('Error saving client matter stage id: $e');
+      AppLogger.error(
+        'Error saving client matter stage id: ',
+        e,
+        StackTrace.current,
+      );
     }
   }
 
@@ -166,7 +187,11 @@ class AuthService {
     try {
       await _secureStorage.delete(key: _clientMatterStageKey);
     } catch (e) {
-      print('Error clearing client matter stage id: $e');
+      AppLogger.error(
+        'Error clearing client matter stage id: ',
+        e,
+        StackTrace.current,
+      );
     }
   }
 
@@ -179,7 +204,11 @@ class AuthService {
         value: status.toString(),
       );
     } catch (e) {
-      print('Error saving CP status: $e');
+      AppLogger.error(
+        'Error saving CP status: ',
+        e,
+        StackTrace.current,
+      );
     }
   }
 
@@ -361,7 +390,11 @@ class AuthService {
             }
             await ApiService.logout();
           } catch (e) {
-            print('Logout API call failed: $e');
+            AppLogger.error(
+              'Logout API call failed: ',
+              e,
+              StackTrace.current,
+            );
           }
         }
       }
@@ -388,7 +421,11 @@ class AuthService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
     } catch (e) {
-      print('Error during logout: $e');
+      AppLogger.error(
+        'Error during logout: ',
+        e,
+        StackTrace.current,
+      );
     }
   }
 
@@ -412,7 +449,11 @@ class AuthService {
         _currentUserId = data['id'];
       }
     } catch (e) {
-      print('Error loading user data: $e');
+      AppLogger.error(
+        'Error loading user data: ',
+        e,
+        StackTrace.current,
+      );
     }
   }
 
