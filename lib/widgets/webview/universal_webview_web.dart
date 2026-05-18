@@ -1,13 +1,6 @@
-// universal_webview_web.dart
-//
-// NOTE: This file is only used if you have OTHER urls that allow iframe
-// embedding. For sites like immi.homeaffairs.gov.au that block iframes,
-// the fallback in UniversalWebView handles it automatically on web.
-
 import 'dart:ui_web' as ui;
 import 'package:flutter/material.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 class UniversalWebViewWeb extends StatefulWidget {
   final String url;
@@ -30,18 +23,20 @@ class _UniversalWebViewWebState extends State<UniversalWebViewWeb> {
   void initState() {
     super.initState();
 
-    // Guard against duplicate registration (causes black screen crash)
     if (!_registeredViewIds.contains(widget.viewId)) {
       _registeredViewIds.add(widget.viewId);
+
       ui.platformViewRegistry.registerViewFactory(
         widget.viewId,
-            (int id) {
-          final iframe = html.IFrameElement()
+            (int viewId) {
+          final iframe = web.HTMLIFrameElement()
             ..src = widget.url
             ..style.border = 'none'
             ..style.width = '100%'
             ..style.height = '100%'
-            ..allow = 'fullscreen';
+            ..allowFullscreen = true
+            ..style.overflow = 'hidden';
+
           return iframe;
         },
       );
