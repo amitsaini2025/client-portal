@@ -563,13 +563,8 @@ class _BasicPersonalInformationWidgetState
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDark ? ThemeConfig.cardDark : ThemeConfig.cardLight;
-    final textColor =
-        isDark ? ThemeConfig.textPrimaryDark : ThemeConfig.textPrimaryLight;
     final secondaryTextColor =
         isDark ? ThemeConfig.textSecondaryDark : ThemeConfig.textSecondaryLight;
-    final borderColor =
-        isDark ? ThemeConfig.borderDark : ThemeConfig.borderLight;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -24,7 +24,6 @@ class CommonAppBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _CommonAppBarState extends State<CommonAppBar> {
   int _unreadNotificationCount = 0;
-  bool _isLoadingNotificationCount = false;
 
   String? _matterName;
   bool _isLoadingMatter = true;
@@ -38,8 +37,6 @@ class _CommonAppBarState extends State<CommonAppBar> {
 
   Future<void> _loadUnreadNotificationCount() async {
     if (!AuthService.isAuthenticated) return;
-
-    setState(() => _isLoadingNotificationCount = true);
 
     try {
       final response = await ApiService.getUnreadNotificationCount();
@@ -56,7 +53,6 @@ class _CommonAppBarState extends State<CommonAppBar> {
       debugPrint("Unread count error: $e");
     }
 
-    if (mounted) setState(() => _isLoadingNotificationCount = false);
   }
 
   Future<void> _loadMatterName() async {

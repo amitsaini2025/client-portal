@@ -38,54 +38,6 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCard(Map<String, dynamic> data) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 14),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "${data["item"]}. ${data["testName"]}",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            const SizedBox(height: 10),
-            _scoreRow("Score Level 1", data["col2"]),
-            const Divider(),
-            _scoreRow("Score Level 2", data["col3"]),
-            const Divider(),
-            _scoreRow("Score Level 3", data["col4"]),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _scoreRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 4,
-            child: Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-          ),
-          Expanded(
-            flex: 6,
-            child: Text(value, style: const TextStyle(fontSize: 13)),
-          ),
-        ],
-      ),
-    );
-  }
-
   List<Map<String, dynamic>> _testData() {
     return [
       {
@@ -482,34 +434,6 @@ class _EnglishLanguageRequirementsWidgetState
     }
 
     return filtered;
-  }
-
-  Widget _valueRow(IconData icon, String label, String? value) {
-    if (value == null || value.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Icon(icon, size: 14, color: Colors.indigo.shade300),
-          const SizedBox(width: 6),
-          Expanded(
-            flex: 3,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 5,
-            child: Text(value, style: const TextStyle(fontSize: 12)),
-          ),
-        ],
-      ),
-    );
   }
 
   List<Map<String, dynamic>> get tableDataAfterAug2025 => [

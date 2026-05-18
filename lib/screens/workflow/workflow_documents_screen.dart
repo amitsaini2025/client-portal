@@ -25,7 +25,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   WorkflowChecklistResponse? _checklistResponse;
-  Map<int, bool> _uploadingStates = {};
+  final Map<int, bool> _uploadingStates = {};
 
   @override
   void initState() {

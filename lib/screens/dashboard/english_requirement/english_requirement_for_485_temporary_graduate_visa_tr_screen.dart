@@ -66,8 +66,6 @@ class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
         children: [
           const SizedBox(height: 12),
 
-          //_buildHeader(),
-
           const SizedBox(height: 12),
 
           _buildTabs(),
@@ -87,49 +85,6 @@ class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
           ),
         ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.indigo.shade100),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.indigo.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              "English Test Score Requirements",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.indigo,
-              ),
-            ),
-            SizedBox(height: 6),
-            Text(
-              "Compare score requirements for each approved English test.",
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-          ],
         ),
       ),
     );

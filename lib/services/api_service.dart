@@ -255,43 +255,6 @@ class ApiService {
     );
   }
 
-  /*static Future<Map<String, dynamic>> refreshToken(String refreshToken) async {
-    if (refreshToken == null) {
-      throw Exception('No refresh token available');
-    }
-
-    final response = await _makeRequest(
-      ApiConfig.refreshTokenEndpoint,
-      _buildHeaders(requiresAuth: false),
-      {'refresh_token': refreshToken},
-      'POST',
-    );
-
-    if (response['success'] == true && response['data'] != null) {
-      final newToken = response['data']['token'];
-      setAuthToken(newToken);
-    }
-
-    return response;
-  }*/
-
-  /*static Future<Map<String, dynamic>> refreshTokenApi(String refreshToken) async {
-    if (refreshToken.isEmpty) {
-      throw Exception('No refresh token available');
-    }
-
-    final response = await _makeRequest(
-      ApiConfig.refreshTokenEndpoint,
-      _buildHeaders(requiresAuth: false),
-      {
-        'refresh_token': refreshToken,
-      },
-      'POST',
-    );
-
-    return response;
-  }*/
-
   static Future<Map<String, dynamic>> refreshTokenApi(
     String refreshToken,
   ) async {
@@ -381,15 +344,6 @@ class ApiService {
     );
   }
 
-  /*static Future<Map<String, dynamic>> getDashboard() async {
-    return await _makeRequest(
-      ApiConfig.dashboardEndpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
-  }*/
-
   static Future<Map<String, dynamic>> getDashboard({
     required String selMatterId,
   }) async {
@@ -428,15 +382,6 @@ class ApiService {
       'GET',
     );
   }
-
-  /*static Future<Map<String, dynamic>> getWorkflowAllowedChecklist({
-    required int clientMatterId,
-  }) async {
-    final endpoint =
-        '${ApiConfig.workflowAllowedChecklistEndpoint}?client_matter_id=$clientMatterId';
-
-    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
-  }*/
 
   static Future<Map<String, dynamic>> getWorkflowAllowedChecklist({
     required int clientMatterId,
@@ -486,32 +431,6 @@ class ApiService {
       throw Exception('Upload failed: ${e.toString()}');
     }
   }
-
-  /*static Future<Map<String, dynamic>> getClientCases() async {
-    return await _makeRequest(
-      ApiConfig.clientCasesEndpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
-  }*/
-
-  /*static Future<Map<String, dynamic>> getClientCases({
-    int page = 1,
-    int perPage = 10,
-    String search = '',
-    String status = '',
-  }) async {
-    final endpoint =
-        "${ApiConfig.clientCasesEndpoint}?page=$page&per_page=$perPage&search=$search&status=$status";
-
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
-  }*/
 
   static Future<Map<String, dynamic>> bulkUploadChecklistDocuments({
     required List<({Uint8List bytes, String name})> filesData,

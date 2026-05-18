@@ -136,9 +136,6 @@ class StripeService {
     return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
-
-  static final Uri _verifyCheckoutSessionUri = Uri.parse('${ApiConfig.baseUrl}/payments/checkout-session');
-
   static Future<Map<String, dynamic>> verifyCheckoutSession({
     required String sessionId,
   }) async {

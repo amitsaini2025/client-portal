@@ -30,16 +30,6 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     });
   }
 
-  Future<void> _openLink(String url) async {
-    final Uri uri = Uri.parse(url);
-
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
   Future<void> _sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 

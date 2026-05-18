@@ -327,7 +327,6 @@ class _StudentFundCalculatorScreenState
       Navigator.pop(context);
 
       if (res['success'] == true) {
-        //_showResult(res['data']);
         _showFinancialResultDialog(context, res['data']);
       } else {
         _showError("Calculation failed");
@@ -553,65 +552,6 @@ class _StudentFundCalculatorScreenState
           Expanded(child: Text(label)),
           Text("AUD \$${amount.toString()}"),
         ],
-      ),
-    );
-  }
-
-
-  void _showResult(Map<String, dynamic> d) {
-    final breakdown = d['breakdown'];
-
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(children: [
-            const Text("Financial Requirements",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            const SizedBox(height: 12),
-            Text("AUD \$${d['total_financial_capacity_required']}",
-                style: const TextStyle(
-                    fontSize: 28,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-
-            ...breakdown.entries.map((e) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(children: [
-                  Expanded(child: Text(e.value['label'])),
-                  Text("AUD \$${e.value['amount']}")
-                ]),
-              );
-            }),
-
-            const SizedBox(height: 16),
-
-            Text(
-              "OSHC Total: AUD \$${d['oshc']['total_cost']}",
-              style: const TextStyle(color: Colors.green),
-            ),
-
-            const SizedBox(height: 12),
-
-            Text(
-              "Income Alternative: AUD \$${d['income_evidence_alternative']['required_annual_income']}",
-              style: const TextStyle(fontSize: 12),
-            ),
-
-            const SizedBox(height: 16),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Close")),
-            )
-          ]),
-        ),
       ),
     );
   }

@@ -78,11 +78,6 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
     }
   }
 
-  Future<void> _saveSelectedOptions() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("selectedOptions", jsonEncode(selectedOptions));
-  }
-
   @override
   void dispose() {
     enquiryController.dispose();

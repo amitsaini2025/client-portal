@@ -115,15 +115,6 @@ class _WorkflowMessageDetailScreenState
     }
   }
 
-  String _formatFullDate(String dateTimeStr) {
-    try {
-      final dt = DateTime.parse(dateTimeStr).toLocal();
-      return DateFormat('MMM d, yyyy hh:mm a').format(dt);
-    } catch (_) {
-      return dateTimeStr;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

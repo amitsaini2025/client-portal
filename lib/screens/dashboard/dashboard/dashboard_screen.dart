@@ -23,7 +23,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool isAuthenticated = false;
 
   int _unreadNotificationCount = 0;
-  bool _isLoadingNotificationCount = false;
 
   @override
   void initState() {
@@ -51,8 +50,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _loadUnreadNotificationCount() async {
     if (!AuthService.isAuthenticated) return;
 
-    setState(() => _isLoadingNotificationCount = true);
-
     try {
       final response = await ApiService.getUnreadNotificationCount();
 
@@ -67,8 +64,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } catch (e) {
       debugPrint("Unread count error: $e");
     }
-
-    if (mounted) setState(() => _isLoadingNotificationCount = false);
   }
 
   AppBar _buildAppBar() {
