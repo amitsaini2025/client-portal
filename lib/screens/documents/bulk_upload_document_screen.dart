@@ -509,7 +509,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
             Expanded(
               flex: 2,
               child: DropdownButtonFormField<int>(
-                value: file.selectedStageId,
+                initialValue: file.selectedStageId,
                 isExpanded: true,
                 style: const TextStyle(fontSize: 13, color: Colors.black87),
                 decoration: _dropdownDecoration("Stage"),
@@ -543,7 +543,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
             Expanded(
               flex: 3,
               child: DropdownButtonFormField<int>(
-                value: file.selectedChecklistId,
+                initialValue: file.selectedChecklistId,
                 isExpanded: true,
                 style: const TextStyle(fontSize: 13, color: Colors.black87),
                 decoration: _dropdownDecoration("Checklist"),
@@ -766,7 +766,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
             child: Column(
               children: [
                 DropdownButtonFormField<int>(
-                  value: file.selectedStageId,
+                  initialValue: file.selectedStageId,
                   isExpanded: true,
                   style: const TextStyle(fontSize: 14, color: Colors.black87),
                   decoration: _dropdownDecoration("Stage"),
@@ -793,7 +793,7 @@ class _BulkUploadDocumentScreenState extends State<BulkUploadDocumentScreen>
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<int>(
-                  value: file.selectedChecklistId,
+                  initialValue: file.selectedChecklistId,
                   isExpanded: true,
                   style: const TextStyle(fontSize: 14, color: Colors.black87),
                   decoration: _dropdownDecoration("Checklist"),

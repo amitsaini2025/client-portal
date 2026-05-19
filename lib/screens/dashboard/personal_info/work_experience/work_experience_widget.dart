@@ -463,7 +463,7 @@ class _WorkExperienceWidgetState extends State<WorkExperienceWidget> {
             SizedBox(
               width: double.infinity,
               child: DropdownButtonFormField<String>(
-                value: exp.country.isEmpty ? null : exp.country,
+                initialValue: exp.country.isEmpty ? null : exp.country,
                 isExpanded: true,
                 style: GoogleFonts.inter(
                   fontSize: 14,

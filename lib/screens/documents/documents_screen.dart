@@ -134,7 +134,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                     labelText: 'Priority',
                     border: OutlineInputBorder(),
                   ),
-                  value: priority,
+                  initialValue: priority,
                   items: const [
                     DropdownMenuItem(value: 'low', child: Text('Low')),
                     DropdownMenuItem(value: 'medium', child: Text('Medium')),

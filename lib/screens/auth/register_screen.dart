@@ -310,7 +310,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 20),
                         DropdownButtonFormField(
-                          value: _gender,
+                          initialValue: _gender,
                           decoration: InputDecoration(
                             labelText: "Gender",
                             border: OutlineInputBorder(
@@ -337,7 +337,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 20),
                         DropdownButtonFormField(
-                          value: _maritalStatus,
+                          initialValue: _maritalStatus,
                           decoration: InputDecoration(
                             labelText: "Marital Status",
                             border: OutlineInputBorder(

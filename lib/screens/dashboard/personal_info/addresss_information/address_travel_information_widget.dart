@@ -814,7 +814,7 @@ class _AddressAndTravelInformationWidgetState
               child:
                   editable
                       ? DropdownButtonFormField<String>(
-                        value: selected!.isEmpty ? null : selected,
+                        initialValue: selected!.isEmpty ? null : selected,
                         isExpanded: true,
                         style: GoogleFonts.inter(
                           fontSize: 14,

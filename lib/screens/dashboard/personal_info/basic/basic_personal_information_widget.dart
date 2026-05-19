@@ -846,7 +846,7 @@ class _BasicPersonalInformationWidgetState
             SizedBox(
               width: double.infinity,
               child: DropdownButtonFormField<String>(
-                value: value,
+                initialValue: value,
                 items:
                     typeOptions
                         .map(
@@ -1236,7 +1236,7 @@ class _BasicPersonalInformationWidgetState
             SizedBox(
               width: double.infinity,
               child: DropdownButtonFormField<String>(
-                value: value.isNotEmpty ? value : null,
+                initialValue: value.isNotEmpty ? value : null,
                 items:
                     options
                         .map(

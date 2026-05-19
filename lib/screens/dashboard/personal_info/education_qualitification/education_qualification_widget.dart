@@ -649,7 +649,7 @@ class _EducationalQualificationsWidgetState
               child:
                   enabled
                       ? DropdownButtonFormField<String>(
-                        value: value.isEmpty ? null : value,
+                        initialValue: value.isEmpty ? null : value,
                         isExpanded: true,
                         style: GoogleFonts.inter(
                           fontSize: 14,

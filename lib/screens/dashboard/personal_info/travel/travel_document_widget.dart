@@ -902,7 +902,7 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
               child:
                   editable
                       ? DropdownButtonFormField<String>(
-                        value: selected?.isEmpty ?? true ? null : selected,
+                        initialValue: selected?.isEmpty ?? true ? null : selected,
                         isExpanded: true,
                         style: GoogleFonts.inter(
                           fontSize: 14,
@@ -1045,7 +1045,7 @@ class _TravelDocumentsWidgetState extends State<TravelDocumentsWidget> {
               child:
                   editable
                       ? DropdownButtonFormField<int>(
-                        value:
+                        initialValue:
                             widget.visaTypes.any((v) => v.id == selectedId)
                                 ? selectedId
                                 : null,

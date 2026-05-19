@@ -415,7 +415,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<int>(
-            value: _selectedChecklistId,
+            initialValue: _selectedChecklistId,
             decoration: InputDecoration(
               labelText: 'Related Checklist',
               labelStyle: const TextStyle(color: Colors.black54),
