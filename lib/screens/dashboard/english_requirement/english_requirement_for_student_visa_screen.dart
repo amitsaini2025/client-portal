@@ -171,6 +171,57 @@ class _EnglishRequirementForStudentVisaScreenState
 
           const SizedBox(height: 10),
 
+          Padding(
+            padding: AppResponsive.horizontalPadding(context),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.orange.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    "Condition 1",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+
+                  SizedBox(height: 4),
+
+                  Text(
+                    "Minimum test score if principal course is accompanied with either at least 10 weeks of ELICOS",
+                    style: TextStyle(fontSize: 12),
+                  ),
+
+                  SizedBox(height: 12),
+
+                  Text(
+                    "Condition 2",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+
+                  SizedBox(height: 4),
+
+                  Text(
+                    "Minimum test score if principal course is accompanied by at least 20 weeks of ELICOS",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
           Expanded(
             child: ListView.builder(
               padding: AppResponsive.horizontalPadding(context),
