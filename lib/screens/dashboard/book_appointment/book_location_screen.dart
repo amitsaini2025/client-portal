@@ -162,45 +162,43 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 8),
-          child: SafeArea(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+            ),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-              child: TextButton.icon(
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AppointmentListScreen(),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const AppointmentListScreen(),
-                    ),
-                  );
-                },
-                icon: const Icon(
-                  Icons.history_rounded,
+                );
+              },
+              icon: const Icon(
+                Icons.history_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+              label: const Text(
+                'My Booking\nHistory',
+                textAlign: TextAlign.center,
+                style: TextStyle(
                   color: Colors.white,
-                  size: 18,
-                ),
-                label: const Text(
-                  'My Booking\nHistory',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11,
-                    height: 1.2,
-                  ),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 11,
+                  height: 1.2,
                 ),
               ),
             ),
@@ -213,113 +211,118 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
                 height: MediaQuery.of(context).size.height / 2,
                 child: const Center(child: AppLoader()),
               )
-              : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Select Office Location',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children:
-                        locations
-                            .map(
-                              (location) => _cardWidth(
-                                context,
-                                SelectionCard(
-                                  title: location.name,
-                                  subtitle: location.fullAddress,
-                                  isSelected:
-                                      selectedLocation?.id == location.id,
-                                  onTap:
-                                      () => setState(
-                                        () => selectedLocation = location,
-                                      ),
+              : SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Select Office Location',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children:
+                          locations
+                              .map(
+                                (location) => _cardWidth(
+                                  context,
+                                  SelectionCard(
+                                    title: location.name,
+                                    subtitle: location.fullAddress,
+                                    isSelected:
+                                        selectedLocation?.id == location.id,
+                                    onTap:
+                                        () => setState(
+                                          () => selectedLocation = location,
+                                        ),
+                                  ),
                                 ),
-                              ),
-                            )
-                            .toList(),
-                  ),
-                  const SizedBox(height: 32),
-                  const Text(
-                    'Meeting Type',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children:
-                        meetingTypes
-                            .map(
-                              (meeting) => _cardWidth(
-                                context,
-                                SelectionCard(
-                                  icon: _iconFromString(meeting.icon),
-                                  title: meeting.name,
-                                  subtitle: meeting.description,
-                                  isSelected: selectedMeeting?.id == meeting.id,
-                                  onTap:
-                                      () => setState(
-                                        () => selectedMeeting = meeting,
-                                      ),
+                              )
+                              .toList(),
+                    ),
+                    const SizedBox(height: 32),
+                    const Text(
+                      'Meeting Type',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children:
+                          meetingTypes
+                              .map(
+                                (meeting) => _cardWidth(
+                                  context,
+                                  SelectionCard(
+                                    icon: _iconFromString(meeting.icon),
+                                    title: meeting.name,
+                                    subtitle: meeting.description,
+                                    isSelected:
+                                        selectedMeeting?.id == meeting.id,
+                                    onTap:
+                                        () => setState(
+                                          () => selectedMeeting = meeting,
+                                        ),
+                                  ),
                                 ),
-                              ),
-                            )
-                            .toList(),
-                  ),
-                  const SizedBox(height: 32),
-                  const Text(
-                    'Preferred Language',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children:
-                        languages
-                            .map(
-                              (lang) => _cardWidth(
-                                context,
-                                SelectionCard(
-                                  title: "${lang.flag} ${lang.name}",
-                                  isSelected: selectedLanguage?.id == lang.id,
-                                  onTap:
-                                      () => setState(
-                                        () => selectedLanguage = lang,
-                                      ),
+                              )
+                              .toList(),
+                    ),
+                    const SizedBox(height: 32),
+                    const Text(
+                      'Preferred Language',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children:
+                          languages
+                              .map(
+                                (lang) => _cardWidth(
+                                  context,
+                                  SelectionCard(
+                                    title: "${lang.flag} ${lang.name}",
+                                    isSelected: selectedLanguage?.id == lang.id,
+                                    onTap:
+                                        () => setState(
+                                          () => selectedLanguage = lang,
+                                        ),
+                                  ),
                                 ),
-                              ),
-                            )
-                            .toList(),
-                  ),
-                  const SizedBox(height: 40),
-                  NextButton(
-                    onTap: () async {
-                      Map<String, dynamic> selectedOptions = {
-                        'location_name': selectedLocation?.name.toString(),
-                        'meeting_type': selectedMeeting?.name.toString(),
-                        'inperson_address': selectedLocation?.id.toString(),
-                        'appointment_details': selectedMeeting?.id.toString(),
-                        'preferred_language': selectedLanguage?.id.toString(),
-                      };
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setString(
-                        'selectedOptions',
-                        jsonEncode(selectedOptions),
-                      );
+                              )
+                              .toList(),
+                    ),
+                    const SizedBox(height: 40),
+                    NextButton(
+                      onTap: () async {
+                        Map<String, dynamic> selectedOptions = {
+                          'location_name': selectedLocation?.name.toString(),
+                          'meeting_type': selectedMeeting?.name.toString(),
+                          'inperson_address': selectedLocation?.id.toString(),
+                          'appointment_details': selectedMeeting?.id.toString(),
+                          'preferred_language': selectedLanguage?.id.toString(),
+                        };
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString(
+                          'selectedOptions',
+                          jsonEncode(selectedOptions),
+                        );
 
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => BookServiceScreen()),
-                      );
-                    },
-                  ),
-                ],
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BookServiceScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
     );
   }
