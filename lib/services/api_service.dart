@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -209,11 +207,7 @@ class ApiService {
       }
     } catch (e) {
       // Continue with local logout even if API call fails
-      AppLogger.error(
-        'Logout API call failed: ',
-        e,
-        StackTrace.current,
-      );
+      AppLogger.error('Logout API call failed: ', e, StackTrace.current);
     } finally {
       clearAuth();
     }
@@ -228,11 +222,7 @@ class ApiService {
         "token": fcmToken,
       }, 'POST');
     } catch (e) {
-      AppLogger.error(
-        'FCM unregister failed: ',
-        e,
-        StackTrace.current,
-      );
+      AppLogger.error('FCM unregister failed: ', e, StackTrace.current);
     }
   }
 
@@ -319,7 +309,9 @@ class ApiService {
       if (success) {
         AppLogger.info('FCM: Token registered successfully');
       } else {
-        AppLogger.info('FCM: Failed to register token: ${response['message'] ?? 'Unknown error'}');
+        AppLogger.info(
+          'FCM: Failed to register token: ${response['message'] ?? 'Unknown error'}',
+        );
       }
 
       return success;
@@ -374,11 +366,12 @@ class ApiService {
   // Workflow Methods
   static Future<Map<String, dynamic>> getWorkflowStages({
     int? clientMatterId,
+    String type = 'all',
   }) async {
     final endpoint =
         clientMatterId != null
-            ? '${ApiConfig.workflowStagesEndpoint}?client_matter_id=$clientMatterId'
-            : ApiConfig.workflowStagesEndpoint;
+            ? '${ApiConfig.workflowStagesEndpoint}?client_matter_id=$clientMatterId&type=$type'
+            : '${ApiConfig.workflowStagesEndpoint}?type=$type';
 
     return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
@@ -430,7 +423,11 @@ class ApiService {
     request.fields['client_matter_id'] = clientMatterId.toString();
     request.fields['allowed_checklist_id'] = allowedChecklistId.toString();
     request.files.add(
-      http.MultipartFile.fromBytes('file', fileBytes, filename: _sanitizeFileName(fileName)),
+      http.MultipartFile.fromBytes(
+        'file',
+        fileBytes,
+        filename: _sanitizeFileName(fileName),
+      ),
     );
 
     try {
@@ -465,7 +462,11 @@ class ApiService {
 
     for (var fileData in filesData) {
       request.files.add(
-        http.MultipartFile.fromBytes('files[]', fileData.bytes, filename: _sanitizeFileName(fileData.name)),
+        http.MultipartFile.fromBytes(
+          'files[]',
+          fileData.bytes,
+          filename: _sanitizeFileName(fileData.name),
+        ),
       );
     }
 
@@ -528,10 +529,16 @@ class ApiService {
 
     if (fileBytes != null && fileName != null) {
       request.files.add(
-        http.MultipartFile.fromBytes('document', fileBytes, filename: _sanitizeFileName(fileName)),
+        http.MultipartFile.fromBytes(
+          'document',
+          fileBytes,
+          filename: _sanitizeFileName(fileName),
+        ),
       );
     } else if (!kIsWeb) {
-      request.files.add(await http.MultipartFile.fromPath('document', filePath));
+      request.files.add(
+        await http.MultipartFile.fromPath('document', filePath),
+      );
     } else {
       throw Exception('File bytes and file name are required on web platform');
     }
@@ -579,9 +586,11 @@ class ApiService {
     Map<String, dynamic> data,
   ) async {
     final attachments = data['attachments'] as List<String>?;
-    final attachmentsBytes = data['attachments_bytes'] as List<({Uint8List bytes, String name})>?;
+    final attachmentsBytes =
+        data['attachments_bytes'] as List<({Uint8List bytes, String name})>?;
 
-    final hasAttachments = (attachments != null && attachments.isNotEmpty) ||
+    final hasAttachments =
+        (attachments != null && attachments.isNotEmpty) ||
         (attachmentsBytes != null && attachmentsBytes.isNotEmpty);
 
     if (hasAttachments) {
@@ -600,7 +609,11 @@ class ApiService {
       if (attachmentsBytes != null && attachmentsBytes.isNotEmpty) {
         for (var fileData in attachmentsBytes) {
           request.files.add(
-            http.MultipartFile.fromBytes('attachments[]', fileData.bytes, filename: _sanitizeFileName(fileData.name)),
+            http.MultipartFile.fromBytes(
+              'attachments[]',
+              fileData.bytes,
+              filename: _sanitizeFileName(fileData.name),
+            ),
           );
         }
       }
@@ -703,18 +716,15 @@ class ApiService {
     int page = 1,
     int limit = 20,
   }) async {
-    final url = Uri.parse(ApiConfig.messagesList).replace(queryParameters: {
-      'client_matter_id': clientMatterId.toString(),
-      'page': page.toString(),
-      'limit': limit.toString(),
-    });
-
-    return await _makeRequest(
-      url.toString(),
-      _buildHeaders(),
-      null,
-      'GET',
+    final url = Uri.parse(ApiConfig.messagesList).replace(
+      queryParameters: {
+        'client_matter_id': clientMatterId.toString(),
+        'page': page.toString(),
+        'limit': limit.toString(),
+      },
     );
+
+    return await _makeRequest(url.toString(), _buildHeaders(), null, 'GET');
   }
 
   static Future<Map<String, dynamic>> getMessageDetail(int messageId) async {
@@ -769,7 +779,11 @@ class ApiService {
       if (attachmentBytes != null && attachmentBytes.isNotEmpty) {
         for (var fileData in attachmentBytes) {
           request.files.add(
-            http.MultipartFile.fromBytes('attachments[]', fileData.bytes, filename: _sanitizeFileName(fileData.name)),
+            http.MultipartFile.fromBytes(
+              'attachments[]',
+              fileData.bytes,
+              filename: _sanitizeFileName(fileData.name),
+            ),
           );
         }
       }
@@ -1000,26 +1014,15 @@ class ApiService {
   }) async {
     final endpoint =
         "${ApiConfig.blogListEndpoint}?page=$page&per_page=$perPage";
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
   static Future<Map<String, dynamic>> getBlogDetail({
     required int blogId,
   }) async {
-    final endpoint =
-        "${ApiConfig.blogDetailEndpoint}/$blogId";
+    final endpoint = "${ApiConfig.blogDetailEndpoint}/$blogId";
 
-    return await _makeRequest(
-      endpoint,
-      _buildHeaders(),
-      null,
-      'GET',
-    );
+    return await _makeRequest(endpoint, _buildHeaders(), null, 'GET');
   }
 
   static Future<Map<String, dynamic>> getPRPoints() async {
@@ -1487,15 +1490,14 @@ class ApiService {
 
       final expiryDate = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
 
-      final threshold = DateTime.now().add(
-        ApiConfig.refreshTokenThreshold,
-      );
+      final threshold = DateTime.now().add(ApiConfig.refreshTokenThreshold);
 
       return threshold.isAfter(expiryDate);
     } catch (e) {
       return true;
     }
   }
+
   // Clear authentication data
   static Future<void> clearAuth() async {
     clearAuthToken();

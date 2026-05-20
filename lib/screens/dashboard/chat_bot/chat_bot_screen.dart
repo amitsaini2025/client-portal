@@ -174,11 +174,32 @@ class ChatMessage extends StatelessWidget {
 
   const ChatMessage({super.key, required this.text, required this.sender});
 
-  Future<void> _openLink(String url) async {
+  /*Future<void> _openLink(String url) async {
     final Uri uri = Uri.parse(url);
-
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }*/
+
+
+  Future<void> _openLink(String url) async {
+    try {
+      Uri uri = Uri.parse(url);
+
+      if (!uri.hasScheme) {
+        uri = Uri.parse('https://$url');
+      }
+
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched) {
+        debugPrint('Could not launch $url');
+      }
+    } catch (e) {
+      debugPrint('Error opening link: $e');
     }
   }
 

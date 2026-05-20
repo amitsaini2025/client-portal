@@ -21,23 +21,43 @@ class WorkflowStagesScreen extends StatefulWidget {
   State<WorkflowStagesScreen> createState() => _WorkflowStagesScreenState();
 }
 
-class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
+class _WorkflowStagesScreenState extends State<WorkflowStagesScreen>
+    with TickerProviderStateMixin {
   WorkflowStagesResponse? _workflowResponse;
   bool _isLoading = true;
   String? _error;
+
+  late TabController _tabController;
 
   final ImagePicker _imagePicker = ImagePicker();
 
   Uint8List? _selectedFileBytes;
   String? _selectedFileName;
 
+  final List<String> _tabs = ['all', 'pending', 'completed'];
+
   @override
   void initState() {
     super.initState();
-    _loadWorkflowData();
+
+    _tabController = TabController(length: 3, vsync: this);
+
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        _loadWorkflowData(type: _tabs[_tabController.index]);
+      }
+    });
+
+    _loadWorkflowData(type: 'all');
   }
 
-  Future<void> _loadWorkflowData() async {
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadWorkflowData({String type = 'all'}) async {
     setState(() {
       _isLoading = true;
       _error = null;
@@ -46,15 +66,18 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     try {
       final response = await ApiService.getWorkflowStages(
         clientMatterId: widget.matterID ?? 0,
+        type: type,
       );
 
       if (response['success'] == true && response['data'] != null) {
         setState(() {
           _workflowResponse = WorkflowStagesResponse.fromJson(response['data']);
 
-          AuthService.setClientMatterStageId(
-            _workflowResponse!.activeStage!.id,
-          );
+          if (_workflowResponse?.activeStage != null) {
+            AuthService.setClientMatterStageId(
+              _workflowResponse!.activeStage!.id,
+            );
+          }
 
           _isLoading = false;
         });
@@ -87,7 +110,6 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Handle bar
                 Container(
                   width: 40,
                   height: 4,
@@ -106,6 +128,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+
                 _buildBottomSheetOption(
                   icon: Icons.folder_open_rounded,
                   label: "My Files",
@@ -116,7 +139,9 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                     await _pickFromFiles(stage, checklistId);
                   },
                 ),
+
                 const SizedBox(height: 10),
+
                 _buildBottomSheetOption(
                   icon: Icons.photo_library_rounded,
                   label: "Gallery",
@@ -127,8 +152,10 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                     await _pickFromGallery(stage, checklistId);
                   },
                 ),
+
                 if (!kIsWeb) ...[
                   const SizedBox(height: 10),
+
                   _buildBottomSheetOption(
                     icon: Icons.camera_alt_rounded,
                     label: "Camera",
@@ -156,7 +183,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: color.withValues(alpha:0.06),
+      color: color.withValues(alpha: 0.06),
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
@@ -169,7 +196,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha:0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 22),
@@ -178,13 +205,18 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 15)),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
                   const SizedBox(height: 2),
-                  Text(subtitle,
-                      style: TextStyle(
-                          fontSize: 12, color: Colors.grey.shade500)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                  ),
                 ],
               ),
               const Spacer(),
@@ -205,9 +237,12 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
 
     if (result != null && result.files.isNotEmpty) {
       final file = result.files.first;
+
       if (file.bytes == null) return;
+
       _selectedFileBytes = file.bytes;
       _selectedFileName = file.name;
+
       await _uploadDocument(stage, checklistId);
     }
   }
@@ -218,6 +253,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     if (image != null) {
       _selectedFileBytes = await image.readAsBytes();
       _selectedFileName = image.name;
+
       await _uploadDocument(stage, checklistId);
     }
   }
@@ -228,23 +264,29 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
     if (image != null) {
       _selectedFileBytes = await image.readAsBytes();
       _selectedFileName = image.name;
+
       await _uploadDocument(stage, checklistId);
     }
   }
 
   Future<void> _uploadDocument(WorkflowStage stage, int checklistId) async {
     if (_selectedFileBytes == null || _selectedFileName == null) return;
+
     _showUploadingDialog();
+
     try {
       final fileBytes = _selectedFileBytes!;
       final fileName = _selectedFileName!;
+
       final response = await ApiService.uploadWorkflowChecklistDocument(
         fileBytes: fileBytes,
         fileName: fileName,
         allowedChecklistId: checklistId,
         clientMatterId: widget.matterID ?? 0,
       );
+
       _hideUploadingDialog();
+
       if (response['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -252,7 +294,8 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        await _loadWorkflowData();
+
+        await _loadWorkflowData(type: _tabs[_tabController.index]);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -263,6 +306,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
       }
     } catch (e) {
       _hideUploadingDialog();
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Upload error: $e"),
@@ -323,7 +367,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
       },
     );
 
-    _loadWorkflowData();
+    _loadWorkflowData(type: _tabs[_tabController.index]);
   }
 
   Future<void> _onViewTap(WorkflowStage stage, int checklistId) async {
@@ -351,57 +395,125 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       appBar: CommonAppBar(
         titleName: 'Workflow Stages',
         matterID: widget.matterID ?? 0,
       ),
-      /*appBar: AppBar(
-        title: const Text(
-          'Workflow Stages',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: ThemeConfig.goldenYellow,
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 0,
-      ),*/
+
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(
             maxWidth: AppResponsive.maxContentWidth,
           ),
-          child:
-              _isLoading
-                  ? const Center(child: AppLoader())
-                  : _error != null
-                  ? _buildErrorWidget(_error!, _loadWorkflowData)
-                  : _workflowResponse == null
-                  ? const Center(child: Text('No workflow data available'))
-                  : RefreshIndicator(
-                    color: ThemeConfig.goldenYellow,
-                    onRefresh: _loadWorkflowData,
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: AppResponsive.pagePadding(context),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (_workflowResponse!.caseSummary != null)
-                            _buildCaseSummary(_workflowResponse!.caseSummary!),
 
-                          const SizedBox(height: 20),
-
-                          WorkflowProgressWidget(
-                            workflowResponse: _workflowResponse!,
-                            onStageTap: _showStageDetails,
-                            onChecklistPlusTap: _openUploadOptions,
-                            onChecklistViewTap: _onViewTap,
-                            onBulkUploadTap: _onBulkUploadTap,
-                          ),
-                        ],
-                      ),
-                    ),
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  color: ThemeConfig.navyBlue.withValues(alpha: 0.04),
+                  border: Border.all(
+                    color: ThemeConfig.navyBlue.withValues(alpha: 0.08),
                   ),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  isScrollable: false,
+                  dividerColor: Colors.transparent,
+                  labelPadding: EdgeInsets.zero,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicator: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    color: ThemeConfig.goldenYellow,
+                  ),
+
+                  labelColor: ThemeConfig.navyBlue,
+                  unselectedLabelColor: ThemeConfig.navyBlue.withValues(
+                    alpha: 0.50,
+                  ),
+
+                  labelStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.1,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.1,
+                  ),
+
+                  tabs: [
+                    _buildTab("All", 24),
+                    _buildTab("Pending", 8),
+                    _buildTab("Completed", 16),
+                  ],
+                ),
+              ),
+              Expanded(
+                child:
+                    _isLoading
+                        ? const Center(child: AppLoader())
+                        : _error != null
+                        ? _buildErrorWidget(
+                          _error!,
+                          () => _loadWorkflowData(
+                            type: _tabs[_tabController.index],
+                          ),
+                        )
+                        : _workflowResponse == null
+                        ? const Center(
+                          child: Text('No workflow data available'),
+                        )
+                        : RefreshIndicator(
+                          color: ThemeConfig.goldenYellow,
+                          onRefresh:
+                              () => _loadWorkflowData(
+                                type: _tabs[_tabController.index],
+                              ),
+                          child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: AppResponsive.pagePadding(context),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (_workflowResponse!.caseSummary != null)
+                                  _buildCaseSummary(
+                                    _workflowResponse!.caseSummary!,
+                                  ),
+
+                                const SizedBox(height: 20),
+
+                                WorkflowProgressWidget(
+                                  workflowResponse: _workflowResponse!,
+                                  onStageTap: _showStageDetails,
+                                  onChecklistPlusTap: _openUploadOptions,
+                                  onChecklistViewTap: _onViewTap,
+                                  onBulkUploadTap: _onBulkUploadTap,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTab(String label, int count) {
+    return Tab(
+      height: 46,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label),
+        ],
       ),
     );
   }
@@ -436,9 +548,13 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.error_outline, size: 64, color: ThemeConfig.goldenYellow),
+
           const SizedBox(height: 16),
+
           Text(error, textAlign: TextAlign.center),
+
           const SizedBox(height: 16),
+
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: ThemeConfig.navyBlue,
@@ -454,45 +570,6 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
 
   void _showStageDetails(WorkflowStage stage) {
     if (stage.allowedChecklistCount > 0) {
-      /*Navigator.pushNamed(
-        context,
-        '/workflow-documents',
-        arguments: {
-          'stageId': stage.id,
-          'stageName': stage.stageName
-        },
-      );*/
-      /*showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Upload Documents'),
-          content: const Text(
-            'Do you want to upload documents in bulk?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(
-                  context,
-                  '/bulk-upload-documents',
-                  arguments: {
-                    'stageId': stage.id,
-                    'allowedChecklistId': null,
-                  },
-                );
-              },
-              child: const Text('Yes, Bulk Upload'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
-        ),
-      );*/
     } else {
       showDialog(
         context: context,
@@ -507,6 +584,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Status: ${stage.statusText}'),
+
                   if (stage.isCurrentStage)
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
