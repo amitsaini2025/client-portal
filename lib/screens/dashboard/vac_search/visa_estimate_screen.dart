@@ -43,8 +43,12 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
 
   int selectedPaymentIndex = 0;
 
+  bool get _isSimpleVisa => widget.visa.id == "147" || widget.visa.id == "148";
+
   int get subtotal =>
-      baseCharge + additionalAdultCharge + additionalChildCharge;
+      _isSimpleVisa
+          ? baseCharge
+          : baseCharge + additionalAdultCharge + additionalChildCharge;
 
   double get surchargeAmount => subtotal * surchargeRates[selectedPaymentIndex];
 
@@ -93,8 +97,8 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
     try {
       final response = await ApiService.getVisaEstimate(
         visaId: widget.visa.id,
-        additional18Plus: adultCount,
-        additionalU18: childCount,
+        additional18Plus: _isSimpleVisa ? 0 : adultCount,
+        additionalU18: _isSimpleVisa ? 0 : childCount,
       );
 
       if (response['success'] == true) {
@@ -230,36 +234,27 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      /*appBar: AppBar(
-        title: const Text(
-          "Visa Estimate",
-          style: TextStyle(color: Colors.white),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: ThemeConfig.goldenYellow,
-        foregroundColor: Colors.black,
-      ),*/
       appBar: CommonAppBar(
         titleName: "Visa Estimate",
         matterID: AuthService.selectedMatterId,
       ),
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: AppResponsive.maxContentWidth,
-            ),
-            child: SingleChildScrollView(
-              padding: AppResponsive.pagePadding(context),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
+          ),
+          child: SingleChildScrollView(
+            padding: AppResponsive.pagePadding(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Top info table (hidden entirely for 147 & 148) ─────
+                if (!_isSimpleVisa) ...[
                   const Text(
                     "for any other applicant:",
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 12),
-
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.black),
@@ -286,32 +281,37 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 30),
+                ],
 
-                  const Text(
-                    "PAYABLE FEES & SURCHARGE",
-                    style: TextStyle(
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.w700,
-                    ),
+                // ── PAYABLE FEES & SURCHARGE (always visible) ──────────
+                const Text(
+                  "PAYABLE FEES & SURCHARGE",
+                  style: TextStyle(
+                    letterSpacing: 2,
+                    fontWeight: FontWeight.w700,
                   ),
-                  const SizedBox(height: 12),
+                ),
+                const SizedBox(height: 12),
 
-                  _paymentSelector(),
-                  const SizedBox(height: 16),
+                _paymentSelector(),
+                const SizedBox(height: 16),
 
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        _tableRow(
-                          left: const Text("Base application charge"),
-                          right: Text("$currency $baseCharge"),
-                        ),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      // Base charge — always shown
+                      _tableRow(
+                        left: const Text("Base application charge"),
+                        right: Text("$currency $baseCharge"),
+                      ),
+
+                      // Additional rows — hidden for 147 & 148
+                      if (!_isSimpleVisa) ...[
                         _tableRow(
                           left: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,32 +340,34 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
                           ),
                           right: Text("$currency $additionalChildCharge"),
                         ),
-                        _tableRow(
-                          left: const Text("Subtotal"),
-                          right: Text("$currency $subtotal"),
-                          bold: true,
-                        ),
-                        _tableRow(
-                          left: Text(
-                            "Surcharge (+ ${(surchargeRates[selectedPaymentIndex] * 100).toStringAsFixed(2)}%)",
-                          ),
-                          right: Text(
-                            "$currency ${surchargeAmount.toStringAsFixed(2)}",
-                          ),
-                        ),
-                        _tableRow(
-                          left: const Text("TOTAL"),
-                          right: Text(
-                            "$currency ${finalTotal.toStringAsFixed(2)}",
-                          ),
-                          bold: true,
-                          bg: Colors.grey.shade300,
-                        ),
                       ],
-                    ),
+
+                      // Subtotal, surcharge, total — always shown
+                      _tableRow(
+                        left: const Text("Subtotal"),
+                        right: Text("$currency $subtotal"),
+                        bold: true,
+                      ),
+                      _tableRow(
+                        left: Text(
+                          "Surcharge (+ ${(surchargeRates[selectedPaymentIndex] * 100).toStringAsFixed(2)}%)",
+                        ),
+                        right: Text(
+                          "$currency ${surchargeAmount.toStringAsFixed(2)}",
+                        ),
+                      ),
+                      _tableRow(
+                        left: const Text("TOTAL"),
+                        right: Text(
+                          "$currency ${finalTotal.toStringAsFixed(2)}",
+                        ),
+                        bold: true,
+                        bg: Colors.grey.shade300,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
