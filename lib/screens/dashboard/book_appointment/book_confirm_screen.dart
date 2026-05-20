@@ -51,7 +51,33 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
   Future<void> _initialize() async {
     await _loadCachedData();
     _populateControllers();
+    await _fetchClientProfile();
     await loadCalendarData();
+  }
+
+  Future<void> _fetchClientProfile() async {
+    try {
+      final result = await ApiService.getClientProfile();
+
+      if (result['success'] == true) {
+        final data = result['data'];
+
+        setState(() {
+          fullNameController.text =
+              "${data['first_name'] ?? ''} ${data['last_name'] ?? ''}".trim();
+
+          emailController.text = data['email'] ?? '';
+          String rawPhone = (data['phone'] ?? '').toString();
+          rawPhone = rawPhone
+              .replaceAll('+61', '')
+              .replaceAll(RegExp(r'^61'), '')
+              .trim();
+          phoneController.text = rawPhone;
+        });
+      }
+    } catch (e) {
+      debugPrint("Profile fetch error: $e");
+    }
   }
 
   Future<void> _loadCachedData() async {
