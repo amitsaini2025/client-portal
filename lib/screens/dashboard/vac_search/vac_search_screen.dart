@@ -58,9 +58,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
         if (cachedJson['success'] == true) {
           final List data = cachedJson['data']['data'];
 
-          allVisas = data
-              .map<VisaModel>((e) => VisaModel.fromJson(e))
-              .toList();
+          allVisas = data.map<VisaModel>((e) => VisaModel.fromJson(e)).toList();
 
           if (mounted) {
             setState(() => loading = false);
@@ -72,21 +70,14 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
     }
 
     try {
-      final res = await ApiService.getVisaList(
-        limit: 160,
-      );
+      final res = await ApiService.getVisaList(limit: 160);
 
-      await prefs.setString(
-        _visaCacheKey,
-        jsonEncode(res),
-      );
+      await prefs.setString(_visaCacheKey, jsonEncode(res));
 
       if (res['success'] == true) {
         final List data = res['data']['data'];
 
-        allVisas = data
-            .map<VisaModel>((e) => VisaModel.fromJson(e))
-            .toList();
+        allVisas = data.map<VisaModel>((e) => VisaModel.fromJson(e)).toList();
       }
     } catch (e) {
       debugPrint("API error: $e");
@@ -107,21 +98,22 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
       return;
     }
 
-    _debounce = Timer(
-      const Duration(milliseconds: 100),
-          () {
-        _searchSuggestions(query);
-      },
-    );
+    _debounce = Timer(const Duration(milliseconds: 100), () {
+      _searchSuggestions(query);
+    });
   }
 
   void _searchSuggestions(String query) {
     final q = query.toLowerCase();
 
-    final results = allVisas.where((e) {
-      return e.label.toLowerCase().contains(q) ||
-          e.subclass.toLowerCase().contains(q);
-    }).take(6).toList();
+    final results =
+        allVisas
+            .where((e) {
+              return e.label.toLowerCase().contains(q) ||
+                  e.subclass.toLowerCase().contains(q);
+            })
+            .take(6)
+            .toList();
 
     setState(() {
       suggestions = results;
@@ -131,9 +123,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
   Future<void> _navigateToEstimate(VisaModel item) async {
     await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => VisaEstimateScreen(visa: item),
-      ),
+      MaterialPageRoute(builder: (_) => VisaEstimateScreen(visa: item)),
     );
 
     _controller.clear();
@@ -151,35 +141,34 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
         titleName: "VAC Search",
         matterID: AuthService.selectedMatterId,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
-          ),
-          child: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
 
-              setState(() => suggestions = []);
-            },
-            child: Padding(
-              padding: AppResponsive.pagePadding(context),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _searchField(),
+                setState(() => suggestions = []);
+              },
+              child: Padding(
+                padding: AppResponsive.pagePadding(context),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _searchField(),
 
-                  if (suggestions.isNotEmpty)
-                    _dropdown(),
+                    if (suggestions.isNotEmpty) _dropdown(),
 
-                  if (loading)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Center(
-                        child: AppLoader(),
+                    if (loading)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Center(child: AppLoader()),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -203,9 +192,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
             setState(() => suggestions = []);
           },
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -217,9 +204,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: Colors.grey.shade300,
-        ),
+        border: Border.all(color: Colors.grey.shade300),
       ),
       child: ListView.builder(
         shrinkWrap: true,
@@ -229,9 +214,7 @@ class _VacSearchScreenState extends State<VacSearchScreen> {
 
           return ListTile(
             title: Text(item.label),
-            subtitle: Text(
-              "Subclass ${item.subclass}",
-            ),
+            subtitle: Text("Subclass ${item.subclass}"),
             onTap: () {
               _controller.text = item.label;
 

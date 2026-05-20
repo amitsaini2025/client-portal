@@ -2,18 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../config/theme_config.dart';
-import '../../../services/api_service.dart';
 import '../../../models/notification/notification.dart';
+import '../../../services/api_service.dart';
 import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 
 class NotificationDetailScreen extends StatefulWidget {
   final int notificationId;
 
-  const NotificationDetailScreen({
-    super.key,
-    required this.notificationId,
-  });
+  const NotificationDetailScreen({super.key, required this.notificationId});
 
   @override
   State<NotificationDetailScreen> createState() =>
@@ -85,10 +82,7 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.black87,
-                  ),
+                  style: const TextStyle(fontSize: 15, color: Colors.black87),
                 ),
               ],
             ),
@@ -107,97 +101,96 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
         elevation: 0,
         title: const Text(
           "Notification Details",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: isLoading
-          ? const Center(child: AppLoader())
-          : error != null
-          ? Center(
-        child: Text(
-          error!,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.red,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                isLoading
+                    ? const Center(child: AppLoader())
+                    : error != null
+                    ? Center(
+                      child: Text(
+                        error!,
+                        style: const TextStyle(fontSize: 16, color: Colors.red),
+                      ),
+                    )
+                    : SingleChildScrollView(
+                      padding: AppResponsive.pagePadding(context),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// TITLE
+                          Text(
+                            notification!.notificationType,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          /// MESSAGE
+                          Text(
+                            notification!.message,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade800,
+                              height: 1.5,
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+                          const Divider(),
+
+                          /// DETAILS SECTION
+                          const SizedBox(height: 12),
+                          const Text(
+                            "Details",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          _buildInfoRow(
+                            Icons.person,
+                            "From",
+                            notification!.senderName ?? "System",
+                          ),
+
+                          _buildInfoRow(
+                            Icons.access_time,
+                            "Created",
+                            _formatDate(notification!.createdAt),
+                          ),
+
+                          _buildInfoRow(
+                            Icons.update,
+                            "Updated",
+                            _formatDate(notification!.updatedAt),
+                          ),
+
+                          if (notification!.url.isNotEmpty)
+                            _buildInfoRow(
+                              Icons.link,
+                              "Action URL",
+                              notification!.url,
+                            ),
+                        ],
+                      ),
+                    ),
           ),
-        ),
-      )
-          : SingleChildScrollView(
-        padding: AppResponsive.pagePadding(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// TITLE
-            Text(
-              notification!.notificationType,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            /// MESSAGE
-            Text(
-              notification!.message,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey.shade800,
-                height: 1.5,
-              ),
-            ),
-
-            const SizedBox(height: 24),
-            const Divider(),
-
-            /// DETAILS SECTION
-            const SizedBox(height: 12),
-            const Text(
-              "Details",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            _buildInfoRow(
-              Icons.person,
-              "From",
-              notification!.senderName ?? "System",
-            ),
-
-            _buildInfoRow(
-              Icons.access_time,
-              "Created",
-              _formatDate(notification!.createdAt),
-            ),
-
-            _buildInfoRow(
-              Icons.update,
-              "Updated",
-              _formatDate(notification!.updatedAt),
-            ),
-
-            if (notification!.url.isNotEmpty)
-              _buildInfoRow(
-                Icons.link,
-                "Action URL",
-                notification!.url,
-              ),
-          ],
-        ),
-      ),
         ),
       ),
     );

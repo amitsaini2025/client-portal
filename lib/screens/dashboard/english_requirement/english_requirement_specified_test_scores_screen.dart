@@ -31,7 +31,9 @@ class EnglishRequirementSpecifiedTestScoresScreen extends StatelessWidget {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
+          constraints: const BoxConstraints(
+            maxWidth: AppResponsive.maxContentWidth,
+          ),
           child: const EnglishLanguageRequirementsWidget(),
         ),
       ),
@@ -131,161 +133,163 @@ class _EnglishLanguageRequirementsWidgetState
   @override
   Widget build(BuildContext context) {
     final allData =
-    selectedTab == 0 ? tableDataAfterAug2025 : tableDataBeforeAug2025;
+        selectedTab == 0 ? tableDataAfterAug2025 : tableDataBeforeAug2025;
 
     final selectedLevel = levelTabs[selectedLevelTab];
     final data = _filteredDataByLevel(allData, selectedLevel);
     final groupedData = _groupDataByTest(data);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding:
-          const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                "English Language Requirements",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.indigo,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                "Specified Test Scores for Visa Requirements",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.indigoAccent,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.indigo.shade100),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.indigo.withValues(alpha:0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+    return SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 12.0,
             ),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                ChoiceChip(
-                  label: const Text("After 7 Aug 2025"),
-                  selected: selectedTab == 0,
-                  selectedColor: Colors.indigo.shade100,
-                  backgroundColor: Colors.grey.shade100,
-                  labelStyle: TextStyle(
-                    color: selectedTab == 0 ? Colors.indigo : Colors.black87,
-                    fontWeight: FontWeight.w600,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  "English Language Requirements",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.indigo,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    side: BorderSide(color: Colors.indigo.shade100),
-                  ),
-                  onSelected: (_) => setState(() => selectedTab = 0),
                 ),
-                ChoiceChip(
-                  label: const Text("Before 6 Aug 2025"),
-                  selected: selectedTab == 1,
-                  selectedColor: Colors.indigo.shade100,
-                  backgroundColor: Colors.grey.shade100,
-                  labelStyle: TextStyle(
-                    color: selectedTab == 1 ? Colors.indigo : Colors.black87,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    side: BorderSide(color: Colors.indigo.shade100),
-                  ),
-                  onSelected: (_) => setState(() => selectedTab = 1),
+                SizedBox(height: 8),
+                Text(
+                  "Specified Test Scores for Visa Requirements",
+                  style: TextStyle(fontSize: 14, color: Colors.indigoAccent),
                 ),
               ],
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.indigo.shade50,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.indigo.shade200),
-            ),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: List.generate(levelTabs.length, (index) {
-                return ChoiceChip(
-                  label: Text(levelTabs[index]),
-                  selected: selectedLevelTab == index,
-                  selectedColor: Colors.indigo,
-                  backgroundColor: Colors.white,
-                  labelStyle: TextStyle(
-                    color: selectedLevelTab == index
-                        ? Colors.white
-                        : Colors.indigo,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    side: BorderSide(color: Colors.indigo.shade200),
-                  ),
-                  onSelected: (_) => setState(() => selectedLevelTab = index),
-                );
-              }),
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Expanded(
-          child: ListView.builder(
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: groupedData.length,
-            itemBuilder: (context, index) {
-              final group = groupedData[index];
-              return _buildGroupedCard(group);
-            },
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            "Department of Home Affairs - English language visa requirements",
-            style: TextStyle(
-              color: Colors.indigo,
-              fontSize: 13,
-              decoration: TextDecoration.underline,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.indigo.shade100),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.indigo.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text("After 7 Aug 2025"),
+                    selected: selectedTab == 0,
+                    selectedColor: Colors.indigo.shade100,
+                    backgroundColor: Colors.grey.shade100,
+                    labelStyle: TextStyle(
+                      color: selectedTab == 0 ? Colors.indigo : Colors.black87,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                      side: BorderSide(color: Colors.indigo.shade100),
+                    ),
+                    onSelected: (_) => setState(() => selectedTab = 0),
+                  ),
+                  ChoiceChip(
+                    label: const Text("Before 6 Aug 2025"),
+                    selected: selectedTab == 1,
+                    selectedColor: Colors.indigo.shade100,
+                    backgroundColor: Colors.grey.shade100,
+                    labelStyle: TextStyle(
+                      color: selectedTab == 1 ? Colors.indigo : Colors.black87,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                      side: BorderSide(color: Colors.indigo.shade100),
+                    ),
+                    onSelected: (_) => setState(() => selectedTab = 1),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.indigo.shade50,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.indigo.shade200),
+              ),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: List.generate(levelTabs.length, (index) {
+                  return ChoiceChip(
+                    label: Text(levelTabs[index]),
+                    selected: selectedLevelTab == index,
+                    selectedColor: Colors.indigo,
+                    backgroundColor: Colors.white,
+                    labelStyle: TextStyle(
+                      color:
+                          selectedLevelTab == index
+                              ? Colors.white
+                              : Colors.indigo,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: Colors.indigo.shade200),
+                    ),
+                    onSelected: (_) => setState(() => selectedLevelTab = index),
+                  );
+                }),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: groupedData.length,
+              itemBuilder: (context, index) {
+                final group = groupedData[index];
+                return _buildGroupedCard(group);
+              },
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              "Department of Home Affairs - English language visa requirements",
+              style: TextStyle(
+                color: Colors.indigo,
+                fontSize: 13,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildGroupedCard(Map<String, dynamic> group) {
     final List<Map<String, String>> values =
-    (group["values"] as List).cast<Map<String, String>>();
+        (group["values"] as List).cast<Map<String, String>>();
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
@@ -320,7 +324,7 @@ class _EnglishLanguageRequirementsWidgetState
             else
               const SizedBox(height: 10),
             ...values.map(
-                  (item) => Padding(
+              (item) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 3),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -377,10 +381,7 @@ class _EnglishLanguageRequirementsWidgetState
         final row = data.first;
         final value = row[test["key"]];
         if (value != null && value.toString().isNotEmpty) {
-          values.add({
-            "label": "Score",
-            "value": value.toString(),
-          });
+          values.add({"label": "Score", "value": value.toString()});
         }
       } else {
         for (final row in data) {
@@ -408,9 +409,9 @@ class _EnglishLanguageRequirementsWidgetState
   }
 
   List<Map<String, dynamic>> _filteredDataByLevel(
-      List<Map<String, dynamic>> allData,
-      String selectedLevel,
-      ) {
+    List<Map<String, dynamic>> allData,
+    String selectedLevel,
+  ) {
     final List<Map<String, dynamic>> filtered = [];
 
     for (int i = 0; i < allData.length; i++) {
@@ -469,10 +470,54 @@ class _EnglishLanguageRequirementsWidgetState
     _row("", "Speaking", "7.0", "76", "24", "194", "360", "8", "82", "59"),
 
     _section("Superior (20 points)"),
-    _row("", "Listening", "8.0", "69", "26", "186", "390", "10", "80", "Excluded"),
-    _row("", "Reading", "8.0", "70", "27", "190", "400", "10", "83", "Excluded"),
-    _row("", "Writing", "8.0", "85", "30", "210", "420", "12", "89", "Excluded"),
-    _row("", "Speaking", "8.0", "88", "28", "208", "400", "10", "89", "Excluded"),
+    _row(
+      "",
+      "Listening",
+      "8.0",
+      "69",
+      "26",
+      "186",
+      "390",
+      "10",
+      "80",
+      "Excluded",
+    ),
+    _row(
+      "",
+      "Reading",
+      "8.0",
+      "70",
+      "27",
+      "190",
+      "400",
+      "10",
+      "83",
+      "Excluded",
+    ),
+    _row(
+      "",
+      "Writing",
+      "8.0",
+      "85",
+      "30",
+      "210",
+      "420",
+      "12",
+      "89",
+      "Excluded",
+    ),
+    _row(
+      "",
+      "Speaking",
+      "8.0",
+      "88",
+      "28",
+      "208",
+      "400",
+      "10",
+      "89",
+      "Excluded",
+    ),
   ];
 
   List<Map<String, dynamic>> get tableDataBeforeAug2025 => [
@@ -515,17 +560,17 @@ class _EnglishLanguageRequirementsWidgetState
   ];
 
   static Map<String, dynamic> _row(
-      String level,
-      String component,
-      String ielts,
-      String pte,
-      String toefl,
-      String c1,
-      String oet,
-      String celpip,
-      String languageCert,
-      String met,
-      ) {
+    String level,
+    String component,
+    String ielts,
+    String pte,
+    String toefl,
+    String c1,
+    String oet,
+    String celpip,
+    String languageCert,
+    String met,
+  ) {
     return {
       "level": level,
       "component": component,

@@ -1,5 +1,6 @@
 import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
+
 import '../../../config/theme_config.dart';
 import '../../../services/api_service.dart';
 import '../../../utils/responsive_utils.dart';
@@ -27,8 +28,9 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
 
   Future<void> fetchDetail() async {
     try {
-      final response =
-      await ApiService.getAppointmentById(widget.appointmentId);
+      final response = await ApiService.getAppointmentById(
+        widget.appointmentId,
+      );
 
       setState(() {
         data = response['data'];
@@ -55,14 +57,19 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: isLoading
-          ? const Center(child: AppLoader())
-          : error != null
-          ? Center(child: Text(error!))
-          : _buildBody(),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                isLoading
+                    ? const Center(child: AppLoader())
+                    : error != null
+                    ? Center(child: Text(error!))
+                    : _buildBody(),
+          ),
         ),
       ),
     );
@@ -227,7 +234,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       "Sep",
       "Oct",
       "Nov",
-      "Dec"
+      "Dec",
     ];
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -266,7 +273,7 @@ class _InfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -311,10 +318,7 @@ class _KeyValue extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            keyText,
-            style: const TextStyle(color: Colors.black54),
-          ),
+          Text(keyText, style: const TextStyle(color: Colors.black54)),
           Flexible(
             child: Text(
               value ?? "-",

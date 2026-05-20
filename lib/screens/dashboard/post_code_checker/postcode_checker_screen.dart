@@ -22,22 +22,22 @@ class PostcodeCheckerScreen extends StatefulWidget {
 class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
   static const String _postcodeCacheKey = "postcode_all_cache";
 
-  static const _primary       = Color(0xFF1A56DB);
-  static const _accent        = Color(0xFF0E9F6E);
-  static const _accentLight   = Color(0xFFECFDF5);
-  static const _border        = Color(0xFFE5E7EB);
-  static const _textPrimary   = Color(0xFF111827);
+  static const _primary = Color(0xFF1A56DB);
+  static const _accent = Color(0xFF0E9F6E);
+  static const _accentLight = Color(0xFFECFDF5);
+  static const _border = Color(0xFFE5E7EB);
+  static const _textPrimary = Color(0xFF111827);
   static const _textSecondary = Color(0xFF6B7280);
-  static const _bg            = Color(0xFFF9FAFB);
+  static const _bg = Color(0xFFF9FAFB);
 
   final TextEditingController _controller = TextEditingController();
 
   Timer? _debounce;
 
   List<PostcodeSearchItem> allPostcodes = [];
-  List<PostcodeSearchItem> suggestions  = [];
-  PostcodeResult?          result;
-  bool                     loading      = false;
+  List<PostcodeSearchItem> suggestions = [];
+  PostcodeResult? result;
+  bool loading = false;
 
   @override
   void initState() {
@@ -63,7 +63,9 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
         final decoded = jsonDecode(cached);
 
         allPostcodes =
-            (decoded as List).map((e) => PostcodeSearchItem.fromJson(e)).toList();
+            (decoded as List)
+                .map((e) => PostcodeSearchItem.fromJson(e))
+                .toList();
 
         if (mounted) {
           setState(() => loading = false);
@@ -75,9 +77,10 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
     try {
       final response = await ApiService.postcodeAll();
       if (response['success']) {
-        allPostcodes = (response['data'] as List)
-            .map((e) => PostcodeSearchItem.fromJson(e))
-            .toList();
+        allPostcodes =
+            (response['data'] as List)
+                .map((e) => PostcodeSearchItem.fromJson(e))
+                .toList();
         await prefs.setString(_postcodeCacheKey, jsonEncode(response['data']));
       }
     } catch (e) {
@@ -98,19 +101,22 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
     }
     _debounce = Timer(
       const Duration(milliseconds: 100),
-          () => _searchSuggestions(query),
+      () => _searchSuggestions(query),
     );
   }
 
   void _searchSuggestions(String query) {
     final q = query.toLowerCase();
-    final results = allPostcodes
-        .where((e) =>
-    e.suburb.toLowerCase().contains(q) ||
-        e.postcode.toLowerCase().contains(q) ||
-        e.state.toLowerCase().contains(q))
-        .take(8)
-        .toList();
+    final results =
+        allPostcodes
+            .where(
+              (e) =>
+                  e.suburb.toLowerCase().contains(q) ||
+                  e.postcode.toLowerCase().contains(q) ||
+                  e.state.toLowerCase().contains(q),
+            )
+            .take(8)
+            .toList();
     if (mounted) setState(() => suggestions = results);
   }
 
@@ -124,7 +130,7 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
       final response = await ApiService.postcodeResult(postcode);
       if (response['success']) {
         setState(() {
-          result  = PostcodeResult.fromJson(response['data']);
+          result = PostcodeResult.fromJson(response['data']);
           loading = false;
         });
       } else {
@@ -144,33 +150,38 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
         titleName: 'Postcode Checker Tool',
         matterID: AuthService.selectedMatterId,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-              setState(() => suggestions = []);
-            },
-            child: SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: AppResponsive.pagePadding(context),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 20),
-                  _buildSearchField(),
-                  if (suggestions.isNotEmpty) _buildSuggestions(),
-                  const SizedBox(height: 12),
-                  if (loading)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
-                      child: Center(child: AppLoader()),
-                    ),
-                  if (result != null) _buildResultCard(),
-                  const SizedBox(height: 32),
-                ],
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+                setState(() => suggestions = []);
+              },
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: AppResponsive.pagePadding(context),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 20),
+                    _buildSearchField(),
+                    if (suggestions.isNotEmpty) _buildSuggestions(),
+                    const SizedBox(height: 12),
+                    if (loading)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: Center(child: AppLoader()),
+                      ),
+                    if (result != null) _buildResultCard(),
+                    const SizedBox(height: 32),
+                  ],
+                ),
               ),
             ),
           ),
@@ -229,20 +240,31 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
           decoration: InputDecoration(
             hintText: 'e.g. Sydney or 2000',
             hintStyle: const TextStyle(color: _textSecondary, fontSize: 14),
-            prefixIcon: const Icon(Icons.search_rounded, color: _primary, size: 20),
+            prefixIcon: const Icon(
+              Icons.search_rounded,
+              color: _primary,
+              size: 20,
+            ),
             suffixIcon: IconButton(
-              icon: const Icon(Icons.close_rounded, color: _textSecondary, size: 18),
+              icon: const Icon(
+                Icons.close_rounded,
+                color: _textSecondary,
+                size: 18,
+              ),
               onPressed: () {
                 _controller.clear();
                 setState(() {
                   suggestions = [];
-                  result      = null;
+                  result = null;
                 });
               },
             ),
             filled: true,
             fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 13,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(color: _border),
@@ -267,7 +289,7 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.07),
+            color: Colors.black.withValues(alpha: 0.07),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -279,12 +301,13 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
           shrinkWrap: true,
           padding: const EdgeInsets.symmetric(vertical: 4),
           itemCount: suggestions.length,
-          separatorBuilder: (_, _) => const Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: _border,
-          ),
+          separatorBuilder:
+              (_, _) => const Divider(
+                height: 1,
+                indent: 16,
+                endIndent: 16,
+                color: _border,
+              ),
           itemBuilder: (_, i) {
             final item = suggestions[i];
             return InkWell(
@@ -295,10 +318,17 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
                 _fetchResult(item.postcode);
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 child: Row(
                   children: [
-                    const Icon(Icons.location_on_outlined, color: _primary, size: 16),
+                    const Icon(
+                      Icons.location_on_outlined,
+                      color: _primary,
+                      size: 16,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -310,8 +340,11 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
                         ),
                       ),
                     ),
-                    const Icon(Icons.chevron_right_rounded,
-                        color: _textSecondary, size: 17),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: _textSecondary,
+                      size: 17,
+                    ),
                   ],
                 ),
               ),
@@ -336,8 +369,11 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.check_circle_outline_rounded,
-                  color: _accent, size: 18),
+              const Icon(
+                Icons.check_circle_outline_rounded,
+                color: _accent,
+                size: 18,
+              ),
               const SizedBox(width: 8),
               const Text(
                 'Result',
@@ -352,22 +388,26 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
           const SizedBox(height: 14),
           const Divider(height: 1, color: _border),
           const SizedBox(height: 4),
-          _resultRow('Postcode',        result!.postcode),
-          _resultRow('Area',            result!.area),
-          _resultRow('State',           result!.state),
-          _resultRow('Regional Status', result!.regionalStatus, highlight: true),
-          _resultRow('Category',        result!.category,       last: true),
+          _resultRow('Postcode', result!.postcode),
+          _resultRow('Area', result!.area),
+          _resultRow('State', result!.state),
+          _resultRow(
+            'Regional Status',
+            result!.regionalStatus,
+            highlight: true,
+          ),
+          _resultRow('Category', result!.category, last: true),
         ],
       ),
     );
   }
 
   Widget _resultRow(
-      String label,
-      String value, {
-        bool highlight = false,
-        bool last = false,
-      }) {
+    String label,
+    String value, {
+    bool highlight = false,
+    bool last = false,
+  }) {
     return Column(
       children: [
         Padding(
@@ -382,31 +422,34 @@ class _PostcodeCheckerScreenState extends State<PostcodeCheckerScreen> {
                 ),
               ),
               Expanded(
-                child: highlight
-                    ? Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: _accentLight,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: _accent,
-                    ),
-                  ),
-                )
-                    : Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                    color: _textPrimary,
-                  ),
-                ),
+                child:
+                    highlight
+                        ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _accentLight,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            value,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: _accent,
+                            ),
+                          ),
+                        )
+                        : Text(
+                          value,
+                          style: const TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                            color: _textPrimary,
+                          ),
+                        ),
               ),
             ],
           ),

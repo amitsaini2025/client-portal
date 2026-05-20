@@ -83,60 +83,62 @@ class _BookServiceScreenState extends State<BookServiceScreen> {
       child:
           isLoading
               ? const Center(child: AppLoader())
-              : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ...serviceCategories.map((service) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
-                      child: SelectionCard(
-                        title: service.name,
-                        subtitle: service.name,
-                        isSelected: selectedService?.id == service.id,
-                        onTap: () {
-                          setState(() {
-                            selectedService = service;
-                          });
-                        },
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 30),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: PreviousButton(
+              : SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...serviceCategories.map((service) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: SelectionCard(
+                          title: service.name,
+                          subtitle: service.name,
+                          isSelected: selectedService?.id == service.id,
                           onTap: () {
-                            Navigator.pop(context);
+                            setState(() {
+                              selectedService = service;
+                            });
                           },
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: NextButton(
-                          onTap: () async {
-                            if (selectedService != null) {
-                              selectedOptions['noe_id'] = selectedService!.id;
-                              selectedOptions["service_name"] =
-                                  selectedService!.name;
+                      );
+                    }),
+                    const SizedBox(height: 30),
 
-                              await _saveSelectedOptions();
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => BookDetailsScreen(),
-                                ),
-                              );
-                            }
-                          },
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: PreviousButton(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: NextButton(
+                            onTap: () async {
+                              if (selectedService != null) {
+                                selectedOptions['noe_id'] = selectedService!.id;
+                                selectedOptions["service_name"] =
+                                    selectedService!.name;
+
+                                await _saveSelectedOptions();
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => BookDetailsScreen(),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
     );
   }

@@ -150,26 +150,28 @@ class _ClaudeChatBotScreenState extends State<ClaudeChatBotScreen> {
         foregroundColor: Colors.white,
         title: const Text("Chatbot"),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
-          ),
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  reverse: true,
-                  padding: const EdgeInsets.all(10),
-                  itemCount: _messages.length,
-                  itemBuilder: (_, index) => _messages[index],
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    reverse: true,
+                    padding: const EdgeInsets.all(10),
+                    itemCount: _messages.length,
+                    itemBuilder: (_, index) => _messages[index],
+                  ),
                 ),
-              ),
-              if (_isLoading) _buildTypingIndicator(),
-              const Divider(height: 1),
-              _buildTextComposer(),
-            ],
+                if (_isLoading) _buildTypingIndicator(),
+                const Divider(height: 1),
+                _buildTextComposer(),
+              ],
+            ),
           ),
         ),
       ),

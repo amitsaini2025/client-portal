@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:client/config/theme_config.dart';
+import 'package:flutter/material.dart';
+
 import '../../models/new/recent_activity.dart';
 import '../../services/api_service.dart';
 import '../../utils/app_loader.dart';
@@ -69,44 +70,54 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Column(
-        children: [
-          Padding(
-            padding: AppResponsive.pagePadding(context),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-                _loadActivities();
-              },
-              style: const TextStyle(color: Colors.black87), // Dark text
-              decoration: InputDecoration(
-                hintText: "Search activities...",
-                hintStyle: const TextStyle(color: Colors.black45),
-                prefixIcon: const Icon(Icons.search, color: Colors.black54),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: ThemeConfig.goldenYellow),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: ThemeConfig.goldenYellow),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: ThemeConfig.goldenYellow, width: 2),
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
             ),
-          ),
-          Expanded(child: _buildActivityList()),
-        ],
+            child: Column(
+              children: [
+                Padding(
+                  padding: AppResponsive.pagePadding(context),
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                      _loadActivities();
+                    },
+                    style: const TextStyle(color: Colors.black87), // Dark text
+                    decoration: InputDecoration(
+                      hintText: "Search activities...",
+                      hintStyle: const TextStyle(color: Colors.black45),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.black54,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: ThemeConfig.goldenYellow),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: ThemeConfig.goldenYellow),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: ThemeConfig.goldenYellow,
+                          width: 2,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                ),
+                Expanded(child: _buildActivityList()),
+              ],
+            ),
           ),
         ),
       ),
@@ -115,9 +126,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
 
   Widget _buildActivityList() {
     if (_isLoading) {
-      return const Center(
-        child: AppLoader(),
-      );
+      return const Center(child: AppLoader());
     }
 
     if (_errorMessage != null) {
@@ -125,7 +134,11 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: ThemeConfig.goldenYellow),
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: ThemeConfig.goldenYellow,
+            ),
             const SizedBox(height: 16),
             Text(
               _errorMessage!,
@@ -178,17 +191,23 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
 
   Widget _buildActivityCard(Activity activity) {
     return Card(
-      color: Colors.white, // ✅ White card
+      color: Colors.white,
+      // ✅ White card
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: ThemeConfig.goldenYellow.withValues(alpha:0.5)),
+        side: BorderSide(
+          color: ThemeConfig.goldenYellow.withValues(alpha: 0.5),
+        ),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         leading: Icon(Icons.task, color: ThemeConfig.goldenYellow),
-        title: Text(activity.title, style: const TextStyle(color: Colors.black87)),
+        title: Text(
+          activity.title,
+          style: const TextStyle(color: Colors.black87),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -201,7 +220,10 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
             const SizedBox(height: 4),
             Text(
               "Group: ${activity.taskGroup ?? "N/A"}",
-              style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.black87),
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
             ),
             Text(
               "Created: ${activity.createdAt} • ${activity.timeAgo}",
@@ -209,7 +231,11 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
             ),
           ],
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black38),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: Colors.black38,
+        ),
         onTap: () => _showActivityDetails(activity),
       ),
     );
@@ -225,46 +251,56 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return SafeArea(child: DraggableScrollableSheet(
-          initialChildSize: 0.5,
-          minChildSize: 0.3,
-          maxChildSize: 0.8,
-          builder: (context, scrollController) {
-            return Container(
-              padding: const EdgeInsets.all(20),
-              child: ListView(
-                controller: scrollController,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: ThemeConfig.goldenYellow,
-                        borderRadius: BorderRadius.circular(2),
+        return SafeArea(
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.5,
+            minChildSize: 0.3,
+            maxChildSize: 0.8,
+            builder: (context, scrollController) {
+              return Container(
+                padding: const EdgeInsets.all(20),
+                child: ListView(
+                  controller: scrollController,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: ThemeConfig.goldenYellow,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    activity.title,
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(height: 16),
+                    Text(
+                      activity.title,
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDetailRow("Description", activity.description.isNotEmpty ? activity.description.replaceAll(RegExp(r'[\n\r\t]+'), ' ') : "No description"),
-                  _buildDetailRow("Task Group", activity.taskGroup),
-                  _buildDetailRow("Created At", activity.createdAt),
-                  _buildDetailRow("Updated At", activity.updatedAt),
-                  _buildDetailRow("Time Ago", activity.timeAgo),
-                ],
-              ),
-            );
-          },
-        ));
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      "Description",
+                      activity.description.isNotEmpty
+                          ? activity.description.replaceAll(
+                            RegExp(r'[\n\r\t]+'),
+                            ' ',
+                          )
+                          : "No description",
+                    ),
+                    _buildDetailRow("Task Group", activity.taskGroup),
+                    _buildDetailRow("Created At", activity.createdAt),
+                    _buildDetailRow("Updated At", activity.updatedAt),
+                    _buildDetailRow("Time Ago", activity.timeAgo),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
       },
     );
   }
@@ -276,10 +312,16 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
         children: [
           Text(
             "$label: ",
-            style: TextStyle(fontWeight: FontWeight.bold, color: ThemeConfig.goldenYellow),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: ThemeConfig.goldenYellow,
+            ),
           ),
           Expanded(
-            child: Text(value ?? "N/A", style: const TextStyle(color: Colors.black87)),
+            child: Text(
+              value ?? "N/A",
+              style: const TextStyle(color: Colors.black87),
+            ),
           ),
         ],
       ),

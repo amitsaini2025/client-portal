@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../services/auth_service.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
@@ -8,8 +9,7 @@ class EnglishRequirementFor485TemporaryGraduateVisaTRScreen
   const EnglishRequirementFor485TemporaryGraduateVisaTRScreen({super.key});
 
   @override
-  State<EnglishRequirementFor485TemporaryGraduateVisaTRScreen>
-  createState() =>
+  State<EnglishRequirementFor485TemporaryGraduateVisaTRScreen> createState() =>
       _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState();
 }
 
@@ -17,10 +17,7 @@ class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
     extends State<EnglishRequirementFor485TemporaryGraduateVisaTRScreen> {
   int selectedTab = 0;
 
-  final tabs = [
-    "After 7 Aug 2025",
-    "Before 6 Aug 2025",
-  ];
+  final tabs = ["After 7 Aug 2025", "Before 6 Aug 2025"];
 
   final tests = [
     "CELPIP",
@@ -59,31 +56,35 @@ class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
         titleName: "English Requirement for 485 Temporary Graduate Visa (TR)",
         matterID: AuthService.selectedMatterId,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Column(
-        children: [
-          const SizedBox(height: 12),
-
-          const SizedBox(height: 12),
-
-          _buildTabs(),
-
-          const SizedBox(height: 10),
-
-          _buildTestFilter(),
-
-          const SizedBox(height: 10),
-
-          Expanded(
-            child: ListView.builder(
-              padding: AppResponsive.horizontalPadding(context),
-              itemCount: filtered.length,
-              itemBuilder: (_, i) => _buildCard(filtered[i]),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
             ),
-          ),
-        ],
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+
+                const SizedBox(height: 12),
+
+                _buildTabs(),
+
+                const SizedBox(height: 10),
+
+                _buildTestFilter(),
+
+                const SizedBox(height: 10),
+
+                Expanded(
+                  child: ListView.builder(
+                    padding: AppResponsive.horizontalPadding(context),
+                    itemCount: filtered.length,
+                    itemBuilder: (_, i) => _buildCard(filtered[i]),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -222,10 +223,7 @@ class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
               flex: 5,
               child: Text(
                 item["value"]!,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black87,
-                ),
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
               ),
             ),
           ],
@@ -235,12 +233,16 @@ class _EnglishRequirementFor485TemporaryGraduateVisaTRScreenState
   }
 
   List<Map<String, String>> _filterByTest(
-      List<Map<String, dynamic>> data, String test) {
+    List<Map<String, dynamic>> data,
+    String test,
+  ) {
     return data
-        .map((row) => {
-      "skill": row["skill"].toString(),
-      "value": (row[test] ?? "-").toString(),
-    })
+        .map(
+          (row) => {
+            "skill": row["skill"].toString(),
+            "value": (row[test] ?? "-").toString(),
+          },
+        )
         .toList();
   }
 

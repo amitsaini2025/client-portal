@@ -113,7 +113,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: ThemeConfig.goldenYellow.withValues(alpha:0.9),
+        backgroundColor: ThemeConfig.goldenYellow.withValues(alpha: 0.9),
         title: const Text(
           "Notifications",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
@@ -121,135 +121,138 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 2,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
-          ),
-          child: RefreshIndicator(
-            onRefresh: _refresh,
-            child:
-                isLoading && notifications.isEmpty
-                    ? const Center(child: AppLoader())
-                    : notifications.isEmpty
-                    ? Center(
-                      child: Text(
-                        'No notifications available',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: RefreshIndicator(
+              onRefresh: _refresh,
+              child:
+                  isLoading && notifications.isEmpty
+                      ? const Center(child: AppLoader())
+                      : notifications.isEmpty
+                      ? Center(
+                        child: Text(
+                          'No notifications available',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    )
-                    : ListView.builder(
-                      controller: _scrollController,
-                      itemCount: notifications.length + (hasMore ? 1 : 0),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemBuilder: (context, index) {
-                        if (index == notifications.length) {
-                          return const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(child: AppLoader()),
-                          );
-                        }
+                      )
+                      : ListView.builder(
+                        controller: _scrollController,
+                        itemCount: notifications.length + (hasMore ? 1 : 0),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemBuilder: (context, index) {
+                          if (index == notifications.length) {
+                            return const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(child: AppLoader()),
+                            );
+                          }
 
-                        final item = notifications[index];
-                        return Padding(
-                          padding: AppResponsive.horizontalPadding(
-                            context,
-                          ).copyWith(top: 6, bottom: 6),
-                          child: Material(
-                            borderRadius: BorderRadius.circular(14),
-                            elevation: 1.5,
-                            shadowColor: Colors.black12,
-                            color: Colors.white,
-                            child: InkWell(
+                          final item = notifications[index];
+                          return Padding(
+                            padding: AppResponsive.horizontalPadding(
+                              context,
+                            ).copyWith(top: 6, bottom: 6),
+                            child: Material(
                               borderRadius: BorderRadius.circular(14),
-                              onTap: () async {
-                                await _handleNotificationTap(context, item);
-                                if (mounted) _refresh();
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  gradient:
-                                      item.isRead
-                                          ? null
-                                          : const LinearGradient(
-                                            colors: [
-                                              Color(0xFFF5F7FA),
-                                              Color(0xFFE8EEF5),
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
+                              elevation: 1.5,
+                              shadowColor: Colors.black12,
+                              color: Colors.white,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(14),
+                                onTap: () async {
+                                  await _handleNotificationTap(context, item);
+                                  if (mounted) _refresh();
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    gradient:
+                                        item.isRead
+                                            ? null
+                                            : const LinearGradient(
+                                              colors: [
+                                                Color(0xFFF5F7FA),
+                                                Color(0xFFE8EEF5),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 22,
+                                        backgroundColor:
+                                            item.isRead
+                                                ? const Color(0xFFE6F4F1)
+                                                : const Color(0xFFE8EEF5),
+                                        child: Text(
+                                          item.senderName[0].toUpperCase(),
+                                          style: const TextStyle(
+                                            color: Color(0xFF374151),
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 22,
-                                      backgroundColor:
-                                          item.isRead
-                                              ? const Color(0xFFE6F4F1)
-                                              : const Color(0xFFE8EEF5),
-                                      child: Text(
-                                        item.senderName[0].toUpperCase(),
-                                        style: const TextStyle(
-                                          color: Color(0xFF374151),
-                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            item.message,
-                                            style: TextStyle(
-                                              fontWeight:
-                                                  item.isRead
-                                                      ? FontWeight.w400
-                                                      : FontWeight.w600,
-                                              fontSize: 15.5,
-                                              color: Colors.grey.shade800,
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              item.message,
+                                              style: TextStyle(
+                                                fontWeight:
+                                                    item.isRead
+                                                        ? FontWeight.w400
+                                                        : FontWeight.w600,
+                                                fontSize: 15.5,
+                                                color: Colors.grey.shade800,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${item.senderName} • ${_formatDate(item.createdAt)}',
-                                            style: TextStyle(
-                                              fontSize: 12.5,
-                                              color: Colors.grey.shade600,
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${item.senderName} • ${_formatDate(item.createdAt)}',
+                                              style: TextStyle(
+                                                fontSize: 12.5,
+                                                color: Colors.grey.shade600,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Icon(
-                                      item.isRead
-                                          ? Icons.mark_email_read
-                                          : Icons.mark_email_unread,
-                                      color:
-                                          item.isRead
-                                              ? Colors.blueGrey.shade400
-                                              : Colors.blueGrey.shade600,
-                                      size: 20,
-                                    ),
-                                  ],
+                                      const SizedBox(width: 8),
+                                      Icon(
+                                        item.isRead
+                                            ? Icons.mark_email_read
+                                            : Icons.mark_email_unread,
+                                        color:
+                                            item.isRead
+                                                ? Colors.blueGrey.shade400
+                                                : Colors.blueGrey.shade600,
+                                        size: 20,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      ),
+            ),
           ),
         ),
       ),
@@ -339,7 +342,6 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       if (!mounted) return;
 
       await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
-
     } finally {
       isNavigating = false;
     }

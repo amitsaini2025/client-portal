@@ -32,7 +32,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
   Future<void> _loadCachedData() async {
     services = await CacheHelper.loadData(
       'services',
-          (e) => ServiceTypeModel.fromJson(e),
+      (e) => ServiceTypeModel.fromJson(e),
     );
 
     final prefs = await SharedPreferences.getInstance();
@@ -45,26 +45,24 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       );
     }
 
-    final noeId = int.tryParse(
-      selectedOptions["noe_id"].toString(),
-    );
+    final noeId = int.tryParse(selectedOptions["noe_id"].toString());
 
     if (noeId == 6 || noeId == 7) {
-      services = services.where((service) {
-        return service.id == 2;
-      }).toList();
+      services =
+          services.where((service) {
+            return service.id == 2;
+          }).toList();
     } else if (noeId == 8) {
-      services = services.where((service) {
-        return service.id == 2 || service.id == 3;
-      }).toList();
+      services =
+          services.where((service) {
+            return service.id == 2 || service.id == 3;
+          }).toList();
     }
 
     if (selectedOptions.containsKey("service_id")) {
       final savedId = selectedOptions["service_id"];
 
-      selectedIndex = services.indexWhere(
-            (service) => service.id == savedId,
-      );
+      selectedIndex = services.indexWhere((service) => service.id == savedId);
 
       if (selectedIndex == -1) {
         selectedIndex = 0;
@@ -90,88 +88,89 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       child:
           isLoading
               ? const Center(child: AppLoader())
-              : Column(
-                children: [
-                  ...List.generate(services.length, (index) {
-                    final service = services[index];
+              : SafeArea(
+                child: Column(
+                  children: [
+                    ...List.generate(services.length, (index) {
+                      final service = services[index];
 
-                    final tagText =
-                        service.price == 0
-                            ? 'FREE'
-                            : service.availableForOverseas
-                            ? 'OVERSEAS'
-                            : service.priceDisplay;
+                      final tagText =
+                          service.price == 0
+                              ? 'FREE'
+                              : service.availableForOverseas
+                              ? 'OVERSEAS'
+                              : service.priceDisplay;
 
-                    final tagColor =
-                        service.price == 0
-                            ? Colors.green
-                            : service.availableForOverseas
-                            ? const Color(0xFF1E3A8A)
-                            : Colors.orange;
+                      final tagColor =
+                          service.price == 0
+                              ? Colors.green
+                              : service.availableForOverseas
+                              ? const Color(0xFF1E3A8A)
+                              : Colors.orange;
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: ServiceCard(
-                        tagText: tagText,
-                        tagColor: tagColor,
-                        title: service.name,
-                        priceText: service.priceDisplay,
-                        duration:
-                            '${service.duration} ${service.durationUnit}',
-                        description: service.description,
-                        availability:
-                            service.timeSlotDescription,
-                        selected: selectedIndex == index,
-                        onTap: () {
-                          setState(() {
-                            selectedIndex = index;
-                          });
-                        },
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 32),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: PreviousButton(
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: ServiceCard(
+                          tagText: tagText,
+                          tagColor: tagColor,
+                          title: service.name,
+                          priceText: service.priceDisplay,
+                          duration:
+                              '${service.duration} ${service.durationUnit}',
+                          description: service.description,
+                          availability: service.timeSlotDescription,
+                          selected: selectedIndex == index,
                           onTap: () {
-                            Navigator.pop(context);
+                            setState(() {
+                              selectedIndex = index;
+                            });
                           },
                         ),
-                      ),
-
-                      const SizedBox(width: 16),
-
-                      Expanded(
-                        child: NextButton(
-                          onTap: () async {
-                            if (services.isNotEmpty) {
-                              final selectedService = services[selectedIndex];
-
-                              selectedOptions['service_id'] =
-                                  selectedService.id;
-                              selectedOptions['service_price'] =
-                                  selectedService.price;
-                              selectedOptions['service_name'] =
-                                  selectedService.name;
-
-                              await _saveSelectedOptions();
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const BookConfirmScreen(),
-                                ),
-                              );
-                            }
-                          },
+                      );
+                    }),
+                    const SizedBox(height: 32),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: PreviousButton(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+
+                        const SizedBox(width: 16),
+
+                        Expanded(
+                          child: NextButton(
+                            onTap: () async {
+                              if (services.isNotEmpty) {
+                                final selectedService = services[selectedIndex];
+
+                                selectedOptions['service_id'] =
+                                    selectedService.id;
+                                selectedOptions['service_price'] =
+                                    selectedService.price;
+                                selectedOptions['service_name'] =
+                                    selectedService.name;
+
+                                await _saveSelectedOptions();
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const BookConfirmScreen(),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
     );
   }

@@ -46,7 +46,9 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         stageId: widget.stageId,
       );
       final responseJsonString = jsonEncode(response);
-      AppLogger.info('Workflow Allowed Checklist Response: $responseJsonString');
+      AppLogger.info(
+        'Workflow Allowed Checklist Response: $responseJsonString',
+      );
       if (response['success'] == true && response['data'] != null) {
         _checklistResponse = WorkflowChecklistResponse.fromJson(
           response['data'],
@@ -84,9 +86,9 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
       );
 
       if (response['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Upload successful')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Upload successful')));
         _loadChecklistData();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -94,9 +96,9 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Upload failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
     } finally {
       setState(() => _uploadingStates[checklist.id] = false);
     }
@@ -122,10 +124,14 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: content,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: content,
+          ),
         ),
       ),
       floatingActionButton: Column(
@@ -142,7 +148,10 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
             icon: const Icon(Icons.upload_file, color: Colors.white),
             label: const Text(
               "Bulk Upload",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -156,7 +165,10 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
             icon: const Icon(Icons.upload_file, color: Colors.white),
             label: const Text(
               "Upload Document",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -241,7 +253,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
               decoration: BoxDecoration(
-                color: statusColor.withValues(alpha:0.1),
+                color: statusColor.withValues(alpha: 0.1),
                 border: Border.all(color: statusColor),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -301,16 +313,16 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
             else
               ElevatedButton.icon(
                 onPressed:
-                isUploading ? null : () => _uploadDocument(checklist),
-                icon: isUploading
-                    ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: AppLoader(),
-                )
-                    : const Icon(Icons.upload_file),
-                label:
-                Text(isUploading ? 'Uploading...' : 'Upload Document'),
+                    isUploading ? null : () => _uploadDocument(checklist),
+                icon:
+                    isUploading
+                        ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: AppLoader(),
+                        )
+                        : const Icon(Icons.upload_file),
+                label: Text(isUploading ? 'Uploading...' : 'Upload Document'),
               ),
           ],
         ),
@@ -354,7 +366,7 @@ class _WorkflowDocumentsScreenState extends State<WorkflowDocumentsScreen> {
 
   Widget _buildChip(String label, String value, Color color) {
     return Chip(
-      backgroundColor: color.withValues(alpha:0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       side: BorderSide(color: color),
       label: Text(
         '$label: $value',

@@ -112,7 +112,7 @@ class _WorkflowViewDocumentsByChecklistScreenState
         boxShadow: [
           BoxShadow(
             blurRadius: 10,
-            color: Colors.black.withValues(alpha:0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             offset: const Offset(0, 4),
           ),
         ],
@@ -127,7 +127,7 @@ class _WorkflowViewDocumentsByChecklistScreenState
           height: 48,
           width: 48,
           decoration: BoxDecoration(
-            color: fileColor.withValues(alpha:0.12),
+            color: fileColor.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(getFileIcon(doc.fileUrl), color: fileColor, size: 26),
@@ -158,7 +158,7 @@ class _WorkflowViewDocumentsByChecklistScreenState
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha:0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -182,7 +182,7 @@ class _WorkflowViewDocumentsByChecklistScreenState
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.green.withValues(alpha:0.12),
+              color: Colors.green.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(Icons.open_in_new, color: Colors.green, size: 22),
@@ -210,21 +210,26 @@ class _WorkflowViewDocumentsByChecklistScreenState
         ),
       ),
 
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: _isLoading
-              ? const Center(child: AppLoader())
-              : _checklists.isEmpty
-              ? const Center(child: Text("No documents uploaded"))
-              : ListView.builder(
-                padding: AppResponsive.pagePadding(context),
-                itemCount: _checklists.length,
-                itemBuilder: (context, index) {
-                  final doc = _checklists[index];
-                  return buildDocumentCard(doc);
-                },
-              ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                _isLoading
+                    ? const Center(child: AppLoader())
+                    : _checklists.isEmpty
+                    ? const Center(child: Text("No documents uploaded"))
+                    : ListView.builder(
+                      padding: AppResponsive.pagePadding(context),
+                      itemCount: _checklists.length,
+                      itemBuilder: (context, index) {
+                        final doc = _checklists[index];
+                        return buildDocumentCard(doc);
+                      },
+                    ),
+          ),
         ),
       ),
     );

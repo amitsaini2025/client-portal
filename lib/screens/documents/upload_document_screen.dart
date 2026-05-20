@@ -248,55 +248,58 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
-          ),
-          child:
-              _isLoading
-                  ? const Center(child: AppLoader())
-                  : SingleChildScrollView(
-                    padding: AppResponsive.pagePadding(context),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          _buildFilePicker(),
-                          const SizedBox(height: 24),
-                          _buildDocumentDetails(context),
-                          const SizedBox(height: 24),
-                          SizedBox(
-                            height: 56,
-                            child: ElevatedButton.icon(
-                              onPressed: _isUploading ? null : _uploadDocument,
-                              icon:
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                _isLoading
+                    ? const Center(child: AppLoader())
+                    : SingleChildScrollView(
+                      padding: AppResponsive.pagePadding(context),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            _buildFilePicker(),
+                            const SizedBox(height: 24),
+                            _buildDocumentDetails(context),
+                            const SizedBox(height: 24),
+                            SizedBox(
+                              height: 56,
+                              child: ElevatedButton.icon(
+                                onPressed:
+                                    _isUploading ? null : _uploadDocument,
+                                icon:
+                                    _isUploading
+                                        ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: AppLoader(size: 20),
+                                        )
+                                        : const Icon(Icons.upload),
+                                label: Text(
                                   _isUploading
-                                      ? const SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: AppLoader(size: 20),
-                                      )
-                                      : const Icon(Icons.upload),
-                              label: Text(
-                                _isUploading
-                                    ? 'Uploading...'
-                                    : 'Upload Document',
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ThemeConfig.goldenYellow,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                      ? 'Uploading...'
+                                      : 'Upload Document',
                                 ),
-                                minimumSize: const Size(double.infinity, 50),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: ThemeConfig.goldenYellow,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  minimumSize: const Size(double.infinity, 50),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+          ),
         ),
       ),
     );
@@ -308,7 +311,9 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeConfig.goldenYellow.withValues(alpha:0.5)),
+        border: Border.all(
+          color: ThemeConfig.goldenYellow.withValues(alpha: 0.5),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,10 +331,10 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
               child: Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: ThemeConfig.goldenYellow.withValues(alpha:0.1),
+                  color: ThemeConfig.goldenYellow.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: ThemeConfig.goldenYellow.withValues(alpha:0.5),
+                    color: ThemeConfig.goldenYellow.withValues(alpha: 0.5),
                   ),
                 ),
                 child: Column(
@@ -380,7 +385,9 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeConfig.goldenYellow.withValues(alpha:0.5)),
+        border: Border.all(
+          color: ThemeConfig.goldenYellow.withValues(alpha: 0.5),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

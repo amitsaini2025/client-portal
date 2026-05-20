@@ -238,142 +238,143 @@ class _BookConfirmScreenState extends State<BookConfirmScreen> {
       activeStep: 4,
       title: 'Confirm Appointment',
       child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SectionTitle('Your Details & Appointment Time'),
-            const SizedBox(height: 20),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isMobile = constraints.maxWidth < 600;
-                return isMobile
-                    ? Column(
-                      children: [
-                        AppTextField(
-                          label: 'Full Name',
-                          controller: fullNameController,
-                          enabled: inputEnabled,
-                        ),
-                        const SizedBox(height: 16),
-                        AppTextField(
-                          label: 'Email Address',
-                          controller: emailController,
-                          enabled: inputEnabled,
-                        ),
-                      ],
-                    )
-                    : Row(
-                      children: [
-                        Expanded(
-                          child: AppTextField(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SectionTitle('Your Details & Appointment Time'),
+              const SizedBox(height: 20),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isMobile = constraints.maxWidth < 600;
+                  return isMobile
+                      ? Column(
+                        children: [
+                          AppTextField(
                             label: 'Full Name',
                             controller: fullNameController,
                             enabled: inputEnabled,
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: AppTextField(
+                          const SizedBox(height: 16),
+                          AppTextField(
                             label: 'Email Address',
                             controller: emailController,
                             enabled: inputEnabled,
                           ),
-                        ),
-                      ],
-                    );
-              },
-            ),
-            const SizedBox(height: 20),
-            PhoneField(controller: phoneController, enabled: inputEnabled),
-            const SizedBox(height: 20),
-            TextField(
-              controller: enquiryController,
-              maxLines: 4,
-              enabled: inputEnabled,
-              decoration: InputDecoration(
-                labelText: 'Details of Enquiry',
-                filled: true,
-                fillColor: const Color(0xFFFFF1F1),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Colors.redAccent),
-                ),
+                        ],
+                      )
+                      : Row(
+                        children: [
+                          Expanded(
+                            child: AppTextField(
+                              label: 'Full Name',
+                              controller: fullNameController,
+                              enabled: inputEnabled,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: AppTextField(
+                              label: 'Email Address',
+                              controller: emailController,
+                              enabled: inputEnabled,
+                            ),
+                          ),
+                        ],
+                      );
+                },
               ),
-            ),
-            const SizedBox(height: 32),
-            const SectionTitle('Select Date & Time'),
-            const SizedBox(height: 12),
-            const TimezoneBanner(),
-            const SizedBox(height: 20),
-            if (isLoading)
-              const Center(child: AppLoader())
-            else if (error != null)
-              Text(error!, style: const TextStyle(color: Colors.red))
-            else
-              CalendarSection(
-                disabledDates: disabledDates,
-                disabledWeekdays: disabledWeekdays,
-                selectedOptions: selectedOptions,
-                onTimeSelected: (time) => selectedTime = time,
-                selectedDayCallback: (day) => selectedDay = day,
-                preSelectedDay: selectedDay,
-                preSelectedTime: selectedTime,
-                slotDuration: slotDuration,
-                startTime: startTime,
-                endTime: endTime,
-              ),
-            const SizedBox(height: 40),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-
-                Expanded(
-                  child: PreviousButton(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
+              const SizedBox(height: 20),
+              PhoneField(controller: phoneController, enabled: inputEnabled),
+              const SizedBox(height: 20),
+              TextField(
+                controller: enquiryController,
+                maxLines: 4,
+                enabled: inputEnabled,
+                decoration: InputDecoration(
+                  labelText: 'Details of Enquiry',
+                  filled: true,
+                  fillColor: const Color(0xFFFFF1F1),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Colors.redAccent),
                   ),
                 ),
+              ),
+              const SizedBox(height: 32),
+              const SectionTitle('Select Date & Time'),
+              const SizedBox(height: 12),
+              const TimezoneBanner(),
+              const SizedBox(height: 20),
+              if (isLoading)
+                const Center(child: AppLoader())
+              else if (error != null)
+                Text(error!, style: const TextStyle(color: Colors.red))
+              else
+                CalendarSection(
+                  disabledDates: disabledDates,
+                  disabledWeekdays: disabledWeekdays,
+                  selectedOptions: selectedOptions,
+                  onTimeSelected: (time) => selectedTime = time,
+                  selectedDayCallback: (day) => selectedDay = day,
+                  preSelectedDay: selectedDay,
+                  preSelectedTime: selectedTime,
+                  slotDuration: slotDuration,
+                  startTime: startTime,
+                  endTime: endTime,
+                ),
+              const SizedBox(height: 40),
 
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Center(
-                    child: SizedBox(
-                      width: 220,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed:
-                            isLoading || isSubmitting
-                                ? null
-                                : _submitAppointment,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1F3C88),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: PreviousButton(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Center(
+                      child: SizedBox(
+                        width: 220,
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed:
+                              isLoading || isSubmitting
+                                  ? null
+                                  : _submitAppointment,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1F3C88),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          child:
+                              isSubmitting
+                                  ? const AppLoader()
+                                  : Text(
+                                    isAdd
+                                        ? 'Review & Confirm'
+                                        : 'Update Appointment',
+                                  ),
                         ),
-                        child:
-                            isSubmitting
-                                ? const AppLoader()
-                                : Text(
-                                  isAdd
-                                      ? 'Review & Confirm'
-                                      : 'Update Appointment',
-                                ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

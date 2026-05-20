@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../config/theme_config.dart';
-import '../../../utils/responsive_utils.dart';
 import '../../../models/action_required.dart';
 import '../../../services/api_service.dart';
 import '../../../services/auth_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../workflow/message/workflow_messages_screen.dart';
 import '../../workflow/workflow_stages_screen.dart';
 import '../billing_list/billing_list_screen.dart';
@@ -77,8 +77,7 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
 
       if (innerData['action_required'] != null) {
         list = innerData['action_required'];
-      }
-      else if (innerData['latest_unread'] != null) {
+      } else if (innerData['latest_unread'] != null) {
         list = [innerData['latest_unread']];
       }
 
@@ -209,99 +208,107 @@ class _ActionRequiredScreenState extends State<ActionRequiredScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: _isLoading
-              ? const Center(child: AppLoader())
-              : _items.isEmpty
-              ? const Center(child: Text("No action required"))
-              : RefreshIndicator(
-                onRefresh: _onRefresh,
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: AppResponsive.pagePadding(context),
-                  itemCount: _items.length + (_isFetchingMore ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == _items.length) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: AppLoader(),
-                        ),
-                      );
-                    }
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                _isLoading
+                    ? const Center(child: AppLoader())
+                    : _items.isEmpty
+                    ? const Center(child: Text("No action required"))
+                    : RefreshIndicator(
+                      onRefresh: _onRefresh,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        padding: AppResponsive.pagePadding(context),
+                        itemCount: _items.length + (_isFetchingMore ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index == _items.length) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: AppLoader(),
+                              ),
+                            );
+                          }
 
-                    final item = _items[index];
+                          final item = _items[index];
 
-                    return InkWell(
-                      onTap: () => _handleItemTap(context, item),
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 14),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color:
-                                item.isRead
-                                    ? Colors.grey.shade200
-                                    : ThemeConfig.goldenYellow.withValues(alpha:0.3),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              _getTypeIcon(item.type),
-                              color: ThemeConfig.goldenYellow,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          return InkWell(
+                            onTap: () => _handleItemTap(context, item),
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 14),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color:
+                                      item.isRead
+                                          ? Colors.grey.shade200
+                                          : ThemeConfig.goldenYellow.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                ),
+                              ),
+                              child: Row(
                                 children: [
-                                  Text(
-                                    _getTypeLabel(item.type),
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: ThemeConfig.goldenYellow,
-                                      fontWeight: FontWeight.bold,
+                                  Icon(
+                                    _getTypeIcon(item.type),
+                                    color: ThemeConfig.goldenYellow,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _getTypeLabel(item.type),
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: ThemeConfig.goldenYellow,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          item.message,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          "${item.senderName} • ${_formatDate(item.createdAt)}",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    item.message,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
+                                  if (!item.isRead)
+                                    Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: ThemeConfig.goldenYellow,
+                                        shape: BoxShape.circle,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    "${item.senderName} • ${_formatDate(item.createdAt)}",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
-                            if (!item.isRead)
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: ThemeConfig.goldenYellow,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-              ),
+                    ),
+          ),
         ),
       ),
     );

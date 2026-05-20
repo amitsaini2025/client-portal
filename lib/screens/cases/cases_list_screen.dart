@@ -1,7 +1,8 @@
+import 'package:client/config/theme_config.dart';
 import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:client/config/theme_config.dart';
+
 import '../../models/new/case.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
@@ -33,7 +34,7 @@ class _CasesListScreenState extends State<CasesListScreen> {
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 200 &&
+              _scrollController.position.maxScrollExtent - 200 &&
           !isFetchingMore &&
           hasMore) {
         _fetchMoreCases();
@@ -58,7 +59,8 @@ class _CasesListScreenState extends State<CasesListScreen> {
       );
 
       if (result['success'] == true) {
-        final List<dynamic> caseList = result['data']['cases'] ?? result['data'];
+        final List<dynamic> caseList =
+            result['data']['cases'] ?? result['data'];
         final fetched = caseList.map((e) => Case.fromJson(e)).toList();
 
         setState(() {
@@ -139,73 +141,80 @@ class _CasesListScreenState extends State<CasesListScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: RefreshIndicator(
-        color: ThemeConfig.goldenYellow,
-        onRefresh: () => _fetchCases(page: 1),
-        child: SingleChildScrollView(
-          controller: _scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: AppResponsive.pagePadding(context),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _header(),
-              const SizedBox(height: 16),
-              _statsCard(),
-              const SizedBox(height: 24),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: RefreshIndicator(
+              color: ThemeConfig.goldenYellow,
+              onRefresh: () => _fetchCases(page: 1),
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: AppResponsive.pagePadding(context),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _header(),
+                    const SizedBox(height: 16),
+                    _statsCard(),
+                    const SizedBox(height: 24),
 
-              if (isLoading)
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 40),
-                    child: AppLoader(),
-                  ),
-                )
-              else if (error != null)
-                _errorView()
-              else if (cases.isEmpty)
-                  _emptyView()
-                else
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final cols = AppResponsive.gridColumns(
-                        context,
-                        mobile: 1,
-                        tablet: 2,
-                        desktop: 3,
-                      );
-                      if (cols == 1) {
-                        return Column(
-                          children: [
-                            for (final item in cases) _buildCaseCard(item),
-                            if (isFetchingMore)
-                              const Padding(
-                                padding: EdgeInsets.all(16),
-                                child: AppLoader(),
-                              ),
-                          ],
-                        );
-                      }
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: cols,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.6,
+                    if (isLoading)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 40),
+                          child: AppLoader(),
                         ),
-                        itemCount: cases.length,
-                        itemBuilder: (context, index) => _buildCaseCard(cases[index]),
-                      );
-                    },
-                  ),
-            ],
-          ),
-        ),
+                      )
+                    else if (error != null)
+                      _errorView()
+                    else if (cases.isEmpty)
+                      _emptyView()
+                    else
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final cols = AppResponsive.gridColumns(
+                            context,
+                            mobile: 1,
+                            tablet: 2,
+                            desktop: 3,
+                          );
+                          if (cols == 1) {
+                            return Column(
+                              children: [
+                                for (final item in cases) _buildCaseCard(item),
+                                if (isFetchingMore)
+                                  const Padding(
+                                    padding: EdgeInsets.all(16),
+                                    child: AppLoader(),
+                                  ),
+                              ],
+                            );
+                          }
+                          return GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: cols,
+                                  crossAxisSpacing: 16,
+                                  mainAxisSpacing: 16,
+                                  childAspectRatio: 1.6,
+                                ),
+                            itemCount: cases.length,
+                            itemBuilder:
+                                (context, index) =>
+                                    _buildCaseCard(cases[index]),
+                          );
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -245,9 +254,11 @@ class _CasesListScreenState extends State<CasesListScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: ThemeConfig.navyBlue.withValues(alpha:0.6),
+        color: ThemeConfig.navyBlue.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ThemeConfig.goldenYellow.withValues(alpha:0.5)),
+        border: Border.all(
+          color: ThemeConfig.goldenYellow.withValues(alpha: 0.5),
+        ),
       ),
       child: Column(
         children: [
@@ -261,7 +272,10 @@ class _CasesListScreenState extends State<CasesListScreen> {
           const SizedBox(height: 12),
           _buildStatCard(
             'Pending Documents',
-            cases.where((c) => c.status == 'pending_documents').length.toString(),
+            cases
+                .where((c) => c.status == 'pending_documents')
+                .length
+                .toString(),
             Icons.pending,
           ),
           const SizedBox(height: 12),
@@ -277,11 +291,13 @@ class _CasesListScreenState extends State<CasesListScreen> {
 
   Widget _buildCaseCard(Case caseItem) {
     return Card(
-      color: ThemeConfig.navyBlue.withValues(alpha:0.8),
+      color: ThemeConfig.navyBlue.withValues(alpha: 0.8),
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: ThemeConfig.goldenYellow.withValues(alpha:0.4)),
+        side: BorderSide(
+          color: ThemeConfig.goldenYellow.withValues(alpha: 0.4),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -321,11 +337,14 @@ class _CasesListScreenState extends State<CasesListScreen> {
                 const SizedBox(width: 8),
                 Flexible(
                   child: Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color:
-                      _getStatusColor(caseItem.status).withValues(alpha:0.2),
+                      color: _getStatusColor(
+                        caseItem.status,
+                      ).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
@@ -371,15 +390,16 @@ class _CasesListScreenState extends State<CasesListScreen> {
             LinearProgressIndicator(
               value: (caseItem.progressPercentage ?? 0) / 100,
               backgroundColor: Colors.white12,
-              valueColor:
-              AlwaysStoppedAnimation<Color>(ThemeConfig.goldenYellow),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                ThemeConfig.goldenYellow,
+              ),
             ),
 
             const SizedBox(height: 16),
 
             /// AGENTS
             ...caseItem.agentsMap.entries.map(
-                  (entry) => Padding(
+              (entry) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: _buildDetailItem(
                   Icons.person,
@@ -427,9 +447,11 @@ class _CasesListScreenState extends State<CasesListScreen> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
-        color: ThemeConfig.navyBlue.withValues(alpha:0.7),
+        color: ThemeConfig.navyBlue.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: ThemeConfig.goldenYellow.withValues(alpha:0.5)),
+        border: Border.all(
+          color: ThemeConfig.goldenYellow.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         children: [
@@ -487,8 +509,10 @@ class _CasesListScreenState extends State<CasesListScreen> {
           children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
-            const Text('Something went wrong',
-                style: TextStyle(color: Colors.white)),
+            const Text(
+              'Something went wrong',
+              style: TextStyle(color: Colors.white),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => _fetchCases(page: 1),

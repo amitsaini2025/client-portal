@@ -45,7 +45,10 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
 
       if (fulfillmentText != null && fulfillmentText.isNotEmpty) {
         setState(() {
-          _messages.insert(0, ChatMessage(text: fulfillmentText, sender: 'bot'));
+          _messages.insert(
+            0,
+            ChatMessage(text: fulfillmentText, sender: 'bot'),
+          );
         });
       }
     } catch (e) {
@@ -113,25 +116,29 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
         title: const Text("Chatbot", style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              reverse: true,
-              padding: const EdgeInsets.all(8.0),
-              itemCount: _messages.length,
-              itemBuilder: (_, int index) => _messages[index],
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
             ),
-          ),
-          const Divider(height: 1.0),
-          Container(
-            decoration: BoxDecoration(color: Theme.of(context).cardColor),
-            child: _buildTextComposer(),
-          ),
-        ],
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    reverse: true,
+                    padding: const EdgeInsets.all(8.0),
+                    itemCount: _messages.length,
+                    itemBuilder: (_, int index) => _messages[index],
+                  ),
+                ),
+                const Divider(height: 1.0),
+                Container(
+                  decoration: BoxDecoration(color: Theme.of(context).cardColor),
+                  child: _buildTextComposer(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -180,7 +187,6 @@ class ChatMessage extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }*/
-
 
   Future<void> _openLink(String url) async {
     try {

@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../config/theme_config.dart';
-import '../../../utils/responsive_utils.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/responsive_utils.dart';
 import '../book_appointment/book_confirm_screen.dart';
 import 'appointment_detail_screen.dart';
 
@@ -52,9 +53,9 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
         const SnackBar(content: Text("Appointment cancelled successfully")),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
@@ -63,96 +64,103 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        elevation: 10,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Cancel Appointment",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "Please provide a reason for cancellation:",
-                style: TextStyle(fontSize: 14, color: Colors.black54),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: reasonController,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: "Type reason here...",
-                  filled: true,
-                  fillColor: const Color(0xFFF5F6FA),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+      builder:
+          (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 10,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.black54,
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    ),
-                    child: const Text(
-                      "Cancel",
-                      style: TextStyle(fontSize: 14),
-                    ),
+                  const Text(
+                    "Cancel Appointment",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      final reason = reasonController.text.trim();
-                      if (reason.isNotEmpty) {
-                        Navigator.pop(context);
-                        cancelAppointment(id, reason);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Reason cannot be empty")),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ThemeConfig.goldenYellow,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Please provide a reason for cancellation:",
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: reasonController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: "Type reason here...",
+                      filled: true,
+                      fillColor: const Color(0xFFF5F6FA),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
                       ),
                     ),
-                    child: const Text(
-                      "Submit",
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white),
-                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.black54,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                        ),
+                        child: const Text(
+                          "Cancel",
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          final reason = reasonController.text.trim();
+                          if (reason.isNotEmpty) {
+                            Navigator.pop(context);
+                            cancelAppointment(id, reason);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Reason cannot be empty"),
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ThemeConfig.goldenYellow,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          "Submit",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -169,25 +177,30 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: isLoading
-          ? const Center(child: AppLoader())
-          : error != null
-          ? Center(child: Text(error!))
-          : ListView.builder(
-        padding: AppResponsive.pagePadding(context),
-        itemCount: appointments.length,
-        itemBuilder: (context, index) {
-          final item = appointments[index];
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                isLoading
+                    ? const Center(child: AppLoader())
+                    : error != null
+                    ? Center(child: Text(error!))
+                    : ListView.builder(
+                      padding: AppResponsive.pagePadding(context),
+                      itemCount: appointments.length,
+                      itemBuilder: (context, index) {
+                        final item = appointments[index];
 
-          return AppointmentCard(
-            data: item,
-            onCancel: () => showCancelDialog(item['id']),
-          );
-        },
-      ),
+                        return AppointmentCard(
+                          data: item,
+                          onCancel: () => showCancelDialog(item['id']),
+                        );
+                      },
+                    ),
+          ),
         ),
       ),
     );
@@ -207,9 +220,10 @@ class AppointmentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final createdBy = data['assigned_admin']?['name'];
-    final avatarChar = createdBy != null && createdBy.isNotEmpty
-        ? createdBy[0].toUpperCase()
-        : data['full_name'][0].toUpperCase();
+    final avatarChar =
+        createdBy != null && createdBy.isNotEmpty
+            ? createdBy[0].toUpperCase()
+            : data['full_name'][0].toUpperCase();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -219,7 +233,7 @@ class AppointmentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -269,9 +283,10 @@ class AppointmentCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => AppointmentDetailScreen(
-                          appointmentId: data['id'],
-                        ),
+                        builder:
+                            (_) => AppointmentDetailScreen(
+                              appointmentId: data['id'],
+                            ),
                       ),
                     );
                   },
@@ -286,9 +301,10 @@ class AppointmentCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => AppointmentDetailScreen(
-                          appointmentId: data['id'],
-                        ),
+                        builder:
+                            (_) => AppointmentDetailScreen(
+                              appointmentId: data['id'],
+                            ),
                       ),
                     );
                   },
@@ -309,15 +325,10 @@ class AppointmentCard extends StatelessWidget {
             onTap: () async {
               data['is_add'] = false;
               final prefs = await SharedPreferences.getInstance();
-              await prefs.setString(
-                "selectedOptions",
-                jsonEncode(data),
-              );
+              await prefs.setString("selectedOptions", jsonEncode(data));
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const BookConfirmScreen(),
-                ),
+                MaterialPageRoute(builder: (_) => const BookConfirmScreen()),
               );
             },
           ),
@@ -341,7 +352,10 @@ class AppointmentCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Created By", style: TextStyle(fontSize: 12, color: Colors.black45)),
+              const Text(
+                "Created By",
+                style: TextStyle(fontSize: 12, color: Colors.black45),
+              ),
               Row(
                 children: [
                   CircleAvatar(
@@ -378,9 +392,15 @@ class AppointmentCard extends StatelessWidget {
 
   String _formatTime(String time, int duration) {
     final parts = time.split(":");
-    final start = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    final start = TimeOfDay(
+      hour: int.parse(parts[0]),
+      minute: int.parse(parts[1]),
+    );
     final endMinutes = start.hour * 60 + start.minute + duration;
-    final end = TimeOfDay(hour: (endMinutes ~/ 60) % 24, minute: endMinutes % 60);
+    final end = TimeOfDay(
+      hour: (endMinutes ~/ 60) % 24,
+      minute: endMinutes % 60,
+    );
     return "${start.formatDummy()} - ${end.formatDummy()}";
   }
 

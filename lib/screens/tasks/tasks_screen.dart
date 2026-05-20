@@ -114,16 +114,18 @@ class _TasksScreenState extends State<TasksScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
-          ),
-          child: Column(
-            children: [
-              _buildSearchAndFilters(),
-              Expanded(child: _buildTaskList()),
-            ],
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: Column(
+              children: [
+                _buildSearchAndFilters(),
+                Expanded(child: _buildTaskList()),
+              ],
+            ),
           ),
         ),
       ),
@@ -339,7 +341,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: ThemeConfig.goldenYellow.withValues(alpha:0.15),
+                      color: ThemeConfig.goldenYellow.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(

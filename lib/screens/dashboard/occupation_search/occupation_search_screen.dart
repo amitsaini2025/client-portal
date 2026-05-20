@@ -54,8 +54,7 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
 
         final List data = decoded['data'] ?? decoded ?? [];
 
-        allOccupations =
-            data.map((e) => Map<String, dynamic>.from(e)).toList();
+        allOccupations = data.map((e) => Map<String, dynamic>.from(e)).toList();
 
         if (mounted) {
           setState(() => loading = false);
@@ -70,11 +69,10 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
 
       final List data = res['data'] ?? [];
 
-      allOccupations =
-          data.map((e) => Map<String, dynamic>.from(e)).toList();
+      allOccupations = data.map((e) => Map<String, dynamic>.from(e)).toList();
 
       await SharedPreferences.getInstance().then(
-            (p) => p.setString(_cacheKey, jsonEncode(res)),
+        (p) => p.setString(_cacheKey, jsonEncode(res)),
       );
     } catch (e) {
       debugPrint("API error: $e");
@@ -101,14 +99,18 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
 
       if (allOccupations.isEmpty) return;
 
-      final results = allOccupations.where((item) {
-        final title =
-        (item['occupation_title'] ?? '').toString().toLowerCase();
-        final code =
-        (item['anzsco_code'] ?? '').toString().toLowerCase();
+      final results =
+          allOccupations
+              .where((item) {
+                final title =
+                    (item['occupation_title'] ?? '').toString().toLowerCase();
+                final code =
+                    (item['anzsco_code'] ?? '').toString().toLowerCase();
 
-        return title.contains(query) || code.contains(query);
-      }).take(8).toList();
+                return title.contains(query) || code.contains(query);
+              })
+              .take(8)
+              .toList();
 
       setState(() {
         suggestions = results;
@@ -148,62 +150,66 @@ class _OccupationSearchScreenState extends State<OccupationSearchScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints:
-          const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Padding(
-            padding: AppResponsive.pagePadding(context),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _controller,
-                  onChanged: _onSearchChanged,
-                  decoration: InputDecoration(
-                    hintText: 'Search occupation',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                if (loading) const AppLoader(),
-
-                if (suggestions.isNotEmpty)
-                  Container(
-                    height: 220,
-                    margin: const EdgeInsets.only(top: 6),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ListView.builder(
-                      itemCount: suggestions.length,
-                      itemBuilder: (_, i) {
-                        final item = suggestions[i];
-
-                        return ListTile(
-                          dense: true,
-                          title: Text(item['occupation_title'] ?? ''),
-                          subtitle: Text(item['anzsco_code'] ?? ''),
-                          onTap: () {
-                            _controller.text =
-                                item['occupation_title'] ?? '';
-                            FocusScope.of(context).unfocus();
-                            _getDetails(item['anzsco_code']);
-                          },
-                        );
-                      },
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: Padding(
+              padding: AppResponsive.pagePadding(context),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _controller,
+                    onChanged: _onSearchChanged,
+                    decoration: InputDecoration(
+                      hintText: 'Search occupation',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
 
-                const SizedBox(height: 12),
+                  const SizedBox(height: 10),
 
-                if (details != null && !loading)
-                  Expanded(child: SingleChildScrollView(child: _buildTable())),
-              ],
+                  if (loading) const AppLoader(),
+
+                  if (suggestions.isNotEmpty)
+                    Container(
+                      height: 220,
+                      margin: const EdgeInsets.only(top: 6),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ListView.builder(
+                        itemCount: suggestions.length,
+                        itemBuilder: (_, i) {
+                          final item = suggestions[i];
+
+                          return ListTile(
+                            dense: true,
+                            title: Text(item['occupation_title'] ?? ''),
+                            subtitle: Text(item['anzsco_code'] ?? ''),
+                            onTap: () {
+                              _controller.text = item['occupation_title'] ?? '';
+                              FocusScope.of(context).unfocus();
+                              _getDetails(item['anzsco_code']);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+
+                  const SizedBox(height: 12),
+
+                  if (details != null && !loading)
+                    Expanded(
+                      child: SingleChildScrollView(child: _buildTable()),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

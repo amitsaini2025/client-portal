@@ -1,16 +1,15 @@
-import 'package:client/models/personal_information/basic_information_post/country/country_model.dart';
-import 'package:client/screens/dashboard/personal_info/test_score/test_score_widget.dart';
-import 'package:flutter/material.dart';
 import 'package:client/config/theme_config.dart';
+import 'package:client/models/personal_information/basic_information_post/country/country_model.dart';
+import 'package:client/screens/dashboard/personal_info/addresss_information/address_travel_information_widget.dart';
+import 'package:client/screens/dashboard/personal_info/basic/basic_personal_information_widget.dart';
+import 'package:client/screens/dashboard/personal_info/education_qualitification/education_qualification_widget.dart';
+import 'package:client/screens/dashboard/personal_info/occupation_skills/occupation_skills_widget.dart';
+import 'package:client/screens/dashboard/personal_info/test_score/test_score_widget.dart';
+import 'package:client/screens/dashboard/personal_info/travel/travel_document_widget.dart';
+import 'package:client/screens/dashboard/personal_info/work_experience/work_experience_widget.dart';
 import 'package:client/services/api_service.dart';
 import 'package:client/utils/responsive_utils.dart';
-
-import 'package:client/screens/dashboard/personal_info/basic/basic_personal_information_widget.dart';
-import 'package:client/screens/dashboard/personal_info/travel/travel_document_widget.dart';
-import 'package:client/screens/dashboard/personal_info/addresss_information/address_travel_information_widget.dart';
-import 'package:client/screens/dashboard/personal_info/education_qualitification/education_qualification_widget.dart';
-import 'package:client/screens/dashboard/personal_info/work_experience/work_experience_widget.dart';
-import 'package:client/screens/dashboard/personal_info/occupation_skills/occupation_skills_widget.dart';
+import 'package:flutter/material.dart';
 
 import '../../../models/personal_information/basic_information_post/visa_types/visa_type.dart';
 import '../../../models/personal_information/client_personal_detail_response.dart';
@@ -24,8 +23,7 @@ class PersonalInformationScreen extends StatefulWidget {
       _PersonalInformationScreenState();
 }
 
-class _PersonalInformationScreenState
-    extends State<PersonalInformationScreen> {
+class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
   ClientPersonalDetail? personalDetail;
   List<Country> countries = [];
   List<VisaType> visaTypes = [];
@@ -107,102 +105,109 @@ class _PersonalInformationScreenState
       backgroundColor: ThemeConfig.white,
       appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow,
-        title: const Text("Personal Information",
-            style: TextStyle(color: Colors.white)),
+        title: const Text(
+          "Personal Information",
+          style: TextStyle(color: Colors.white),
+        ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: isLoading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AppLoader(),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Loading personal information...',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha:0.8),
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : errorMessage != null
+      body:
+          isLoading
               ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline_rounded,
-                          color: ThemeConfig.errorColor,
-                          size: 48,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          errorMessage!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AppLoader(),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Loading personal information...',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontSize: 14,
+                      ),
                     ),
-                  ),
-                )
-              : Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-                    child: SingleChildScrollView(
-                  padding: AppResponsive.pagePadding(context),
+                  ],
+                ),
+              )
+              : errorMessage != null
+              ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      BasicPersonalInformationWidget(
-                        basicInfo: personalDetail!.basicInformation,
-                        phones: personalDetail!.phones,
-                        emails: personalDetail!.emails,
+                      Icon(
+                        Icons.error_outline_rounded,
+                        color: ThemeConfig.errorColor,
+                        size: 48,
                       ),
-                      const SizedBox(height: 24),
-                      TravelDocumentsWidget(
-                        passports: personalDetail!.passports,
-                        visas: personalDetail!.visas,
-                        countries: countries,
-                        visaTypes: visaTypes,
+                      const SizedBox(height: 16),
+                      Text(
+                        errorMessage!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 24),
-                      AddressAndTravelInformationWidget(
-                        addresses: personalDetail!.addresses,
-                        travels: personalDetail!.travels,
-                        countries: countries,
-                      ),
-                      const SizedBox(height: 24),
-                      EducationalQualificationsWidget(
-                        qualifications: personalDetail!.qualifications,
-                        countries: countries,
-                      ),
-                      const SizedBox(height: 24),
-                      WorkExperienceWidget(
-                        experiences: personalDetail!.experiences,
-                        countries: countries,
-                      ),
-                      const SizedBox(height: 24),
-                      OccupationSkillsWidget(
-                        occupations: personalDetail!.occupations,
-                      ),
-                      const SizedBox(height: 24),
-                      TestScoresWidget(
-                        testScores: personalDetail!.testScores,
-                      ),
-                      const SizedBox(height: 24),
                     ],
                   ),
+                ),
+              )
+              : SafeArea(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: AppResponsive.maxContentWidth,
+                    ),
+                    child: SingleChildScrollView(
+                      padding: AppResponsive.pagePadding(context),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          BasicPersonalInformationWidget(
+                            basicInfo: personalDetail!.basicInformation,
+                            phones: personalDetail!.phones,
+                            emails: personalDetail!.emails,
+                          ),
+                          const SizedBox(height: 24),
+                          TravelDocumentsWidget(
+                            passports: personalDetail!.passports,
+                            visas: personalDetail!.visas,
+                            countries: countries,
+                            visaTypes: visaTypes,
+                          ),
+                          const SizedBox(height: 24),
+                          AddressAndTravelInformationWidget(
+                            addresses: personalDetail!.addresses,
+                            travels: personalDetail!.travels,
+                            countries: countries,
+                          ),
+                          const SizedBox(height: 24),
+                          EducationalQualificationsWidget(
+                            qualifications: personalDetail!.qualifications,
+                            countries: countries,
+                          ),
+                          const SizedBox(height: 24),
+                          WorkExperienceWidget(
+                            experiences: personalDetail!.experiences,
+                            countries: countries,
+                          ),
+                          const SizedBox(height: 24),
+                          OccupationSkillsWidget(
+                            occupations: personalDetail!.occupations,
+                          ),
+                          const SizedBox(height: 24),
+                          TestScoresWidget(
+                            testScores: personalDetail!.testScores,
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+              ),
     );
   }
 }

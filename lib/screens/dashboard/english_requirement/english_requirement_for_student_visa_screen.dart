@@ -122,117 +122,121 @@ class _EnglishRequirementForStudentVisaScreenState
         titleName: "English Requirement For Student Visa",
         matterID: AuthService.selectedMatterId,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Column(
-        children: [
-          const SizedBox(height: 10),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
 
-          Padding(
-            padding: AppResponsive.horizontalPadding(context),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.indigo.shade50,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.indigo.shade200),
-              ),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: List.generate(filters.length, (index) {
-                  final isSelected = selectedFilter == filters[index];
+                Padding(
+                  padding: AppResponsive.horizontalPadding(context),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.indigo.shade50,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.indigo.shade200),
+                    ),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: List.generate(filters.length, (index) {
+                        final isSelected = selectedFilter == filters[index];
 
-                  return ChoiceChip(
-                    label: Text(filters[index]),
-                    selected: isSelected,
-                    selectedColor: Colors.indigo,
-                    backgroundColor: Colors.white,
-                    showCheckmark: false,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : Colors.indigo,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
+                        return ChoiceChip(
+                          label: Text(filters[index]),
+                          selected: isSelected,
+                          selectedColor: Colors.indigo,
+                          backgroundColor: Colors.white,
+                          showCheckmark: false,
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : Colors.indigo,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(color: Colors.indigo.shade200),
+                          ),
+                          onSelected: (_) {
+                            setState(() => selectedFilter = filters[index]);
+                          },
+                        );
+                      }),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: Colors.indigo.shade200),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                Padding(
+                  padding: AppResponsive.horizontalPadding(context),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.orange.shade200),
                     ),
-                    onSelected: (_) {
-                      setState(() => selectedFilter = filters[index]);
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          "Condition 1",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+
+                        SizedBox(height: 4),
+
+                        Text(
+                          "Minimum test score if principal course is accompanied with either at least 10 weeks of ELICOS",
+                          style: TextStyle(fontSize: 12),
+                        ),
+
+                        SizedBox(height: 12),
+
+                        Text(
+                          "Condition 2",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+
+                        SizedBox(height: 4),
+
+                        Text(
+                          "Minimum test score if principal course is accompanied by at least 20 weeks of ELICOS",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                Expanded(
+                  child: ListView.builder(
+                    padding: AppResponsive.horizontalPadding(context),
+                    itemCount: filteredData.length,
+                    itemBuilder: (context, index) {
+                      final item = filteredData[index];
+                      return _buildCard(item);
                     },
-                  );
-                }),
-              ),
+                  ),
+                ),
+              ],
             ),
-          ),
-
-          const SizedBox(height: 10),
-
-          Padding(
-            padding: AppResponsive.horizontalPadding(context),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange.shade200),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "Condition 1",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-                  ),
-
-                  SizedBox(height: 4),
-
-                  Text(
-                    "Minimum test score if principal course is accompanied with either at least 10 weeks of ELICOS",
-                    style: TextStyle(fontSize: 12),
-                  ),
-
-                  SizedBox(height: 12),
-
-                  Text(
-                    "Condition 2",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-                  ),
-
-                  SizedBox(height: 4),
-
-                  Text(
-                    "Minimum test score if principal course is accompanied by at least 20 weeks of ELICOS",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          Expanded(
-            child: ListView.builder(
-              padding: AppResponsive.horizontalPadding(context),
-              itemCount: filteredData.length,
-              itemBuilder: (context, index) {
-                final item = filteredData[index];
-                return _buildCard(item);
-              },
-            ),
-          ),
-        ],
           ),
         ),
       ),

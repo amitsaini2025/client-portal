@@ -1,11 +1,6 @@
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../../config/theme_config.dart';
 import '../../../models/workflow_message_detail_response.dart';
@@ -17,10 +12,7 @@ import '../../../utils/responsive_utils.dart';
 class WorkflowMessageDetailScreen extends StatefulWidget {
   final int messageId;
 
-  const WorkflowMessageDetailScreen({
-    super.key,
-    required this.messageId,
-  });
+  const WorkflowMessageDetailScreen({super.key, required this.messageId});
 
   @override
   State<WorkflowMessageDetailScreen> createState() =>
@@ -69,24 +61,22 @@ class _WorkflowMessageDetailScreenState
 
   Future<void> _downloadFile(String url, String filename) async {
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Download started...')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Download started...')));
 
       await FileDownloader.downloadFile(
         url: url,
         name: filename,
-        headers: {
-          "Authorization": "Bearer ${AuthService.currentToken}",
-        },
+        headers: {"Authorization": "Bearer ${AuthService.currentToken}"},
         onProgress: (fileName, progress) {
           debugPrint('$fileName: $progress% downloaded');
         },
         onDownloadCompleted: (filePath) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Saved: $filePath')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Saved: $filePath')));
           }
         },
         onDownloadError: (errorMessage) {
@@ -99,9 +89,9 @@ class _WorkflowMessageDetailScreenState
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
@@ -132,18 +122,21 @@ class _WorkflowMessageDetailScreenState
           ),
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                _isLoading
+                    ? Center(child: AppLoader())
+                    : _error != null
+                    ? _buildErrorWidget()
+                    : _message == null
+                    ? _buildEmptyWidget()
+                    : _buildContent(),
           ),
-          child: _isLoading
-              ? Center(child: AppLoader())
-              : _error != null
-              ? _buildErrorWidget()
-              : _message == null
-              ? _buildEmptyWidget()
-              : _buildContent(),
         ),
       ),
     );
@@ -161,9 +154,10 @@ class _WorkflowMessageDetailScreenState
             icon: Icons.done_all,
             iconColor: Colors.blue,
             title: "Read Status",
-            time: _message!.recipients.any((r) => r.isRead)
-                ? "Some recipients have read this message"
-                : "No one has read this message yet",
+            time:
+                _message!.recipients.any((r) => r.isRead)
+                    ? "Some recipients have read this message"
+                    : "No one has read this message yet",
           ),
         ],
       ),
@@ -181,7 +175,7 @@ class _WorkflowMessageDetailScreenState
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha:0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(2, 4),
             ),
@@ -194,105 +188,106 @@ class _WorkflowMessageDetailScreenState
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
-                children: _message!.attachments.map((attachment) {
-                  if (attachment.type == "image") {
-                    return Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            attachment.url,
-                            width: 130,
-                            height: 130,
-                            fit: BoxFit.cover,
-                            headers: {
-                              "Authorization":
-                              "Bearer ${AuthService.currentToken}",
-                            },
-                          ),
-                        ),
-                        Positioned(
-                          top: 6,
-                          right: 6,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha:0.6),
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              constraints: const BoxConstraints(),
-                              padding: const EdgeInsets.all(6),
-                              icon: const Icon(
-                                Icons.download_rounded,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                              onPressed: () {
-                                _downloadFile(
-                                  attachment.url,
-                                  attachment.filename,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Container(
-                      width: 130,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.insert_drive_file_rounded,
-                            size: 34,
-                            color: Colors.blueGrey,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            attachment.filename,
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            onPressed: () {
-                              _downloadFile(
+                children:
+                    _message!.attachments.map((attachment) {
+                      if (attachment.type == "image") {
+                        return Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
                                 attachment.url,
-                                attachment.filename,
-                              );
-                            },
-                            icon: const Icon(Icons.download, size: 16),
-                            label: const Text(
-                              "Download",
-                              style: TextStyle(fontSize: 12),
+                                width: 130,
+                                height: 130,
+                                fit: BoxFit.cover,
+                                headers: {
+                                  "Authorization":
+                                      "Bearer ${AuthService.currentToken}",
+                                },
+                              ),
                             ),
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.6),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  constraints: const BoxConstraints(),
+                                  padding: const EdgeInsets.all(6),
+                                  icon: const Icon(
+                                    Icons.download_rounded,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                  onPressed: () {
+                                    _downloadFile(
+                                      attachment.url,
+                                      attachment.filename,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Container(
+                          width: 130,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ],
-                      ),
-                    );
-                  }
-                }).toList(),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.insert_drive_file_rounded,
+                                size: 34,
+                                color: Colors.blueGrey,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                attachment.filename,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  _downloadFile(
+                                    attachment.url,
+                                    attachment.filename,
+                                  );
+                                },
+                                icon: const Icon(Icons.download, size: 16),
+                                label: const Text(
+                                  "Download",
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    }).toList(),
               ),
               const SizedBox(height: 14),
             ],
@@ -319,9 +314,10 @@ class _WorkflowMessageDetailScreenState
                       ? Icons.done_all
                       : Icons.done,
                   size: 16,
-                  color: _message!.recipients.any((r) => r.isRead)
-                      ? Colors.blue
-                      : Colors.grey,
+                  color:
+                      _message!.recipients.any((r) => r.isRead)
+                          ? Colors.blue
+                          : Colors.grey,
                 ),
               ],
             ),
@@ -344,7 +340,7 @@ class _WorkflowMessageDetailScreenState
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(1, 3),
           ),

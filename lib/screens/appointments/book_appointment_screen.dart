@@ -1,9 +1,10 @@
 import 'package:client/utils/app_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../services/api_service.dart';
-import '../../models/case.dart';
+
 import '../../config/theme_config.dart';
+import '../../models/case.dart';
+import '../../services/api_service.dart';
 import '../../utils/responsive_utils.dart';
 
 class BookAppointmentScreen extends StatefulWidget {
@@ -94,8 +95,10 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
 
   Future<void> _bookAppointment() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedDate == null) return _showErrorSnackBar('Please select a date');
-    if (_selectedTime == null) return _showErrorSnackBar('Please select a time');
+    if (_selectedDate == null)
+      return _showErrorSnackBar('Please select a date');
+    if (_selectedTime == null)
+      return _showErrorSnackBar('Please select a time');
 
     setState(() => _isSaving = true);
 
@@ -153,149 +156,163 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: _isLoading
-          ? const Center(child: AppLoader())
-          : SingleChildScrollView(
-        padding: AppResponsive.pagePadding(context),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white24),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Appointment Details',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                _isLoading
+                    ? const Center(child: AppLoader())
+                    : SingleChildScrollView(
+                      padding: AppResponsive.pagePadding(context),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.white24),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Appointment Details',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
 
-                    TextFormField(
-                      controller: _titleController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: _inputDecoration(
-                        label: 'Appointment Title *',
-                        icon: Icons.event,
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter an appointment title';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: _titleController,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: _inputDecoration(
+                                      label: 'Appointment Title *',
+                                      icon: Icons.event,
+                                    ),
+                                    validator: (value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return 'Please enter an appointment title';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
 
-                    TextFormField(
-                      style: const TextStyle(color: Colors.white),
-                      controller: _descriptionController,
-                      decoration: _inputDecoration(
-                        label: 'Description (optional)',
-                        icon: Icons.description,
-                      ),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 16),
+                                  TextFormField(
+                                    style: const TextStyle(color: Colors.white),
+                                    controller: _descriptionController,
+                                    decoration: _inputDecoration(
+                                      label: 'Description (optional)',
+                                      icon: Icons.description,
+                                    ),
+                                    maxLines: 3,
+                                  ),
+                                  const SizedBox(height: 16),
 
-                    DropdownButtonFormField<int>(
-                      dropdownColor: ThemeConfig.navyBlue,
-                      initialValue: _selectedCaseId,
-                      decoration: _inputDecoration(
-                        label: 'Related Case (Optional)',
-                        icon: Icons.folder,
-                      ),
-                      items: [
-                        const DropdownMenuItem<int>(
-                          value: null,
-                          child: Text('No specific case'),
+                                  DropdownButtonFormField<int>(
+                                    dropdownColor: ThemeConfig.navyBlue,
+                                    initialValue: _selectedCaseId,
+                                    decoration: _inputDecoration(
+                                      label: 'Related Case (Optional)',
+                                      icon: Icons.folder,
+                                    ),
+                                    items: [
+                                      const DropdownMenuItem<int>(
+                                        value: null,
+                                        child: Text('No specific case'),
+                                      ),
+                                      ..._cases.map(
+                                        (case_) => DropdownMenuItem<int>(
+                                          value: case_.id,
+                                          child: Text(case_.title),
+                                        ),
+                                      ),
+                                    ],
+                                    onChanged: (value) {
+                                      setState(() => _selectedCaseId = value);
+                                    },
+                                    style: const TextStyle(color: Colors.white),
+                                    iconEnabledColor: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+
+                            _buildDateTimePicker(context),
+                            const SizedBox(height: 24),
+
+                            SizedBox(
+                              height: 56,
+                              child: ElevatedButton.icon(
+                                onPressed: _isSaving ? null : _bookAppointment,
+                                icon:
+                                    _isSaving
+                                        ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: AppLoader(),
+                                        )
+                                        : const Icon(Icons.event_available),
+                                label: Text(
+                                  _isSaving ? 'Booking...' : 'Book Appointment',
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: ThemeConfig.goldenYellow,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.white24),
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.info_outline, color: Colors.white),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Appointments are subject to availability. You will receive a confirmation email once approved.',
+                                      style: TextStyle(color: Colors.white70),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        ..._cases.map((case_) => DropdownMenuItem<int>(
-                          value: case_.id,
-                          child: Text(case_.title),
-                        )),
-                      ],
-                      onChanged: (value) {
-                        setState(() => _selectedCaseId = value);
-                      },
-                      style: const TextStyle(color: Colors.white),
-                      iconEnabledColor: Colors.white,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              _buildDateTimePicker(context),
-              const SizedBox(height: 24),
-
-              SizedBox(
-                height: 56,
-                child: ElevatedButton.icon(
-                  onPressed: _isSaving ? null : _bookAppointment,
-                  icon: _isSaving
-                      ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: AppLoader(),
-                  )
-                      : const Icon(Icons.event_available),
-                  label: Text(_isSaving ? 'Booking...' : 'Book Appointment'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeConfig.goldenYellow,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white24),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.info_outline, color: Colors.white),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Appointments are subject to availability. You will receive a confirmation email once approved.',
-                        style: TextStyle(color: Colors.white70),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
           ),
         ),
       ),
     );
   }
 
-  InputDecoration _inputDecoration({required String label, required IconData icon}) {
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData icon,
+  }) {
     return InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(color: Colors.white70),
@@ -326,16 +343,21 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         children: [
           const Text(
             'Schedule',
-            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 20),
 
           _dateOrTimeTile(
             icon: Icons.calendar_today,
             label: 'Date',
-            value: _selectedDate != null
-                ? DateFormat('EEEE, MMMM d, y').format(_selectedDate!)
-                : 'Select date',
+            value:
+                _selectedDate != null
+                    ? DateFormat('EEEE, MMMM d, y').format(_selectedDate!)
+                    : 'Select date',
             onTap: _selectDate,
           ),
           const SizedBox(height: 16),
@@ -343,9 +365,10 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           _dateOrTimeTile(
             icon: Icons.access_time,
             label: 'Time',
-            value: _selectedTime != null
-                ? _selectedTime!.format(context)
-                : 'Select time',
+            value:
+                _selectedTime != null
+                    ? _selectedTime!.format(context)
+                    : 'Select time',
             onTap: _selectTime,
           ),
         ],
@@ -377,8 +400,14 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                  Text(value, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                  Text(
+                    label,
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                  Text(
+                    value,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ],
               ),
             ),

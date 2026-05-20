@@ -115,18 +115,26 @@ class _WorkflowScreenState extends State<WorkflowScreen>
           ],
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Container(
-            color: ThemeConfig.navyBlue,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                WorkflowStagesScreen(matterID: AuthService.selectedMatterId ?? 0),
-                const WorkflowDocumentsScreen(),
-                WorkflowMessagesScreen(matterID: AuthService.selectedMatterId ?? 0),
-              ],
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: Container(
+              color: ThemeConfig.navyBlue,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  WorkflowStagesScreen(
+                    matterID: AuthService.selectedMatterId ?? 0,
+                  ),
+                  const WorkflowDocumentsScreen(),
+                  WorkflowMessagesScreen(
+                    matterID: AuthService.selectedMatterId ?? 0,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -78,7 +78,10 @@ class _BlogListScreenState extends State<BlogListScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha:0.06), blurRadius: 12),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+          ),
         ],
       ),
       child: GestureDetector(
@@ -168,10 +171,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
                 children: [
                   Text(
                     blog.date,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey.shade600,
-                    ),
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -188,18 +188,12 @@ class _BlogListScreenState extends State<BlogListScreen> {
                     blog.description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey.shade700,
-                    ),
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     "By ${blog.author}",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade600,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                   ),
                 ],
               ),
@@ -219,68 +213,69 @@ class _BlogListScreenState extends State<BlogListScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
-          ),
-          child: _blogs.isEmpty && _isLoading
-              ? const Center(child: AppLoader())
-              : RefreshIndicator(
-            onRefresh: _onRefresh,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final cols = AppResponsive.gridColumns(
-                  context,
-                  mobile: 1,
-                  tablet: 2,
-                  desktop: 3,
-                );
-
-                if (cols == 1) {
-                  return ListView.builder(
-                    controller: _scrollController,
-                    itemCount:
-                    _blogs.length + (_isLoading ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index < _blogs.length) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          child: _buildBlogCard(_blogs[index]),
-                        );
-                      }
-                      return const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(child: AppLoader()),
-                      );
-                    },
-                  );
-                }
-
-                return GridView.builder(
-                  controller: _scrollController,
-                  padding: AppResponsive.pagePadding(context),
-                  gridDelegate:
-                  SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: cols,
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 20,
-                    childAspectRatio: 1.1,
-                  ),
-                  itemCount:
-                  _blogs.length + (_isLoading ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index < _blogs.length) {
-                      return _buildBlogCard(_blogs[index]);
-                    }
-                    return const Center(child: AppLoader());
-                  },
-                );
-              },
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
             ),
+            child:
+                _blogs.isEmpty && _isLoading
+                    ? const Center(child: AppLoader())
+                    : RefreshIndicator(
+                      onRefresh: _onRefresh,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final cols = AppResponsive.gridColumns(
+                            context,
+                            mobile: 1,
+                            tablet: 2,
+                            desktop: 3,
+                          );
+
+                          if (cols == 1) {
+                            return ListView.builder(
+                              controller: _scrollController,
+                              itemCount: _blogs.length + (_isLoading ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index < _blogs.length) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 10,
+                                    ),
+                                    child: _buildBlogCard(_blogs[index]),
+                                  );
+                                }
+                                return const Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Center(child: AppLoader()),
+                                );
+                              },
+                            );
+                          }
+
+                          return GridView.builder(
+                            controller: _scrollController,
+                            padding: AppResponsive.pagePadding(context),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: cols,
+                                  crossAxisSpacing: 20,
+                                  mainAxisSpacing: 20,
+                                  childAspectRatio: 1.1,
+                                ),
+                            itemCount: _blogs.length + (_isLoading ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index < _blogs.length) {
+                                return _buildBlogCard(_blogs[index]);
+                              }
+                              return const Center(child: AppLoader());
+                            },
+                          );
+                        },
+                      ),
+                    ),
           ),
         ),
       ),

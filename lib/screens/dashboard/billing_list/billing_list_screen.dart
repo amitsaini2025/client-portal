@@ -243,28 +243,30 @@ class _BillingListScreenState extends State<BillingListScreen> {
         titleName: 'Billing & Invoices',
         matterID: AuthService.selectedMatterId,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
-          ),
-          child: Column(
-            children: [
-              _buildSummary(),
-              Expanded(
-                child:
-                    _isInitialLoading
-                        ? const Center(child: AppLoader())
-                        : ListView.builder(
-                          controller: _scrollController,
-                          padding: AppResponsive.pagePadding(context),
-                          itemCount: _invoices.length,
-                          itemBuilder: (context, index) {
-                            return _buildInvoiceCard(_invoices[index]);
-                          },
-                        ),
-              ),
-            ],
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: Column(
+              children: [
+                _buildSummary(),
+                Expanded(
+                  child:
+                      _isInitialLoading
+                          ? const Center(child: AppLoader())
+                          : ListView.builder(
+                            controller: _scrollController,
+                            padding: AppResponsive.pagePadding(context),
+                            itemCount: _invoices.length,
+                            itemBuilder: (context, index) {
+                              return _buildInvoiceCard(_invoices[index]);
+                            },
+                          ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -437,8 +439,8 @@ class _BillingListScreenState extends State<BillingListScreen> {
       decoration: BoxDecoration(
         color:
             isPaid
-                ? Colors.green.withValues(alpha:0.1)
-                : Colors.orange.withValues(alpha:0.1),
+                ? Colors.green.withValues(alpha: 0.1)
+                : Colors.orange.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(

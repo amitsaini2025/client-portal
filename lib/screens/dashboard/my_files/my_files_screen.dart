@@ -21,43 +21,47 @@ class MyFilesScreen extends StatelessWidget {
         elevation: 0,
         foregroundColor: Colors.white,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Padding(
-        padding: AppResponsive.pagePadding(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            MyFilesQuickActionsCard(
-              onViewWorkflow: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const WorkflowScreen(),
-                  ),
-                );
-              },
-              onBilling: () {
-                /*Navigator.of(context).push(
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: Padding(
+              padding: AppResponsive.pagePadding(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  MyFilesQuickActionsCard(
+                    onViewWorkflow: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const WorkflowScreen(),
+                        ),
+                      );
+                    },
+                    onBilling: () {
+                      /*Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const BillingScreen(),
                             ),
                           );*/
-                showSnack(
-                  context,
-                  "This feature will be available in a future update.",
-                );
-              },
-              onDocumentStatus: () {
-                Navigator.pushNamed(context, '/documents');
-              },
-              onUpcomingDeadlines: () {
-                Navigator.pushNamed(context, '/tasks');
-              },
+                      showSnack(
+                        context,
+                        "This feature will be available in a future update.",
+                      );
+                    },
+                    onDocumentStatus: () {
+                      Navigator.pushNamed(context, '/documents');
+                    },
+                    onUpcomingDeadlines: () {
+                      Navigator.pushNamed(context, '/tasks');
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
-            const SizedBox(height: 24),
-          ],
-        ),
           ),
         ),
       ),

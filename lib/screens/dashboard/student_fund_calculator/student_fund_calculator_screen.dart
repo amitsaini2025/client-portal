@@ -93,103 +93,106 @@ class _StudentFundCalculatorScreenState
       body:
           loading || data == null
               ? const Center(child: AppLoader())
-              : SingleChildScrollView(
-                padding: AppResponsive.pagePadding(context),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: AppResponsive.maxContentWidth,
-                    ),
-                    child: Card(
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+              : SafeArea(
+                child: SingleChildScrollView(
+                  padding: AppResponsive.pagePadding(context),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: AppResponsive.maxContentWidth,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Calculate Your Financial Requirements",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            _courseDurationDropdown(
-                              "Course Duration",
-                              data!['course_duration'],
-                              "Visa funding figures below cap tuition and living at the first 12 months (pro‑rata if your course is shorter).",
-                              selectedCourseDuration,
-                              (v) => setState(() => selectedCourseDuration = v),
-                            ),
-
-                            _numberField(
-                              "Annual Tuition Fee (AUD)",
-                              "Enter annual tuition fee",
-                              _tuitionCtrl,
-                              helper:
-                                  "For visa purposes: Max 12 months of fees required",
-                            ),
-
-                            _livingCostBox(),
-
-                            _dropdown(
-                              "Partner/Spouse Accompanying You",
-                              data!['partner_spouse_options'],
-                              partner,
-                              (v) => setState(() => partner = v),
-                            ),
-
-                            _dropdown(
-                              "Number of Dependent Children",
-                              data!['dependent_children_options'],
-                              children,
-                              (v) => setState(() => children = v),
-                            ),
-
-                            _dropdown(
-                              "Number of School-age Children",
-                              data!['school_age_children_options'],
-                              schoolChildren,
-                              (v) => setState(() => schoolChildren = v),
-                            ),
-
-                            _numberField(
-                              "Travel Expenses (Return flights)",
-                              "Include return airfare",
-                              _travelCtrl,
-                            ),
-
-                            const SizedBox(height: 24),
-
-                            SizedBox(
-                              width: double.infinity,
-                              height: 48,
-                              child: ElevatedButton(
-                                onPressed: _calculate,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                ),
-                                child: const Text(
-                                  "Calculate Requirements",
-                                  style: TextStyle(color: Colors.white),
+                      child: Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Calculate Your Financial Requirements",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
 
-                            const SizedBox(height: 24),
+                              const SizedBox(height: 16),
 
-                            _incomeBox(),
+                              _courseDurationDropdown(
+                                "Course Duration",
+                                data!['course_duration'],
+                                "Visa funding figures below cap tuition and living at the first 12 months (pro‑rata if your course is shorter).",
+                                selectedCourseDuration,
+                                (v) =>
+                                    setState(() => selectedCourseDuration = v),
+                              ),
 
-                            const SizedBox(height: 16),
+                              _numberField(
+                                "Annual Tuition Fee (AUD)",
+                                "Enter annual tuition fee",
+                                _tuitionCtrl,
+                                helper:
+                                    "For visa purposes: Max 12 months of fees required",
+                              ),
 
-                            _notesBox(),
-                          ],
+                              _livingCostBox(),
+
+                              _dropdown(
+                                "Partner/Spouse Accompanying You",
+                                data!['partner_spouse_options'],
+                                partner,
+                                (v) => setState(() => partner = v),
+                              ),
+
+                              _dropdown(
+                                "Number of Dependent Children",
+                                data!['dependent_children_options'],
+                                children,
+                                (v) => setState(() => children = v),
+                              ),
+
+                              _dropdown(
+                                "Number of School-age Children",
+                                data!['school_age_children_options'],
+                                schoolChildren,
+                                (v) => setState(() => schoolChildren = v),
+                              ),
+
+                              _numberField(
+                                "Travel Expenses (Return flights)",
+                                "Include return airfare",
+                                _travelCtrl,
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              SizedBox(
+                                width: double.infinity,
+                                height: 48,
+                                child: ElevatedButton(
+                                  onPressed: _calculate,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                  ),
+                                  child: const Text(
+                                    "Calculate Requirements",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              _incomeBox(),
+
+                              const SizedBox(height: 16),
+
+                              _notesBox(),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -376,9 +379,7 @@ class _StudentFundCalculatorScreenState
       decoration: BoxDecoration(
         color: const Color(0xFFF4FFF7),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFB7EAC7),
-        ),
+        border: Border.all(color: const Color(0xFFB7EAC7)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,10 +391,7 @@ class _StudentFundCalculatorScreenState
                 height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF1FA64A),
-                    width: 2,
-                  ),
+                  border: Border.all(color: const Color(0xFF1FA64A), width: 2),
                 ),
                 child: const Icon(
                   Icons.check,
@@ -466,16 +464,11 @@ class _StudentFundCalculatorScreenState
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 14,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFB7EAC7),
-        ),
+        border: Border.all(color: const Color(0xFFB7EAC7)),
       ),
       child: Row(
         children: [
@@ -496,10 +489,7 @@ class _StudentFundCalculatorScreenState
 
                 Text(
                   subtitle,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -561,7 +551,8 @@ class _StudentFundCalculatorScreenState
 
     final payload = {
       "course_duration": (selectedCourseDuration!['id'] as num).toInt(),
-      "annual_tuition_fee": (double.tryParse(_tuitionCtrl.text) ?? 0).toDouble(),
+      "annual_tuition_fee":
+          (double.tryParse(_tuitionCtrl.text) ?? 0).toDouble(),
       "partner_spouse": ((partner?['value'] ?? 0) as num).toInt(),
       "dependent_children": ((children?['value'] ?? 0) as num).toInt(),
       "school_age_children": ((schoolChildren?['value'] ?? 0) as num).toInt(),
@@ -818,10 +809,7 @@ class _StudentFundCalculatorScreenState
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 15,
-            color: Colors.black54,
-          ),
+          style: const TextStyle(fontSize: 15, color: Colors.black54),
         ),
 
         const SizedBox(height: 4),

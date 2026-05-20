@@ -57,35 +57,50 @@ class ImportantLinksScreen extends StatelessWidget {
         titleName: 'Important Links',
         matterID: AuthService.selectedMatterId,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Padding(
-            padding: AppResponsive.pagePadding(context),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final cols = AppResponsive.gridColumns(context, mobile: 1, tablet: 2, desktop: 3);
-                if (cols == 1) {
-                  return Column(
-                    children: links.map((link) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _linkTile(context, link),
-                    )).toList(),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: Padding(
+              padding: AppResponsive.pagePadding(context),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final cols = AppResponsive.gridColumns(
+                    context,
+                    mobile: 1,
+                    tablet: 2,
+                    desktop: 3,
                   );
-                }
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: cols,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 3.5,
-                  ),
-                  itemCount: links.length,
-                  itemBuilder: (context, index) => _linkTile(context, links[index]),
-                );
-              },
+                  if (cols == 1) {
+                    return Column(
+                      children:
+                          links
+                              .map(
+                                (link) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: _linkTile(context, link),
+                                ),
+                              )
+                              .toList(),
+                    );
+                  }
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: cols,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 3.5,
+                    ),
+                    itemCount: links.length,
+                    itemBuilder:
+                        (context, index) => _linkTile(context, links[index]),
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -112,9 +127,9 @@ class ImportantLinksScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
         decoration: BoxDecoration(
-          color: link.color.withValues(alpha:0.1),
+          color: link.color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: link.color.withValues(alpha:0.3)),
+          border: Border.all(color: link.color.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [

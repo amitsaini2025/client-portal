@@ -204,99 +204,110 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Client Information'),
-        backgroundColor: ThemeConfig.goldenYellow,
-        foregroundColor: Colors.white,
-      ),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: AppResponsive.maxFormWidth),
-            child: _isLoading
-            ? const Center(child: AppLoader())
-            : _loadError != null
-            ? _ErrorState(message: _loadError!, onRetry: _fetchProfile)
-            : GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: SingleChildScrollView(
-            padding: AppResponsive.pagePadding(context),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SectionTitle(text: 'Personal Information'),
-                  const SizedBox(height: 12),
-                  _buildFirstNameField(),
-                  const SizedBox(height: 16),
-                  _buildLastNameField(),
-                  const SizedBox(height: 16),
-                  _buildEmailField(), // Added email field
-                  const SizedBox(height: 16),
-                  _buildDateOfBirthField(),
-                  const SizedBox(height: 16),
-                  _buildGenderField(),
-                  const SizedBox(height: 16),
-                  _buildMaritalStatusField(),
-                  const SizedBox(height: 28),
-                  _SectionTitle(text: 'Contact Information'),
-                  const SizedBox(height: 12),
-                  _buildPhoneField(),
-                  const SizedBox(height: 16),
-                  _buildAddressField(),
-                  const SizedBox(height: 16),
-                  _buildCityField(),
-                  const SizedBox(height: 16),
-                  _buildStateField(),
-                  const SizedBox(height: 16),
-                  _buildPostCodeField(),
-                  const SizedBox(height: 16),
-                  _buildCountryField(),
-                  if (_submitError != null) ...[
-                    const SizedBox(height: 20),
-                    Text(
-                      _submitError!,
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  ],
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _isSubmitting ? null : _submit,
-                      icon: _isSubmitting
-                          ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: AppLoader(),
-                      )
-                          : const Icon(Icons.save),
-                      label: Text(
-                        _isSubmitting ? 'Saving...' : 'Update Profile',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                        ),
-                        backgroundColor: ThemeConfig.goldenYellow,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Edit Client Information'),
+          backgroundColor: ThemeConfig.goldenYellow,
+          foregroundColor: Colors.white,
         ),
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppResponsive.maxFormWidth,
+              ),
+              child:
+                  _isLoading
+                      ? const Center(child: AppLoader())
+                      : _loadError != null
+                      ? _ErrorState(
+                        message: _loadError!,
+                        onRetry: _fetchProfile,
+                      )
+                      : GestureDetector(
+                        onTap: () => FocusScope.of(context).unfocus(),
+                        child: SingleChildScrollView(
+                          padding: AppResponsive.pagePadding(context),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _SectionTitle(text: 'Personal Information'),
+                                const SizedBox(height: 12),
+                                _buildFirstNameField(),
+                                const SizedBox(height: 16),
+                                _buildLastNameField(),
+                                const SizedBox(height: 16),
+                                _buildEmailField(), // Added email field
+                                const SizedBox(height: 16),
+                                _buildDateOfBirthField(),
+                                const SizedBox(height: 16),
+                                _buildGenderField(),
+                                const SizedBox(height: 16),
+                                _buildMaritalStatusField(),
+                                const SizedBox(height: 28),
+                                _SectionTitle(text: 'Contact Information'),
+                                const SizedBox(height: 12),
+                                _buildPhoneField(),
+                                const SizedBox(height: 16),
+                                _buildAddressField(),
+                                const SizedBox(height: 16),
+                                _buildCityField(),
+                                const SizedBox(height: 16),
+                                _buildStateField(),
+                                const SizedBox(height: 16),
+                                _buildPostCodeField(),
+                                const SizedBox(height: 16),
+                                _buildCountryField(),
+                                if (_submitError != null) ...[
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    _submitError!,
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                ],
+                                const SizedBox(height: 24),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    onPressed: _isSubmitting ? null : _submit,
+                                    icon:
+                                        _isSubmitting
+                                            ? const SizedBox(
+                                              height: 18,
+                                              width: 18,
+                                              child: AppLoader(),
+                                            )
+                                            : const Icon(Icons.save),
+                                    label: Text(
+                                      _isSubmitting
+                                          ? 'Saving...'
+                                          : 'Update Profile',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 14,
+                                      ),
+                                      backgroundColor: ThemeConfig.goldenYellow,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+            ),
           ),
         ),
       ),
@@ -366,9 +377,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _buildDateOfBirthField() {
     final formattedDate =
-    _selectedDateOfBirth != null
-        ? DateFormat('dd/MM/yyyy').format(_selectedDateOfBirth!)
-        : 'Select Date';
+        _selectedDateOfBirth != null
+            ? DateFormat('dd/MM/yyyy').format(_selectedDateOfBirth!)
+            : 'Select Date';
     return InkWell(
       onTap: _pickDateOfBirth,
       child: InputDecorator(
@@ -381,9 +392,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           formattedDate,
           style: TextStyle(
             color:
-            _selectedDateOfBirth != null
-                ? Colors.black87
-                : Colors.grey[600],
+                _selectedDateOfBirth != null
+                    ? Colors.black87
+                    : Colors.grey[600],
             fontSize: 16,
           ),
         ),
@@ -398,14 +409,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         labelText: 'Gender',
         border: OutlineInputBorder(),
       ),
-      items: _genders
-          .map(
-            (gender) => DropdownMenuItem<String>(
-          value: gender,
-          child: Text(gender),
-        ),
-      )
-          .toList(),
+      items:
+          _genders
+              .map(
+                (gender) => DropdownMenuItem<String>(
+                  value: gender,
+                  child: Text(gender),
+                ),
+              )
+              .toList(),
       onChanged: (value) {
         setState(() {
           _selectedGender = value;
@@ -421,14 +433,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         labelText: 'Marital Status',
         border: OutlineInputBorder(),
       ),
-      items: _maritalStatuses
-          .map(
-            (status) => DropdownMenuItem<String>(
-          value: status,
-          child: Text(status),
-        ),
-      )
-          .toList(),
+      items:
+          _maritalStatuses
+              .map(
+                (status) => DropdownMenuItem<String>(
+                  value: status,
+                  child: Text(status),
+                ),
+              )
+              .toList(),
       onChanged: (value) {
         setState(() {
           _selectedMaritalStatus = value;

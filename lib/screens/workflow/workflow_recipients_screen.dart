@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../services/api_service.dart';
 import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
@@ -14,7 +15,8 @@ class WorkflowRecipientsScreen extends StatefulWidget {
   });
 
   @override
-  State<WorkflowRecipientsScreen> createState() => _WorkflowRecipientsScreenState();
+  State<WorkflowRecipientsScreen> createState() =>
+      _WorkflowRecipientsScreenState();
 }
 
 class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
@@ -61,26 +63,32 @@ class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: _isLoading
-          ? const Center(child: AppLoader())
-          : _error != null
-          ? _buildErrorWidget(_error!, _loadChatRecipients)
-          : RefreshIndicator(
-        onRefresh: _loadChatRecipients,
-        child: _recipients.isEmpty
-            ? _buildEmptyWidget()
-            : ListView.builder(
-          padding: AppResponsive.pagePadding(context),
-          itemCount: _recipients.length,
-          itemBuilder: (context, index) {
-            final recipient = _recipients[index];
-            return _buildRecipientCard(recipient);
-          },
-        ),
-      ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                _isLoading
+                    ? const Center(child: AppLoader())
+                    : _error != null
+                    ? _buildErrorWidget(_error!, _loadChatRecipients)
+                    : RefreshIndicator(
+                      onRefresh: _loadChatRecipients,
+                      child:
+                          _recipients.isEmpty
+                              ? _buildEmptyWidget()
+                              : ListView.builder(
+                                padding: AppResponsive.pagePadding(context),
+                                itemCount: _recipients.length,
+                                itemBuilder: (context, index) {
+                                  final recipient = _recipients[index];
+                                  return _buildRecipientCard(recipient);
+                                },
+                              ),
+                    ),
+          ),
         ),
       ),
     );
@@ -92,11 +100,12 @@ class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ChatDetailScreen(
-              recipientName: recipient['name'],
-              recipientEmail: recipient['email'],
-              clientId: recipient['client_id'],
-            ),
+            builder:
+                (_) => ChatDetailScreen(
+                  recipientName: recipient['name'],
+                  recipientEmail: recipient['email'],
+                  clientId: recipient['client_id'],
+                ),
           ),
         );
       },
@@ -107,7 +116,7 @@ class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black12.withValues(alpha:0.08),
+              color: Colors.black12.withValues(alpha: 0.08),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -129,18 +138,12 @@ class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
               const SizedBox(height: 6),
               Text(
                 recipient['email'] ?? 'No email provided',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black54,
-                ),
+                style: const TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 6),
               Text(
                 'Client ID: ${recipient['client_id'] ?? '-'}',
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
             ],
           ),
@@ -173,8 +176,10 @@ class _WorkflowRecipientsScreenState extends State<WorkflowRecipientsScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                padding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
               ),
             ),
           ],
@@ -240,7 +245,7 @@ class ChatDetailScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black12.withValues(alpha:0.08),
+                color: Colors.black12.withValues(alpha: 0.08),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),

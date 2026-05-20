@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+
+import '../../config/theme_config.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
-import '../../config/theme_config.dart';
 import '../../utils/app_loader.dart';
 import '../../utils/app_logger.dart';
 import '../../utils/responsive_utils.dart';
 
 class MattersScreen extends StatefulWidget {
   final bool? isFromFiles;
+
   const MattersScreen({super.key, required this.isFromFiles});
 
   @override
@@ -47,7 +49,7 @@ class _MattersScreenState extends State<MattersScreen> {
       Navigator.pushNamedAndRemoveUntil(
         context,
         '/dashboard',
-            (route) => false,
+        (route) => false,
         arguments: AuthService.selectedMatterId.toString(),
       );
     }
@@ -71,7 +73,7 @@ class _MattersScreenState extends State<MattersScreen> {
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Colors.white
+            color: Colors.white,
           ),
         ),
         backgroundColor: ThemeConfig.goldenYellow,
@@ -108,62 +110,80 @@ class _MattersScreenState extends State<MattersScreen> {
             final List matters = snapshot.data!['data']['matters'];
             final selectedMatterId = AuthService.selectedMatterId;
 
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-                child: ListView.builder(
-              padding: AppResponsive.pagePadding(context).copyWith(top: 12, bottom: 12),
-              itemCount: matters.length,
-              itemBuilder: (context, index) {
-                final matter = matters[index];
-                final matterId = matter['matter_id'];
-                final matterName = matter["matter_name"];
-                final isSelected = selectedMatterId == matterId;
-
-                return GestureDetector(
-                  onTap: () async {
-                    await AuthService.selectMatter(matterId: matterId, matterName: matterName);
-                    setState(() {});
-                  },
-                  child: Card(
-                    elevation: isSelected ? 6 : 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: isSelected
-                          ? BorderSide(
-                        color: ThemeConfig.navyBlue,
-                        width: 2,
-                      )
-                          : BorderSide.none,
-                    ),
-                    color: isSelected
-                        ? ThemeConfig.goldenYellow.withValues(alpha:0.3)
-                        : Colors.white,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      title: Text(
-                        matter['matter_name'],
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: ThemeConfig.navyBlue,
-                        ),
-                      ),
-                      trailing: isSelected
-                          ? Icon(
-                        Icons.check_circle,
-                        color: ThemeConfig.navyBlue,
-                      )
-                          : Icon(Icons.radio_button_unchecked,
-                          color: ThemeConfig.navyBlue.withValues(alpha:0.6)),
-                    ),
+            return SafeArea(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: AppResponsive.maxContentWidth,
                   ),
-                );
-              },
+                  child: ListView.builder(
+                    padding: AppResponsive.pagePadding(
+                      context,
+                    ).copyWith(top: 12, bottom: 12),
+                    itemCount: matters.length,
+                    itemBuilder: (context, index) {
+                      final matter = matters[index];
+                      final matterId = matter['matter_id'];
+                      final matterName = matter["matter_name"];
+                      final isSelected = selectedMatterId == matterId;
+
+                      return GestureDetector(
+                        onTap: () async {
+                          await AuthService.selectMatter(
+                            matterId: matterId,
+                            matterName: matterName,
+                          );
+                          setState(() {});
+                        },
+                        child: Card(
+                          elevation: isSelected ? 6 : 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side:
+                                isSelected
+                                    ? BorderSide(
+                                      color: ThemeConfig.navyBlue,
+                                      width: 2,
+                                    )
+                                    : BorderSide.none,
+                          ),
+                          color:
+                              isSelected
+                                  ? ThemeConfig.goldenYellow.withValues(
+                                    alpha: 0.3,
+                                  )
+                                  : Colors.white,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                            title: Text(
+                              matter['matter_name'],
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: ThemeConfig.navyBlue,
+                              ),
+                            ),
+                            trailing:
+                                isSelected
+                                    ? Icon(
+                                      Icons.check_circle,
+                                      color: ThemeConfig.navyBlue,
+                                    )
+                                    : Icon(
+                                      Icons.radio_button_unchecked,
+                                      color: ThemeConfig.navyBlue.withValues(
+                                        alpha: 0.6,
+                                      ),
+                                    ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             );

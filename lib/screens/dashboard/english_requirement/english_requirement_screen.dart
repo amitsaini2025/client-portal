@@ -1,6 +1,7 @@
-import 'package:client/screens/dashboard/english_requirement/english_requirement_for_student_visa_screen.dart';
 import 'package:client/screens/dashboard/english_requirement/english_requirement_for_485_temporary_graduate_visa_tr_screen.dart';
+import 'package:client/screens/dashboard/english_requirement/english_requirement_for_student_visa_screen.dart';
 import 'package:flutter/material.dart';
+
 import '../../../services/auth_service.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
@@ -42,21 +43,26 @@ class EnglishRequirementScreen extends StatelessWidget {
         titleName: "English Requirements",
         matterID: AuthService.selectedMatterId,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Padding(
-        padding: AppResponsive.pagePadding(context),
-        child: Column(
-          children: links
-              .map(
-                (link) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: _linkTile(context, link),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
             ),
-          )
-              .toList(),
-        ),
+            child: Padding(
+              padding: AppResponsive.pagePadding(context),
+              child: Column(
+                children:
+                    links
+                        .map(
+                          (link) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: _linkTile(context, link),
+                          ),
+                        )
+                        .toList(),
+              ),
+            ),
           ),
         ),
       ),
@@ -70,14 +76,17 @@ class EnglishRequirementScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const EnglishRequirementSpecifiedTestScoresScreen(),
+              builder:
+                  (_) => const EnglishRequirementSpecifiedTestScoresScreen(),
             ),
           );
         } else if (link.index == 1) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const EnglishRequirementFor485TemporaryGraduateVisaTRScreen(),
+              builder:
+                  (_) =>
+                      const EnglishRequirementFor485TemporaryGraduateVisaTRScreen(),
             ),
           );
         } else {
@@ -93,9 +102,9 @@ class EnglishRequirementScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
         decoration: BoxDecoration(
-          color: link.color.withValues(alpha:0.1),
+          color: link.color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: link.color.withValues(alpha:0.3)),
+          border: Border.all(color: link.color.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [

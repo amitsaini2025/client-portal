@@ -162,43 +162,45 @@ class _BookLocationScreenState extends State<BookLocationScreen> {
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 8),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha:0.15),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withValues(alpha:0.2)),
-            ),
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+          child: SafeArea(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AppointmentListScreen(),
+              child: TextButton.icon(
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
                   ),
-                );
-              },
-              icon: const Icon(
-                Icons.history_rounded,
-                color: Colors.white,
-                size: 18,
-              ),
-              label: const Text(
-                'My Booking\nHistory',
-                textAlign: TextAlign.center,
-                style: TextStyle(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const AppointmentListScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(
+                  Icons.history_rounded,
                   color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 11,
-                  height: 1.2,
+                  size: 18,
+                ),
+                label: const Text(
+                  'My Booking\nHistory',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11,
+                    height: 1.2,
+                  ),
                 ),
               ),
             ),

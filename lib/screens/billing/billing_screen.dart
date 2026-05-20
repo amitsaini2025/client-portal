@@ -320,195 +320,197 @@ class _BillingScreenState extends State<BillingScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
-          ),
-          child: Column(
-            children: [
-              // Summary Cards
-              Container(
-                padding: AppResponsive.pagePadding(context),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isWide = constraints.maxWidth >= 600;
-                    final summaryCards = [
-                      _buildSummaryCard(
-                        'Total Amount',
-                        '\$${NumberFormat('#,##0.00').format(totalAmount)}',
-                        Icons.account_balance_wallet,
-                        Colors.blue,
-                      ),
-                      _buildSummaryCard(
-                        'Paid',
-                        '\$${NumberFormat('#,##0.00').format(paidAmount)}',
-                        Icons.check_circle,
-                        Colors.green,
-                      ),
-                      _buildSummaryCard(
-                        'Pending',
-                        '\$${NumberFormat('#,##0.00').format(pendingAmount)}',
-                        Icons.schedule,
-                        Colors.orange,
-                      ),
-                      _buildSummaryCard(
-                        'Overdue',
-                        '\$${NumberFormat('#,##0.00').format(_invoices.where((i) => i.status == 'overdue').fold(0.0, (sum, i) => sum + (i.totalAmount ?? 0.0)))}',
-                        Icons.warning,
-                        Colors.red,
-                      ),
-                    ];
-                    if (isWide) {
-                      return Row(
-                        children:
-                            summaryCards
-                                .map(
-                                  (c) => Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child: Column(
+              children: [
+                // Summary Cards
+                Container(
+                  padding: AppResponsive.pagePadding(context),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isWide = constraints.maxWidth >= 600;
+                      final summaryCards = [
+                        _buildSummaryCard(
+                          'Total Amount',
+                          '\$${NumberFormat('#,##0.00').format(totalAmount)}',
+                          Icons.account_balance_wallet,
+                          Colors.blue,
+                        ),
+                        _buildSummaryCard(
+                          'Paid',
+                          '\$${NumberFormat('#,##0.00').format(paidAmount)}',
+                          Icons.check_circle,
+                          Colors.green,
+                        ),
+                        _buildSummaryCard(
+                          'Pending',
+                          '\$${NumberFormat('#,##0.00').format(pendingAmount)}',
+                          Icons.schedule,
+                          Colors.orange,
+                        ),
+                        _buildSummaryCard(
+                          'Overdue',
+                          '\$${NumberFormat('#,##0.00').format(_invoices.where((i) => i.status == 'overdue').fold(0.0, (sum, i) => sum + (i.totalAmount ?? 0.0)))}',
+                          Icons.warning,
+                          Colors.red,
+                        ),
+                      ];
+                      if (isWide) {
+                        return Row(
+                          children:
+                              summaryCards
+                                  .map(
+                                    (c) => Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                        ),
+                                        child: c,
                                       ),
-                                      child: c,
                                     ),
-                                  ),
-                                )
-                                .toList(),
-                      );
-                    }
-                    return Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(child: summaryCards[0]),
-                            const SizedBox(width: 12),
-                            Expanded(child: summaryCards[1]),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(child: summaryCards[2]),
-                            const SizedBox(width: 12),
-                            Expanded(child: summaryCards[3]),
-                          ],
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-
-              // Search and Filter Bar
-              Container(
-                padding: AppResponsive.horizontalPadding(context),
-                child: Column(
-                  children: [
-                    // Search Bar
-                    TextField(
-                      onChanged: (value) {
-                        setState(() {
-                          _searchQuery = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Search invoices...',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).cardColor,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Status Filter
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
+                                  )
+                                  .toList(),
+                        );
+                      }
+                      return Column(
                         children: [
-                          _buildFilterChip('All', 'all'),
-                          const SizedBox(width: 8),
-                          _buildFilterChip('Paid', 'paid'),
-                          const SizedBox(width: 8),
-                          _buildFilterChip('Pending', 'pending'),
-                          const SizedBox(width: 8),
-                          _buildFilterChip('Overdue', 'overdue'),
-                          const SizedBox(width: 8),
-                          _buildFilterChip('Draft', 'draft'),
+                          Row(
+                            children: [
+                              Expanded(child: summaryCards[0]),
+                              const SizedBox(width: 12),
+                              Expanded(child: summaryCards[1]),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(child: summaryCards[2]),
+                              const SizedBox(width: 12),
+                              Expanded(child: summaryCards[3]),
+                            ],
+                          ),
                         ],
-                      ),
-                    ),
-                  ],
+                      );
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
 
-              // Invoices List
-              Expanded(
-                child:
-                    _isLoading
-                        ? const Center(child: AppLoader())
-                        : _errorMessage != null
-                        ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.error_outline,
-                                size: 64,
-                                color: Colors.red[300],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                _errorMessage!,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: _loadInvoices,
-                                child: const Text('Retry'),
-                              ),
-                            ],
+                // Search and Filter Bar
+                Container(
+                  padding: AppResponsive.horizontalPadding(context),
+                  child: Column(
+                    children: [
+                      // Search Bar
+                      TextField(
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Search invoices...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        )
-                        : _filteredInvoices.isEmpty
-                        ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.receipt_long,
-                                size: 64,
-                                color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                _searchQuery.isNotEmpty ||
-                                        _statusFilter != 'all'
-                                    ? 'No invoices match your search'
-                                    : 'No invoices found',
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(color: Colors.grey[600]),
-                              ),
-                            ],
-                          ),
-                        )
-                        : RefreshIndicator(
-                          onRefresh: _loadInvoices,
-                          child: ListView.builder(
-                            padding: AppResponsive.horizontalPadding(context),
-                            itemCount: _filteredInvoices.length,
-                            itemBuilder: (context, index) {
-                              final invoice = _filteredInvoices[index];
-                              return _buildInvoiceCard(invoice);
-                            },
-                          ),
+                          filled: true,
+                          fillColor: Theme.of(context).cardColor,
                         ),
-              ),
-            ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Status Filter
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildFilterChip('All', 'all'),
+                            const SizedBox(width: 8),
+                            _buildFilterChip('Paid', 'paid'),
+                            const SizedBox(width: 8),
+                            _buildFilterChip('Pending', 'pending'),
+                            const SizedBox(width: 8),
+                            _buildFilterChip('Overdue', 'overdue'),
+                            const SizedBox(width: 8),
+                            _buildFilterChip('Draft', 'draft'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Invoices List
+                Expanded(
+                  child:
+                      _isLoading
+                          ? const Center(child: AppLoader())
+                          : _errorMessage != null
+                          ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  size: 64,
+                                  color: Colors.red[300],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _errorMessage!,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: _loadInvoices,
+                                  child: const Text('Retry'),
+                                ),
+                              ],
+                            ),
+                          )
+                          : _filteredInvoices.isEmpty
+                          ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.receipt_long,
+                                  size: 64,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _searchQuery.isNotEmpty ||
+                                          _statusFilter != 'all'
+                                      ? 'No invoices match your search'
+                                      : 'No invoices found',
+                                  style: Theme.of(context).textTheme.bodyLarge
+                                      ?.copyWith(color: Colors.grey[600]),
+                                ),
+                              ],
+                            ),
+                          )
+                          : RefreshIndicator(
+                            onRefresh: _loadInvoices,
+                            child: ListView.builder(
+                              padding: AppResponsive.horizontalPadding(context),
+                              itemCount: _filteredInvoices.length,
+                              itemBuilder: (context, index) {
+                                final invoice = _filteredInvoices[index];
+                                return _buildInvoiceCard(invoice);
+                              },
+                            ),
+                          ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

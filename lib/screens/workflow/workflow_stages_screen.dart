@@ -401,105 +401,107 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen>
         matterID: widget.matterID ?? 0,
       ),
 
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
-          ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
 
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: ThemeConfig.navyBlue.withValues(alpha: 0.04),
-                  border: Border.all(
-                    color: ThemeConfig.navyBlue.withValues(alpha: 0.08),
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    color: ThemeConfig.navyBlue.withValues(alpha: 0.04),
+                    border: Border.all(
+                      color: ThemeConfig.navyBlue.withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    isScrollable: false,
+                    dividerColor: Colors.transparent,
+                    labelPadding: EdgeInsets.zero,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicator: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      color: ThemeConfig.goldenYellow,
+                    ),
+
+                    labelColor: ThemeConfig.navyBlue,
+                    unselectedLabelColor: ThemeConfig.navyBlue.withValues(
+                      alpha: 0.50,
+                    ),
+
+                    labelStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.1,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.1,
+                    ),
+
+                    tabs: [
+                      _buildTab("All", 24),
+                      _buildTab("Pending", 8),
+                      _buildTab("Completed", 16),
+                    ],
                   ),
                 ),
-                child: TabBar(
-                  controller: _tabController,
-                  isScrollable: false,
-                  dividerColor: Colors.transparent,
-                  labelPadding: EdgeInsets.zero,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicator: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    color: ThemeConfig.goldenYellow,
-                  ),
-
-                  labelColor: ThemeConfig.navyBlue,
-                  unselectedLabelColor: ThemeConfig.navyBlue.withValues(
-                    alpha: 0.50,
-                  ),
-
-                  labelStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.1,
-                  ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.1,
-                  ),
-
-                  tabs: [
-                    _buildTab("All", 24),
-                    _buildTab("Pending", 8),
-                    _buildTab("Completed", 16),
-                  ],
-                ),
-              ),
-              Expanded(
-                child:
-                    _isLoading
-                        ? const Center(child: AppLoader())
-                        : _error != null
-                        ? _buildErrorWidget(
-                          _error!,
-                          () => _loadWorkflowData(
-                            type: _tabs[_tabController.index],
-                          ),
-                        )
-                        : _workflowResponse == null
-                        ? const Center(
-                          child: Text('No workflow data available'),
-                        )
-                        : RefreshIndicator(
-                          color: ThemeConfig.goldenYellow,
-                          onRefresh:
-                              () => _loadWorkflowData(
-                                type: _tabs[_tabController.index],
-                              ),
-                          child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: AppResponsive.pagePadding(context),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (_workflowResponse!.caseSummary != null)
-                                  _buildCaseSummary(
-                                    _workflowResponse!.caseSummary!,
-                                  ),
-
-                                const SizedBox(height: 20),
-
-                                WorkflowProgressWidget(
-                                  workflowResponse: _workflowResponse!,
-                                  onStageTap: _showStageDetails,
-                                  onChecklistPlusTap: _openUploadOptions,
-                                  onChecklistViewTap: _onViewTap,
-                                  onBulkUploadTap: _onBulkUploadTap,
+                Expanded(
+                  child:
+                      _isLoading
+                          ? const Center(child: AppLoader())
+                          : _error != null
+                          ? _buildErrorWidget(
+                            _error!,
+                            () => _loadWorkflowData(
+                              type: _tabs[_tabController.index],
+                            ),
+                          )
+                          : _workflowResponse == null
+                          ? const Center(
+                            child: Text('No workflow data available'),
+                          )
+                          : RefreshIndicator(
+                            color: ThemeConfig.goldenYellow,
+                            onRefresh:
+                                () => _loadWorkflowData(
+                                  type: _tabs[_tabController.index],
                                 ),
-                              ],
+                            child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: AppResponsive.pagePadding(context),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (_workflowResponse!.caseSummary != null)
+                                    _buildCaseSummary(
+                                      _workflowResponse!.caseSummary!,
+                                    ),
+
+                                  const SizedBox(height: 20),
+
+                                  WorkflowProgressWidget(
+                                    workflowResponse: _workflowResponse!,
+                                    onStageTap: _showStageDetails,
+                                    onChecklistPlusTap: _openUploadOptions,
+                                    onChecklistViewTap: _onViewTap,
+                                    onBulkUploadTap: _onBulkUploadTap,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -509,12 +511,7 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen>
   Widget _buildTab(String label, int count) {
     return Tab(
       height: 46,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label),
-        ],
-      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [Text(label)]),
     );
   }
 

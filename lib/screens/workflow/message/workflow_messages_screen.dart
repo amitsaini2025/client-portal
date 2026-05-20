@@ -447,27 +447,29 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
         matterID: AuthService.selectedMatterId,
       ),
       backgroundColor: const Color(0xFFF5F5F5),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppResponsive.maxContentWidth,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                _isLoading
+                    ? Center(child: AppLoader())
+                    : _error != null
+                    ? _buildErrorWidget(_error!)
+                    : Column(
+                      children: [
+                        Expanded(
+                          child:
+                              _messages.isEmpty
+                                  ? _buildEmptyWidget()
+                                  : _buildMessageList(),
+                        ),
+                        _buildMessageInput(),
+                      ],
+                    ),
           ),
-          child:
-              _isLoading
-                  ? Center(child: AppLoader())
-                  : _error != null
-                  ? _buildErrorWidget(_error!)
-                  : Column(
-                    children: [
-                      Expanded(
-                        child:
-                            _messages.isEmpty
-                                ? _buildEmptyWidget()
-                                : _buildMessageList(),
-                      ),
-                      _buildMessageInput(),
-                    ],
-                  ),
         ),
       ),
     );
@@ -632,7 +634,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                       decoration: BoxDecoration(
                         color:
                             isSender
-                                ? ThemeConfig.navyBlue.withValues(alpha:0.9)
+                                ? ThemeConfig.navyBlue.withValues(alpha: 0.9)
                                 : Colors.white,
                         borderRadius: BorderRadius.only(
                           topLeft: const Radius.circular(16),
@@ -642,7 +644,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha:0.08),
+                            color: Colors.black.withValues(alpha: 0.08),
                             blurRadius: 3,
                             offset: const Offset(1, 2),
                           ),

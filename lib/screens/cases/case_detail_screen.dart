@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../models/case.dart';
-import '../../utils/responsive_utils.dart';
 import '../../models/document.dart';
-import '../../models/task.dart';
 import '../../models/note.dart';
-import '../../widgets/common/loading_widget.dart';
-import '../../widgets/common/error_widget.dart';
+import '../../models/task.dart';
+import '../../utils/responsive_utils.dart';
 import '../../widgets/cases/progress_bar.dart';
 import '../../widgets/cases/timeline_widget.dart';
+import '../../widgets/common/error_widget.dart';
+import '../../widgets/common/loading_widget.dart';
 
 class CaseDetailScreen extends StatefulWidget {
   final int caseId;
@@ -198,111 +199,115 @@ class _CaseDetailScreenState extends State<CaseDetailScreen>
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Column(
-        children: [
-          // Case header with progress
-          Container(
-            padding: AppResponsive.pagePadding(context),
-            color: Theme.of(context).cardColor,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  _case!.title,
-                  style: Theme.of(context).textTheme.headlineSmall,
+                // Case header with progress
+                Container(
+                  padding: AppResponsive.pagePadding(context),
+                  color: Theme.of(context).cardColor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _case!.title,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _getStatusColor(_case!.status ?? ''),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              (_case!.status ?? '')
+                                  .replaceAll('_', ' ')
+                                  .toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _getPriorityColor(_case!.priority ?? ''),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              (_case!.priority ?? '').toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      ProgressBar(
+                        currentStage: _getCurrentStage(),
+                        totalStages: 5,
+                        progress: _getProgressPercentage(),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _case!.description ?? 'No description available',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(_case!.status ?? ''),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        (_case!.status ?? '')
-                            .replaceAll('_', ' ')
-                            .toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getPriorityColor(_case!.priority ?? ''),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        (_case!.priority ?? '').toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                ProgressBar(
-                  currentStage: _getCurrentStage(),
-                  totalStages: 5,
-                  progress: _getProgressPercentage(),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  _case!.description ?? 'No description available',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-            ),
-          ),
 
-          // Tab bar
-          Container(
-            color: Theme.of(context).cardColor,
-            child: TabBar(
-              controller: _tabController,
-              labelColor: Theme.of(context).primaryColor,
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: Theme.of(context).primaryColor,
-              tabs: const [
-                Tab(text: 'Overview'),
-                Tab(text: 'Documents'),
-                Tab(text: 'Tasks'),
-                Tab(text: 'Timeline'),
-              ],
-            ),
-          ),
+                // Tab bar
+                Container(
+                  color: Theme.of(context).cardColor,
+                  child: TabBar(
+                    controller: _tabController,
+                    labelColor: Theme.of(context).primaryColor,
+                    unselectedLabelColor: Colors.grey,
+                    indicatorColor: Theme.of(context).primaryColor,
+                    tabs: const [
+                      Tab(text: 'Overview'),
+                      Tab(text: 'Documents'),
+                      Tab(text: 'Tasks'),
+                      Tab(text: 'Timeline'),
+                    ],
+                  ),
+                ),
 
-          // Tab content
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildOverviewTab(),
-                _buildDocumentsTab(),
-                _buildTasksTab(),
-                _buildTimelineTab(),
+                // Tab content
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildOverviewTab(),
+                      _buildDocumentsTab(),
+                      _buildTasksTab(),
+                      _buildTimelineTab(),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
           ),
         ),
       ),

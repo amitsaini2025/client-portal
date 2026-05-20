@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../models/recent_case.dart';
 import '../../../services/api_service.dart';
 import '../../../utils/app_loader.dart';
@@ -90,8 +91,7 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
           ],
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: () {
-        },
+        onTap: () {},
       ),
     );
   }
@@ -103,36 +103,41 @@ class _RecentCasesScreenState extends State<RecentCasesScreen> {
         title: const Text("Recent Cases"),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: _cases.isEmpty && _isLoading
-          ? const Center(child: AppLoader())
-          : RefreshIndicator(
-        onRefresh: () async {
-          setState(() {
-            _cases.clear();
-            _currentPage = 1;
-            _hasNextPage = true;
-          });
-          await _fetchCases();
-        },
-        child: ListView.builder(
-          controller: _scrollController,
-          padding: AppResponsive.pagePadding(context),
-          itemCount: _cases.length + (_isLoading ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (index < _cases.length) {
-              return _buildCaseCard(_cases[index]);
-            } else {
-              return const Padding(
-                padding: EdgeInsets.all(16),
-                child: Center(child: AppLoader()),
-              );
-            }
-          },
-        ),
-      ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                _cases.isEmpty && _isLoading
+                    ? const Center(child: AppLoader())
+                    : RefreshIndicator(
+                      onRefresh: () async {
+                        setState(() {
+                          _cases.clear();
+                          _currentPage = 1;
+                          _hasNextPage = true;
+                        });
+                        await _fetchCases();
+                      },
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        padding: AppResponsive.pagePadding(context),
+                        itemCount: _cases.length + (_isLoading ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index < _cases.length) {
+                            return _buildCaseCard(_cases[index]);
+                          } else {
+                            return const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(child: AppLoader()),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+          ),
         ),
       ),
     );

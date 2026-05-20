@@ -3,8 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../services/api_service.dart';
+
 import '../../config/theme_config.dart';
+import '../../services/api_service.dart';
 import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 
@@ -141,7 +142,10 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.photo_library, color: Colors.white),
-                title: const Text('Choose from Gallery', style: TextStyle(color: Colors.white)),
+                title: const Text(
+                  'Choose from Gallery',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onTap: () {
                   Navigator.of(context).pop();
                   _pickImages();
@@ -150,7 +154,10 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
               if (!kIsWeb)
                 ListTile(
                   leading: const Icon(Icons.camera_alt, color: Colors.white),
-                  title: const Text('Take Photo', style: TextStyle(color: Colors.white)),
+                  title: const Text(
+                    'Take Photo',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   onTap: () {
                     Navigator.of(context).pop();
                     _pickImageFromCamera();
@@ -168,7 +175,10 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
     return Scaffold(
       backgroundColor: ThemeConfig.navyBlue,
       appBar: AppBar(
-        title: const Text('Send Message', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Send Message',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
         leading: IconButton(
@@ -179,11 +189,7 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
           if (_isLoading)
             const Padding(
               padding: EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: AppLoader(),
-              ),
+              child: SizedBox(width: 20, height: 20, child: AppLoader()),
             )
           else
             TextButton(
@@ -199,197 +205,231 @@ class _SendMessageScreenState extends State<SendMessageScreen> {
             ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: SingleChildScrollView(
-        padding: AppResponsive.pagePadding(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Subject Field
-            TextFormField(
-              controller: _subjectController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                labelText: 'Subject *',
-                labelStyle: const TextStyle(color: Colors.white70),
-                hintText: 'Enter message subject',
-                hintStyle: const TextStyle(color: Colors.white54),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                prefixIcon: const Icon(Icons.subject, color: Colors.white),
-                filled: true,
-                fillColor: ThemeConfig.navyBlue.withValues(alpha:0.6),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: ThemeConfig.goldenYellow),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              textCapitalization: TextCapitalization.sentences,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
             ),
-            const SizedBox(height: 20),
-
-            // Message Field
-            TextFormField(
-              controller: _messageController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                labelText: 'Message *',
-                labelStyle: const TextStyle(color: Colors.white70),
-                hintText: 'Type your message here...',
-                hintStyle: const TextStyle(color: Colors.white54),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                prefixIcon: const Icon(Icons.message, color: Colors.white),
-                filled: true,
-                fillColor: ThemeConfig.navyBlue.withValues(alpha:0.6),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: ThemeConfig.goldenYellow),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                alignLabelWithHint: true,
-              ),
-              maxLines: 6,
-              textCapitalization: TextCapitalization.sentences,
-            ),
-            const SizedBox(height: 20),
-
-            // Photo Section
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: ThemeConfig.navyBlue.withValues(alpha:0.6),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white24),
-              ),
+            child: SingleChildScrollView(
+              padding: AppResponsive.pagePadding(context),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Attachments',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+                  // Subject Field
+                  TextFormField(
+                    controller: _subjectController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: 'Subject *',
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      hintText: 'Enter message subject',
+                      hintStyle: const TextStyle(color: Colors.white54),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      TextButton.icon(
-                        onPressed: _showImageSourceDialog,
-                        icon: const Icon(Icons.add_photo_alternate, size: 20, color: Colors.white),
-                        label: const Text('Add Photos', style: TextStyle(color: Colors.white)),
-                        style: TextButton.styleFrom(
-                          foregroundColor: ThemeConfig.goldenYellow,
-                        ),
+                      prefixIcon: const Icon(
+                        Icons.subject,
+                        color: Colors.white,
                       ),
-                    ],
+                      filled: true,
+                      fillColor: ThemeConfig.navyBlue.withValues(alpha: 0.6),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: ThemeConfig.goldenYellow),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    textCapitalization: TextCapitalization.sentences,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 20),
 
-                  if (_selectedImageBytes.isEmpty)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(32),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha:0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: Colors.white24,
-                        ),
+                  // Message Field
+                  TextFormField(
+                    controller: _messageController,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: 'Message *',
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      hintText: 'Type your message here...',
+                      hintStyle: const TextStyle(color: Colors.white54),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Column(
-                        children: [
-                          Icon(Icons.photo_library_outlined, size: 48, color: Colors.white54),
-                          SizedBox(height: 12),
-                          Text('No photos selected', style: TextStyle(color: Colors.white70)),
-                          SizedBox(height: 4),
-                          Text('Tap "Add Photos" to attach images', style: TextStyle(color: Colors.white54)),
-                        ],
+                      prefixIcon: const Icon(
+                        Icons.message,
+                        color: Colors.white,
                       ),
-                    )
-                  else
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                        childAspectRatio: 1,
+                      filled: true,
+                      fillColor: ThemeConfig.navyBlue.withValues(alpha: 0.6),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: ThemeConfig.goldenYellow),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      itemCount: _selectedImageBytes.length,
-                      itemBuilder: (context, index) {
-                        return Stack(
+                      alignLabelWithHint: true,
+                    ),
+                    maxLines: 6,
+                    textCapitalization: TextCapitalization.sentences,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Photo Section
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: ThemeConfig.navyBlue.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.memory(
-                                _selectedImageBytes[index].bytes,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
+                            const Text(
+                              'Attachments',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
                               ),
                             ),
-                            Positioned(
-                              top: 4,
-                              right: 4,
-                              child: GestureDetector(
-                                onTap: () => _removeImage(index),
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.close, color: Colors.white, size: 16),
-                                ),
+                            TextButton.icon(
+                              onPressed: _showImageSourceDialog,
+                              icon: const Icon(
+                                Icons.add_photo_alternate,
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                'Add Photos',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: TextButton.styleFrom(
+                                foregroundColor: ThemeConfig.goldenYellow,
                               ),
                             ),
                           ],
-                        );
-                      },
+                        ),
+                        const SizedBox(height: 12),
+
+                        if (_selectedImageBytes.isEmpty)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(32),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.white24),
+                            ),
+                            child: const Column(
+                              children: [
+                                Icon(
+                                  Icons.photo_library_outlined,
+                                  size: 48,
+                                  color: Colors.white54,
+                                ),
+                                SizedBox(height: 12),
+                                Text(
+                                  'No photos selected',
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Tap "Add Photos" to attach images',
+                                  style: TextStyle(color: Colors.white54),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                  childAspectRatio: 1,
+                                ),
+                            itemCount: _selectedImageBytes.length,
+                            itemBuilder: (context, index) {
+                              return Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.memory(
+                                      _selectedImageBytes[index].bytes,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 4,
+                                    right: 4,
+                                    child: GestureDetector(
+                                      onTap: () => _removeImage(index),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                      ],
                     ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Send Button
+                  SizedBox(
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _isLoading ? null : _sendMessage,
+                      icon:
+                          _isLoading
+                              ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : const Icon(Icons.send, color: Colors.white),
+                      label: Text(
+                        _isLoading ? 'Sending...' : 'Send Message',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ThemeConfig.goldenYellow,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-
-            // Send Button
-            SizedBox(
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed: _isLoading ? null : _sendMessage,
-                icon: _isLoading
-                    ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-                    : const Icon(Icons.send, color: Colors.white),
-                label: Text(
-                  _isLoading ? 'Sending...' : 'Send Message',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ThemeConfig.goldenYellow,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 4,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
           ),
         ),
       ),

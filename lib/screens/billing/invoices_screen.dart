@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../models/invoice.dart';
 import '../../utils/responsive_utils.dart';
-import '../../widgets/common/loading_widget.dart';
 import '../../widgets/common/error_widget.dart';
+import '../../widgets/common/loading_widget.dart';
 
 class InvoicesScreen extends StatefulWidget {
   const InvoicesScreen({super.key});
@@ -126,19 +127,24 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: _invoices.isEmpty
-              ? _buildEmptyState()
-              : ListView.builder(
-                padding: AppResponsive.pagePadding(context),
-                itemCount: _invoices.length,
-                itemBuilder: (context, index) {
-                  final invoice = _invoices[index];
-                  return _buildInvoiceCard(invoice);
-                },
-              ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
+            ),
+            child:
+                _invoices.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                      padding: AppResponsive.pagePadding(context),
+                      itemCount: _invoices.length,
+                      itemBuilder: (context, index) {
+                        final invoice = _invoices[index];
+                        return _buildInvoiceCard(invoice);
+                      },
+                    ),
+          ),
         ),
       ),
     );
@@ -212,7 +218,9 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(invoice.status).withValues(alpha: 0.1),
+                      color: _getStatusColor(
+                        invoice.status,
+                      ).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(

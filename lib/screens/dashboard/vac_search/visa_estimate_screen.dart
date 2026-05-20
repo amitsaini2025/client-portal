@@ -211,7 +211,7 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
         return ChoiceChip(
           label: Text(paymentMethods[index]),
           selected: selectedPaymentIndex == index,
-          selectedColor: ThemeConfig.goldenYellow.withValues(alpha:0.3),
+          selectedColor: ThemeConfig.goldenYellow.withValues(alpha: 0.3),
           backgroundColor: Colors.white,
           side: const BorderSide(color: Colors.black),
           onSelected: (val) {
@@ -243,117 +243,130 @@ class _VisaEstimateScreenState extends State<VisaEstimateScreen> {
         titleName: "Visa Estimate",
         matterID: AuthService.selectedMatterId,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: SingleChildScrollView(
-        padding: AppResponsive.pagePadding(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "for any other applicant:",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
             ),
-            const SizedBox(height: 12),
-
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(8),
-              ),
+            child: SingleChildScrollView(
+              padding: AppResponsive.pagePadding(context),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _tableRow(
-                    left: const Text("1  Base application charge"),
-                    right: Text("$currency $topBaseCharge"),
+                  const Text(
+                    "for any other applicant:",
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
-                  _tableRow(
-                    left: const Text("2  Additional applicant charge >= 18"),
-                    right: Text("$currency $topAdultCharge"),
+                  const SizedBox(height: 12),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        _tableRow(
+                          left: const Text("1  Base application charge"),
+                          right: Text("$currency $topBaseCharge"),
+                        ),
+                        _tableRow(
+                          left: const Text(
+                            "2  Additional applicant charge >= 18",
+                          ),
+                          right: Text("$currency $topAdultCharge"),
+                        ),
+                        _tableRow(
+                          left: const Text(
+                            "3  Additional applicant charge < 18",
+                          ),
+                          right: Text("$currency $topChildCharge"),
+                        ),
+                      ],
+                    ),
                   ),
-                  _tableRow(
-                    left: const Text("3  Additional applicant charge < 18"),
-                    right: Text("$currency $topChildCharge"),
+
+                  const SizedBox(height: 30),
+
+                  const Text(
+                    "PAYABLE FEES & SURCHARGE",
+                    style: TextStyle(
+                      letterSpacing: 2,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  _paymentSelector(),
+                  const SizedBox(height: 16),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        _tableRow(
+                          left: const Text("Base application charge"),
+                          right: Text("$currency $baseCharge"),
+                        ),
+                        _tableRow(
+                          left: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text("Additional applicant charge >= 18"),
+                              const SizedBox(height: 8),
+                              _counterBox(
+                                adultCount,
+                                (v) => setState(() => adultCount = v),
+                              ),
+                            ],
+                          ),
+                          right: Text("$currency $additionalAdultCharge"),
+                        ),
+                        _tableRow(
+                          left: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text("Additional applicant charge < 18"),
+                              const SizedBox(height: 8),
+                              _counterBox(
+                                childCount,
+                                (v) => setState(() => childCount = v),
+                              ),
+                            ],
+                          ),
+                          right: Text("$currency $additionalChildCharge"),
+                        ),
+                        _tableRow(
+                          left: const Text("Subtotal"),
+                          right: Text("$currency $subtotal"),
+                          bold: true,
+                        ),
+                        _tableRow(
+                          left: Text(
+                            "Surcharge (+ ${(surchargeRates[selectedPaymentIndex] * 100).toStringAsFixed(2)}%)",
+                          ),
+                          right: Text(
+                            "$currency ${surchargeAmount.toStringAsFixed(2)}",
+                          ),
+                        ),
+                        _tableRow(
+                          left: const Text("TOTAL"),
+                          right: Text(
+                            "$currency ${finalTotal.toStringAsFixed(2)}",
+                          ),
+                          bold: true,
+                          bg: Colors.grey.shade300,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              "PAYABLE FEES & SURCHARGE",
-              style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 12),
-
-            _paymentSelector(),
-            const SizedBox(height: 16),
-
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                children: [
-                  _tableRow(
-                    left: const Text("Base application charge"),
-                    right: Text("$currency $baseCharge"),
-                  ),
-                  _tableRow(
-                    left: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Additional applicant charge >= 18"),
-                        const SizedBox(height: 8),
-                        _counterBox(
-                          adultCount,
-                          (v) => setState(() => adultCount = v),
-                        ),
-                      ],
-                    ),
-                    right: Text("$currency $additionalAdultCharge"),
-                  ),
-                  _tableRow(
-                    left: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Additional applicant charge < 18"),
-                        const SizedBox(height: 8),
-                        _counterBox(
-                          childCount,
-                          (v) => setState(() => childCount = v),
-                        ),
-                      ],
-                    ),
-                    right: Text("$currency $additionalChildCharge"),
-                  ),
-                  _tableRow(
-                    left: const Text("Subtotal"),
-                    right: Text("$currency $subtotal"),
-                    bold: true,
-                  ),
-                  _tableRow(
-                    left: Text(
-                      "Surcharge (+ ${(surchargeRates[selectedPaymentIndex] * 100).toStringAsFixed(2)}%)",
-                    ),
-                    right: Text(
-                      "$currency ${surchargeAmount.toStringAsFixed(2)}",
-                    ),
-                  ),
-                  _tableRow(
-                    left: const Text("TOTAL"),
-                    right: Text("$currency ${finalTotal.toStringAsFixed(2)}"),
-                    bold: true,
-                    bg: Colors.grey.shade300,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
           ),
         ),
       ),

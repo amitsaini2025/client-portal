@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:client/config/theme_config.dart'; // ✅ Import theme
+import 'package:flutter/material.dart';
+
 import '../../models/new/document_category.dart';
 import '../../services/api_service.dart';
 import '../../utils/app_loader.dart';
@@ -9,7 +10,8 @@ class DocumentManagementScreen extends StatefulWidget {
   const DocumentManagementScreen({super.key});
 
   @override
-  State<DocumentManagementScreen> createState() => _DocumentManagementScreenState();
+  State<DocumentManagementScreen> createState() =>
+      _DocumentManagementScreenState();
 }
 
 class _DocumentManagementScreenState extends State<DocumentManagementScreen>
@@ -38,9 +40,10 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
 
     try {
       final response = await ApiService.getDocumentCategories(type: type);
-      final cats = (response['data']['categories'] as List)
-          .map((json) => DocumentCategory.fromJson(json))
-          .toList();
+      final cats =
+          (response['data']['categories'] as List)
+              .map((json) => DocumentCategory.fromJson(json))
+              .toList();
 
       setState(() {
         _categories = cats;
@@ -74,9 +77,8 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
 
     try {
       final response = await ApiService.getDocumentChecklist(type: type);
-      final docs = (response)
-          .map((json) => DocumentChecklist.fromJson(json))
-          .toList();
+      final docs =
+          (response).map((json) => DocumentChecklist.fromJson(json)).toList();
 
       setState(() {
         _documents = docs;
@@ -113,50 +115,64 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
           ],
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Column(
-        children: [
-          if (_categories.isNotEmpty)
-            SizedBox(
-              height: 50,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _categories.length,
-                itemBuilder: (context, index) {
-                  final cat = _categories[index];
-                  final selected = cat.id == _selectedCategoryId;
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedCategoryId = cat.id;
-                      });
-                      _loadChecklist(currentType);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: selected ? ThemeConfig.goldenYellow : Colors.grey[700],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Center(
-                        child: Text(
-                          cat.title,
-                          style: TextStyle(
-                            color: selected ? Colors.white : Colors.white70,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: AppResponsive.maxContentWidth,
             ),
-          Expanded(child: _buildBody(currentType)),
-        ],
+            child: Column(
+              children: [
+                if (_categories.isNotEmpty)
+                  SizedBox(
+                    height: 50,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _categories.length,
+                      itemBuilder: (context, index) {
+                        final cat = _categories[index];
+                        final selected = cat.id == _selectedCategoryId;
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedCategoryId = cat.id;
+                            });
+                            _loadChecklist(currentType);
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 10,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  selected
+                                      ? ThemeConfig.goldenYellow
+                                      : Colors.grey[700],
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Center(
+                              child: Text(
+                                cat.title,
+                                style: TextStyle(
+                                  color:
+                                      selected ? Colors.white : Colors.white70,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                Expanded(child: _buildBody(currentType)),
+              ],
+            ),
           ),
         ),
       ),
@@ -179,13 +195,25 @@ class _DocumentManagementScreenState extends State<DocumentManagementScreen>
             color: Colors.grey[800], // ✅ Card background
             margin: const EdgeInsets.all(8),
             child: ListTile(
-              title: Text(doc.name, style: const TextStyle(color: Colors.white)),
+              title: Text(
+                doc.name,
+                style: const TextStyle(color: Colors.white),
+              ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Type: ${doc.docTypeName}", style: const TextStyle(color: Colors.white70)),
-                  Text("Created: ${doc.createdAt}", style: const TextStyle(color: Colors.white70)),
-                  Text("Updated: ${doc.updatedAt}", style: const TextStyle(color: Colors.white70)),
+                  Text(
+                    "Type: ${doc.docTypeName}",
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                  Text(
+                    "Created: ${doc.createdAt}",
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                  Text(
+                    "Updated: ${doc.updatedAt}",
+                    style: const TextStyle(color: Colors.white70),
+                  ),
                 ],
               ),
               trailing: ElevatedButton(
