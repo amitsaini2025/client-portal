@@ -23,7 +23,8 @@ class PersonalInformationScreen extends StatefulWidget {
       _PersonalInformationScreenState();
 }
 
-class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
+class _PersonalInformationScreenState
+    extends State<PersonalInformationScreen> {
   ClientPersonalDetail? personalDetail;
   List<Country> countries = [];
   List<VisaType> visaTypes = [];
@@ -34,73 +35,85 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPersonalDetails();
-    _loadCountries();
-    _loadVisaTypes();
+    _loadAll();
   }
 
-  Future<void> _loadPersonalDetails() async {
-    try {
-      final response = await ApiService.getClientPersonalDetail(tab: "all");
+  Future<void> _loadAll() async {
+    if (!mounted) return;
 
-      if (response["success"] == true) {
-        final parsed = ClientPersonalDetailResponse.fromJson(response);
-        setState(() {
-          personalDetail = parsed.data;
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          errorMessage = response["message"] ?? "Something went wrong";
-          isLoading = false;
-        });
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+      personalDetail = null;
+      countries = [];
+      visaTypes = [];
+    });
+
+    ClientPersonalDetail? loadedDetail;
+    List<Country> loadedCountries = [];
+    List<VisaType> loadedVisaTypes = [];
+    String? loadedError;
+
+    Future<void> fetchDetail() async {
+      try {
+        final response = await ApiService.getClientPersonalDetail(tab: "all")
+            .timeout(const Duration(seconds: 30));
+        if (response["success"] == true) {
+          loadedDetail = ClientPersonalDetailResponse.fromJson(response).data;
+        } else {
+          loadedError = response["message"]?.toString() ??
+              "Failed to load personal details";
+        }
+      } catch (e) {
+        loadedError = "Failed to load personal details: $e";
       }
-    } catch (e) {
-      setState(() {
-        errorMessage = e.toString();
-        isLoading = false;
-      });
     }
-  }
 
-  Future<void> _loadCountries() async {
-    final response = await ApiService.getCountries();
-    if (response["success"] == true) {
-      final parsed = CountryResponse.fromJson(response);
-      setState(() {
-        countries = parsed.data;
-      });
-    } else {
-      setState(() {
-        errorMessage = response["message"] ?? "Something went wrong";
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _loadVisaTypes() async {
-    try {
-      final response = await ApiService.getVisaTypes();
-
-      if (response["success"] == true) {
-        final parsed = VisaTypeResponse.fromJson(response);
-        setState(() {
-          visaTypes = parsed.data;
-        });
-      } else {
-        setState(() {
-          errorMessage = response["message"] ?? "Failed to load visa types";
-        });
+    Future<void> fetchCountries() async {
+      try {
+        final response = await ApiService.getCountries()
+            .timeout(const Duration(seconds: 30));
+        if (response["success"] == true) {
+          loadedCountries = CountryResponse.fromJson(response).data;
+        }
+      } catch (_) {
       }
-    } catch (e) {
-      setState(() {
-        errorMessage = e.toString();
-      });
     }
+
+    Future<void> fetchVisaTypes() async {
+      try {
+        final response = await ApiService.getVisaTypes()
+            .timeout(const Duration(seconds: 30));
+        if (response["success"] == true) {
+          loadedVisaTypes = VisaTypeResponse.fromJson(response).data;
+        }
+      } catch (_) {
+      }
+    }
+
+    await Future.wait([
+      fetchDetail(),
+      fetchCountries(),
+      fetchVisaTypes(),
+    ]);
+
+    if (!mounted) return;
+    setState(() {
+      personalDetail = loadedDetail;
+      countries = loadedCountries;
+      visaTypes = loadedVisaTypes;
+      errorMessage = loadedError;
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final viewportHeight = MediaQuery.of(context).size.height -
+        kToolbarHeight -
+        MediaQuery.of(context).padding.top -
+        MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
       backgroundColor: ThemeConfig.white,
       appBar: AppBar(
@@ -111,103 +124,117 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body:
-          isLoading
-              ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AppLoader(),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Loading personal information...',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-              : errorMessage != null
-              ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppResponsive.maxContentWidth,
+              ),
+              child: isLoading
+                  ? SizedBox(
+                height: viewportHeight,
+                child: const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.error_outline_rounded,
-                        color: ThemeConfig.errorColor,
-                        size: 48,
-                      ),
-                      const SizedBox(height: 16),
+                      AppLoader(),
+                      SizedBox(height: 16),
                       Text(
-                        errorMessage!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                        'Loading personal information...',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                 ),
               )
-              : SafeArea(
+                  : errorMessage != null
+                  ? SizedBox(
+                height: viewportHeight,
                 child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: AppResponsive.maxContentWidth,
-                    ),
-                    child: SingleChildScrollView(
-                      padding: AppResponsive.pagePadding(context),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BasicPersonalInformationWidget(
-                            basicInfo: personalDetail!.basicInformation,
-                            phones: personalDetail!.phones,
-                            emails: personalDetail!.emails,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline_rounded,
+                          color: ThemeConfig.errorColor,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          errorMessage!,
+                          style: const TextStyle(fontSize: 16),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: _loadAll,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Retry'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ThemeConfig.goldenYellow,
+                            foregroundColor: Colors.white,
                           ),
-                          const SizedBox(height: 24),
-                          TravelDocumentsWidget(
-                            passports: personalDetail!.passports,
-                            visas: personalDetail!.visas,
-                            countries: countries,
-                            visaTypes: visaTypes,
-                          ),
-                          const SizedBox(height: 24),
-                          AddressAndTravelInformationWidget(
-                            addresses: personalDetail!.addresses,
-                            travels: personalDetail!.travels,
-                            countries: countries,
-                          ),
-                          const SizedBox(height: 24),
-                          EducationalQualificationsWidget(
-                            qualifications: personalDetail!.qualifications,
-                            countries: countries,
-                          ),
-                          const SizedBox(height: 24),
-                          WorkExperienceWidget(
-                            experiences: personalDetail!.experiences,
-                            countries: countries,
-                          ),
-                          const SizedBox(height: 24),
-                          OccupationSkillsWidget(
-                            occupations: personalDetail!.occupations,
-                          ),
-                          const SizedBox(height: 24),
-                          TestScoresWidget(
-                            testScores: personalDetail!.testScores,
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
+              )
+                  : Padding(
+                padding: AppResponsive.pagePadding(context),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BasicPersonalInformationWidget(
+                      basicInfo: personalDetail!.basicInformation,
+                      phones: personalDetail!.phones,
+                      emails: personalDetail!.emails,
+                    ),
+                    const SizedBox(height: 24),
+                    TravelDocumentsWidget(
+                      passports: personalDetail!.passports,
+                      visas: personalDetail!.visas,
+                      countries: countries,
+                      visaTypes: visaTypes,
+                    ),
+                    const SizedBox(height: 24),
+                    AddressAndTravelInformationWidget(
+                      addresses: personalDetail!.addresses,
+                      travels: personalDetail!.travels,
+                      countries: countries,
+                    ),
+                    const SizedBox(height: 24),
+                    EducationalQualificationsWidget(
+                      qualifications: personalDetail!.qualifications,
+                      countries: countries,
+                    ),
+                    const SizedBox(height: 24),
+                    WorkExperienceWidget(
+                      experiences: personalDetail!.experiences,
+                      countries: countries,
+                    ),
+                    const SizedBox(height: 24),
+                    OccupationSkillsWidget(
+                      occupations: personalDetail!.occupations,
+                    ),
+                    const SizedBox(height: 24),
+                    TestScoresWidget(
+                      testScores: personalDetail!.testScores,
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
