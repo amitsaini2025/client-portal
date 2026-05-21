@@ -83,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
         border: Border.all(
-          color: ThemeConfig.goldenYellow.withValues(alpha:0.3),
+          color: ThemeConfig.goldenYellow.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -98,7 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 gradient: LinearGradient(
                   colors: [
                     ThemeConfig.goldenYellow,
-                    ThemeConfig.goldenYellow.withValues(alpha:0.6),
+                    ThemeConfig.goldenYellow.withValues(alpha: 0.6),
                   ],
                 ),
               ),
@@ -120,11 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 14),
             Text(
               "${data["first_name"] ?? ""} ${data["last_name"] ?? ""}",
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: ThemeConfig.navyBlue,
                 letterSpacing: 0.5,
@@ -133,11 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 6),
             Text(
               data["email"] ?? "",
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.black54,
                 fontStyle: FontStyle.italic,
               ),
@@ -163,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: ThemeConfig.goldenYellow.withValues(alpha:0.15),
+              color: ThemeConfig.goldenYellow.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.all(8),
@@ -224,70 +216,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-                maxWidth: AppResponsive.maxFormWidth),
-            child: Padding(
-              padding: AppResponsive.pagePadding(context),
-              child: _isLoading
-                  ? const AppLoader()
-                  : _errorMessage != null
-                  ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline,
-                      color: Colors.redAccent, size: 48),
-                  const SizedBox(height: 12),
-                  Text(
-                    _errorMessage!,
-                    style: const TextStyle(
-                        color: Colors.redAccent, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: _fetchProfile,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text("Retry"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ThemeConfig.goldenYellow,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+        child: SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints:
+              const BoxConstraints(maxWidth: AppResponsive.maxFormWidth),
+              child: Padding(
+                padding: AppResponsive.pagePadding(context),
+                child: _isLoading
+                    ? // Keep loader vertically centred on the visible viewport
+                SizedBox(
+                  height: MediaQuery.of(context).size.height -
+                      kToolbarHeight -
+                      MediaQuery.of(context).padding.top -
+                      MediaQuery.of(context).padding.bottom,
+                  child: const Center(child: AppLoader()),
+                )
+                    : _errorMessage != null
+                    ? SizedBox(
+                  height: MediaQuery.of(context).size.height -
+                      kToolbarHeight -
+                      MediaQuery.of(context).padding.top -
+                      MediaQuery.of(context).padding.bottom,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline,
+                            color: Colors.redAccent, size: 48),
+                        const SizedBox(height: 12),
+                        Text(
+                          _errorMessage!,
+                          style: const TextStyle(
+                              color: Colors.redAccent, fontSize: 16),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: _fetchProfile,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text("Retry"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ThemeConfig.goldenYellow,
+                            foregroundColor: Colors.white,
+                            minimumSize:
+                            const Size(double.infinity, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.circular(14),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              )
-                  : SingleChildScrollView(
-                child: Column(
+                )
+                    : Column(
                   children: [
                     _buildProfileCard(context),
                     const SizedBox(height: 30),
-
                     _elegantButton(
                       label: "Personal Information",
                       icon: Icons.person_outline,
                       onTap: _openPersonalInformation,
                       color: ThemeConfig.navyBlue,
                     ),
-
                     _elegantButton(
                       label: "Edit Information",
                       icon: Icons.edit,
-                      onTap:
-                      _isLoading ? null : _openEditProfile,
+                      onTap: _isLoading ? null : _openEditProfile,
                       color: ThemeConfig.goldenYellow,
                     ),
-
                     _elegantButton(
                       label: "Logout",
                       icon: Icons.logout,
                       onTap: () => _handleLogout(context),
                       color: Colors.redAccent,
                     ),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -297,7 +303,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-
 
   Widget _elegantButton({
     required String label,
@@ -312,12 +317,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: color.withValues(alpha:0.4),
+          color: color.withValues(alpha: 0.4),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
