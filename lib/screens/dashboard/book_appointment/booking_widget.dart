@@ -30,34 +30,38 @@ class ScaffoldWrapper extends StatelessWidget {
         elevation: 0,
         actions: actions,
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-          child: Container(
-        margin: AppResponsive.pagePadding(context),
-        padding: AppResponsive.pagePadding(context),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
+      body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              StepHeader(activeStep: activeStep),
-              const SizedBox(height: 30),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: AppResponsive.maxContentWidth,
+              ),
+              child: Container(
+                margin: AppResponsive.pagePadding(context),
+                padding: AppResponsive.pagePadding(context),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    StepHeader(activeStep: activeStep),
+                    const SizedBox(height: 30),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    child,
+                  ],
                 ),
               ),
-              const SizedBox(height: 24),
-              child,
-            ],
-          ),
-        ),
+            ),
           ),
         ),
       ),
@@ -109,10 +113,12 @@ class StepHeader extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: active ? const Color(0xFF1E3A8A) : Colors.grey[300],
+            backgroundColor:
+            active ? const Color(0xFF1E3A8A) : Colors.grey[300],
             child: Text(
               '$n',
-              style: TextStyle(color: active ? Colors.white : Colors.black),
+              style:
+              TextStyle(color: active ? Colors.white : Colors.black),
             ),
           ),
           const SizedBox(height: 6),
@@ -136,6 +142,7 @@ class SelectionCard extends StatelessWidget {
   final IconData? icon;
   final bool isSelected;
   final VoidCallback onTap;
+
   const SelectionCard({
     super.key,
     required this.title,
@@ -165,7 +172,6 @@ class SelectionCard extends StatelessWidget {
               Icon(icon, size: 30),
               const SizedBox(width: 12),
             ],
-
             Expanded(
               child: Text(
                 title,
@@ -173,7 +179,6 @@ class SelectionCard extends StatelessWidget {
                 style: const TextStyle(fontSize: 16),
               ),
             ),
-
             if (isSelected)
               const Icon(
                 Icons.check_circle,
@@ -220,10 +225,9 @@ class PreviousButton extends StatelessWidget {
   }
 }
 
-
-
 class NextButton extends StatelessWidget {
   final VoidCallback onTap;
+
   const NextButton({super.key, required this.onTap});
 
   @override
@@ -255,13 +259,15 @@ class NextButton extends StatelessWidget {
 
 class SectionTitle extends StatelessWidget {
   final String text;
+
   const SectionTitle(this.text, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
+      child:
+      Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
     );
   }
 }

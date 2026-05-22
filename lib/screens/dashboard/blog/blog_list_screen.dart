@@ -35,21 +35,28 @@ class _BlogListScreenState extends State<BlogListScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   Future<void> _fetchBlogs() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
       final response = await ApiService.getFeaturedBlogs(
         page: _currentPage,
         perPage: 10,
-      );
+      ).timeout(const Duration(seconds: 30));
 
       if (response['success'] == true) {
         final List list = response['data'];
         final blogs = list.map((e) => Blog.fromJson(e)).toList();
-
         final pagination = response['pagination'];
 
+        if (!mounted) return;
         setState(() {
           _blogs.addAll(blogs);
           _hasNextPage = pagination['has_more_pages'] ?? false;
@@ -60,10 +67,12 @@ class _BlogListScreenState extends State<BlogListScreen> {
       debugPrint("Error fetching blogs: $e");
     }
 
+    if (!mounted) return;
     setState(() => _isLoading = false);
   }
 
   Future<void> _onRefresh() async {
+    if (!mounted) return;
     setState(() {
       _blogs.clear();
       _currentPage = 1;
@@ -94,7 +103,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min, // FIX
+          mainAxisSize: MainAxisSize.min,
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
@@ -161,8 +170,6 @@ class _BlogListScreenState extends State<BlogListScreen> {
                 ],
               ),
             ),
-
-            // FIXED: REMOVED Expanded (this caused crash)
             Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
@@ -171,7 +178,8 @@ class _BlogListScreenState extends State<BlogListScreen> {
                 children: [
                   Text(
                     blog.date,
-                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                    style:
+                    TextStyle(fontSize: 11, color: Colors.grey.shade600),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -188,12 +196,14 @@ class _BlogListScreenState extends State<BlogListScreen> {
                     blog.description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                    style:
+                    TextStyle(fontSize: 13, color: Colors.grey.shade700),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     "By ${blog.author}",
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    style:
+                    TextStyle(fontSize: 12, color: Colors.grey.shade600),
                   ),
                 ],
               ),
@@ -206,6 +216,11 @@ class _BlogListScreenState extends State<BlogListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final viewportHeight = MediaQuery.of(context).size.height -
+        kToolbarHeight -
+        MediaQuery.of(context).padding.top -
+        MediaQuery.of(context).padding.bottom;
+
     return Scaffold(
       backgroundColor: const Color(0xffF5F7FB),
       appBar: AppBar(
@@ -213,69 +228,88 @@ class _BlogListScreenState extends State<BlogListScreen> {
         backgroundColor: ThemeConfig.goldenYellow,
         foregroundColor: Colors.white,
       ),
+      // ── KEY CHANGE ──────────────────────────────────────────────────────────
+      // SafeArea wraps the full body. The ListView/GridView already scroll
+      // themselves via _scrollController, so we do NOT wrap them in an extra
+      // SingleChildScrollView — that would break infinite scroll. Instead we
+      // move Center + ConstrainedBox INSIDE the scrollable builders so the
+      // content is width-capped on large screens while the list itself owns
+      // the full viewport and scrolls natively on web/desktop.
+      // ────────────────────────────────────────────────────────────────────────
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: AppResponsive.maxContentWidth,
-            ),
-            child:
-                _blogs.isEmpty && _isLoading
-                    ? const Center(child: AppLoader())
-                    : RefreshIndicator(
-                      onRefresh: _onRefresh,
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final cols = AppResponsive.gridColumns(
-                            context,
-                            mobile: 1,
-                            tablet: 2,
-                            desktop: 3,
-                          );
+        child: _blogs.isEmpty && _isLoading
+            ? Center(
+          child: SizedBox(
+            height: viewportHeight,
+            child: const Center(child: AppLoader()),
+          ),
+        )
+            : RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final cols = AppResponsive.gridColumns(
+                context,
+                mobile: 1,
+                tablet: 2,
+                desktop: 3,
+              );
 
-                          if (cols == 1) {
-                            return ListView.builder(
-                              controller: _scrollController,
-                              itemCount: _blogs.length + (_isLoading ? 1 : 0),
-                              itemBuilder: (context, index) {
-                                if (index < _blogs.length) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 10,
-                                    ),
-                                    child: _buildBlogCard(_blogs[index]),
-                                  );
-                                }
-                                return const Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: Center(child: AppLoader()),
-                                );
-                              },
-                            );
-                          }
+              if (cols == 1) {
+                return ListView.builder(
+                  controller: _scrollController,
+                  itemCount: _blogs.length + (_isLoading ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index < _blogs.length) {
+                      return Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: AppResponsive.maxContentWidth,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            child: _buildBlogCard(_blogs[index]),
+                          ),
+                        ),
+                      );
+                    }
+                    return const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(child: AppLoader()),
+                    );
+                  },
+                );
+              }
 
-                          return GridView.builder(
-                            controller: _scrollController,
-                            padding: AppResponsive.pagePadding(context),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: cols,
-                                  crossAxisSpacing: 20,
-                                  mainAxisSpacing: 20,
-                                  childAspectRatio: 1.1,
-                                ),
-                            itemCount: _blogs.length + (_isLoading ? 1 : 0),
-                            itemBuilder: (context, index) {
-                              if (index < _blogs.length) {
-                                return _buildBlogCard(_blogs[index]);
-                              }
-                              return const Center(child: AppLoader());
-                            },
-                          );
-                        },
-                      ),
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: AppResponsive.maxContentWidth,
+                  ),
+                  child: GridView.builder(
+                    controller: _scrollController,
+                    padding: AppResponsive.pagePadding(context),
+                    gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: cols,
+                      crossAxisSpacing: 20,
+                      mainAxisSpacing: 20,
+                      childAspectRatio: 1.1,
                     ),
+                    itemCount: _blogs.length + (_isLoading ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index < _blogs.length) {
+                        return _buildBlogCard(_blogs[index]);
+                      }
+                      return const Center(child: AppLoader());
+                    },
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
