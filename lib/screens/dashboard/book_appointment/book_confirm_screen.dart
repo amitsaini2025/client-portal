@@ -638,6 +638,9 @@ class _CalendarSectionState extends State<CalendarSection> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cols = screenWidth > 900 ? 4 : screenWidth > 600 ? 3 : 2;
+
     return Column(
       children: [
         TableCalendar(
@@ -662,44 +665,44 @@ class _CalendarSectionState extends State<CalendarSection> {
         loadingSlots
             ? const AppLoader()
             : GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 3,
-              ),
-              itemCount: availableSlots.length,
-              itemBuilder: (context, index) {
-                final slot = availableSlots[index];
-                final isSelected = slot == selectedSlot;
-                return GestureDetector(
-                  onTap:
-                      widget.onTimeSelected != null
-                          ? () {
-                            setState(() => selectedSlot = slot);
-                            widget.onTimeSelected?.call(slot);
-                          }
-                          : null,
-                  child: Container(
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color:
-                          isSelected ? Colors.grey.shade300 : Color(0xFF1E3A8A),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      slot,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: isSelected ? Colors.black : Colors.white,
-                      ),
-                    ),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: cols,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 3,
+          ),
+          itemCount: availableSlots.length,
+          itemBuilder: (context, index) {
+            final slot = availableSlots[index];
+            final isSelected = slot == selectedSlot;
+            return GestureDetector(
+              onTap: widget.onTimeSelected != null
+                  ? () {
+                setState(() => selectedSlot = slot);
+                widget.onTimeSelected?.call(slot);
+              }
+                  : null,
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.grey.shade300
+                      : const Color(0xFF1E3A8A),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  slot,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? Colors.black : Colors.white,
                   ),
-                );
-              },
-            ),
+                ),
+              ),
+            );
+          },
+        ),
       ],
     );
   }
