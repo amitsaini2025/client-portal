@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
@@ -17,6 +18,17 @@ import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../utils/revert_socket_service.dart';
 import '../../../widgets/common_app_bar.dart';
+
+/// Enables mouse, trackpad, and touch scrolling everywhere on Flutter Web.
+class _WebScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.stylus,
+  };
+}
 
 class PusherService {
   PusherService._();
@@ -50,7 +62,7 @@ class PusherService {
 
 class ReverbService {
   static final PusherChannelsFlutter pusher =
-      PusherChannelsFlutter.getInstance();
+  PusherChannelsFlutter.getInstance();
 
   static Function(MessageDetail message)? onMessageReceived;
 
@@ -93,7 +105,7 @@ class ReverbService {
           try {
             if (event.data != null) {
               final jsonData =
-                  event.data is String ? jsonDecode(event.data) : event.data;
+              event.data is String ? jsonDecode(event.data) : event.data;
               if (jsonData['data']?['message_sent'] != null) {
                 final message = MessageDetail.fromJson(
                   jsonData['data']['message_sent'],
@@ -155,18 +167,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
     super.initState();
     _loadWorkflowMessages();
 
-    /*PusherService.onMessageReceived = _handleIncomingMessage;
-    PusherService.init_();
-
-    ReverbService.onMessageReceived = (message) {
-      _handleIncomingMessage(message);
-    };
-
-    ReverbService.init(
-      userId: AuthService.currentUserId.toString(),
-      token: AuthService.currentToken.toString(),
-    );*/
-
     ReverbSocketService.onMessageReceived = (message) {
       _handleIncomingMessage(message);
     };
@@ -177,7 +177,7 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
-              _scrollController.position.maxScrollExtent - 100 &&
+          _scrollController.position.maxScrollExtent - 100 &&
           !_isLoadingMore &&
           _hasMore) {
         _loadMoreMessages();
@@ -187,6 +187,8 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
   @override
   void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
     ReverbSocketService.disconnect();
     super.dispose();
   }
@@ -197,16 +199,15 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       message: msgDetail.message,
       sender: msgDetail.sender,
       senderId: msgDetail.senderId,
-      recipientIds:
-          msgDetail.recipientIds
-              .map(
-                (r) => Recipient(
-                  recipientId: r.recipientId,
-                  recipient: r.recipient,
-                  recipientShortname: r.recipientShortname,
-                ),
-              )
-              .toList(),
+      recipientIds: msgDetail.recipientIds
+          .map(
+            (r) => Recipient(
+          recipientId: r.recipientId,
+          recipient: r.recipient,
+          recipientShortname: r.recipientShortname,
+        ),
+      )
+          .toList(),
       sentAt: msgDetail.sentAt.toIso8601String(),
       clientMatterId: msgDetail.clientMatterId,
       recipientCount: msgDetail.recipientCount,
@@ -217,18 +218,17 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       senderShortname: msgDetail.senderShortname,
       isRead: msgDetail.isRead ?? false,
       readAt: msgDetail.readAt,
-      attachments:
-          msgDetail.attachments
-              .map(
-                (file) => wf.Attachment(
-                  id: file.id,
-                  filename: file.filename,
-                  size: file.size,
-                  type: file.type,
-                  url: file.url,
-                ),
-              )
-              .toList(),
+      attachments: msgDetail.attachments
+          .map(
+            (file) => wf.Attachment(
+          id: file.id,
+          filename: file.filename,
+          size: file.size,
+          type: file.type,
+          url: file.url,
+        ),
+      )
+          .toList(),
     );
 
     setState(() {
@@ -355,16 +355,15 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       final response = SendMessageResponse.fromJson(responseJson);
       if (response.success && response.data.message != null) {
         MessageDetail message = response.data.message;
-        message.attachments =
-            message.attachments.map((file) {
-              return Attachment(
-                id: file.id,
-                filename: file.filename,
-                size: file.size,
-                type: file.filename,
-                url: file.url,
-              );
-            }).toList();
+        message.attachments = message.attachments.map((file) {
+          return Attachment(
+            id: file.id,
+            filename: file.filename,
+            size: file.size,
+            type: file.filename,
+            url: file.url,
+          );
+        }).toList();
         message.isSender = true;
         message.isRecipient = false;
         _handleIncomingMessage(response.data.message);
@@ -373,7 +372,8 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.redAccent),
+        SnackBar(
+            content: Text("Error: $e"), backgroundColor: Colors.redAccent),
       );
     } finally {
       setState(() => _isSending = false);
@@ -390,11 +390,10 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
       if (result != null && result.files.isNotEmpty) {
         setState(() {
-          _attachmentBytes =
-              result.files
-                  .where((f) => f.bytes != null)
-                  .map((f) => (bytes: f.bytes!, name: f.name))
-                  .toList();
+          _attachmentBytes = result.files
+              .where((f) => f.bytes != null)
+              .map((f) => (bytes: f.bytes!, name: f.name))
+              .toList();
         });
       }
     } catch (e) {
@@ -435,40 +434,44 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      /*appBar: AppBar(
-        title: const Text('Messages', style: TextStyle(color: Colors.white)),
-        backgroundColor: ThemeConfig.goldenYellow,
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 0,
-      ),*/
-      appBar: CommonAppBar(
-        titleName: 'Messages',
-        matterID: AuthService.selectedMatterId,
-      ),
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: AppResponsive.maxContentWidth,
-            ),
-            child:
-                _isLoading
-                    ? Center(child: AppLoader())
-                    : _error != null
-                    ? _buildErrorWidget(_error!)
-                    : Column(
-                      children: [
-                        Expanded(
-                          child:
-                              _messages.isEmpty
-                                  ? _buildEmptyWidget()
-                                  : _buildMessageList(),
-                        ),
-                        _buildMessageInput(),
-                      ],
-                    ),
+    // ── KEY FIX: ScrollConfiguration wraps the ENTIRE Scaffold body so the
+    // scroll hit-area covers 100% of the screen, not just the constrained
+    // content column.
+    return ScrollConfiguration(
+      behavior: _WebScrollBehavior(),
+      child: Scaffold(
+        appBar: CommonAppBar(
+          titleName: 'Messages',
+          matterID: AuthService.selectedMatterId,
+        ),
+        backgroundColor: const Color(0xFFF5F5F5),
+        body: SafeArea(
+          child: _isLoading
+              ? Center(child: AppLoader())
+              : _error != null
+              ? _buildErrorWidget(_error!)
+          // ── Column fills full screen width; ConstrainedBox is moved
+          // INSIDE only where it is needed for visual centering of
+          // each child widget, NOT around the scrollable container.
+              : Column(
+            children: [
+              Expanded(
+                child: _messages.isEmpty
+                    ? _buildEmptyWidget()
+                    : _buildMessageList(),
+              ),
+              // ── Input bar is visually centred but scroll area
+              // stays full-width above it.
+              Align(
+                alignment: Alignment.center,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: AppResponsive.maxContentWidth,
+                  ),
+                  child: _buildMessageInput(),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -512,13 +515,13 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                         height: 40,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
+                          physics: const ClampingScrollPhysics(),
                           itemCount: _attachmentBytes.length,
                           itemBuilder: (context, index) {
                             return Container(
                               margin: const EdgeInsets.only(right: 6, top: 4),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
+                              padding:
+                              const EdgeInsets.symmetric(horizontal: 8),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade300,
                                 borderRadius: BorderRadius.circular(16),
@@ -551,21 +554,20 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
             CircleAvatar(
               radius: 22,
               backgroundColor: ThemeConfig.navyBlue,
-              child:
-                  _isSending
-                      ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: AppLoader(size: 20),
-                      )
-                      : IconButton(
-                        icon: const Icon(
-                          Icons.send,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        onPressed: _sendMessage,
-                      ),
+              child: _isSending
+                  ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: AppLoader(size: 20),
+              )
+                  : IconButton(
+                icon: const Icon(
+                  Icons.send,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                onPressed: _sendMessage,
+              ),
             ),
           ],
         ),
@@ -574,152 +576,176 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
   }
 
   Widget _buildMessageList() {
+    // ── Messages are visually centred via padding, but the ListView itself
+    // spans the full screen so scroll events register everywhere.
     return RefreshIndicator(
       onRefresh: _loadWorkflowMessages,
       color: ThemeConfig.goldenYellow,
-      child: ListView.builder(
-        controller: _scrollController,
-        padding: const EdgeInsets.all(12),
-        itemCount: _messages.length + (_isLoadingMore ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index >= _messages.length) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Center(child: AppLoader(size: 20)),
-            );
-          }
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Calculate side padding so content stays within maxContentWidth
+          // while the ListView hit-area covers the full screen width.
+          final sidePadding = constraints.maxWidth >
+              AppResponsive.maxContentWidth
+              ? (constraints.maxWidth - AppResponsive.maxContentWidth) / 2
+              : 0.0;
 
-          final msg = _messages[index];
-          final isSender = msg.isSender;
-          String avatarName =
-              isSender
+          return ListView.builder(
+            controller: _scrollController,
+            primary: false,
+            physics: const ClampingScrollPhysics(),
+            padding: EdgeInsets.fromLTRB(
+              sidePadding + 12,
+              12,
+              sidePadding + 12,
+              12,
+            ),
+            itemCount: _messages.length + (_isLoadingMore ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index >= _messages.length) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Center(child: AppLoader(size: 20)),
+                );
+              }
+
+              final msg = _messages[index];
+              final isSender = msg.isSender;
+              String avatarName = isSender
                   ? msg.sender
                   : msg.recipientIds.map((r) => r.recipient).join(", ");
 
-          return GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/workflow-message-detail',
-                arguments: {'messageId': msg.id},
-              );
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 6),
-              child: Row(
-                mainAxisAlignment:
-                    isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (!isSender)
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.blueGrey,
-                      child: Text(
-                        _getInitials(avatarName),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/workflow-message-detail',
+                    arguments: {'messageId': msg.id},
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    mainAxisAlignment: isSender
+                        ? MainAxisAlignment.end
+                        : MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (!isSender)
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.blueGrey,
+                          child: Text(
+                            _getInitials(avatarName),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  if (!isSender) const SizedBox(width: 8),
-                  Flexible(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            isSender
+                      if (!isSender) const SizedBox(width: 8),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSender
                                 ? ThemeConfig.navyBlue.withValues(alpha: 0.9)
                                 : Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(16),
-                          topRight: const Radius.circular(16),
-                          bottomLeft: Radius.circular(isSender ? 16 : 0),
-                          bottomRight: Radius.circular(isSender ? 0 : 16),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 3,
-                            offset: const Offset(1, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            msg.message,
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: isSender ? Colors.white : Colors.black87,
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(16),
+                              topRight: const Radius.circular(16),
+                              bottomLeft: Radius.circular(isSender ? 16 : 0),
+                              bottomRight: Radius.circular(isSender ? 0 : 16),
                             ),
-                          ),
-                          if (msg.attachments != null &&
-                              msg.attachments!.isNotEmpty)
-                            SizedBox(
-                              height: 60,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: msg.attachments!.length,
-                                itemBuilder: (context, index) {
-                                  final attachment = msg.attachments![index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 6),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.network(
-                                        attachment.url,
-                                        width: 60,
-                                        height: 60,
-                                        fit: BoxFit.cover,
-                                        headers: {
-                                          "Authorization":
-                                              "Bearer ${AuthService.currentToken}",
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 3,
+                                offset: const Offset(1, 2),
                               ),
-                            ),
-                          const SizedBox(height: 6),
-                          Text(
-                            _formatDateTime(msg.sentAt),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color:
-                                  isSender
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                msg.message,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: isSender
+                                      ? Colors.white
+                                      : Colors.black87,
+                                ),
+                              ),
+                              if (msg.attachments != null &&
+                                  msg.attachments!.isNotEmpty)
+                                SizedBox(
+                                  height: 60,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    physics: const ClampingScrollPhysics(),
+                                    itemCount: msg.attachments!.length,
+                                    itemBuilder: (context, index) {
+                                      final attachment =
+                                      msg.attachments![index];
+                                      return Padding(
+                                        padding:
+                                        const EdgeInsets.only(right: 6),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                          BorderRadius.circular(8),
+                                          child: Image.network(
+                                            attachment.url,
+                                            width: 60,
+                                            height: 60,
+                                            fit: BoxFit.cover,
+                                            headers: {
+                                              "Authorization":
+                                              "Bearer ${AuthService.currentToken}",
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              const SizedBox(height: 6),
+                              Text(
+                                _formatDateTime(msg.sentAt),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isSender
                                       ? Colors.white70
                                       : Colors.grey.shade600,
-                            ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (isSender) const SizedBox(width: 8),
-                  if (isSender)
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.orangeAccent,
-                      child: Text(
-                        _getInitials(avatarName),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                ],
-              ),
-            ),
+                      if (isSender) const SizedBox(width: 8),
+                      if (isSender)
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.orangeAccent,
+                          child: Text(
+                            _getInitials(avatarName),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
           );
         },
       ),

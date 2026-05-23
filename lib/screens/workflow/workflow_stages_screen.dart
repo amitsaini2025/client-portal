@@ -2,6 +2,7 @@ import 'package:client/config/theme_config.dart';
 import 'package:client/widgets/common_app_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -11,6 +12,16 @@ import '../../services/auth_service.dart';
 import '../../utils/app_loader.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/workflow/workflow_progress_widget.dart';
+
+class _WebScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.stylus,
+  };
+}
 
 class WorkflowStagesScreen extends StatefulWidget {
   final int? matterID;
@@ -393,115 +404,150 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
+    // KEY FIX: ScrollConfiguration wraps the entire Scaffold so the scroll
+    // hit-area covers 100% of the screen, not just the constrained content box.
+    return ScrollConfiguration(
+      behavior: _WebScrollBehavior(),
+      child: Scaffold(
+        backgroundColor: Colors.white,
 
-      appBar: CommonAppBar(
-        titleName: 'Workflow Stages',
-        matterID: widget.matterID ?? 0,
-      ),
+        appBar: CommonAppBar(
+          titleName: 'Workflow Stages',
+          matterID: widget.matterID ?? 0,
+        ),
 
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: AppResponsive.maxContentWidth,
-            ),
-
-            child: Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    color: ThemeConfig.navyBlue.withValues(alpha: 0.04),
-                    border: Border.all(
-                      color: ThemeConfig.navyBlue.withValues(alpha: 0.08),
-                    ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Tab bar is visually centred but does NOT constrain the
+              // scrollable area below it.
+              Align(
+                alignment: Alignment.center,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: AppResponsive.maxContentWidth,
                   ),
-                  child: TabBar(
-                    controller: _tabController,
-                    isScrollable: false,
-                    dividerColor: Colors.transparent,
-                    labelPadding: EdgeInsets.zero,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: ThemeConfig.goldenYellow,
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      color: ThemeConfig.navyBlue.withValues(alpha: 0.04),
+                      border: Border.all(
+                        color: ThemeConfig.navyBlue.withValues(alpha: 0.08),
+                      ),
                     ),
-
-                    labelColor: ThemeConfig.navyBlue,
-                    unselectedLabelColor: ThemeConfig.navyBlue.withValues(
-                      alpha: 0.50,
+                    child: TabBar(
+                      controller: _tabController,
+                      isScrollable: false,
+                      dividerColor: Colors.transparent,
+                      labelPadding: EdgeInsets.zero,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      indicator: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: ThemeConfig.goldenYellow,
+                      ),
+                      labelColor: ThemeConfig.navyBlue,
+                      unselectedLabelColor: ThemeConfig.navyBlue.withValues(
+                        alpha: 0.50,
+                      ),
+                      labelStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.1,
+                      ),
+                      unselectedLabelStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.1,
+                      ),
+                      tabs: [
+                        _buildTab("All", 24),
+                        _buildTab("Pending", 8),
+                        _buildTab("Completed", 16),
+                      ],
                     ),
-
-                    labelStyle: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.1,
-                    ),
-                    unselectedLabelStyle: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.1,
-                    ),
-
-                    tabs: [
-                      _buildTab("All", 24),
-                      _buildTab("Pending", 8),
-                      _buildTab("Completed", 16),
-                    ],
                   ),
                 ),
-                Expanded(
-                  child:
-                      _isLoading
-                          ? const Center(child: AppLoader())
-                          : _error != null
-                          ? _buildErrorWidget(
-                            _error!,
-                            () => _loadWorkflowData(
-                              type: _tabs[_tabController.index],
-                            ),
-                          )
-                          : _workflowResponse == null
-                          ? const Center(
-                            child: Text('No workflow data available'),
-                          )
-                          : RefreshIndicator(
-                            color: ThemeConfig.goldenYellow,
-                            onRefresh:
-                                () => _loadWorkflowData(
-                                  type: _tabs[_tabController.index],
-                                ),
-                            child: SingleChildScrollView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              padding: AppResponsive.pagePadding(context),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (_workflowResponse!.caseSummary != null)
-                                    _buildCaseSummary(
-                                      _workflowResponse!.caseSummary!,
-                                    ),
+              ),
 
-                                  const SizedBox(height: 20),
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: AppLoader())
+                    : _error != null
+                    ? _buildErrorWidget(
+                  _error!,
+                      () => _loadWorkflowData(
+                    type: _tabs[_tabController.index],
+                  ),
+                )
+                    : _workflowResponse == null
+                    ? const Center(
+                  child: Text('No workflow data available'),
+                )
+                    : RefreshIndicator(
+                  color: ThemeConfig.goldenYellow,
+                  onRefresh: () => _loadWorkflowData(
+                    type: _tabs[_tabController.index],
+                  ),
+                  // KEY FIX: SingleChildScrollView spans full
+                  // screen width; content is centred via
+                  // LayoutBuilder + side padding, same pattern
+                  // used in the messages screen.
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final sidePadding =
+                      constraints.maxWidth >
+                          AppResponsive.maxContentWidth
+                          ? (constraints.maxWidth -
+                          AppResponsive
+                              .maxContentWidth) /
+                          2
+                          : 0.0;
 
-                                  WorkflowProgressWidget(
-                                    workflowResponse: _workflowResponse!,
-                                    onStageTap: _showStageDetails,
-                                    onChecklistPlusTap: _openUploadOptions,
-                                    onChecklistViewTap: _onViewTap,
-                                    onBulkUploadTap: _onBulkUploadTap,
-                                  ),
-                                ],
+                      return SingleChildScrollView(
+                        physics:
+                        const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.fromLTRB(
+                          sidePadding +
+                              AppResponsive.pagePadding(context)
+                                  .left,
+                          AppResponsive.pagePadding(context).top,
+                          sidePadding +
+                              AppResponsive.pagePadding(context)
+                                  .right,
+                          AppResponsive.pagePadding(context)
+                              .bottom,
+                        ),
+                        child: Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+                            if (_workflowResponse!.caseSummary !=
+                                null)
+                              _buildCaseSummary(
+                                _workflowResponse!.caseSummary!,
                               ),
+
+                            const SizedBox(height: 20),
+
+                            WorkflowProgressWidget(
+                              workflowResponse:
+                              _workflowResponse!,
+                              onStageTap: _showStageDetails,
+                              onChecklistPlusTap:
+                              _openUploadOptions,
+                              onChecklistViewTap: _onViewTap,
+                              onBulkUploadTap: _onBulkUploadTap,
                             ),
-                          ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -570,48 +616,47 @@ class _WorkflowStagesScreenState extends State<WorkflowStagesScreen>
     } else {
       showDialog(
         context: context,
-        builder:
-            (context) => AlertDialog(
-              title: Text(
-                stage.stageName,
-                style: const TextStyle(color: ThemeConfig.navyBlue),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Status: ${stage.statusText}'),
+        builder: (context) => AlertDialog(
+          title: Text(
+            stage.stageName,
+            style: const TextStyle(color: ThemeConfig.navyBlue),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Status: ${stage.statusText}'),
 
-                  if (stage.isCurrentStage)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle,
-                            color: ThemeConfig.goldenYellow,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Current Stage',
-                            style: TextStyle(
-                              color: ThemeConfig.goldenYellow,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+              if (stage.isCurrentStage)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: ThemeConfig.goldenYellow,
+                        size: 18,
                       ),
-                    ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Close'),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Current Stage',
+                        style: TextStyle(
+                          color: ThemeConfig.goldenYellow,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
             ),
+          ],
+        ),
       );
     }
   }

@@ -1,6 +1,7 @@
 import 'package:client/utils/app_loader.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:pay/pay.dart';
@@ -13,6 +14,16 @@ import '../../../services/stripe_service.dart';
 import '../../../utils/payment_config.dart';
 import '../../../utils/responsive_utils.dart';
 import '../../../widgets/common_app_bar.dart';
+
+class _WebScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.stylus,
+  };
+}
 
 class BillingListScreen extends StatefulWidget {
   final int? matterID;
@@ -43,9 +54,16 @@ class _BillingListScreenState extends State<BillingListScreen> {
     _scrollController.addListener(_paginationListener);
   }
 
+  @override
+  void dispose() {
+    _scrollController.removeListener(_paginationListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   void _paginationListener() {
     if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 150 &&
+        _scrollController.position.maxScrollExtent - 150 &&
         !_isPaginating &&
         _hasMore) {
       _fetchInvoices();
@@ -75,7 +93,7 @@ class _BillingListScreenState extends State<BillingListScreen> {
       final pagination = data['pagination'];
 
       final fetchedInvoices =
-          invoicesJson.map((e) => Invoice.fromJson(e)).toList();
+      invoicesJson.map((e) => Invoice.fromJson(e)).toList();
 
       setState(() {
         _invoices.addAll(fetchedInvoices);
@@ -105,9 +123,9 @@ class _BillingListScreenState extends State<BillingListScreen> {
         billingInvoiceId: invoice.id,
         clientMatterId: invoice.clientMatterId,
         paymentType:
-            defaultTargetPlatform == TargetPlatform.iOS
-                ? "apple_pay"
-                : "google_pay",
+        defaultTargetPlatform == TargetPlatform.iOS
+            ? "apple_pay"
+            : "google_pay",
         paymentToken: result.toString(),
         paymentStatus: "completed",
       );
@@ -160,9 +178,9 @@ class _BillingListScreenState extends State<BillingListScreen> {
           context: context,
           clientSecret: clientSecret,
           style:
-              Theme.of(context).brightness == Brightness.dark
-                  ? ThemeMode.dark
-                  : ThemeMode.light,
+          Theme.of(context).brightness == Brightness.dark
+              ? ThemeMode.dark
+              : ThemeMode.light,
         );
       }
 
@@ -189,9 +207,9 @@ class _BillingListScreenState extends State<BillingListScreen> {
   }
 
   Future<void> _handleStripeWebPayment(
-    String clientSecret,
-    Invoice invoice,
-  ) async {
+      String clientSecret,
+      Invoice invoice,
+      ) async {
     await showDialog(
       context: context,
       builder: (context) {
@@ -237,36 +255,75 @@ class _BillingListScreenState extends State<BillingListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      appBar: CommonAppBar(
-        titleName: 'Billing & Invoices',
-        matterID: AuthService.selectedMatterId,
-      ),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: AppResponsive.maxContentWidth,
-            ),
-            child: Column(
-              children: [
-                _buildSummary(),
-                Expanded(
-                  child:
-                      _isInitialLoading
-                          ? const Center(child: AppLoader())
-                          : ListView.builder(
-                            controller: _scrollController,
-                            padding: AppResponsive.pagePadding(context),
-                            itemCount: _invoices.length,
-                            itemBuilder: (context, index) {
-                              return _buildInvoiceCard(_invoices[index]);
-                            },
-                          ),
+    // KEY FIX: ScrollConfiguration wraps the entire Scaffold so the scroll
+    // hit-area covers 100% of the screen, not just the constrained content box.
+    return ScrollConfiguration(
+      behavior: _WebScrollBehavior(),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F7FA),
+        appBar: CommonAppBar(
+          titleName: 'Billing & Invoices',
+          matterID: AuthService.selectedMatterId,
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Summary bar is visually centred but does NOT constrain
+              // the scrollable area below it.
+              Align(
+                alignment: Alignment.center,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: AppResponsive.maxContentWidth,
+                  ),
+                  child: _buildSummary(),
                 ),
-              ],
-            ),
+              ),
+
+              Expanded(
+                child: _isInitialLoading
+                    ? const Center(child: AppLoader())
+                // KEY FIX: LayoutBuilder + sidePadding keeps content
+                // centred within maxContentWidth while the ListView
+                // itself spans the full screen width so scroll events
+                // register anywhere on the page.
+                    : LayoutBuilder(
+                  builder: (context, constraints) {
+                    final sidePadding =
+                    constraints.maxWidth >
+                        AppResponsive.maxContentWidth
+                        ? (constraints.maxWidth -
+                        AppResponsive.maxContentWidth) /
+                        2
+                        : 0.0;
+
+                    return ListView.builder(
+                      controller: _scrollController,
+                      primary: false,
+                      physics: const ClampingScrollPhysics(),
+                      padding: AppResponsive.pagePadding(context)
+                          .copyWith(
+                        left: sidePadding +
+                            AppResponsive.pagePadding(context).left,
+                        right: sidePadding +
+                            AppResponsive.pagePadding(context).right,
+                      ),
+                      itemCount:
+                      _invoices.length + (_isPaginating ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == _invoices.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(child: AppLoader(size: 20)),
+                          );
+                        }
+                        return _buildInvoiceCard(_invoices[index]);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -307,11 +364,11 @@ class _BillingListScreenState extends State<BillingListScreen> {
   }
 
   Widget _modernSummaryCard(
-    String title,
-    double amount,
-    Gradient gradient,
-    IconData icon,
-  ) {
+      String title,
+      double amount,
+      Gradient gradient,
+      IconData icon,
+      ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -380,35 +437,34 @@ class _BillingListScreenState extends State<BillingListScreen> {
               if (!kIsWeb) ...[
                 defaultTargetPlatform == TargetPlatform.iOS
                     ? ApplePayButton(
-                      paymentConfiguration: PaymentConfiguration.fromJsonString(
-                        applePayConfig,
-                      ),
-                      paymentItems: [
-                        PaymentItem(
-                          label: "Invoice ${invoice.invoiceNumber}",
-                          amount: invoice.totalAmount.toString(),
-                          status: PaymentItemStatus.final_price,
-                        ),
-                      ],
-                      width: double.infinity,
-                      height: 48,
-                      onPaymentResult: (r) => _onPaymentResult(r, invoice),
-                    )
-                    : GooglePayButton(
-                      paymentConfiguration: PaymentConfiguration.fromJsonString(
-                        googlePayConfig,
-                      ),
-                      paymentItems: [
-                        PaymentItem(
-                          label: "Invoice ${invoice.invoiceNumber}",
-                          amount: invoice.totalAmount.toString(),
-                          status: PaymentItemStatus.final_price,
-                        ),
-                      ],
-                      width: double.infinity,
-                      height: 48,
-                      onPaymentResult: (r) => _onPaymentResult(r, invoice),
+                  paymentConfiguration:
+                  PaymentConfiguration.fromJsonString(applePayConfig),
+                  paymentItems: [
+                    PaymentItem(
+                      label: "Invoice ${invoice.invoiceNumber}",
+                      amount: invoice.totalAmount.toString(),
+                      status: PaymentItemStatus.final_price,
                     ),
+                  ],
+                  width: double.infinity,
+                  height: 48,
+                  onPaymentResult: (r) => _onPaymentResult(r, invoice),
+                )
+                    : GooglePayButton(
+                  paymentConfiguration:
+                  PaymentConfiguration.fromJsonString(
+                      googlePayConfig),
+                  paymentItems: [
+                    PaymentItem(
+                      label: "Invoice ${invoice.invoiceNumber}",
+                      amount: invoice.totalAmount.toString(),
+                      status: PaymentItemStatus.final_price,
+                    ),
+                  ],
+                  width: double.infinity,
+                  height: 48,
+                  onPaymentResult: (r) => _onPaymentResult(r, invoice),
+                ),
                 const SizedBox(height: 12),
               ],
 
@@ -417,11 +473,10 @@ class _BillingListScreenState extends State<BillingListScreen> {
                 height: 48,
                 child: ElevatedButton(
                   onPressed:
-                      isProcessing ? null : () => _handleStripePayment(invoice),
-                  child:
-                      isProcessing
-                          ? const AppLoader(size: 20)
-                          : const Text("Pay with Stripe"),
+                  isProcessing ? null : () => _handleStripePayment(invoice),
+                  child: isProcessing
+                      ? const AppLoader(size: 20)
+                      : const Text("Pay with Stripe"),
                 ),
               ),
             ],
@@ -437,10 +492,9 @@ class _BillingListScreenState extends State<BillingListScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color:
-            isPaid
-                ? Colors.green.withValues(alpha: 0.1)
-                : Colors.orange.withValues(alpha: 0.1),
+        color: isPaid
+            ? Colors.green.withValues(alpha: 0.1)
+            : Colors.orange.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(
