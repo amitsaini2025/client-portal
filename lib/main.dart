@@ -1598,7 +1598,7 @@ class ClientFormPageState extends State<ClientFormPage> {
                   Expanded(
                     child: TextFormField(
                       decoration: InputDecoration(labelText: 'First Name *'),
-                      controller: TextEditingController(text: firstName),
+                      initialValue: firstName,
                       onChanged: (v) => firstName = v,
                       validator:
                           (v) => v == null || v.isEmpty ? 'Required' : null,
@@ -1608,7 +1608,7 @@ class ClientFormPageState extends State<ClientFormPage> {
                   Expanded(
                     child: TextFormField(
                       decoration: InputDecoration(labelText: 'Last Name *'),
-                      controller: TextEditingController(text: lastName),
+                      initialValue: lastName,
                       onChanged: (v) => lastName = v,
                       validator:
                           (v) => v == null || v.isEmpty ? 'Required' : null,
