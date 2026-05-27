@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:client/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../config/theme_config.dart';
 import '../../../utils/app_loader.dart';
 import '../../../utils/responsive_utils.dart';
 
@@ -266,12 +267,12 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Material(
-        borderRadius: BorderRadius.circular(14),
-        elevation: 2,
-        shadowColor: Colors.orange.withValues(alpha:0.3),
+        borderRadius: BorderRadius.circular(16),
+        elevation: 3,
+        shadowColor: const Color(0xFFEA580C).withValues(alpha: 0.2),
         color: Colors.white,
         child: InkWell(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           onTap: _isFetchingActionRequired
               ? null
               : () {
@@ -280,42 +281,76 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                   }
                 },
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(16),
               gradient: const LinearGradient(
-                colors: [Color(0xFFFFF8F0), Color(0xFFFFEDD5)],
+                colors: [Color(0xFFFFF3E0), Color(0xFFFFCCBC)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               border: Border.all(
-                color: const Color(0xFFFB923C).withValues(alpha:0.4),
+                color: const Color(0xFFFB923C).withValues(alpha: 0.5),
                 width: 1,
               ),
             ),
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFB923C).withValues(alpha:0.15),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.assignment_late_rounded,
-                    color: Color(0xFFEA580C),
-                    size: 22,
-                  ),
+                // Icon with urgent dot
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEA580C).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.assignment_late_rounded,
+                        color: Color(0xFFEA580C),
+                        size: 22,
+                      ),
+                    ),
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDC2626),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Expanded(
                   child: _isFetchingActionRequired
-                      ? const Text(
-                          'Loading action required...',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF9A3412),
-                          ),
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 13,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEA580C).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Container(
+                              height: 11,
+                              width: 180,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEA580C).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                          ],
                         )
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,7 +360,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                                 const Text(
                                   'Action Required',
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 14.5,
                                     fontWeight: FontWeight.w700,
                                     color: Color(0xFF9A3412),
                                   ),
@@ -333,17 +368,17 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                                 const SizedBox(width: 8),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
+                                    horizontal: 7,
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFEA580C),
+                                    color: const Color(0xFFDC2626),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
                                     '$_actionRequiredCount',
                                     style: const TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
@@ -357,9 +392,9 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                                 _latestActionRequired!['message'] as String? ?? '',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12.5,
-                                  color: Colors.orange.shade800,
+                                  color: Color(0xFFB45309),
                                 ),
                               ),
                             ],
@@ -367,10 +402,17 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                         ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  color: Color(0xFFEA580C),
-                  size: 22,
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEA580C).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Color(0xFFEA580C),
+                    size: 16,
+                  ),
                 ),
               ],
             ),
@@ -381,72 +423,115 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
   }
 
   Widget _buildNotificationItem(NotificationModel item) {
+    final bool isUnread = !item.isRead;
+    final isDesktop = AppResponsive.isDesktop(context);
+    final double radius = isDesktop ? 16 : 12;
+
+    // Platform-specific backgrounds
+    final Color cardBg = isDesktop
+        ? (isUnread ? const Color(0xFFEDF5F3) : ThemeConfig.backgroundLight)
+        : (isUnread ? const Color(0xFFF0F7F5) : Colors.white);
+
+    final Color avatarBg = isUnread
+        ? ThemeConfig.primaryColor
+        : (isDesktop ? ThemeConfig.borderLight : const Color(0xFFF1F5F9));
+    final Color avatarTextColor =
+        isUnread ? Colors.white : ThemeConfig.primaryColor;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(vertical: isDesktop ? 6 : 4),
       child: Material(
-        borderRadius: BorderRadius.circular(14),
-        elevation: 1.5,
-        shadowColor: Colors.black12,
-        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
+        elevation: isDesktop ? 2 : 1,
+        shadowColor: Colors.black.withValues(alpha: isDesktop ? 0.08 : 0.05),
+        color: cardBg,
         child: InkWell(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(radius),
           onTap: () => _handleNotificationTap(context, item),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              gradient: item.isRead
-                  ? null
-                  : const LinearGradient(
-                      colors: [Color(0xFFF5F7FA), Color(0xFFE8EEF5)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 22,
-                  backgroundColor: item.isRead
-                      ? const Color(0xFFE6F4F1)
-                      : const Color(0xFFE8EEF5),
-                  child: Text(
-                    item.senderName[0].toUpperCase(),
-                    style: const TextStyle(
-                      color: Color(0xFF374151),
-                      fontWeight: FontWeight.bold,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(radius),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Left accent strip — teal for unread, transparent for read
+                  Container(
+                    width: 4,
+                    color: isUnread
+                        ? ThemeConfig.primaryColor
+                        : Colors.transparent,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: isDesktop
+                          ? const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 16,
+                            )
+                          : const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: isDesktop ? 26 : 21,
+                            backgroundColor: avatarBg,
+                            child: Text(
+                              item.senderName[0].toUpperCase(),
+                              style: TextStyle(
+                                color: avatarTextColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: isDesktop ? 16 : 14,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: isDesktop ? 16 : 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.message,
+                                  style: TextStyle(
+                                    fontWeight: isUnread
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                    fontSize: isDesktop ? 15.5 : 14.5,
+                                    color: isUnread
+                                        ? ThemeConfig.textPrimaryLight
+                                        : ThemeConfig.textSecondaryLight,
+                                  ),
+                                ),
+                                SizedBox(height: isDesktop ? 5 : 4),
+                                Text(
+                                  '${item.senderName} • ${_relativeTime(item.createdAt)}',
+                                  style: TextStyle(
+                                    fontSize: isDesktop ? 13 : 12,
+                                    color: ThemeConfig.textSecondaryLight
+                                        .withValues(alpha: 0.7),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: isDesktop ? 12 : 8),
+                          Icon(
+                            isUnread
+                                ? Icons.notifications_active_rounded
+                                : Icons.notifications_none_rounded,
+                            color: isUnread
+                                ? ThemeConfig.primaryColor
+                                : Colors.grey.shade400,
+                            size: isDesktop ? 22 : 20,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.message,
-                        style: TextStyle(
-                          fontWeight: item.isRead ? FontWeight.w400 : FontWeight.w600,
-                          fontSize: 15.5,
-                          color: Colors.grey.shade800,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${item.senderName} • ${_formatDate(item.createdAt)}',
-                        style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Icon(
-                  item.isRead ? Icons.mark_email_read : Icons.mark_email_unread,
-                  color: item.isRead ? Colors.blueGrey.shade400 : Colors.blueGrey.shade600,
-                  size: 20,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -454,63 +539,97 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
     );
   }
 
-  // Desktop-only: mirrors _buildRecentUpdatesSection() pattern from DashboardTabScreen
   Widget _buildNotificationsSection() {
+    final int unreadCount = notifications.where((n) => !n.isRead).length;
+    final isDesktop = AppResponsive.isDesktop(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: AppResponsive.horizontalPadding(context).copyWith(top: 24),
+          padding: AppResponsive.horizontalPadding(
+            context,
+          ).copyWith(top: isDesktop ? 24 : 8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Notifications",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                  if (isDesktop) ...[
+                    const SizedBox(height: 4),
+                    Container(
+                      width: 28,
+                      height: 3,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9B000),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    width: 28,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF9B000),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
+                  ],
                 ],
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        Padding(
-          padding: AppResponsive.horizontalPadding(context),
-          child: notifications.isEmpty && !isFetchingNotifications
-              ? Center(
-                  child: Text(
-                    'No notifications available',
+        const SizedBox(height: 12),
+        if (isFetchingNotifications)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: AppLoader(),
+            ),
+          )
+        else if (notifications.isEmpty)
+          Padding(
+            padding: AppResponsive.horizontalPadding(context).copyWith(
+              top: 8,
+              bottom: 16,
+            ),
+            child: Center(
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.notifications_off_outlined,
+                      size: 32,
+                      color: Colors.grey.shade400,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'No notifications yet',
                     style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
+                      fontSize: 14,
+                      color: Colors.grey.shade500,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: notifications.length,
-                  itemBuilder: (context, index) =>
-                      _buildNotificationItem(notifications[index]),
-                ),
-        ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "You're all caught up",
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          Padding(
+            padding: AppResponsive.horizontalPadding(context),
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: notifications.length,
+              itemBuilder: (context, index) =>
+                  _buildNotificationItem(notifications[index]),
+            ),
+          ),
       ],
     );
   }
@@ -595,130 +714,29 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                     ),
                   ),
                 )
-              // Mobile: unchanged
+              // Mobile
               : SingleChildScrollView(
                   child: Center(
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-                      child: Padding(
-                        padding: AppResponsive.pagePadding(context),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 12),
-                            // Action Required Banner
-                            notifications.isEmpty && !isFetchingNotifications
-                                ? Center(
-                                    child: Text(
-                                      'No notifications available',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey.shade600,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  )
-                                : SizedBox(
-                                    height: 200,
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      itemCount: notifications.length,
-                                      itemBuilder: (context, index) {
-                                        final item = notifications[index];
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 6),
-                                          child: Material(
-                                            borderRadius: BorderRadius.circular(14),
-                                            elevation: 1.5,
-                                            shadowColor: Colors.black12,
-                                            color: Colors.white,
-                                            child: InkWell(
-                                              borderRadius: BorderRadius.circular(14),
-                                              onTap: () =>
-                                                  _handleNotificationTap(context, item),
-                                              child: Container(
-                                                padding: const EdgeInsets.all(16),
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(14),
-                                                  gradient: item.isRead
-                                                      ? null
-                                                      : const LinearGradient(
-                                                          colors: [
-                                                            Color(0xFFF5F7FA),
-                                                            Color(0xFFE8EEF5),
-                                                          ],
-                                                          begin: Alignment.topLeft,
-                                                          end: Alignment.bottomRight,
-                                                        ),
-                                                ),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    CircleAvatar(
-                                                      radius: 22,
-                                                      backgroundColor: item.isRead
-                                                          ? const Color(0xFFE6F4F1)
-                                                          : const Color(0xFFE8EEF5),
-                                                      child: Text(
-                                                        item.senderName[0].toUpperCase(),
-                                                        style: const TextStyle(
-                                                          color: Color(0xFF374151),
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 12),
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(
-                                                            item.message,
-                                                            style: TextStyle(
-                                                              fontWeight: item.isRead
-                                                                  ? FontWeight.w400
-                                                                  : FontWeight.w600,
-                                                              fontSize: 15.5,
-                                                              color: Colors.grey.shade800,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(height: 4),
-                                                          Text(
-                                                            '${item.senderName} • ${_formatDate(item.createdAt)}',
-                                                            style: TextStyle(
-                                                              fontSize: 12.5,
-                                                              color: Colors.grey.shade600,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                    Icon(
-                                                      item.isRead
-                                                          ? Icons.mark_email_read
-                                                          : Icons.mark_email_unread,
-                                                      color: item.isRead
-                                                          ? Colors.blueGrey.shade400
-                                                          : Colors.blueGrey.shade600,
-                                                      size: 20,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                            _buildActionRequiredBanner(),
-                            quickActionsCard,
-                            const SizedBox(height: 24),
-                          ],
-                        ),
+                      constraints: const BoxConstraints(
+                        maxWidth: AppResponsive.maxContentWidth,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildNotificationsSection(),
+                          Padding(
+                            padding: AppResponsive.pagePadding(context),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _buildActionRequiredBanner(),
+                                quickActionsCard,
+                                const SizedBox(height: 24),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -809,6 +827,36 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
     }finally{
       _isNavigating = false;
     }
+  }
+
+  ({IconData icon, Color color}) _notificationStyle(String type) {
+    return switch (type) {
+      'message' => (icon: Icons.chat_bubble_rounded, color: const Color(0xFF2E7D32)),
+      'invoice_sent_to_client_app' => (icon: Icons.receipt_long_rounded, color: const Color(0xFFC62828)),
+      'detail_approved' => (icon: Icons.verified_rounded, color: const Color(0xFF1565C0)),
+      'detail_rejected' => (icon: Icons.cancel_rounded, color: const Color(0xFFB71C1C)),
+      'document_approved' => (icon: Icons.task_alt_rounded, color: const Color(0xFF2E7D32)),
+      'document_rejected' => (icon: Icons.highlight_off_rounded, color: const Color(0xFFB71C1C)),
+      'document_deleted' => (icon: Icons.delete_forever_rounded, color: const Color(0xFF6D4C41)),
+      'document_downloaded' => (icon: Icons.download_done_rounded, color: const Color(0xFF00695C)),
+      'stage_change' => (icon: Icons.account_tree_rounded, color: const Color(0xFF6A1B9A)),
+      'checklist' || 'checklist_added' => (icon: Icons.checklist_rounded, color: const Color(0xFF00838F)),
+      'matter_discontinued' => (icon: Icons.pause_circle_rounded, color: const Color(0xFFE65100)),
+      'matter_reopened' => (icon: Icons.play_circle_rounded, color: const Color(0xFF1B5E20)),
+      'lead_converted_to_client' => (icon: Icons.person_add_alt_1_rounded, color: const Color(0xFF1A237E)),
+      'action_completed' => (icon: Icons.check_circle_rounded, color: const Color(0xFF2E7D32)),
+      _ => (icon: Icons.notifications_rounded, color: const Color(0xFF5E8B7E)),
+    };
+  }
+
+  String _relativeTime(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 1) return 'Just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays == 1) return 'Yesterday';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return DateFormat('MMM d').format(dt);
   }
 
   String _formatDate(DateTime dateTime) {

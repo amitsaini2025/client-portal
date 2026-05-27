@@ -110,8 +110,10 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = AppResponsive.isDesktop(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: ThemeConfig.backgroundLight,
       appBar: AppBar(
         backgroundColor: ThemeConfig.goldenYellow.withValues(alpha: 0.9),
         title: const Text(
@@ -129,129 +131,188 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             ),
             child: RefreshIndicator(
               onRefresh: _refresh,
-              child:
-                  isLoading && notifications.isEmpty
-                      ? const Center(child: AppLoader())
-                      : notifications.isEmpty
+              child: isLoading && notifications.isEmpty
+                  ? const Center(child: AppLoader())
+                  : notifications.isEmpty
                       ? Center(
-                        child: Text(
-                          'No notifications available',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey.shade600,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      )
-                      : ListView.builder(
-                        controller: _scrollController,
-                        itemCount: notifications.length + (hasMore ? 1 : 0),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        itemBuilder: (context, index) {
-                          if (index == notifications.length) {
-                            return const Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Center(child: AppLoader()),
-                            );
-                          }
-
-                          final item = notifications[index];
-                          return Padding(
-                            padding: AppResponsive.horizontalPadding(
-                              context,
-                            ).copyWith(top: 6, bottom: 6),
-                            child: Material(
-                              borderRadius: BorderRadius.circular(14),
-                              elevation: 1.5,
-                              shadowColor: Colors.black12,
-                              color: Colors.white,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(14),
-                                onTap: () async {
-                                  await _handleNotificationTap(context, item);
-                                  if (mounted) _refresh();
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    gradient:
-                                        item.isRead
-                                            ? null
-                                            : const LinearGradient(
-                                              colors: [
-                                                Color(0xFFF5F7FA),
-                                                Color(0xFFE8EEF5),
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: ThemeConfig.primaryColor.withValues(
+                                    alpha: 0.08,
                                   ),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 22,
-                                        backgroundColor:
-                                            item.isRead
-                                                ? const Color(0xFFE6F4F1)
-                                                : const Color(0xFFE8EEF5),
-                                        child: Text(
-                                          item.senderName[0].toUpperCase(),
-                                          style: const TextStyle(
-                                            color: Color(0xFF374151),
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              item.message,
-                                              style: TextStyle(
-                                                fontWeight:
-                                                    item.isRead
-                                                        ? FontWeight.w400
-                                                        : FontWeight.w600,
-                                                fontSize: 15.5,
-                                                color: Colors.grey.shade800,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              '${item.senderName} • ${_formatDate(item.createdAt)}',
-                                              style: TextStyle(
-                                                fontSize: 12.5,
-                                                color: Colors.grey.shade600,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Icon(
-                                        item.isRead
-                                            ? Icons.mark_email_read
-                                            : Icons.mark_email_unread,
-                                        color:
-                                            item.isRead
-                                                ? Colors.blueGrey.shade400
-                                                : Colors.blueGrey.shade600,
-                                        size: 20,
-                                      ),
-                                    ],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.notifications_none_rounded,
+                                  size: 40,
+                                  color: ThemeConfig.primaryColor.withValues(
+                                    alpha: 0.5,
                                   ),
                                 ),
                               ),
+                              const SizedBox(height: 14),
+                              Text(
+                                'No notifications yet',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: ThemeConfig.textSecondaryLight,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "You're all caught up",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: ThemeConfig.textSecondaryLight
+                                      .withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          controller: _scrollController,
+                          itemCount: notifications.length + (hasMore ? 1 : 0),
+                          padding: AppResponsive.horizontalPadding(
+                            context,
+                          ).copyWith(top: 10, bottom: 24),
+                          itemBuilder: (context, index) {
+                            if (index == notifications.length) {
+                              return const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(child: AppLoader()),
+                              );
+                            }
+                            return _buildNotificationItem(
+                              notifications[index],
+                              isDesktop,
+                            );
+                          },
+                        ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationItem(NotificationModel item, bool isDesktop) {
+    final bool isUnread = !item.isRead;
+    final double radius = isDesktop ? 16 : 12;
+
+    final Color cardBg = isDesktop
+        ? (isUnread ? const Color(0xFFEDF5F3) : ThemeConfig.backgroundLight)
+        : (isUnread ? const Color(0xFFF0F7F5) : Colors.white);
+
+    final Color avatarBg = isUnread
+        ? ThemeConfig.primaryColor
+        : (isDesktop ? ThemeConfig.borderLight : const Color(0xFFF1F5F9));
+    final Color avatarTextColor =
+        isUnread ? Colors.white : ThemeConfig.primaryColor;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: isDesktop ? 6 : 4),
+      child: Material(
+        borderRadius: BorderRadius.circular(radius),
+        elevation: isDesktop ? 2 : 1,
+        shadowColor: Colors.black.withValues(
+          alpha: isDesktop ? 0.08 : 0.05,
+        ),
+        color: cardBg,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(radius),
+          onTap: () async {
+            await _handleNotificationTap(context, item);
+            if (mounted) _refresh();
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(radius),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    width: 4,
+                    color: isUnread
+                        ? ThemeConfig.primaryColor
+                        : Colors.transparent,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: isDesktop
+                          ? const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 16,
+                            )
+                          : const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
                             ),
-                          );
-                        },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: isDesktop ? 26 : 21,
+                            backgroundColor: avatarBg,
+                            child: Text(
+                              item.senderName[0].toUpperCase(),
+                              style: TextStyle(
+                                color: avatarTextColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: isDesktop ? 16 : 14,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: isDesktop ? 16 : 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.message,
+                                  style: TextStyle(
+                                    fontWeight: isUnread
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                    fontSize: isDesktop ? 15.5 : 14.5,
+                                    color: isUnread
+                                        ? ThemeConfig.textPrimaryLight
+                                        : ThemeConfig.textSecondaryLight,
+                                  ),
+                                ),
+                                SizedBox(height: isDesktop ? 5 : 4),
+                                Text(
+                                  '${item.senderName} • ${_formatDate(item.createdAt)}',
+                                  style: TextStyle(
+                                    fontSize: isDesktop ? 13 : 12,
+                                    color: ThemeConfig.textSecondaryLight
+                                        .withValues(alpha: 0.7),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: isDesktop ? 12 : 8),
+                          Icon(
+                            isUnread
+                                ? Icons.notifications_active_rounded
+                                : Icons.notifications_none_rounded,
+                            color: isUnread
+                                ? ThemeConfig.primaryColor
+                                : Colors.grey.shade400,
+                            size: isDesktop ? 22 : 20,
+                          ),
+                        ],
                       ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

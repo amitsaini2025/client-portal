@@ -41,7 +41,7 @@ class QuickActionsCard extends StatelessWidget {
       showDialog(
         context: context,
         barrierDismissible: false,
-        barrierColor: Colors.black.withValues(alpha:0.4),
+        barrierColor: Colors.black.withValues(alpha: 0.4),
         builder: (context) {
           return BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -56,50 +56,64 @@ class QuickActionsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWeb = constraints.maxWidth > 600; // detect web/large screen
-        final crossAxisCount = isWeb ? 6 : 4;
-        final tilePadding = isWeb ? 12.0 : 20.0;
-        final iconSize = isWeb ? 26.0 : 32.0;
-        final fontSize = isWeb ? 13.0 : 15.0;
+        final isWeb = constraints.maxWidth > 600;
+        final tilePadding = isWeb ? 14.0 : 16.0;
+        final iconSize = isWeb ? 22.0 : 26.0;
+        final fontSize = isWeb ? 12.5 : 13.5;
 
         return Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(_radius),
-            boxShadow: const [
+            border: Border.all(color: Colors.grey.shade200),
+            boxShadow: [
               BoxShadow(
-                color: Colors.black12,
-                blurRadius: 10,
-                offset: Offset(0, 4),
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 12,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Quick Actions',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                ),
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF9B000),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Quick Actions',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
 
               StaggeredGrid.count(
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
+                crossAxisCount: isWeb ? 6 : 4,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
                 children: [
+                  // --- Row 1: 3 tall tiles on web / 2 on mobile ---
                   StaggeredGridTile.count(
-                    crossAxisCellCount: isWeb ? 2 : 2,
-                    mainAxisCellCount: isWeb ? 1.5 : 2.2,
+                    crossAxisCellCount: 2,
+                    mainAxisCellCount: isWeb ? 1.7 : 2.2,
                     child: _verticalTile(
                       context: context,
-                      icon: Icons.schedule,
+                      icon: Icons.event_available_rounded,
                       label: 'Book\nAppointment',
-                      color: const Color(0xCC1B5E20),
+                      gradient: const [Color(0xFF2E7D32), Color(0xFF81C784)],
                       onTap: onBookAppointment,
                       iconSize: iconSize,
                       fontSize: fontSize,
@@ -108,13 +122,13 @@ class QuickActionsCard extends StatelessWidget {
                   ),
 
                   StaggeredGridTile.count(
-                    crossAxisCellCount: isWeb ? 2 : 2,
-                    mainAxisCellCount: isWeb ? 1.5 : 2.2,
+                    crossAxisCellCount: 2,
+                    mainAxisCellCount: isWeb ? 1.7 : 2.2,
                     child: _verticalTile(
                       context: context,
-                      icon: Icons.health_and_safety,
+                      icon: Icons.health_and_safety_rounded,
                       label: 'Health\nInsurance',
-                      color: const Color(0xCC4E342E),
+                      gradient: const [Color(0xFF6D4C41), Color(0xFFBCAAA4)],
                       onTap: onHealthInsurance ?? () {},
                       iconSize: iconSize,
                       fontSize: fontSize,
@@ -122,85 +136,98 @@ class QuickActionsCard extends StatelessWidget {
                     ),
                   ),
 
+                  // PR Calculator: 3rd tall tile on web, full-width horizontal on mobile
                   StaggeredGridTile.count(
-                    crossAxisCellCount: isWeb ? 4 : 4,
-                    mainAxisCellCount: isWeb ? 1.0 : 1.3,
-                    child: _horizontalTile(
-                      context: context,
-                      icon: Icons.calculate,
-                      label: 'PR\nCalculator',
-                      color: const Color(0xCCB71C1C),
-                      onTap: onPRCalculator ?? () {},
-                      iconSize: iconSize - 2,
-                      fontSize: fontSize,
-                      padding: tilePadding - 2,
-                    ),
+                    crossAxisCellCount: isWeb ? 2 : 4,
+                    mainAxisCellCount: isWeb ? 1.7 : 1.1,
+                    child: isWeb
+                        ? _verticalTile(
+                            context: context,
+                            icon: Icons.calculate_rounded,
+                            label: 'PR\nCalculator',
+                            gradient: const [Color(0xFFC2185B), Color(0xFFF48FB1)],
+                            onTap: onPRCalculator ?? () {},
+                            iconSize: iconSize,
+                            fontSize: fontSize,
+                            padding: tilePadding,
+                          )
+                        : _horizontalTile(
+                            context: context,
+                            icon: Icons.calculate_rounded,
+                            label: 'PR Calculator',
+                            gradient: const [Color(0xFFC2185B), Color(0xFFF48FB1)],
+                            onTap: onPRCalculator ?? () {},
+                            iconSize: iconSize,
+                            fontSize: fontSize,
+                            padding: tilePadding,
+                          ),
+                  ),
+
+                  // --- Small tiles: col2 each, 3-per-row on web, 2-per-row on mobile ---
+                  _smallTile(
+                    icon: Icons.school_rounded,
+                    label: 'Student Fund\nCalculator',
+                    gradient: const [Color(0xFF3949AB), Color(0xFF9FA8DA)],
+                    onTap: onStudentFundCalculator ?? () {},
+                    context: context,
+                    iconSize: iconSize - 4,
+                    fontSize: fontSize - 0.5,
+                    padding: tilePadding - 2,
                   ),
 
                   _smallTile(
-                    Icons.calculate,
-                    'Student\nFund Calculator',
-                    const Color(0xCC4A148C),
-                    onStudentFundCalculator ?? () {},
+                    icon: Icons.manage_search_rounded,
+                    label: 'Occupation\nSearch',
+                    gradient: const [Color(0xFF00838F), Color(0xFF80DEEA)],
+                    onTap: onOccupationSearch ?? () {},
                     context: context,
-                    iconSize: iconSize - 6,
-                    fontSize: fontSize - 1,
-                    padding: tilePadding - 4,
+                    iconSize: iconSize - 4,
+                    fontSize: fontSize - 0.5,
+                    padding: tilePadding - 2,
                   ),
 
                   _smallTile(
-                    Icons.search,
-                    'Occupation\nSearch',
-                    const Color(0xCC0D47A1),
-                    onOccupationSearch ?? () {},
+                    icon: Icons.location_on_rounded,
+                    label: 'Post Code\nChecker',
+                    gradient: const [Color(0xFF7B1FA2), Color(0xFFCE93D8)],
+                    onTap: onPostCodeChecker ?? () {},
                     context: context,
-                    iconSize: iconSize - 6,
-                    fontSize: fontSize - 1,
-                    padding: tilePadding - 4,
+                    iconSize: iconSize - 4,
+                    fontSize: fontSize - 0.5,
+                    padding: tilePadding - 2,
                   ),
 
                   _smallTile(
-                    Icons.code,
-                    'Post\nCode Checker',
-                    const Color(0xCC880E4F),
-                    onPostCodeChecker ?? () {},
+                    icon: Icons.link_rounded,
+                    label: 'Important\nLinks',
+                    gradient: const [Color(0xFF1565C0), Color(0xFF90CAF9)],
+                    onTap: onImportantLinks ?? () {},
                     context: context,
-                    iconSize: iconSize - 6,
-                    fontSize: fontSize - 1,
-                    padding: tilePadding - 4,
+                    iconSize: iconSize - 4,
+                    fontSize: fontSize - 0.5,
+                    padding: tilePadding - 2,
                   ),
 
                   _smallTile(
-                    Icons.link,
-                    'Important\nLinks',
-                    const Color(0xCC004D40),
-                    onImportantLinks ?? () {},
+                    icon: Icons.record_voice_over_rounded,
+                    label: 'English\nRequirement',
+                    gradient: const [Color(0xFFE64A19), Color(0xFFFFAB91)],
+                    onTap: onEnglishRequirement ?? () {},
                     context: context,
-                    iconSize: iconSize - 6,
-                    fontSize: fontSize - 1,
-                    padding: tilePadding - 4,
+                    iconSize: iconSize - 4,
+                    fontSize: fontSize - 0.5,
+                    padding: tilePadding - 2,
                   ),
 
                   _smallTile(
-                    Icons.language,
-                    'English\nRequirement',
-                    const Color(0xCC1A237E),
-                    onEnglishRequirement ?? () {},
+                    icon: Icons.travel_explore_rounded,
+                    label: 'VAC\nSearch',
+                    gradient: const [Color(0xFF00695C), Color(0xFF80CBC4)],
+                    onTap: onVACSearch ?? () {},
                     context: context,
-                    iconSize: iconSize - 6,
-                    fontSize: fontSize - 1,
-                    padding: tilePadding - 4,
-                  ),
-
-                  _smallTile(
-                    Icons.web,
-                    'VAC\nSearch',
-                    const Color(0xCC880E4F),
-                    onVACSearch ?? () {},
-                    context: context,
-                    iconSize: iconSize - 6,
-                    fontSize: fontSize - 1,
-                    padding: tilePadding - 4,
+                    iconSize: iconSize - 4,
+                    fontSize: fontSize - 0.5,
+                    padding: tilePadding - 2,
                   ),
                 ],
               ),
@@ -215,7 +242,7 @@ class QuickActionsCard extends StatelessWidget {
     required BuildContext context,
     required IconData icon,
     required String label,
-    required Color color,
+    required List<Color> gradient,
     required VoidCallback onTap,
     required double iconSize,
     required double fontSize,
@@ -227,13 +254,24 @@ class QuickActionsCard extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(padding),
         decoration: BoxDecoration(
-          color: color,
+          gradient: LinearGradient(
+            colors: gradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(_radius),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: iconSize, color: Colors.white),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: iconSize, color: Colors.white),
+            ),
             const Spacer(),
             Text(
               label,
@@ -254,7 +292,7 @@ class QuickActionsCard extends StatelessWidget {
     required BuildContext context,
     required IconData icon,
     required String label,
-    required Color color,
+    required List<Color> gradient,
     required VoidCallback onTap,
     required double iconSize,
     required double fontSize,
@@ -266,13 +304,24 @@ class QuickActionsCard extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(padding),
         decoration: BoxDecoration(
-          color: color,
+          gradient: LinearGradient(
+            colors: gradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(_radius),
         ),
         child: Row(
           children: [
-            Icon(icon, size: iconSize, color: Colors.white),
-            const SizedBox(width: 16),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: iconSize, color: Colors.white),
+            ),
+            const SizedBox(width: 14),
             Expanded(
               child: Text(
                 label,
@@ -283,38 +332,54 @@ class QuickActionsCard extends StatelessWidget {
                 ),
               ),
             ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 12,
+              color: Colors.white54,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _smallTile(
-    IconData icon,
-    String label,
-    Color color,
-    VoidCallback onTap, {
+  Widget _smallTile({
     required BuildContext context,
+    required IconData icon,
+    required String label,
+    required List<Color> gradient,
+    required VoidCallback onTap,
     required double iconSize,
     required double fontSize,
     required double padding,
   }) {
     return StaggeredGridTile.count(
       crossAxisCellCount: 2,
-      mainAxisCellCount: 1.2,
+      mainAxisCellCount: 1.25,
       child: InkWell(
         onTap: () => _handleTap(context, onTap),
         borderRadius: BorderRadius.circular(_radius),
         child: Container(
           padding: EdgeInsets.all(padding),
           decoration: BoxDecoration(
-            color: color,
+            gradient: LinearGradient(
+              colors: gradient,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.circular(_radius),
           ),
           child: Row(
             children: [
-              Icon(icon, size: iconSize, color: Colors.white),
-              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: iconSize, color: Colors.white),
+              ),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   label,
@@ -322,6 +387,7 @@ class QuickActionsCard extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     fontSize: fontSize,
                     color: Colors.white,
+                    height: 1.2,
                   ),
                 ),
               ),
