@@ -61,7 +61,7 @@ class PusherService {
 
 class ReverbService {
   static final PusherChannelsFlutter pusher =
-      PusherChannelsFlutter.getInstance();
+  PusherChannelsFlutter.getInstance();
 
   static Function(MessageDetail message)? onMessageReceived;
 
@@ -104,7 +104,7 @@ class ReverbService {
           try {
             if (event.data != null) {
               final jsonData =
-                  event.data is String ? jsonDecode(event.data) : event.data;
+              event.data is String ? jsonDecode(event.data) : event.data;
               if (jsonData['data']?['message_sent'] != null) {
                 final message = MessageDetail.fromJson(
                   jsonData['data']['message_sent'],
@@ -174,11 +174,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       token: AuthService.currentToken.toString(),
     );
 
-    // ── FIX: Load older messages when user scrolls to the TOP
-    // (in a reversed ListView, maxScrollExtent is the top of the list)
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
-              _scrollController.position.maxScrollExtent - 100 &&
+          _scrollController.position.maxScrollExtent - 100 &&
           !_isLoadingMore &&
           _hasMore) {
         _loadMoreMessages();
@@ -200,16 +198,15 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       message: msgDetail.message,
       sender: msgDetail.sender,
       senderId: msgDetail.senderId,
-      recipientIds:
-          msgDetail.recipientIds
-              .map(
-                (r) => Recipient(
-                  recipientId: r.recipientId,
-                  recipient: r.recipient,
-                  recipientShortname: r.recipientShortname,
-                ),
-              )
-              .toList(),
+      recipientIds: msgDetail.recipientIds
+          .map(
+            (r) => Recipient(
+          recipientId: r.recipientId,
+          recipient: r.recipient,
+          recipientShortname: r.recipientShortname,
+        ),
+      )
+          .toList(),
       sentAt: msgDetail.sentAt.toIso8601String(),
       clientMatterId: msgDetail.clientMatterId,
       recipientCount: msgDetail.recipientCount,
@@ -220,18 +217,17 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       senderShortname: msgDetail.senderShortname,
       isRead: msgDetail.isRead ?? false,
       readAt: msgDetail.readAt,
-      attachments:
-          msgDetail.attachments
-              .map(
-                (file) => wf.Attachment(
-                  id: file.id,
-                  filename: file.filename,
-                  size: file.size,
-                  type: file.type,
-                  url: file.url,
-                ),
-              )
-              .toList(),
+      attachments: msgDetail.attachments
+          .map(
+            (file) => wf.Attachment(
+          id: file.id,
+          filename: file.filename,
+          size: file.size,
+          type: file.type,
+          url: file.url,
+        ),
+      )
+          .toList(),
     );
 
     setState(() {
@@ -279,10 +275,6 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
       if (response['success'] == true) {
         final parsed = WorkflowMessagesResponse.fromJson(response);
-
-        // ── FIX: API returns newest-first (page 1 = latest messages).
-        // The reversed ListView shows index 0 at the BOTTOM, so we keep
-        // the list in newest-first order (index 0 = newest = bottom).
         final msgs = parsed.data.messages;
 
         setState(() {
@@ -366,16 +358,15 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       final response = SendMessageResponse.fromJson(responseJson);
       if (response.success && response.data.message != null) {
         MessageDetail message = response.data.message;
-        message.attachments =
-            message.attachments.map((file) {
-              return Attachment(
-                id: file.id,
-                filename: file.filename,
-                size: file.size,
-                type: file.filename,
-                url: file.url,
-              );
-            }).toList();
+        message.attachments = message.attachments.map((file) {
+          return Attachment(
+            id: file.id,
+            filename: file.filename,
+            size: file.size,
+            type: file.filename,
+            url: file.url,
+          );
+        }).toList();
         message.isSender = true;
         message.isRecipient = false;
         _handleIncomingMessage(response.data.message);
@@ -384,7 +375,8 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.redAccent),
+        SnackBar(
+            content: Text("Error: $e"), backgroundColor: Colors.redAccent),
       );
     } finally {
       setState(() => _isSending = false);
@@ -401,11 +393,10 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
       if (result != null && result.files.isNotEmpty) {
         setState(() {
-          _attachmentBytes =
-              result.files
-                  .where((f) => f.bytes != null)
-                  .map((f) => (bytes: f.bytes!, name: f.name))
-                  .toList();
+          _attachmentBytes = result.files
+              .where((f) => f.bytes != null)
+              .map((f) => (bytes: f.bytes!, name: f.name))
+              .toList();
         });
       }
     } catch (e) {
@@ -444,6 +435,27 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
     return parts.take(2).map((e) => e.substring(0, 1).toUpperCase()).join();
   }
 
+  // ── Returns the right icon + accent colour for a given filename/type ──
+  ({IconData icon, Color color}) _fileIconFor(String filename, String type) {
+    final ext = filename.split('.').last.toLowerCase();
+    if (type == 'document' || ext == 'pdf') {
+      return (icon: Icons.picture_as_pdf_rounded, color: const Color(0xFFE53935));
+    }
+    if (['doc', 'docx'].contains(ext)) {
+      return (icon: Icons.description_rounded, color: const Color(0xFF1565C0));
+    }
+    if (['xls', 'xlsx', 'csv'].contains(ext)) {
+      return (icon: Icons.table_chart_rounded, color: const Color(0xFF2E7D32));
+    }
+    if (['ppt', 'pptx'].contains(ext)) {
+      return (icon: Icons.slideshow_rounded, color: const Color(0xFFE65100));
+    }
+    if (['zip', 'rar', '7z'].contains(ext)) {
+      return (icon: Icons.folder_zip_rounded, color: const Color(0xFF6D4C41));
+    }
+    return (icon: Icons.insert_drive_file_rounded, color: Colors.blueGrey);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScrollConfiguration(
@@ -455,30 +467,28 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
         ),
         backgroundColor: const Color(0xFFF5F5F5),
         body: SafeArea(
-          child:
-              _isLoading
-                  ? Center(child: AppLoader())
-                  : _error != null
-                  ? _buildErrorWidget(_error!)
-                  : Column(
-                    children: [
-                      Expanded(
-                        child:
-                            _messages.isEmpty
-                                ? _buildEmptyWidget()
-                                : _buildMessageList(),
-                      ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(
-                            maxWidth: AppResponsive.maxContentWidth,
-                          ),
-                          child: _buildMessageInput(),
-                        ),
-                      ),
-                    ],
+          child: _isLoading
+              ? Center(child: AppLoader())
+              : _error != null
+              ? _buildErrorWidget(_error!)
+              : Column(
+            children: [
+              Expanded(
+                child: _messages.isEmpty
+                    ? _buildEmptyWidget()
+                    : _buildMessageList(),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: AppResponsive.maxContentWidth,
                   ),
+                  child: _buildMessageInput(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -526,9 +536,8 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                           itemBuilder: (context, index) {
                             return Container(
                               margin: const EdgeInsets.only(right: 6, top: 4),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
+                              padding:
+                              const EdgeInsets.symmetric(horizontal: 8),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade300,
                                 borderRadius: BorderRadius.circular(16),
@@ -561,21 +570,20 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
             CircleAvatar(
               radius: 22,
               backgroundColor: ThemeConfig.navyBlue,
-              child:
-                  _isSending
-                      ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: AppLoader(size: 20),
-                      )
-                      : IconButton(
-                        icon: const Icon(
-                          Icons.send,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        onPressed: _sendMessage,
-                      ),
+              child: _isSending
+                  ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: AppLoader(size: 20),
+              )
+                  : IconButton(
+                icon: const Icon(
+                  Icons.send,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                onPressed: _sendMessage,
+              ),
             ),
           ],
         ),
@@ -586,10 +594,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
   Widget _buildMessageList() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final sidePadding =
-            constraints.maxWidth > AppResponsive.maxContentWidth
-                ? (constraints.maxWidth - AppResponsive.maxContentWidth) / 2
-                : 0.0;
+        final sidePadding = constraints.maxWidth > AppResponsive.maxContentWidth
+            ? (constraints.maxWidth - AppResponsive.maxContentWidth) / 2
+            : 0.0;
 
         return ListView.builder(
           controller: _scrollController,
@@ -613,10 +620,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
 
             final msg = _messages[index];
             final isSender = msg.isSender;
-            String avatarName =
-                isSender
-                    ? msg.sender
-                    : msg.recipientIds.map((r) => r.recipient).join(", ");
+            final avatarName = isSender
+                ? msg.sender
+                : msg.recipientIds.map((r) => r.recipient).join(", ");
 
             return GestureDetector(
               onTap: () {
@@ -629,10 +635,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
               child: Container(
                 margin: const EdgeInsets.symmetric(vertical: 6),
                 child: Row(
-                  mainAxisAlignment:
-                      isSender
-                          ? MainAxisAlignment.end
-                          : MainAxisAlignment.start,
+                  mainAxisAlignment: isSender
+                      ? MainAxisAlignment.end
+                      : MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     if (!isSender)
@@ -656,10 +661,9 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color:
-                              isSender
-                                  ? ThemeConfig.navyBlue.withValues(alpha: 0.9)
-                                  : Colors.white,
+                          color: isSender
+                              ? ThemeConfig.navyBlue.withValues(alpha: 0.9)
+                              : Colors.white,
                           borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
                             topRight: const Radius.circular(16),
@@ -677,51 +681,33 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              msg.message,
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: isSender ? Colors.white : Colors.black87,
-                              ),
-                            ),
                             if (msg.attachments != null &&
                                 msg.attachments!.isNotEmpty)
-                              SizedBox(
-                                height: 60,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const ClampingScrollPhysics(),
-                                  itemCount: msg.attachments!.length,
-                                  itemBuilder: (context, index) {
-                                    final attachment = msg.attachments![index];
-                                    return Padding(
-                                      padding: const EdgeInsets.only(right: 6),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.network(
-                                          attachment.url,
-                                          width: 60,
-                                          height: 60,
-                                          fit: BoxFit.cover,
-                                          headers: {
-                                            "Authorization":
-                                                "Bearer ${AuthService.currentToken}",
-                                          },
-                                        ),
-                                      ),
-                                    );
-                                  },
+                              _buildAttachmentRow(
+                                  msg.attachments!, isSender),
+                            if (msg.message.isNotEmpty) ...[
+                              if (msg.attachments != null &&
+                                  msg.attachments!.isNotEmpty)
+                                const SizedBox(height: 6),
+                              Text(
+                                msg.message,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: isSender
+                                      ? Colors.white
+                                      : Colors.black87,
                                 ),
                               ),
+                            ],
                             const SizedBox(height: 6),
+                            // ── Timestamp ────────────────────────────────────
                             Text(
                               _formatDateTime(msg.sentAt),
                               style: TextStyle(
                                 fontSize: 11,
-                                color:
-                                    isSender
-                                        ? Colors.white70
-                                        : Colors.grey.shade600,
+                                color: isSender
+                                    ? Colors.white70
+                                    : Colors.grey.shade600,
                               ),
                             ),
                           ],
@@ -749,6 +735,127 @@ class _WorkflowMessagesScreenState extends State<WorkflowMessagesScreen> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildAttachmentRow(List<wf.Attachment> attachments, bool isSender) {
+    return SizedBox(
+      height: 60,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        physics: const ClampingScrollPhysics(),
+        itemCount: attachments.length,
+        itemBuilder: (context, index) {
+          final attachment = attachments[index];
+          final type = (attachment.type ?? '').toLowerCase();
+
+          if (type == 'image') {
+            // ── Image thumbnail ───────────────────────────────────────────
+            return Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  attachment.url,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  headers: {
+                    "Authorization": "Bearer ${AuthService.currentToken}",
+                  },
+                  errorBuilder: (_, __, ___) => Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.broken_image, size: 24),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          // ── Document / PDF / generic file chip ────────────────────────
+          final (:icon, :color) =
+          _fileIconFor(attachment.filename, attachment.type ?? '');
+
+          // Truncate long filenames to keep the chip compact
+          final rawName = attachment.filename;
+          final dotIndex = rawName.lastIndexOf('.');
+          final nameWithoutExt =
+          dotIndex > 0 ? rawName.substring(0, dotIndex) : rawName;
+          final ext =
+          dotIndex > 0 ? rawName.substring(dotIndex + 1).toUpperCase() : '';
+          final displayName = nameWithoutExt.length > 18
+              ? '${nameWithoutExt.substring(0, 16)}…'
+              : nameWithoutExt;
+
+          return Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: Container(
+              height: 60,
+              constraints: const BoxConstraints(maxWidth: 180),
+              padding:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                // Slightly transparent so it blends with the bubble colour
+                color: isSender
+                    ? Colors.white.withValues(alpha: 0.15)
+                    : color.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isSender
+                      ? Colors.white.withValues(alpha: 0.3)
+                      : color.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Coloured icon
+                  Icon(
+                    icon,
+                    size: 28,
+                    color: isSender ? Colors.white : color,
+                  ),
+                  const SizedBox(width: 8),
+                  // Filename + extension badge
+                  Flexible(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: isSender ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        if (ext.isNotEmpty)
+                          Text(
+                            ext,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: isSender
+                                  ? Colors.white70
+                                  : Colors.grey.shade600,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
