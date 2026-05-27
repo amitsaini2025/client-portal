@@ -3,13 +3,13 @@ import 'dart:ui';
 import 'package:client/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../config/theme_config.dart';
-import '../../../utils/app_loader.dart';
-import '../../../utils/responsive_utils.dart';
 
+import '../../../config/theme_config.dart';
 import '../../../main.dart';
 import '../../../models/notification/notification.dart';
 import '../../../services/api_service.dart';
+import '../../../utils/app_loader.dart';
+import '../../../utils/responsive_utils.dart';
 import '../../../widgets/dialog/login_required_dialog.dart';
 import '../../workflow/message/workflow_messages_screen.dart';
 import '../../workflow/workflow_stages_screen.dart';
@@ -140,7 +140,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
         showDialog(
           context: context,
           barrierDismissible: false,
-          barrierColor: Colors.black.withValues(alpha:0.4),
+          barrierColor: Colors.black.withValues(alpha: 0.4),
           builder: (context) {
             return BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -192,7 +192,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withValues(alpha:0.4),
+      barrierColor: Colors.black.withValues(alpha: 0.4),
       builder: (context) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -226,7 +226,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
       showDialog(
         context: parentContext,
         barrierDismissible: false,
-        barrierColor: Colors.black.withValues(alpha:0.4),
+        barrierColor: Colors.black.withValues(alpha: 0.4),
         builder: (context) {
           return BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
@@ -273,13 +273,14 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
         color: Colors.white,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: _isFetchingActionRequired
-              ? null
-              : () {
-                  if (_latestActionRequired != null) {
-                    Navigator.pushNamed(context, '/action-required');
-                  }
-                },
+          onTap:
+              _isFetchingActionRequired
+                  ? null
+                  : () {
+                    if (_latestActionRequired != null) {
+                      Navigator.pushNamed(context, '/action-required');
+                    }
+                  },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
             decoration: BoxDecoration(
@@ -329,77 +330,84 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                 ),
                 const SizedBox(width: 14),
                 Expanded(
-                  child: _isFetchingActionRequired
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 13,
-                              width: 120,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFEA580C).withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Container(
-                              height: 11,
-                              width: 180,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFEA580C).withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                            ),
-                          ],
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Text(
-                                  'Action Required',
-                                  style: TextStyle(
-                                    fontSize: 14.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF9A3412),
-                                  ),
+                  child:
+                      _isFetchingActionRequired
+                          ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 13,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFFEA580C,
+                                  ).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 7,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFDC2626),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    '$_actionRequiredCount',
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (_latestActionRequired != null) ...[
-                              const SizedBox(height: 3),
-                              Text(
-                                _latestActionRequired!['message'] as String? ?? '',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 12.5,
-                                  color: Color(0xFFB45309),
+                              ),
+                              const SizedBox(height: 6),
+                              Container(
+                                height: 11,
+                                width: 180,
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFFEA580C,
+                                  ).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
                               ),
                             ],
-                          ],
-                        ),
+                          )
+                          : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Action Required',
+                                    style: TextStyle(
+                                      fontSize: 14.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF9A3412),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFDC2626),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      '$_actionRequiredCount',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (_latestActionRequired != null) ...[
+                                const SizedBox(height: 3),
+                                Text(
+                                  _latestActionRequired!['message']
+                                          as String? ??
+                                      '',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: Color(0xFFB45309),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                 ),
                 const SizedBox(width: 8),
                 Container(
@@ -428,13 +436,15 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
     final double radius = isDesktop ? 16 : 12;
 
     // Platform-specific backgrounds
-    final Color cardBg = isDesktop
-        ? (isUnread ? const Color(0xFFEDF5F3) : ThemeConfig.backgroundLight)
-        : (isUnread ? const Color(0xFFF0F7F5) : Colors.white);
+    final Color cardBg =
+        isDesktop
+            ? (isUnread ? const Color(0xFFEDF5F3) : ThemeConfig.backgroundLight)
+            : (isUnread ? const Color(0xFFF0F7F5) : Colors.white);
 
-    final Color avatarBg = isUnread
-        ? ThemeConfig.primaryColor
-        : (isDesktop ? ThemeConfig.borderLight : const Color(0xFFF1F5F9));
+    final Color avatarBg =
+        isUnread
+            ? ThemeConfig.primaryColor
+            : (isDesktop ? ThemeConfig.borderLight : const Color(0xFFF1F5F9));
     final Color avatarTextColor =
         isUnread ? Colors.white : ThemeConfig.primaryColor;
 
@@ -457,21 +467,23 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                   // Left accent strip — teal for unread, transparent for read
                   Container(
                     width: 4,
-                    color: isUnread
-                        ? ThemeConfig.primaryColor
-                        : Colors.transparent,
+                    color:
+                        isUnread
+                            ? ThemeConfig.primaryColor
+                            : Colors.transparent,
                   ),
                   Expanded(
                     child: Padding(
-                      padding: isDesktop
-                          ? const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 16,
-                            )
-                          : const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
+                      padding:
+                          isDesktop
+                              ? const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 16,
+                              )
+                              : const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -495,13 +507,15 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                                 Text(
                                   item.message,
                                   style: TextStyle(
-                                    fontWeight: isUnread
-                                        ? FontWeight.w600
-                                        : FontWeight.w400,
+                                    fontWeight:
+                                        isUnread
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
                                     fontSize: isDesktop ? 15.5 : 14.5,
-                                    color: isUnread
-                                        ? ThemeConfig.textPrimaryLight
-                                        : ThemeConfig.textSecondaryLight,
+                                    color:
+                                        isUnread
+                                            ? ThemeConfig.textPrimaryLight
+                                            : ThemeConfig.textSecondaryLight,
                                   ),
                                 ),
                                 SizedBox(height: isDesktop ? 5 : 4),
@@ -521,9 +535,10 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                             isUnread
                                 ? Icons.notifications_active_rounded
                                 : Icons.notifications_none_rounded,
-                            color: isUnread
-                                ? ThemeConfig.primaryColor
-                                : Colors.grey.shade400,
+                            color:
+                                isUnread
+                                    ? ThemeConfig.primaryColor
+                                    : Colors.grey.shade400,
                             size: isDesktop ? 22 : 20,
                           ),
                         ],
@@ -580,12 +595,11 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
               child: AppLoader(),
             ),
           )
-        else if (notifications.isEmpty)
+        else if (notifications.isEmpty && AuthService.isAuthenticated)
           Padding(
-            padding: AppResponsive.horizontalPadding(context).copyWith(
-              top: 8,
-              bottom: 16,
-            ),
+            padding: AppResponsive.horizontalPadding(
+              context,
+            ).copyWith(top: 8, bottom: 16),
             child: Center(
               child: Column(
                 children: [
@@ -626,8 +640,9 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: notifications.length,
-              itemBuilder: (context, index) =>
-                  _buildNotificationItem(notifications[index]),
+              itemBuilder:
+                  (context, index) =>
+                      _buildNotificationItem(notifications[index]),
             ),
           ),
       ],
@@ -684,19 +699,51 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
       body: SafeArea(
         child: AbsorbPointer(
           absorbing: _isBlocked,
-          child: isDesktop
-              // Web: same structure as DashboardTabScreen
-              ? SingleChildScrollView(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: AppResponsive.maxContentWidth),
-                      child: Container(
-                        color: const Color(0xFFF8FAFC),
+          child:
+              isDesktop
+                  // Web: same structure as DashboardTabScreen
+                  ? SingleChildScrollView(
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: AppResponsive.maxContentWidth,
+                        ),
+                        child: Container(
+                          color: const Color(0xFFF8FAFC),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildNotificationsSection(),
+                              const SizedBox(height: 24),
+                              Padding(
+                                padding: AppResponsive.pagePadding(context),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    _buildActionRequiredBanner(),
+                                    quickActionsCard,
+                                    const SizedBox(height: 24),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                  // Mobile
+                  : SingleChildScrollView(
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: AppResponsive.maxContentWidth,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             _buildNotificationsSection(),
-                            const SizedBox(height: 24),
                             Padding(
                               padding: AppResponsive.pagePadding(context),
                               child: Column(
@@ -713,34 +760,6 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                       ),
                     ),
                   ),
-                )
-              // Mobile
-              : SingleChildScrollView(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: AppResponsive.maxContentWidth,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildNotificationsSection(),
-                          Padding(
-                            padding: AppResponsive.pagePadding(context),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                _buildActionRequiredBanner(),
-                                quickActionsCard,
-                                const SizedBox(height: 24),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
         ),
       ),
     );
@@ -753,7 +772,7 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
     if (_isNavigating) return;
     _isNavigating = true;
 
-    try{
+    try {
       if (!item.isRead) {
         await ApiService.markNotificationAsRead(notificationId: item.id);
         item.isRead = true;
@@ -771,7 +790,10 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
       }
       matterName ??= "Unknown";
 
-      await AuthService.selectMatter(matterId: matterId, matterName: matterName);
+      await AuthService.selectMatter(
+        matterId: matterId,
+        matterName: matterName,
+      );
 
       Widget? screen;
 
@@ -824,27 +846,69 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
       if (!mounted) return;
 
       await Navigator.push(context, MaterialPageRoute(builder: (_) => screen!));
-    }finally{
+    } finally {
       _isNavigating = false;
     }
   }
 
   ({IconData icon, Color color}) _notificationStyle(String type) {
     return switch (type) {
-      'message' => (icon: Icons.chat_bubble_rounded, color: const Color(0xFF2E7D32)),
-      'invoice_sent_to_client_app' => (icon: Icons.receipt_long_rounded, color: const Color(0xFFC62828)),
-      'detail_approved' => (icon: Icons.verified_rounded, color: const Color(0xFF1565C0)),
-      'detail_rejected' => (icon: Icons.cancel_rounded, color: const Color(0xFFB71C1C)),
-      'document_approved' => (icon: Icons.task_alt_rounded, color: const Color(0xFF2E7D32)),
-      'document_rejected' => (icon: Icons.highlight_off_rounded, color: const Color(0xFFB71C1C)),
-      'document_deleted' => (icon: Icons.delete_forever_rounded, color: const Color(0xFF6D4C41)),
-      'document_downloaded' => (icon: Icons.download_done_rounded, color: const Color(0xFF00695C)),
-      'stage_change' => (icon: Icons.account_tree_rounded, color: const Color(0xFF6A1B9A)),
-      'checklist' || 'checklist_added' => (icon: Icons.checklist_rounded, color: const Color(0xFF00838F)),
-      'matter_discontinued' => (icon: Icons.pause_circle_rounded, color: const Color(0xFFE65100)),
-      'matter_reopened' => (icon: Icons.play_circle_rounded, color: const Color(0xFF1B5E20)),
-      'lead_converted_to_client' => (icon: Icons.person_add_alt_1_rounded, color: const Color(0xFF1A237E)),
-      'action_completed' => (icon: Icons.check_circle_rounded, color: const Color(0xFF2E7D32)),
+      'message' => (
+        icon: Icons.chat_bubble_rounded,
+        color: const Color(0xFF2E7D32),
+      ),
+      'invoice_sent_to_client_app' => (
+        icon: Icons.receipt_long_rounded,
+        color: const Color(0xFFC62828),
+      ),
+      'detail_approved' => (
+        icon: Icons.verified_rounded,
+        color: const Color(0xFF1565C0),
+      ),
+      'detail_rejected' => (
+        icon: Icons.cancel_rounded,
+        color: const Color(0xFFB71C1C),
+      ),
+      'document_approved' => (
+        icon: Icons.task_alt_rounded,
+        color: const Color(0xFF2E7D32),
+      ),
+      'document_rejected' => (
+        icon: Icons.highlight_off_rounded,
+        color: const Color(0xFFB71C1C),
+      ),
+      'document_deleted' => (
+        icon: Icons.delete_forever_rounded,
+        color: const Color(0xFF6D4C41),
+      ),
+      'document_downloaded' => (
+        icon: Icons.download_done_rounded,
+        color: const Color(0xFF00695C),
+      ),
+      'stage_change' => (
+        icon: Icons.account_tree_rounded,
+        color: const Color(0xFF6A1B9A),
+      ),
+      'checklist' || 'checklist_added' => (
+        icon: Icons.checklist_rounded,
+        color: const Color(0xFF00838F),
+      ),
+      'matter_discontinued' => (
+        icon: Icons.pause_circle_rounded,
+        color: const Color(0xFFE65100),
+      ),
+      'matter_reopened' => (
+        icon: Icons.play_circle_rounded,
+        color: const Color(0xFF1B5E20),
+      ),
+      'lead_converted_to_client' => (
+        icon: Icons.person_add_alt_1_rounded,
+        color: const Color(0xFF1A237E),
+      ),
+      'action_completed' => (
+        icon: Icons.check_circle_rounded,
+        color: const Color(0xFF2E7D32),
+      ),
       _ => (icon: Icons.notifications_rounded, color: const Color(0xFF5E8B7E)),
     };
   }
