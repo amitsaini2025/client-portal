@@ -55,11 +55,14 @@ dependencies:
   local_auth: ^2.1.7
   flutter_secure_storage: ^10.0.0
   
-  # Notifications
+  # Notifications & Firebase Observability
   firebase_core: ^4.1.0
   firebase_messaging: ^16.0.1
   cloud_firestore: ^6.1.2
   flutter_local_notifications: ^19.4.1
+  firebase_crashlytics: ^5.2.2
+  firebase_analytics: ^12.4.1
+  firebase_performance: ^0.11.4+1
   
   # File Handling
   file_picker: ^10.3.2

@@ -39,6 +39,7 @@ import 'package:client/utils/app_loader.dart';
 import 'package:client/utils/navigation_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -51,6 +52,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'config/stripe_config.dart';
 import 'fcm_service.dart';
 import 'firebase_options.dart';
+import 'services/firebase_service.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
@@ -239,6 +241,7 @@ void main() async {
   }
 
   await initializeFirebaseSafely();
+  await FirebaseObservability.initialize();
 
   // Firebase background handler (ONLY Android)
   if (!kIsWeb && Platform.isAndroid) {
@@ -318,6 +321,7 @@ Future<void> initializeFirebaseSafely() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   } on FirebaseException catch (e) {
     if (e.code == 'duplicate-app') {
       // Firebase already initialized — ignore
