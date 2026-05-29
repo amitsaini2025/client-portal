@@ -20,22 +20,23 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     this.onMessage,
   });
 
-  static const double _radius = 16;
+  static const double _radius = 14;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWeb = constraints.maxWidth > 600;
-        final tilePadding = isWeb ? 14.0 : 16.0;
-        final iconSize = isWeb ? 22.0 : 26.0;
+        final tilePadding = isWeb ? 12.0 : 16.0;
+        final iconSize = isWeb ? 20.0 : 26.0;
         final fontSize = isWeb ? 12.5 : 13.5;
+        final iconPad = isWeb ? 8.0 : 8.0;
 
         return Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(_radius),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey.shade200),
             boxShadow: [
               BoxShadow(
@@ -77,76 +78,105 @@ class MyFilesQuickActionsCard extends StatelessWidget {
 
               StaggeredGrid.count(
                 crossAxisCount: isWeb ? 6 : 4,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
+                mainAxisSpacing: isWeb ? 10 : 12,
+                crossAxisSpacing: isWeb ? 10 : 12,
                 children: [
-                  // Big tiles: span 3 cols on web, 2 on mobile
+                  // Big tiles: horizontal on web, vertical on mobile
                   StaggeredGridTile.count(
                     crossAxisCellCount: isWeb ? 3 : 2,
-                    mainAxisCellCount: isWeb ? 1.7 : 2.2,
-                    child: _verticalTile(
-                      context: context,
-                      icon: Icons.account_tree_rounded,
-                      label: 'View\nWorkflow',
-                      gradient: const [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
-                      onTap: onViewWorkflow ?? () {},
-                      iconSize: iconSize,
-                      fontSize: fontSize,
-                      padding: tilePadding,
-                    ),
+                    mainAxisCellCount: isWeb ? 0.85 : 2.2,
+                    child: isWeb
+                        ? _horizontalTile(
+                            context: context,
+                            icon: Icons.account_tree_rounded,
+                            label: 'View Workflow',
+                            gradient: const [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
+                            onTap: onViewWorkflow ?? () {},
+                            iconSize: iconSize,
+                            fontSize: fontSize,
+                            padding: tilePadding,
+                            iconPad: iconPad,
+                          )
+                        : _verticalTile(
+                            context: context,
+                            icon: Icons.account_tree_rounded,
+                            label: 'View\nWorkflow',
+                            gradient: const [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
+                            onTap: onViewWorkflow ?? () {},
+                            iconSize: iconSize,
+                            fontSize: fontSize,
+                            padding: tilePadding,
+                          ),
                   ),
 
                   StaggeredGridTile.count(
                     crossAxisCellCount: isWeb ? 3 : 2,
-                    mainAxisCellCount: isWeb ? 1.7 : 2.2,
-                    child: _verticalTile(
-                      context: context,
-                      icon: Icons.receipt_long_rounded,
-                      label: 'Billing',
-                      gradient: const [Color(0xFFC62828), Color(0xFFEF9A9A)],
-                      onTap: onBilling ?? () {},
-                      iconSize: iconSize,
-                      fontSize: fontSize,
-                      padding: tilePadding,
-                    ),
+                    mainAxisCellCount: isWeb ? 0.85 : 2.2,
+                    child: isWeb
+                        ? _horizontalTile(
+                            context: context,
+                            icon: Icons.receipt_long_rounded,
+                            label: 'Billing',
+                            gradient: const [Color(0xFFC62828), Color(0xFFEF9A9A)],
+                            onTap: onBilling ?? () {},
+                            iconSize: iconSize,
+                            fontSize: fontSize,
+                            padding: tilePadding,
+                            iconPad: iconPad,
+                          )
+                        : _verticalTile(
+                            context: context,
+                            icon: Icons.receipt_long_rounded,
+                            label: 'Billing',
+                            gradient: const [Color(0xFFC62828), Color(0xFFEF9A9A)],
+                            onTap: onBilling ?? () {},
+                            iconSize: iconSize,
+                            fontSize: fontSize,
+                            padding: tilePadding,
+                          ),
                   ),
 
-                  // Small tiles: col2 each → 3-per-row on web, 2-per-row on mobile
-                  _smallTile(
+                  // Small tiles
+                  _tile(
                     context: context,
                     icon: Icons.chat_bubble_rounded,
                     label: 'Messages',
                     gradient: const [Color(0xFF2E7D32), Color(0xFF81C784)],
                     onTap: onMessage ?? () {},
-                    iconSize: iconSize - 4,
+                    iconSize: iconSize - 2,
                     fontSize: fontSize - 0.5,
                     padding: tilePadding - 2,
-                    crossAxisCellCount: 2,
+                    iconPad: iconPad - 2,
+                    crossAxisCellCount: isWeb ? 3 : 2,
+                    isWeb: isWeb,
                   ),
 
-                  /*_smallTile(
+                  /*_tile(
                     context: context,
                     icon: Icons.folder_copy_rounded,
                     label: 'Documents',
                     gradient: const [Color(0xFF1565C0), Color(0xFF90CAF9)],
                     onTap: onDocumentStatus ?? () {},
-                    iconSize: iconSize - 4,
+                    iconSize: iconSize - 2,
                     fontSize: fontSize - 0.5,
                     padding: tilePadding - 2,
+                    iconPad: iconPad - 2,
                     crossAxisCellCount: 2,
+                    isWeb: isWeb,
                   ),
 
-                  // Upcoming: full-width on mobile (col4), normal on web (col2)
-                  _smallTile(
+                  _tile(
                     context: context,
                     icon: Icons.alarm_rounded,
-                    label: 'Upcoming\nDeadlines',
+                    label: 'Upcoming Deadlines',
                     gradient: const [Color(0xFFE65100), Color(0xFFFFCC80)],
                     onTap: onUpcomingDeadlines ?? () {},
-                    iconSize: iconSize - 4,
+                    iconSize: iconSize - 2,
                     fontSize: fontSize - 0.5,
                     padding: tilePadding - 2,
+                    iconPad: iconPad - 2,
                     crossAxisCellCount: isWeb ? 2 : 4,
+                    isWeb: isWeb,
                   ),*/
                 ],
               ),
@@ -270,6 +300,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     );
   }
 
+  // Vertical tile — icon top, label bottom (mobile big tiles)
   Widget _verticalTile({
     required BuildContext context,
     required IconData icon,
@@ -320,7 +351,8 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     );
   }
 
-  Widget _smallTile({
+  // Horizontal tile — icon left, label right (web big tiles)
+  Widget _horizontalTile({
     required BuildContext context,
     required IconData icon,
     required String label,
@@ -329,16 +361,72 @@ class MyFilesQuickActionsCard extends StatelessWidget {
     required double iconSize,
     required double fontSize,
     required double padding,
+    required double iconPad,
+  }) {
+    return InkWell(
+      onTap: () => _handleAuth(context, onTap),
+      borderRadius: BorderRadius.circular(_radius),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: padding + 2, vertical: padding),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: gradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(_radius),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(iconPad),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: iconSize, color: Colors.white),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: fontSize,
+                  height: 1.3,
+                ),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, size: 11, color: Colors.white54),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Small tile — always horizontal, wraps in StaggeredGridTile
+  Widget _tile({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required List<Color> gradient,
+    required VoidCallback onTap,
+    required double iconSize,
+    required double fontSize,
+    required double padding,
+    required double iconPad,
     required int crossAxisCellCount,
+    required bool isWeb,
   }) {
     return StaggeredGridTile.count(
       crossAxisCellCount: crossAxisCellCount,
-      mainAxisCellCount: 1.25,
+      mainAxisCellCount: isWeb ? 0.72 : 1.25,
       child: InkWell(
         onTap: () => _handleAuth(context, onTap),
         borderRadius: BorderRadius.circular(_radius),
         child: Container(
-          padding: EdgeInsets.all(padding),
+          padding: EdgeInsets.symmetric(horizontal: padding + 2, vertical: padding),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: gradient,
@@ -350,7 +438,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: EdgeInsets.all(iconPad),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
@@ -361,11 +449,13 @@ class MyFilesQuickActionsCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w500,
                     fontSize: fontSize,
-                    height: 1.2,
+                    height: 1.25,
                   ),
                 ),
               ),
