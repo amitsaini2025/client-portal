@@ -60,9 +60,9 @@ class QuickActionsCard extends StatelessWidget {
 
         // Web: compact horizontal tiles. Mobile: original vertical/horizontal mix.
         final tilePadding = isWeb ? 12.0 : 16.0;
-        final iconSize = isWeb ? 20.0 : 26.0;
+        final iconSize = isWeb ? 20.0 : 18.0;
         final fontSize = isWeb ? 12.5 : 13.5;
-        final iconPad = isWeb ? 8.0 : 8.0;
+        final iconPad = isWeb ? 8.0 : 5.0;
 
         return Container(
           padding: const EdgeInsets.all(18),
@@ -108,87 +108,53 @@ class QuickActionsCard extends StatelessWidget {
                 mainAxisSpacing: isWeb ? 10 : 12,
                 crossAxisSpacing: isWeb ? 10 : 12,
                 children: [
-                  // Row 1 — big tiles: horizontal on web, vertical on mobile
+                  // Row 1 — all tiles horizontal at uniform height
                   StaggeredGridTile.count(
                     crossAxisCellCount: 2,
-                    mainAxisCellCount: isWeb ? 0.85 : 2.2,
-                    child: isWeb
-                        ? _horizontalTile(
-                            context: context,
-                            icon: Icons.event_available_rounded,
-                            label: 'Book Appointment',
-                            gradient: const [Color(0xFF2E7D32), Color(0xFF81C784)],
-                            onTap: onBookAppointment,
-                            iconSize: iconSize,
-                            fontSize: fontSize,
-                            padding: tilePadding,
-                            iconPad: iconPad,
-                          )
-                        : _verticalTile(
-                            context: context,
-                            icon: Icons.event_available_rounded,
-                            label: 'Book\nAppointment',
-                            gradient: const [Color(0xFF2E7D32), Color(0xFF81C784)],
-                            onTap: onBookAppointment,
-                            iconSize: iconSize,
-                            fontSize: fontSize,
-                            padding: tilePadding,
-                          ),
+                    mainAxisCellCount: isWeb ? 0.85 : 1.1,
+                    child: _horizontalTile(
+                      context: context,
+                      icon: Icons.event_available_rounded,
+                      label: 'Book Appointment',
+                      gradient: const [Color(0xFF2E7D32), Color(0xFF81C784)],
+                      onTap: onBookAppointment,
+                      iconSize: iconSize,
+                      fontSize: fontSize,
+                      padding: tilePadding,
+                      iconPad: iconPad,
+                    ),
                   ),
 
                   StaggeredGridTile.count(
                     crossAxisCellCount: 2,
-                    mainAxisCellCount: isWeb ? 0.85 : 2.2,
-                    child: isWeb
-                        ? _horizontalTile(
-                            context: context,
-                            icon: Icons.health_and_safety_rounded,
-                            label: 'Health Insurance',
-                            gradient: const [Color(0xFF6D4C41), Color(0xFFBCAAA4)],
-                            onTap: onHealthInsurance ?? () {},
-                            iconSize: iconSize,
-                            fontSize: fontSize,
-                            padding: tilePadding,
-                            iconPad: iconPad,
-                          )
-                        : _verticalTile(
-                            context: context,
-                            icon: Icons.health_and_safety_rounded,
-                            label: 'Health\nInsurance',
-                            gradient: const [Color(0xFF6D4C41), Color(0xFFBCAAA4)],
-                            onTap: onHealthInsurance ?? () {},
-                            iconSize: iconSize,
-                            fontSize: fontSize,
-                            padding: tilePadding,
-                          ),
+                    mainAxisCellCount: isWeb ? 0.85 : 1.1,
+                    child: _horizontalTile(
+                      context: context,
+                      icon: Icons.health_and_safety_rounded,
+                      label: 'Health Insurance',
+                      gradient: const [Color(0xFF6D4C41), Color(0xFFBCAAA4)],
+                      onTap: onHealthInsurance ?? () {},
+                      iconSize: iconSize,
+                      fontSize: fontSize,
+                      padding: tilePadding,
+                      iconPad: iconPad,
+                    ),
                   ),
 
                   StaggeredGridTile.count(
                     crossAxisCellCount: isWeb ? 2 : 4,
                     mainAxisCellCount: isWeb ? 0.85 : 1.1,
-                    child: isWeb
-                        ? _horizontalTile(
-                            context: context,
-                            icon: Icons.calculate_rounded,
-                            label: 'PR Calculator',
-                            gradient: const [Color(0xFFC2185B), Color(0xFFF48FB1)],
-                            onTap: onPRCalculator ?? () {},
-                            iconSize: iconSize,
-                            fontSize: fontSize,
-                            padding: tilePadding,
-                            iconPad: iconPad,
-                          )
-                        : _horizontalTile(
-                            context: context,
-                            icon: Icons.calculate_rounded,
-                            label: 'PR Calculator',
-                            gradient: const [Color(0xFFC2185B), Color(0xFFF48FB1)],
-                            onTap: onPRCalculator ?? () {},
-                            iconSize: iconSize,
-                            fontSize: fontSize,
-                            padding: tilePadding,
-                            iconPad: iconPad,
-                          ),
+                    child: _horizontalTile(
+                      context: context,
+                      icon: Icons.calculate_rounded,
+                      label: 'PR Calculator',
+                      gradient: const [Color(0xFFC2185B), Color(0xFFF48FB1)],
+                      onTap: onPRCalculator ?? () {},
+                      iconSize: iconSize,
+                      fontSize: fontSize,
+                      padding: tilePadding,
+                      iconPad: iconPad,
+                    ),
                   ),
 
                   // Row 2 — small tiles: all horizontal, 3-per-row on web, 2 on mobile
@@ -398,7 +364,7 @@ class QuickActionsCard extends StatelessWidget {
   }) {
     return StaggeredGridTile.count(
       crossAxisCellCount: 2,
-      mainAxisCellCount: isWeb ? 0.72 : 1.25,
+      mainAxisCellCount: isWeb ? 0.85 : 1.1,
       child: InkWell(
         onTap: () => _handleTap(context, onTap),
         borderRadius: BorderRadius.circular(_radius),

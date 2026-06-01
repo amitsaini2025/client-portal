@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+import '../../../config/theme_config.dart';
 import '../../../services/auth_service.dart';
 import '../../../widgets/dialog/login_required_dialog.dart';
 
@@ -28,9 +29,9 @@ class MyFilesQuickActionsCard extends StatelessWidget {
       builder: (context, constraints) {
         final isWeb = constraints.maxWidth > 600;
         final tilePadding = isWeb ? 12.0 : 16.0;
-        final iconSize = isWeb ? 20.0 : 26.0;
+        final iconSize = isWeb ? 20.0 : 18.0;
         final fontSize = isWeb ? 12.5 : 13.5;
-        final iconPad = isWeb ? 8.0 : 8.0;
+        final iconPad = isWeb ? 8.0 : 5.0;
 
         return Container(
           padding: const EdgeInsets.all(18),
@@ -81,59 +82,37 @@ class MyFilesQuickActionsCard extends StatelessWidget {
                 mainAxisSpacing: isWeb ? 10 : 12,
                 crossAxisSpacing: isWeb ? 10 : 12,
                 children: [
-                  // Big tiles: horizontal on web, vertical on mobile
+                  // Big tiles: horizontal at uniform height
                   StaggeredGridTile.count(
                     crossAxisCellCount: isWeb ? 3 : 2,
-                    mainAxisCellCount: isWeb ? 0.85 : 2.2,
-                    child: isWeb
-                        ? _horizontalTile(
-                            context: context,
-                            icon: Icons.account_tree_rounded,
-                            label: 'View Workflow',
-                            gradient: const [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
-                            onTap: onViewWorkflow ?? () {},
-                            iconSize: iconSize,
-                            fontSize: fontSize,
-                            padding: tilePadding,
-                            iconPad: iconPad,
-                          )
-                        : _verticalTile(
-                            context: context,
-                            icon: Icons.account_tree_rounded,
-                            label: 'View\nWorkflow',
-                            gradient: const [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
-                            onTap: onViewWorkflow ?? () {},
-                            iconSize: iconSize,
-                            fontSize: fontSize,
-                            padding: tilePadding,
-                          ),
+                    mainAxisCellCount: isWeb ? 0.85 : 1.1,
+                    child: _horizontalTile(
+                      context: context,
+                      icon: Icons.account_tree_rounded,
+                      label: 'View Workflow',
+                      gradient: const [Color(0xFF6A1B9A), Color(0xFFCE93D8)],
+                      onTap: onViewWorkflow ?? () {},
+                      iconSize: iconSize,
+                      fontSize: fontSize,
+                      padding: tilePadding,
+                      iconPad: iconPad,
+                    ),
                   ),
 
                   StaggeredGridTile.count(
                     crossAxisCellCount: isWeb ? 3 : 2,
-                    mainAxisCellCount: isWeb ? 0.85 : 2.2,
-                    child: isWeb
-                        ? _horizontalTile(
-                            context: context,
-                            icon: Icons.receipt_long_rounded,
-                            label: 'Billing',
-                            gradient: const [Color(0xFFC62828), Color(0xFFEF9A9A)],
-                            onTap: onBilling ?? () {},
-                            iconSize: iconSize,
-                            fontSize: fontSize,
-                            padding: tilePadding,
-                            iconPad: iconPad,
-                          )
-                        : _verticalTile(
-                            context: context,
-                            icon: Icons.receipt_long_rounded,
-                            label: 'Billing',
-                            gradient: const [Color(0xFFC62828), Color(0xFFEF9A9A)],
-                            onTap: onBilling ?? () {},
-                            iconSize: iconSize,
-                            fontSize: fontSize,
-                            padding: tilePadding,
-                          ),
+                    mainAxisCellCount: isWeb ? 0.85 : 1.1,
+                    child: _horizontalTile(
+                      context: context,
+                      icon: Icons.receipt_long_rounded,
+                      label: 'Billing',
+                      gradient: const [Color(0xFFC62828), Color(0xFFEF9A9A)],
+                      onTap: onBilling ?? () {},
+                      iconSize: iconSize,
+                      fontSize: fontSize,
+                      padding: tilePadding,
+                      iconPad: iconPad,
+                    ),
                   ),
 
                   // Small tiles
@@ -189,163 +168,376 @@ class MyFilesQuickActionsCard extends StatelessWidget {
 
   Widget _matterSelector(BuildContext context) {
     void openDialog() {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final isWide = screenWidth >= 600;
+      final dialogWidth = isWide
+          ? (screenWidth > 1024 ? 440.0 : 400.0)
+          : screenWidth * 0.92;
+
       showDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Change Matter"),
-          content: const Text("Do you want to change the selected matter?"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("No"),
+        barrierColor: Colors.black.withValues(alpha: 0.45),
+        builder: (dialogContext) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: isWide ? 40 : 16,
+            vertical: 24,
+          ),
+          child: SizedBox(
+            width: dialogWidth,
+            child: Container(
+              decoration: BoxDecoration(
+                color: ThemeConfig.surfaceLight,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: ThemeConfig.navyBlue.withValues(alpha: 0.14),
+                    blurRadius: 32,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ── Header ──────────────────────────────────────────
+                  Container(
+                    padding: EdgeInsets.fromLTRB(
+                      isWide ? 28 : 22,
+                      isWide ? 26 : 22,
+                      isWide ? 28 : 22,
+                      isWide ? 22 : 18,
+                    ),
+                    decoration: BoxDecoration(
+                      color: ThemeConfig.navyBlue,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(isWide ? 11 : 9),
+                          decoration: BoxDecoration(
+                            color: ThemeConfig.goldenYellow.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.swap_horiz_rounded,
+                            color: ThemeConfig.goldenYellow,
+                            size: isWide ? 24 : 20,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Change Matter',
+                                style: TextStyle(
+                                  fontSize: isWide ? 18 : 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: ThemeConfig.white,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                'Switch your active matter',
+                                style: TextStyle(
+                                  fontSize: isWide ? 13 : 12,
+                                  color: ThemeConfig.white.withValues(alpha: 0.55),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Close icon
+                        GestureDetector(
+                          onTap: () => Navigator.pop(dialogContext),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: ThemeConfig.white.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.close_rounded,
+                              color: ThemeConfig.white.withValues(alpha: 0.7),
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // ── Body ────────────────────────────────────────────
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      isWide ? 28 : 22,
+                      isWide ? 22 : 18,
+                      isWide ? 28 : 22,
+                      isWide ? 24 : 20,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Current matter display
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isWide ? 16 : 14,
+                            vertical: isWide ? 13 : 11,
+                          ),
+                          decoration: BoxDecoration(
+                            color: ThemeConfig.goldenYellow.withValues(alpha: 0.07),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: ThemeConfig.goldenYellow.withValues(alpha: 0.35),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: ThemeConfig.goldenYellow.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.folder_rounded,
+                                  color: ThemeConfig.goldenYellow,
+                                  size: isWide ? 16 : 15,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'CURRENTLY ACTIVE',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: ThemeConfig.textSecondaryLight,
+                                        letterSpacing: 0.7,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      AuthService.selectedMatterName ?? 'No matter selected',
+                                      style: TextStyle(
+                                        fontSize: isWide ? 14 : 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: ThemeConfig.navyBlue,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: isWide ? 16 : 13),
+
+                        // Description
+                        Text(
+                          'Select a different matter to update your active view. All case actions will apply to the new matter.',
+                          style: TextStyle(
+                            fontSize: isWide ? 14 : 13,
+                            color: ThemeConfig.textSecondaryLight,
+                            height: 1.55,
+                          ),
+                        ),
+                        SizedBox(height: isWide ? 22 : 18),
+
+                        // Action buttons
+                        Row(
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: isWide ? 46 : 44,
+                                child: OutlinedButton(
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                      color: ThemeConfig.borderLight,
+                                      width: 1.5,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    foregroundColor: ThemeConfig.textSecondaryLight,
+                                    backgroundColor: ThemeConfig.backgroundLight,
+                                  ),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      fontSize: isWide ? 14.5 : 13.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: SizedBox(
+                                height: isWide ? 46 : 44,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pop(dialogContext);
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/matters',
+                                      arguments: {'from_my_files': true},
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: ThemeConfig.goldenYellow,
+                                    foregroundColor: ThemeConfig.white,
+                                    elevation: 0,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.swap_horiz_rounded, size: 17),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'Switch',
+                                        style: TextStyle(
+                                          fontSize: isWide ? 14.5 : 13.5,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(
-                  context,
-                  '/matters',
-                  arguments: {'from_my_files': true},
-                );
-              },
-              child: const Text("Yes"),
-            ),
-          ],
+          ),
         ),
       );
     }
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: openDialog,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF2E7D6B), Color(0xFF1A4F45)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: openDialog,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: ThemeConfig.navyBlue.withValues(alpha: 0.04),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: ThemeConfig.goldenYellow.withValues(alpha: 0.5),
+            ),
           ),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.folder_special_rounded,
-                color: Colors.white,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'ACTIVE MATTER',
-                    style: TextStyle(
-                      color: Colors.white60,
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    AuthService.selectedMatterName ?? 'No Matter Selected',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (AuthService.selectedMatterId != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      'ID: ${AuthService.selectedMatterId}',
-                      style: const TextStyle(color: Colors.white54, fontSize: 12),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
-              ),
-              child: const Text(
-                'Switch',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+          child: Row(
+            children: [
+              // Folder icon badge
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: ThemeConfig.goldenYellow.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Icon(
+                  Icons.folder_special_rounded,
+                  color: ThemeConfig.goldenYellow,
+                  size: 18,
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+              const SizedBox(width: 12),
 
-  // Vertical tile — icon top, label bottom (mobile big tiles)
-  Widget _verticalTile({
-    required BuildContext context,
-    required IconData icon,
-    required String label,
-    required List<Color> gradient,
-    required VoidCallback onTap,
-    required double iconSize,
-    required double fontSize,
-    required double padding,
-  }) {
-    return InkWell(
-      onTap: () => _handleAuth(context, onTap),
-      borderRadius: BorderRadius.circular(_radius),
-      child: Container(
-        padding: EdgeInsets.all(padding),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: gradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+              // Matter info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ACTIVE MATTER',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: ThemeConfig.textSecondaryLight,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      AuthService.selectedMatterName ?? 'No Matter Selected',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: ThemeConfig.navyBlue,
+                      ),
+                      maxLines: 2,
+                    ),
+                    if (AuthService.selectedMatterId != null) ...[
+                      const SizedBox(height: 1),
+                      Text(
+                        'ID: ${AuthService.selectedMatterId}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: ThemeConfig.textSecondaryLight.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+
+              // Switch button
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                decoration: BoxDecoration(
+                  color: ThemeConfig.goldenYellow,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.swap_horiz_rounded, color: ThemeConfig.white, size: 14),
+                    SizedBox(width: 4),
+                    Text(
+                      'Switch',
+                      style: TextStyle(
+                        color: ThemeConfig.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          borderRadius: BorderRadius.circular(_radius),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, size: iconSize, color: Colors.white),
-            ),
-            const Spacer(),
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: fontSize,
-                height: 1.3,
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -421,7 +613,7 @@ class MyFilesQuickActionsCard extends StatelessWidget {
   }) {
     return StaggeredGridTile.count(
       crossAxisCellCount: crossAxisCellCount,
-      mainAxisCellCount: isWeb ? 0.72 : 1.25,
+      mainAxisCellCount: isWeb ? 0.85 : 1.1,
       child: InkWell(
         onTap: () => _handleAuth(context, onTap),
         borderRadius: BorderRadius.circular(_radius),

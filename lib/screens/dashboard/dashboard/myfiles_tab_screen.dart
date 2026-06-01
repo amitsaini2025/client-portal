@@ -555,82 +555,33 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
   }
 
   Widget _buildNotificationsSection() {
-    final int unreadCount = notifications.where((n) => !n.isRead).length;
+    if (!isFetchingNotifications && notifications.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     final isDesktop = AppResponsive.isDesktop(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: AppResponsive.horizontalPadding(
-            context,
-          ).copyWith(top: isDesktop ? 24 : 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (isDesktop) ...[
-                    const SizedBox(height: 4),
-                    Container(
-                      width: 28,
-                      height: 3,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF9B000),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ],
-                ],
+        if (isDesktop)
+          Padding(
+            padding: AppResponsive.horizontalPadding(context).copyWith(top: 24),
+            child: Container(
+              width: 28,
+              height: 3,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF9B000),
+                borderRadius: BorderRadius.circular(2),
               ),
-            ],
+            ),
           ),
-        ),
         const SizedBox(height: 12),
         if (isFetchingNotifications)
           const Center(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
               child: AppLoader(),
-            ),
-          )
-        else if (notifications.isEmpty && AuthService.isAuthenticated)
-          Padding(
-            padding: AppResponsive.horizontalPadding(
-              context,
-            ).copyWith(top: 8, bottom: 16),
-            child: Center(
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.notifications_off_outlined,
-                      size: 32,
-                      color: Colors.grey.shade400,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'No notifications yet',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade500,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "You're all caught up",
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
-                  ),
-                ],
-              ),
             ),
           )
         else
@@ -640,9 +591,8 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: notifications.length,
-              itemBuilder:
-                  (context, index) =>
-                      _buildNotificationItem(notifications[index]),
+              itemBuilder: (context, index) =>
+                  _buildNotificationItem(notifications[index]),
             ),
           ),
       ],
@@ -713,10 +663,12 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              _buildNotificationsSection(),
+                              if (AuthService.isAuthenticated)
+                                _buildNotificationsSection(),
                               const SizedBox(height: 24),
                               Padding(
-                                padding: AppResponsive.pagePadding(context),
+                                padding: AppResponsive.pagePadding(context)
+                                    .copyWith(top: 12),
                                 child: Column(
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
@@ -743,7 +695,8 @@ class _MyFilesTabScreenState extends State<MyFilesTabScreen>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            _buildNotificationsSection(),
+                            if (AuthService.isAuthenticated)
+                              _buildNotificationsSection(),
                             Padding(
                               padding: AppResponsive.pagePadding(context),
                               child: Column(
